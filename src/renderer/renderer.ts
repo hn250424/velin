@@ -6,6 +6,18 @@ import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 
+import { Mode } from '../Shared/constants/Mode'
+
+window.addEventListener('DOMContentLoaded', () => {
+    window.electronAPI.onSetMode((mode: number) => {
+        if (mode === Mode.Edit) {
+            alert('edit')
+        } else if (mode === Mode.Reading) {
+            alert('reading')
+        }
+    })
+})
+
 const container = document.getElementById('container')
 
 Editor.make()

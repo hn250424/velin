@@ -1,20 +1,8 @@
-$borderColor: white;
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    width: 100%;
-    height: 100%;
-
-    background-color: $borderColor;
-}
+@use './styles/global_variables.scss' as gv;
+@use './styles/common.scss';
 
 #container {
-    width: 500px;
-    height: 1000px;
-    border: 1px solid red;
+    width: 100%;
+    height: 100%;
+    background-color: gv.$grey-1;
 }

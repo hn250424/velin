@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+test.md
+TODO.txt
