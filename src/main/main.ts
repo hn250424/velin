@@ -4,6 +4,7 @@ import started from 'electron-squirrel-startup'
 import { fileURLToPath } from 'url'
 
 import { createMenu } from './menu'
+import registerMainHandler from './mainHandler'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -34,11 +35,15 @@ const createWindow = () => {
     const mainWindow = createMainWindow()
     createMenu(mainWindow)
     loadUrl(mainWindow)
+
+    registerMainHandler(mainWindow)
 }
 
 if (started) app.quit()
 app.on('ready', createWindow)
 app.on('window-all-closed', () => {
+    // TODO: Confirm save action.
+
     if (process.platform !== 'darwin') {
         app.quit()
     }

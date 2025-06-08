@@ -1,6 +1,11 @@
 export const electronAPI = {
     channel: 'electronAPI',
     events: {
-        setMode: 'setMode',
+        onCreate: 'onCreate',
+        onSave: 'onSave',
+        onOpen: 'onOpen',
+        onSetMode: 'onSetMode',
+
+        sendSave: 'sendSave',
     }
-}
+} as const
