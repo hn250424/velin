@@ -1,9 +1,8 @@
 import { Editor, editorViewCtx, parserCtx, serializerCtx } from "@milkdown/kit/core"
 
-import { Mode } from '../Shared/constants/Mode'
-import { electronAPI } from '../Shared/constants/electronAPI'
+import { electronAPI } from '../../Shared/constants/electronAPI'
 
-export default function registerRendererHandler(editorInstance: Editor) {
+export default function registerIpcHandlers(editorInstance: Editor) {
     window[electronAPI.channel].onCreate(() => {
         editorInstance.action(ctx => {
             const view = ctx.get(editorViewCtx)
@@ -12,7 +11,7 @@ export default function registerRendererHandler(editorInstance: Editor) {
         })
     })
     
-    window[electronAPI.channel].onSave((isSaveAs: Boolean) => {
+    window[electronAPI.channel].onSave((isSaveAs: boolean) => {
         editorInstance.action(ctx => {
             const serializer = ctx.get(serializerCtx)
             const view = ctx.get(editorViewCtx)
@@ -34,16 +33,19 @@ export default function registerRendererHandler(editorInstance: Editor) {
             )
         })
     })
+}
 
-    window[electronAPI.channel].onSetMode((mode: number) => {
-        editorInstance.action((ctx) => {
-            const view = ctx.get(editorViewCtx)
-
-            if (mode === Mode.Edit) {
-                view.setProps({ editable: () => true })
-            } else if (mode === Mode.Reading) {
-                view.setProps({ editable: () => false })
-            }
-        })
-    })
+// TODO: Utils
+function createFileTreeHTML(tree: any): string {
+    if (!tree) return ''
+    if (Array.isArray(tree)) {
+        return `<ul>${tree.map(createFileTreeHTML).join('')}</ul>`
+    }
+    const { name, children } = tree
+    return `
+        <li>
+            <span>${name}</span>
+            ${children ? createFileTreeHTML(children) : ''}
+        </li>
+    `
 }

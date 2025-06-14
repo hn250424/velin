@@ -4,7 +4,7 @@ import started from 'electron-squirrel-startup'
 import { fileURLToPath } from 'url'
 
 import { createMenu } from './menu'
-import registerMainHandler from './mainHandler'
+import registerIpcHandlers from './handlers/ipcHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -13,6 +13,8 @@ const createMainWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        frame: false,
+        show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
         },
@@ -33,10 +35,13 @@ const loadUrl = (mainWindow: BrowserWindow) => {
 
 const createWindow = () => {
     const mainWindow = createMainWindow()
-    createMenu(mainWindow)
+    Menu.setApplicationMenu(null);
+    // createMenu(mainWindow)
     loadUrl(mainWindow)
 
-    registerMainHandler(mainWindow)
+    registerIpcHandlers(mainWindow)
+
+    mainWindow.webContents.once('did-finish-load', () => { mainWindow.show() })
 }
 
 if (started) app.quit()

@@ -7,12 +7,8 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
         ipcRenderer.on(electronAPI.events.onCreate, (_e) => callback())
     },
     
-    onSave: (callback: (isSaveAs: Boolean) => void) => {
+    onSave: (callback: (isSaveAs: boolean) => void) => {
         ipcRenderer.on(electronAPI.events.onSave, (_e, isSaveAs) => callback(isSaveAs))
-    },
-
-    onSetMode: (callback: (mode: number) => void) => {
-        ipcRenderer.on(electronAPI.events.onSetMode, (_e, mode) => callback(mode))
     },
 
     onOpen: (callback: (content: string) => void) => {
@@ -23,4 +19,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     sendSave: (content: string, isSaveAs: boolean) => {
         ipcRenderer.send(electronAPI.events.sendSave, content, isSaveAs)
     },
+    test: () => {
+        ipcRenderer.send('test')
+    }
 })

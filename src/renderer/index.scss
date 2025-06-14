@@ -1,8 +1,210 @@
 @use './styles/global_variables.scss' as gv;
 @use './styles/common.scss';
 
+$logo_size: 24px;
+$icon_size: 20px;
+
+$title_bar_height: 40px;
+$title_bar_left_height: 30px;
+$title_bar_right_height: 30px;
+$title_bar_right_width: 100px;
+$title_bar_right_gap: 5px;
+
+$logo_horizontal_margin: 10px;
+$tab_width: 150px;
+$tab_right_margin: 10px;
+$tab_elem_padding: 5px;
+$add_tab_button_size: $title_bar_left_height;
+
+$menu_bar_height: 20px;
+$menu_bar_horizontal_margin: 10px;
+$dropdown_min_width: 150px;
+$dropdown_border_color: gv.$grey-2;
+$dropdown_item_hover_color: gv.$grey-1;
+$dropdown_divider_color: gv.$grey-2;
+$dropdown_padding: 5px;
+$dropdown_item_padding: 5px 10px;
+$shortcut_font_size: 0.85em;
+$shortcut_left_margin: 20px;
+$shortcut_color: gv.$grey-4;
+
+$milkdown-padding: 16px;
+
 #container {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    background-color: gv.$red-1;
+}
+
+#title_bar {
+    width: 100%;
+    height: $title_bar_height;
+
+    display: flex;
+    justify-content: space-between;
+
+    background-color: gv.$blue-1;
+}
+
+#title_bar_left {
+    height: $title_bar_left_height;
+    margin-top: auto;
+    display: flex;
+}
+
+#logo {
+    width: $logo_size;
+    height: $logo_size;
+    margin-left: $logo_horizontal_margin;
+    margin-right: $logo_horizontal_margin;
+}
+
+.tab {
+    width: $tab_width;
+    margin-right: $tab_right_margin;
+
+    display: flex;
+    justify-content: space-between;
+
+    background-color: brown;
+}
+
+.tab > p, span {
+    display: flex;
+    align-items: center;
+    padding: $tab_elem_padding;
+}
+
+.tab > p {
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab > span {
+    background-color: aliceblue;
+}
+
+#addTabButton {
+    width: $add_tab_button_size;
+    height: $add_tab_button_size;
+
+    background-color: bisque;
+}
+
+#title_bar_right {
+    width: $title_bar_right_width;
+    height: $title_bar_right_height;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: $title_bar_right_gap;
+
+    background-color: blueviolet;
+}
+
+#title_bar_right img {
+    width: $icon_size;
+    height: $icon_size;
+
+    background-color: white;
+}
+
+#menu_bar {
+    width: 100%;
+    height: $menu_bar_height;
+
+    display: flex;
+
+    background-color: gv.$green-1;
+}
+
+#menu_bar .menu_item {
+    margin-left: $menu_bar_horizontal_margin;
+    margin-right: $menu_bar_horizontal_margin;
+
+    background-color: chartreuse;
+}
+
+.menu_item {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu_item.active>.dropdown {
+    display: block;
+}
+
+.menu_item:hover {
+    cursor: pointer;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid $dropdown_border_color;
+    min-width: $dropdown_min_width;
+    z-index: 1000;
+    padding: $dropdown_padding;
+}
+
+.dropdown_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: $dropdown_item_padding;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.dropdown_item:hover {
+    background-color: $dropdown_item_hover_color;
+}
+
+.shortcut {
+    font-size: $shortcut_font_size;
+    margin-left: $shortcut_left_margin;
+    color: $shortcut_color;
+    user-select: none;
+}
+
+.dropdown_divider {
+    height: 1px;
+    margin: 1px;
+    background-color: $dropdown_divider_color;
+}
+
+#editor_container {
+    width: 100%;
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+
+    background-color: white;
+
+}
+
+.milkdown {
+    width: 100%;
+    height: 100%;
+    padding: $milkdown-padding;
+
     background-color: gv.$grey-1;
+}
+
+.milkdown>.editor {
+    height: inherit;
 }

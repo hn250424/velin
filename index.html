@@ -1,13 +1,88 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>Hello World!</title>
 
-  </head>
-  <body>
-    <div id="container"></div>
-    
+</head>
+
+<body>
+    <div id="container">
+        <div id="title_bar" class="drag">
+            <div id="title_bar_left">
+                <img src="src/renderer/assets/icons/file.png" id="logo" />
+                <div class="tab">
+                    <p>undefined</p>
+                    <span>x</span>
+                </div>
+                <button id="addTabButton">+</button>
+            </div>
+
+            <div id="title_bar_right">
+                <img src="src/renderer/assets/icons/minimize.png" id="minimize" />
+                <img src="src/renderer/assets/icons/maximize.png" id="maximize" />
+                <img src="src/renderer/assets/icons/close.png" id="close" />
+            </div>
+        </div>
+        <div id="menu_bar">
+            <div class="menu_item" tabindex="0">
+                File
+                <div class="dropdown">
+                    <div class="dropdown_item">New<span class="shortcut">Ctrl+N</span></div>
+                    <div class="dropdown_item">Open<span class="shortcut">Ctrl+O</span></div>
+                    <div class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
+                    <div class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
+                    <div class="dropdown_item">Save All<span class="shortcut">Ctrl+Alt+S</span></div>
+                    <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Settings<span class="shortcut">Ctrl+,</span></div>
+                    <div class="dropdown_item">Exit</div>
+                </div>
+            </div>
+
+            <div class="menu_item" tabindex="0">
+                Edit
+                <div class="dropdown">
+                    <div class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span></div>
+                    <div class="dropdown_item">Redo<span class="shortcut">Ctrl+Y</span></div>
+                    <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
+                    <div class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span></div>
+                    <div class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span></div>
+                    <div class="dropdown_item">Delete<span class="shortcut">Del</span></div>
+                    <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Search<span class="shortcut">Ctrl+F</span></div>
+                    <div class="dropdown_item">Find Next<span class="shortcut">F3</span></div>
+                    <div class="dropdown_item">Find Previous<span class="shortcut">Shift+F3</span></div>
+                    <div class="dropdown_item">Replace<span class="shortcut">Ctrl+H</span></div>
+                    <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Font</div>
+                </div>
+            </div>
+
+            <div class="menu_item" tabindex="0">
+                View
+                <div class="dropdown">
+                    <div class="dropdown_item">Zoom In<span class="shortcut">Ctrl++</span></div>
+                    <div class="dropdown_item">Zoom Out<span class="shortcut">Ctrl+-</span></div>
+                    <div class="dropdown_item">Reset Zoom<span class="shortcut">Ctrl+0</span></div>
+                    <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Fullscreen<span class="shortcut">F11</span></div>
+                </div>
+            </div>
+
+            <div class="menu_item" tabindex="0">
+                Help
+                <div class="dropdown">
+                    <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+M</span></div>
+                    <div class="dropdown_item">Information<span class="shortcut">Ctrl+I</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="editor_container"></div>
+    </div>
+
     <script type="module" src="/src/renderer/renderer.ts"></script>
-  </body>
+</body>
+
 </html>

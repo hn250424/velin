@@ -2,8 +2,7 @@ import { ipcMain, Menu, MenuItemConstructorOptions, BrowserWindow, dialog } from
 import fs from 'fs'
 import path from 'path'
 
-import StateManager from './module/core/StateManager'
-import { Mode } from '../Shared/constants/Mode'
+import StateManager from './modules/core/StateManager'
 import { electronAPI } from '../Shared/constants/electronAPI'
 
 export const createMenu = (mainWindow: BrowserWindow) => {
@@ -16,13 +15,6 @@ export const createMenu = (mainWindow: BrowserWindow) => {
                 { label: 'Save', click: () => { save(mainWindow, false) } },
                 { label: 'Save as..', click: () => { save(mainWindow, true) } },
                 { role: 'quit' }
-            ]
-        },
-        {
-            label: 'Mode',
-            submenu: [
-                { label: 'Edit', type: 'radio', click: () => { setMode(mainWindow, Mode.Edit) } },
-                { label: 'Reading', type: 'radio', checked: true, click: () => { setMode(mainWindow, Mode.Reading) } }
             ]
         },
         {
@@ -64,21 +56,12 @@ async function open(mainWindow: BrowserWindow) {
 
     const filePath = result.filePaths[0]
     const content = await fs.promises.readFile(filePath, 'utf-8')
-
+    mainWindow.webContents.send(electronAPI.events.onOpen, content)
+    
     const stateManager = StateManager.getInstancec()
     stateManager.setCurrentPath(filePath)
-
-    mainWindow.webContents.send(electronAPI.events.onOpen, content)
 }
 
-async function save(mainWindow: BrowserWindow, isSaveAs: Boolean) {
+async function save(mainWindow: BrowserWindow, isSaveAs: boolean) {
     mainWindow.webContents.send(electronAPI.events.onSave, isSaveAs)
 }
-
-function setMode(mainWindow: BrowserWindow, mode: number) {
-    const stateManager = StateManager.getInstancec()
-    stateManager.setModeState(mode)
-
-    mainWindow.webContents.send(electronAPI.events.onSetMode, mode)
-}
-

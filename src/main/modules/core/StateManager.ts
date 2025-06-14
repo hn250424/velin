@@ -1,8 +1,5 @@
-import { Mode } from "../../../Shared/constants/Mode" 
-
 export default class StateManager {
     private static instance: StateManager | null = null
-    private mode: number = Mode.Reading
     private currentPath: string = ''
 
     private constructor() {}
@@ -13,14 +10,6 @@ export default class StateManager {
         }
 
         return this.instance
-    }
-
-    getModeState(): number {
-        return this.mode
-    }
-
-    setModeState(mode: number) {
-        this.mode = mode
     }
 
     getCurrentPath(): string {

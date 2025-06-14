@@ -91,5 +91,5 @@ typings/
 # Electron-Forge
 out/
 
-test
+test_file
 TODO.txt

@@ -2,14 +2,15 @@ import { ipcMain, dialog, BrowserWindow } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
-import StateManager from './module/core/StateManager'
-import { Mode } from '../Shared/constants/Mode'
-import { electronAPI } from '../Shared/constants/electronAPI'
+import StateManager from '../modules/core/StateManager'
+import { electronAPI } from '../../Shared/constants/electronAPI'
 
-export default function registerMainHandler(mainWindow: BrowserWindow) {
+export default function registerIpcHandlers(mainWindow: BrowserWindow) {
     const stateManager = StateManager.getInstancec()
 
-    ipcMain.on(electronAPI.events.sendSave, async (event, content: string, isSaveAs: Boolean) => {
+    ipcMain.on('test', () => console.log('test received'))
+
+    ipcMain.on(electronAPI.events.sendSave, async (event, content: string, isSaveAs: boolean) => {
         if (isSaveAs || stateManager.getCurrentPath() === '') {
             const result = await dialog.showSaveDialog(mainWindow, {
                 title: 'Save As',
