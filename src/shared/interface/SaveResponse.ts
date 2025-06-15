@@ -1,4 +1,4 @@
-export default interface SaveAllResponse {
+export default interface SaveResponse {
     id: number
     isSaved: boolean 
     filePath: string

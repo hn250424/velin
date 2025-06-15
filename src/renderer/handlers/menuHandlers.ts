@@ -6,8 +6,8 @@ import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '../../shared/constants/electronAPI'
 import TabManager from "../modules/core/TabManager"
-import TabsData from "../../shared/interface/TabsData"
-import SaveAllResponse from "../../shared/interface/SaveAllResponse"
+import TabsData from "../../shared/interface/TabData"
+import SaveResponse from "../../shared/interface/SaveResponse"
 import TabSession from "../../shared/interface/TabSession"
 import OpenResponse from "../../shared/interface/OpenResponse"
 
@@ -17,16 +17,7 @@ export default function registerMenuHandlers() {
     bindMenuEvents()
     bindMenuItemCommands()
 
-    window[electronAPI.channel].tabSession((tabs: TabSession[]) => {
-        const tabManager = TabManager.getInstance()
-        if (tabs.length > 0) {
-            for (const tab of tabs) {
-                tabManager.addTab(tab.filePath, tab.fileName, tab.content)
-            }
-        } else {
-            tabManager.addTab()
-        }
-    })
+
 }
 
 function bindMenuEvents() {
@@ -67,9 +58,17 @@ function bindMenuItemCommands() {
         }
     })
 
+    document.getElementById('save').addEventListener('click', async () => {
+        const tabData: TabsData = tabManager.getActivatedTab()
+        if (tabData.isModified) {
+            const response: SaveResponse = await window[electronAPI.channel].save(tabData)
+            tabManager.applySaveAResult([response])
+        }
+    })
+
     document.getElementById('save_all').addEventListener('click', async () => {
         const tabsData: TabsData[] = tabManager.getTabsData()
-        const response: SaveAllResponse[] = await window[electronAPI.channel].saveAll(tabsData)
-        tabManager.applySaveAllResults(response)
+        const response: SaveResponse[] = await window[electronAPI.channel].saveAll(tabsData)
+        tabManager.applySaveAResult(response)
     })
 }

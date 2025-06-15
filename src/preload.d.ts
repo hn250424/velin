@@ -1,7 +1,7 @@
 import { electronAPI } from "./shared/constants/electronAPI"
 import OpenResponse from "./shared/interface/OpenResponse"
-import SaveAllResponse from "./shared/interface/SaveAllResponse"
-import TabsData from "./shared/interface/TabsData"
+import SaveResponse from "./shared/interface/SaveResponse"
+import TabData from "./shared/interface/TabData"
 import TabSession from "./shared/interface/TabSession"
 
 export { }
@@ -20,7 +20,8 @@ declare global {
             close: () => void
 
             open: () => Promise<OpenResponse>
-            saveAll: (data: TabsData[]) => Promise<SaveAllResponse[]>
+            save: (data: TabData) => promise<SaveResponse>
+            saveAll: (data: TabData[]) => Promise<SaveResponse[]>
 
             confirm: (message: string) => Promise<boolean>
         }

@@ -1,1 +1,1 @@
-export const TABS_SESSION = 'tabsSession.json'
+export const TAB_SESSION_PATH = 'tabsSession.json'

@@ -4,21 +4,22 @@ import path from 'path'
 
 import StateManager from '../modules/core/StateManager'
 import { electronAPI } from '../../shared/constants/electronAPI'
-import { TABS_SESSION } from '../constants/file_info'
+import { TAB_SESSION_PATH } from '../constants/file_info'
+import SavedTabSession from '../interface/SavedTabSession'
 import { log } from 'console'
 
 export default function registerLoadHandlers(mainWindow: BrowserWindow) {
     ipcMain.on(electronAPI.events.loadedRenderer, async (e) => {
-        const tabs_session = path.join(app.getPath('userData'), TABS_SESSION)
+        const tabSessionPath = path.join(app.getPath('userData'), TAB_SESSION_PATH)
 
-        if (! fs.existsSync(tabs_session)) {
+        if (! fs.existsSync(tabSessionPath)) {
             mainWindow.webContents.send(electronAPI.events.tabSession, [])
             return
         }
 
         try {
-            const jsonTabSession = fs.readFileSync(tabs_session, 'utf-8')
-            let objTabSession: { order: number, filePath: string }[] = JSON.parse(jsonTabSession)
+            const jsonTabSession = fs.readFileSync(tabSessionPath, 'utf-8')
+            let objTabSession: SavedTabSession[] = JSON.parse(jsonTabSession)
             objTabSession = objTabSession.sort((a, b) => a.order - b.order)
 
             const arr = await Promise.all(

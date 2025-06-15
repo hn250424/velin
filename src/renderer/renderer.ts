@@ -17,7 +17,5 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addTabButton').addEventListener('click', async () => {
         const res = await window[electronAPI.channel].confirm('test test')
         console.log(res)
-        
-        
     })
 })

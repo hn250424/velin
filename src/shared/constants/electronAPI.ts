@@ -10,16 +10,9 @@ export const electronAPI = {
         maximize: 'maximize',
         close: 'close',
         open: 'open',
+        save: 'save',
         saveAll: 'saveAll',
 
         confirm: 'confirm',
-
-        //
-        onCreate: 'onCreate',
-        onSave: 'onSave',
-        onOpen: 'onOpen',
-        onSetMode: 'onSetMode',
-
-        sendSave: 'sendSave',
     }
 } as const

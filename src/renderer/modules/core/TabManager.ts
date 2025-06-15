@@ -4,14 +4,16 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import TabsData from '../../../shared/interface/TabsData'
-import SaveAllResponse from '../../../shared/interface/SaveAllResponse'
+import TabData from '../../../shared/interface/TabData'
+import SaveResponse from '../../../shared/interface/SaveResponse'
+import TabSession from '../../../shared/interface/TabSession'
 
 export default class TabManager {
     private static instance: TabManager | null = null
     private tabs: Tab[] = []
     private id = 0
     private order = 0
+    private activatedTabIndex = 0
 
     private constructor() { }
 
@@ -23,39 +25,16 @@ export default class TabManager {
         return this.instance
     }
 
-    getTabsData(): TabsData[] {
-        const result: TabsData[] = []
-
-        for (const tab of this.tabs) {
-            let fileName = tab.getFileName()
-
-            if (!fileName) {
-                const view = tab.getEditor().ctx.get(editorViewCtx)
-                if (view) {
-                    const firstLine = view.state.doc
-                        .textBetween(0, view.state.doc.content.size)
-                        .split('\n')[0]
-                        .trim()
-                    fileName = firstLine || 'Untitled'
-                } else {
-                    fileName = 'Untitled'
-                }
-            }
-
-            result.push({
-                id: tab.getId(),
-                isModified: tab.isModified(),
-                order: tab.getOrder(),
-                filePath: tab.getFilePath(),
-                fileName: fileName,
-                content: tab.getContent(),
-            })
+    async restoreTabs(tabs: TabSession[]) {
+        const lastIndex = tabs.length - 1
+        for (let i = 0; i < lastIndex; i++) {
+            await this.addTab(tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
         }
 
-        return result
+        await this.addTab(tabs[lastIndex].filePath, tabs[lastIndex].fileName, tabs[lastIndex].content, true)
     }
 
-    async addTab(filePath: string = '', fileName: string = '', content: string = '') {
+    async addTab(filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const { tabDiv, tabP, tabSpan } = this.createTabBox(fileName)
         document.getElementById('tab_container').appendChild(tabDiv)
 
@@ -82,8 +61,47 @@ export default class TabManager {
         document.getElementById('editor_container').appendChild(editorBoxDiv)
 
         this.tabs.push(new Tab(this.id++, this.order++, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
-        this.tabs.forEach((tab, i) => {
-            tab.setActive(i === this.tabs.length - 1)
+        if (activate) {
+            this.tabs.forEach((tab, i) => {
+                tab.setActive(i === this.tabs.length - 1)
+            })
+            this.activatedTabIndex = this.tabs.length - 1
+        }
+    }
+
+    getActivatedTab(): TabData {
+        const tab = this.tabs[this.activatedTabIndex]
+        return {
+            id: tab.getId(),
+            isModified: tab.isModified(),
+            order: tab.getOrder(),
+            filePath: tab.getFilePath(),
+            fileName: tab.resolveFileName(),
+            content: tab.getContent(),
+        }
+    }
+
+    getTabsData(): TabData[] {
+        return this.tabs.map(tab => ({
+            id: tab.getId(),
+            isModified: tab.isModified(),
+            order: tab.getOrder(),
+            filePath: tab.getFilePath(),
+            fileName: tab.resolveFileName(),
+            content: tab.getContent(),
+        }))
+    }
+
+    applySaveAResult(results: SaveResponse[]) {
+        results.forEach(({ id, isSaved, filePath, fileName }) => {
+            const tab = this.tabs.find(t => t.getId() === id)
+            if (isSaved) {
+                tab.setModified(false)
+                tab.setFilePath(filePath)
+                tab.setFileName(fileName)
+                tab.setTabPTextContent(fileName)
+                tab.setTabSpanTextContent('x')
+            }
         })
     }
 
@@ -106,23 +124,12 @@ export default class TabManager {
                 this.tabs.forEach((tab, i) => {
                     tab.setActive(i === index)
                 })
+
+                this.activatedTabIndex = index
             }
         })
 
         return { tabDiv: div, tabP: p, tabSpan: span }
-    }
-
-    applySaveAllResults(results: SaveAllResponse[]) {
-        results.forEach(({ id, isSaved, filePath, fileName }) => {
-            const tab = this.tabs.find(t => t.getId() === id)
-            if (isSaved) {
-                tab.setModified(false)
-                tab.setFilePath(filePath)
-                tab.setFileName(fileName)
-                tab.setTabPTextContent(fileName)
-                tab.setTabSpanTextContent('x')
-            }
-        })
     }
 }
 
@@ -202,7 +209,16 @@ class Tab {
         this.filePath = filePath
     }
 
-    getFileName(): string {
+    resolveFileName(): string {
+        if (!this.fileName) {
+            const view = this.getEditor().ctx.get(editorViewCtx)
+            const firstLine = view.state.doc
+                .textBetween(0, view.state.doc.content.size)
+                .split('\n')[0]
+                .trim()
+            this.fileName = firstLine || 'Untitled'
+        }
+
         return this.fileName
     }
 
