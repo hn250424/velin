@@ -3,12 +3,10 @@ import fs from 'fs'
 import path from 'path'
 
 import StateManager from '../modules/core/StateManager'
-import { electronAPI } from '../../Shared/constants/electronAPI'
+import { electronAPI } from '../../shared/constants/electronAPI'
 
 export default function registerIpcHandlers(mainWindow: BrowserWindow) {
     const stateManager = StateManager.getInstancec()
-
-    ipcMain.on('test', () => console.log('test received'))
 
     ipcMain.on(electronAPI.events.sendSave, async (event, content: string, isSaveAs: boolean) => {
         if (isSaveAs || stateManager.getCurrentPath() === '') {

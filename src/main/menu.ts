@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 import StateManager from './modules/core/StateManager'
-import { electronAPI } from '../Shared/constants/electronAPI'
+import { electronAPI } from '../shared/constants/electronAPI'
 
 export const createMenu = (mainWindow: BrowserWindow) => {
     const template: MenuItemConstructorOptions[] = [

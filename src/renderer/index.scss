@@ -36,7 +36,7 @@ $milkdown-padding: 16px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: stretch;
 
     background-color: gv.$red-1;
 }
@@ -44,6 +44,7 @@ $milkdown-padding: 16px;
 #title_bar {
     width: 100%;
     height: $title_bar_height;
+    flex-shrink: 0;
 
     display: flex;
     justify-content: space-between;
@@ -64,14 +65,23 @@ $milkdown-padding: 16px;
     margin-right: $logo_horizontal_margin;
 }
 
+#tab_container {
+    display: flex;
+}
+
 .tab {
     width: $tab_width;
+    height: 100%;
     margin-right: $tab_right_margin;
 
     display: flex;
     justify-content: space-between;
 
     background-color: brown;
+}
+
+.tab:hover {
+    cursor: pointer;
 }
 
 .tab > p, span {
@@ -81,7 +91,6 @@ $milkdown-padding: 16px;
 }
 
 .tab > p {
-    
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,6 +130,7 @@ $milkdown-padding: 16px;
 #menu_bar {
     width: 100%;
     height: $menu_bar_height;
+    flex-shrink: 0;
 
     display: flex;
 
@@ -190,11 +200,22 @@ $milkdown-padding: 16px;
     width: 100%;
     flex: 1;
 
-    display: flex;
-    justify-content: center;
+    overflow-x: auto;
+    overflow-y: auto;
 
+    background-color: yellowgreen;
+}
+
+.editorBox {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
     background-color: white;
+}
 
+.editorBox {
+    display: none;
 }
 
 .milkdown {
@@ -205,6 +226,6 @@ $milkdown-padding: 16px;
     background-color: gv.$grey-1;
 }
 
-.milkdown>.editor {
+.milkdown > .editor {
     height: inherit;
 }

@@ -16,6 +16,10 @@ body {
     -webkit-app-region: drag;
 }
 
+.no_drag {
+    -webkit-app-region: no-drag;
+}
+
 .ellipsis {
     white-space: nowrap;
     overflow: hidden;

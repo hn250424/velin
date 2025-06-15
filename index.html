@@ -9,12 +9,11 @@
 
 <body>
     <div id="container">
-        <div id="title_bar" class="drag">
+        <div id="title_bar">
             <div id="title_bar_left">
                 <img src="src/renderer/assets/icons/file.png" id="logo" />
-                <div class="tab">
-                    <p>undefined</p>
-                    <span>x</span>
+                <div id="tab_container">
+                    
                 </div>
                 <button id="addTabButton">+</button>
             </div>
@@ -29,14 +28,14 @@
             <div class="menu_item" tabindex="0">
                 File
                 <div class="dropdown">
-                    <div class="dropdown_item">New<span class="shortcut">Ctrl+N</span></div>
-                    <div class="dropdown_item">Open<span class="shortcut">Ctrl+O</span></div>
-                    <div class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
-                    <div class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
-                    <div class="dropdown_item">Save All<span class="shortcut">Ctrl+Alt+S</span></div>
+                    <div id="new" class="dropdown_item">New<span class="shortcut">Ctrl+N</span></div>
+                    <div id="open" class="dropdown_item">Open<span class="shortcut">Ctrl+O</span></div>
+                    <div id="save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
+                    <div id="save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
+                    <div id="save_all" class="dropdown_item">Save All<span class="shortcut">Ctrl+Alt+S</span></div>
                     <div class="dropdown_divider"></div>
-                    <div class="dropdown_item">Settings<span class="shortcut">Ctrl+,</span></div>
-                    <div class="dropdown_item">Exit</div>
+                    <div id="settings" class="dropdown_item">Settings<span class="shortcut">Ctrl+,</span></div>
+                    <div id="exit" class="dropdown_item">Exit</div>
                 </div>
             </div>
 

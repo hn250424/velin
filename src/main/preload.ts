@@ -1,8 +1,13 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { electronAPI } from '../Shared/constants/electronAPI'
+import { electronAPI } from '../shared/constants/electronAPI'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
+    noTab: (callback: () => void) => {
+        ipcRenderer.on(electronAPI.events.noTab, (_e) => callback())
+    },
+
+    //
     onCreate: (callback: () => void) => {
         ipcRenderer.on(electronAPI.events.onCreate, (_e) => callback())
     },
@@ -16,10 +21,19 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     },
 
     // Renderer -> Main.
+    loadedRenderer: () => { ipcRenderer.send(electronAPI.events.loadedRenderer) },
+
+    minimize: () => { ipcRenderer.send(electronAPI.events.minimize) },
+    maximize: () => { ipcRenderer.send(electronAPI.events.maximize) },
+    close: () => { ipcRenderer.send(electronAPI.events.close) },
+
+    open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
+    save: (data: { filePath: string; content: string }[]) => { return ipcRenderer.invoke(electronAPI.events.save) },
+
+
+
+    //
     sendSave: (content: string, isSaveAs: boolean) => {
         ipcRenderer.send(electronAPI.events.sendSave, content, isSaveAs)
     },
-    test: () => {
-        ipcRenderer.send('test')
-    }
 })

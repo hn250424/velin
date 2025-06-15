@@ -1,10 +1,14 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions  } from 'electron'
+import fs from 'fs'
 import path from 'node:path'
 import started from 'electron-squirrel-startup'
 import { fileURLToPath } from 'url'
 
+import { electronAPI } from '../shared/constants/electronAPI'
 import { createMenu } from './menu'
-import registerIpcHandlers from './handlers/ipcHandlers'
+import registerLoadHandlers from './handlers/loadHandlers'
+import registerWindowsHandlers from './handlers/windowsHandlers'
+import registerMenuHandlers from './handlers/menuHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -35,12 +39,15 @@ const loadUrl = (mainWindow: BrowserWindow) => {
 
 const createWindow = () => {
     const mainWindow = createMainWindow()
-    Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(null)
     // createMenu(mainWindow)
     loadUrl(mainWindow)
 
-    registerIpcHandlers(mainWindow)
-
+    registerLoadHandlers(mainWindow)
+    registerWindowsHandlers(mainWindow)
+    registerMenuHandlers(mainWindow)
+    // registerIpcHandlers(mainWindow)
+    
     mainWindow.webContents.once('did-finish-load', () => { mainWindow.show() })
 }
 

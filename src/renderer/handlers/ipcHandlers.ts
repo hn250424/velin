@@ -1,6 +1,6 @@
 import { Editor, editorViewCtx, parserCtx, serializerCtx } from "@milkdown/kit/core"
 
-import { electronAPI } from '../../Shared/constants/electronAPI'
+import { electronAPI } from '../../shared/constants/electronAPI'
 
 export default function registerIpcHandlers(editorInstance: Editor) {
     window[electronAPI.channel].onCreate(() => {
@@ -33,19 +33,4 @@ export default function registerIpcHandlers(editorInstance: Editor) {
             )
         })
     })
-}
-
-// TODO: Utils
-function createFileTreeHTML(tree: any): string {
-    if (!tree) return ''
-    if (Array.isArray(tree)) {
-        return `<ul>${tree.map(createFileTreeHTML).join('')}</ul>`
-    }
-    const { name, children } = tree
-    return `
-        <li>
-            <span>${name}</span>
-            ${children ? createFileTreeHTML(children) : ''}
-        </li>
-    `
 }
