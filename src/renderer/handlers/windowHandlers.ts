@@ -1,6 +1,6 @@
 import { electronAPI } from "../../shared/constants/electronAPI"
 
-export default function registerWindowsHandlers() {
+export default function registerWindowHandlers() {
     const maximize = document.getElementById('maximize') as HTMLImageElement | null
     let isMax = false
     maximize.addEventListener('click', () => {

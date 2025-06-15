@@ -1,5 +1,8 @@
 import { electronAPI } from "./shared/constants/electronAPI"
-import Tab from "./shared/Tab"
+import OpenResponse from "./shared/interface/OpenResponse"
+import SaveAllResponse from "./shared/interface/SaveAllResponse"
+import TabsData from "./shared/interface/TabsData"
+import TabSession from "./shared/interface/TabSession"
 
 export { }
 
@@ -7,14 +10,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Main -> Renderer.
-            noTab: (callback: () => void) => void
-
-
-            //
-            onCreate: (callback: () => void) => void
-            onSave: (callback: (isSaveAs: boolean) => void) => void
-            onOpen: (callback: (content: string) => void) => void
-            onSetMode: (callback: (mode: number) => void) => void
+            tabSession: (callback: (tabs: TabSession[]) => void) => void
 
             // Renderer -> Main.
             loadedRenderer: () => void
@@ -23,12 +19,10 @@ declare global {
             maximize: () => void
             close: () => void
 
-            open:() => Promise<{ filePath: string; fileName: string; content: string }>
-            save: (data: { filePath: string; content: string }[]) => Promise<boolean>
+            open: () => Promise<OpenResponse>
+            saveAll: (data: TabsData[]) => Promise<SaveAllResponse[]>
 
-
-            //
-            sendSave: (content: string, isSaveAs: boolean) => void
+            confirm: (message: string) => Promise<boolean>
         }
     }
 }

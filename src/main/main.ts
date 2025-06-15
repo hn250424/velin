@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url'
 import { electronAPI } from '../shared/constants/electronAPI'
 import { createMenu } from './menu'
 import registerLoadHandlers from './handlers/loadHandlers'
-import registerWindowsHandlers from './handlers/windowsHandlers'
+import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -44,7 +44,7 @@ const createWindow = () => {
     loadUrl(mainWindow)
 
     registerLoadHandlers(mainWindow)
-    registerWindowsHandlers(mainWindow)
+    registerWindowHandlers(mainWindow)
     registerMenuHandlers(mainWindow)
     // registerIpcHandlers(mainWindow)
     

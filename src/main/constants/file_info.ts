@@ -1,0 +1,1 @@
+export const TABS_SESSION = 'tabsSession.json'

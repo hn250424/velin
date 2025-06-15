@@ -2,7 +2,7 @@ export const electronAPI = {
     channel: 'electronAPI',
     events: {
         // Main -> Renderer.
-        noTab: 'noTab',
+        tabSession: 'tabSession',
 
         // Renderer -> Main.
         loadedRenderer: 'loadedRenderer',
@@ -10,7 +10,9 @@ export const electronAPI = {
         maximize: 'maximize',
         close: 'close',
         open: 'open',
-        save: 'save',
+        saveAll: 'saveAll',
+
+        confirm: 'confirm',
 
         //
         onCreate: 'onCreate',
