@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     // Renderer -> Main.
     loadedRenderer: () => { ipcRenderer.send(electronAPI.events.loadedRenderer) },
+    showMainWindow: () => { ipcRenderer.send(electronAPI.events.showMainWindow) },
 
     minimize: () => { ipcRenderer.send(electronAPI.events.minimize) },
     maximize: () => { ipcRenderer.send(electronAPI.events.maximize) },

@@ -6,6 +6,7 @@ export const electronAPI = {
 
         // Renderer -> Main.
         loadedRenderer: 'loadedRenderer',
+        showMainWindow: 'showMainWindow',
         minimize: 'minimize',
         maximize: 'maximize',
         close: 'close',

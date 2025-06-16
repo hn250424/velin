@@ -84,19 +84,20 @@ $milkdown-padding: 16px;
     cursor: pointer;
 }
 
-.tab > p, span {
+.tab>p,
+span {
     display: flex;
     align-items: center;
     padding: $tab_elem_padding;
 }
 
-.tab > p {
+.tab>p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.tab > span {
+.tab>span {
     background-color: aliceblue;
 }
 
@@ -226,6 +227,6 @@ $milkdown-padding: 16px;
     background-color: gv.$grey-1;
 }
 
-.milkdown > .editor {
+.milkdown>.editor {
     height: inherit;
 }

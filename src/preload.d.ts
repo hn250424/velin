@@ -14,6 +14,7 @@ declare global {
 
             // Renderer -> Main.
             loadedRenderer: () => void
+            showMainWindow: () => void
 
             minimize: () => void
             maximize: () => void

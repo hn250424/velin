@@ -38,4 +38,8 @@ export default function registerLoadHandlers(mainWindow: BrowserWindow) {
             mainWindow.webContents.send(electronAPI.events.tabSession, [])
         }
     })
+
+    ipcMain.on(electronAPI.events.showMainWindow, () => {
+        mainWindow.show()
+    })
 }
