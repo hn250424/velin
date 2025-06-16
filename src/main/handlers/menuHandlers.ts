@@ -20,7 +20,7 @@ export default function registerMenuHandlers(mainWindow: BrowserWindow) {
             properties: ['openFile']
         })
 
-        if (result.canceled || result.filePaths.length === 0) return
+        if (result.canceled || result.filePaths.length === 0) return null
 
         const filePath = result.filePaths[0]
         const fileName = path.basename(filePath)
@@ -71,7 +71,7 @@ export default function registerMenuHandlers(mainWindow: BrowserWindow) {
             const { id, isModified, order, filePath, fileName, content } = tab
 
             if ((!filePath) && (!isModified)) {
-                responseArr.push({ id: id, isSaved: false, filePath: '', fileName: '' })
+                responseArr.push({ id: id, isSaved: false, filePath: filePath, fileName: fileName })
             } else if ((!filePath) && isModified) {
                 const result = await dialog.showSaveDialog(mainWindow, {
                     title: 'Save As',

@@ -9,6 +9,7 @@ export const electronAPI = {
         showMainWindow: 'showMainWindow',
         minimize: 'minimize',
         maximize: 'maximize',
+        unmaximize: 'unmaximize',
         close: 'close',
         open: 'open',
         save: 'save',

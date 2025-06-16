@@ -18,6 +18,7 @@ declare global {
 
             minimize: () => void
             maximize: () => void
+            unmaximize: () => void
             close: () => void
 
             open: () => Promise<OpenResponse>

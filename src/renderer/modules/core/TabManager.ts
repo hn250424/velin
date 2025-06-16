@@ -40,7 +40,7 @@ export default class TabManager {
 
         const editorBoxDiv = document.createElement('div')
         editorBoxDiv.className = 'editorBox'
-        editorBoxDiv.style.display = 'block'
+        editorBoxDiv.style.display = 'none'
         const editor = await Editor.make()
             .config((ctx) => {
                 ctx.set(rootCtx, editorBoxDiv)
@@ -81,7 +81,7 @@ export default class TabManager {
         }
     }
 
-    getTabsData(): TabData[] {
+    getTabData(): TabData[] {
         return this.tabs.map(tab => ({
             id: tab.getId(),
             isModified: tab.isModified(),
@@ -184,15 +184,15 @@ class Tab {
             view.setProps({
                 handleDOMEvents: {
                     input: (view, event) => {
-                        if (!this._isModified) {
-                            this.tabSpan.textContent = 'o'
-                            this._isModified = true
+                        if (!this.isModified()) {
+                            this.setTabSpanTextContent('o')
+                            this.setModified(true)
                         }
                         return false
                     },
 
                     blur: (view, event) => {
-                        if (this.filePath === '' && this._isModified) {
+                        if (this.getFilePath() === '' && this.isModified()) {
                             const firstLine = view.state.doc.textBetween(0, view.state.doc.content.size).split('\n')[0].trim()
                             if (firstLine) this.setTabPTextContent(firstLine)
                             else this.setTabPTextContent('Untitled')

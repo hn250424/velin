@@ -53,9 +53,7 @@ function bindMenuItemCommands() {
 
     document.getElementById('open').addEventListener('click', async () => {
         const response: OpenResponse = await window[electronAPI.channel].open()
-        if (response) {      
-            await tabManager.addTab(response.filePath, response.fileName, response.content)
-        }
+        if (response) await tabManager.addTab(response.filePath, response.fileName, response.content)
     })
 
     document.getElementById('save').addEventListener('click', async () => {
@@ -67,7 +65,7 @@ function bindMenuItemCommands() {
     })
 
     document.getElementById('save_all').addEventListener('click', async () => {
-        const tabsData: TabsData[] = tabManager.getTabsData()
+        const tabsData: TabsData[] = tabManager.getTabData()
         const response: SaveResponse[] = await window[electronAPI.channel].saveAll(tabsData)
         tabManager.applySaveAllResults(response)
     })
