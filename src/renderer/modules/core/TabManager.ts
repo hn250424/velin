@@ -92,14 +92,25 @@ export default class TabManager {
         }))
     }
 
-    applySaveAResult(results: SaveResponse[]) {
-        results.forEach(({ id, isSaved, filePath, fileName }) => {
-            const tab = this.tabs.find(t => t.getId() === id)
-            if (isSaved) {
+    applySaveResult(result: SaveResponse) {
+        if (result.isSaved) {
+            const tab = this.tabs.find(tab => tab.getId() === result.id)
+            tab.setModified(false)
+            tab.setFilePath(result.filePath)
+            tab.setFileName(result.fileName)
+            tab.setTabPTextContent(result.fileName)
+            tab.setTabSpanTextContent('x')
+        }
+    }
+
+    applySaveAllResults(results: SaveResponse[]) {
+        results.forEach((result, i) => {
+            if (result.isSaved) {
+                const tab = this.tabs[i]
                 tab.setModified(false)
-                tab.setFilePath(filePath)
-                tab.setFileName(fileName)
-                tab.setTabPTextContent(fileName)
+                tab.setFilePath(result.filePath)
+                tab.setFileName(result.fileName)
+                tab.setTabPTextContent(result.fileName)
                 tab.setTabSpanTextContent('x')
             }
         })

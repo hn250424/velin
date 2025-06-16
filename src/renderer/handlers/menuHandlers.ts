@@ -62,13 +62,13 @@ function bindMenuItemCommands() {
         const tabData: TabsData = tabManager.getActivatedTab()
         if (tabData.isModified) {
             const response: SaveResponse = await window[electronAPI.channel].save(tabData)
-            tabManager.applySaveAResult([response])
+            tabManager.applySaveResult(response)
         }
     })
 
     document.getElementById('save_all').addEventListener('click', async () => {
         const tabsData: TabsData[] = tabManager.getTabsData()
         const response: SaveResponse[] = await window[electronAPI.channel].saveAll(tabsData)
-        tabManager.applySaveAResult(response)
+        tabManager.applySaveAllResults(response)
     })
 }
