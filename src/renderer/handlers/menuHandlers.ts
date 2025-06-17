@@ -1,23 +1,13 @@
-import { Editor, rootCtx, editorViewCtx, parserCtx, serializerCtx } from "@milkdown/kit/core"
-import { history } from "@milkdown/kit/plugin/history"
-import { commonmark } from "@milkdown/kit/preset/commonmark"
-import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '../../shared/constants/electronAPI'
+import Response from "../../shared/interface/Response"
+import { default as TabData, default as TabsData } from "../../shared/interface/TabData"
 import TabManager from "../modules/core/TabManager"
-import TabsData from "../../shared/interface/TabData"
-import SaveResponse from "../../shared/interface/SaveResponse"
-import TabSession from "../../shared/interface/TabSession"
-import OpenResponse from "../../shared/interface/OpenResponse"
-
-const log = console.log
 
 export default function registerMenuHandlers() {
     bindMenuEvents()
     bindMenuItemCommands()
-
-
 }
 
 function bindMenuEvents() {
@@ -48,34 +38,37 @@ function bindMenuItemCommands() {
     const tabManager = TabManager.getInstance()
 
     document.getElementById('new_tab').addEventListener('click', async () => {
-        tabManager.addTab()
+        const response: Response<number> = await window[electronAPI.channel].newTab()
+        if (response.result) tabManager.addTab(response.data)
     })
 
     document.getElementById('open').addEventListener('click', async () => {
-        const response: OpenResponse = await window[electronAPI.channel].open()
-        if (response) await tabManager.addTab(response.filePath, response.fileName, response.content)
+        const response: Response<TabData> = await window[electronAPI.channel].open()
+        if (response.result) {
+            const data = response.data
+            tabManager.addTab(data.id, data.filePath, data.fileName, data.content)
+        }
     })
 
     document.getElementById('save').addEventListener('click', async () => {
-        const tabData: TabsData = tabManager.getActivatedTab()
-        if (tabData.isModified) {
-            const response: SaveResponse = await window[electronAPI.channel].save(tabData)
-            if (response.isSaved) tabManager.applySaveResult(response)
-        }
+        const tabData = tabManager.getActivatedTab()
+        if (!tabData.isModified) return
+        const response: Response<TabData> = await window[electronAPI.channel].save(tabData)
+        if (response.result) tabManager.applySaveResult(response.data)
     })
 
     document.getElementById('save_as').addEventListener('click', async () => {
         const tabData: TabsData = tabManager.getActivatedTab()
-        const response: SaveResponse = await window[electronAPI.channel].saveAs(tabData)
-        if (response.isSaved) {
-            tabManager.addTab(response.filePath, response.fileName, tabData.content, true)
-            tabManager.applySaveResult(response)
+        const response: Response<TabData> = await window[electronAPI.channel].saveAs(tabData)
+        if (response.result) {
+            const newData = response.data
+            tabManager.addTab(newData.id, newData.filePath, newData.fileName, newData.content, true)
         }
     })
 
     document.getElementById('save_all').addEventListener('click', async () => {
         const tabsData: TabsData[] = tabManager.getTabData()
-        const response: SaveResponse[] = await window[electronAPI.channel].saveAll(tabsData)
-        tabManager.applySaveAllResults(response)
+        const response: Response<TabData[]> = await window[electronAPI.channel].saveAll(tabsData)
+        if (response.result) tabManager.applySaveAllResults(response.data)
     })
 }

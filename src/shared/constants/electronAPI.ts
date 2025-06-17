@@ -11,6 +11,7 @@ export const electronAPI = {
         maximize: 'maximize',
         unmaximize: 'unmaximize',
         close: 'close',
+        newTab: 'newTab',
         open: 'open',
         save: 'save',
         saveAs: 'saveAs',

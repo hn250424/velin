@@ -1,6 +1,7 @@
 import { electronAPI } from "./shared/constants/electronAPI"
 import OpenResponse from "./shared/interface/OpenResponse"
 import SaveResponse from "./shared/interface/SaveResponse"
+import Response from "./shared/interface/Response"
 import TabData from "./shared/interface/TabData"
 import TabSession from "./shared/interface/TabSession"
 
@@ -21,10 +22,11 @@ declare global {
             unmaximize: () => void
             close: () => void
 
-            open: () => Promise<OpenResponse>
-            save: (data: TabData) => promise<SaveResponse>
-            saveAs: (data: TabData) => promise<SaveResponse>
-            saveAll: (data: TabData[]) => Promise<SaveResponse[]>
+            newTab: () => Promise<Response<number>>
+            open: () => Promise<Response<TabData>>
+            save: (data: TabData) => promise<Response<TabData>>
+            saveAs: (data: TabData) => promise<Response<TabData>>
+            saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
 
             confirm: (message: string) => Promise<boolean>
         }

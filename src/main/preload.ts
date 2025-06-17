@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     unmaximize: () => { ipcRenderer.send(electronAPI.events.unmaximize) },
     close: () => { ipcRenderer.send(electronAPI.events.close) },
 
+    newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
     save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },

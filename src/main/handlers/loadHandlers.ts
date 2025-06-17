@@ -20,9 +20,9 @@ export default function registerLoadHandlers(mainWindow: BrowserWindow) {
         try {
             const arr = await Promise.all(
                 tabSessionArr.map(async (data) => {
-                    const filePath = data.filePath !== '' ? data.filePath : ''
-                    const fileName = filePath !== '' ? path.basename(filePath) : ''
-                    const content = filePath !== '' ? await fs.promises.readFile(data.filePath, 'utf-8') : ''
+                    const filePath = data.filePath ? data.filePath : ''
+                    const fileName = filePath ? path.basename(filePath) : ''
+                    const content = filePath ? await fs.promises.readFile(data.filePath, 'utf-8') : ''
                     return {
                         id: data.id,
                         isModified: false,

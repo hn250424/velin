@@ -1,6 +1,4 @@
-import { app, ipcMain, dialog, BrowserWindow } from 'electron'
-import fs from 'fs'
-import path from 'path'
+import { BrowserWindow, ipcMain } from 'electron'
 
 import { electronAPI } from '../../shared/constants/electronAPI'
 

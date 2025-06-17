@@ -5,7 +5,6 @@ import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import TabData from '../../../shared/interface/TabData'
-import SaveResponse from '../../../shared/interface/SaveResponse'
 
 export default class TabManager {
     private static instance: TabManager | null = null
@@ -26,13 +25,13 @@ export default class TabManager {
     async restoreTabs(tabs: TabData[]) {
         const lastIndex = tabs.length - 1
         for (let i = 0; i < lastIndex; i++) {
-            await this.addTab(tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
+            await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
         }
 
-        await this.addTab(tabs[lastIndex].filePath, tabs[lastIndex].fileName, tabs[lastIndex].content, true)
+        await this.addTab(tabs[lastIndex].id, tabs[lastIndex].filePath, tabs[lastIndex].fileName, tabs[lastIndex].content, true)
     }
 
-    async addTab(filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
+    async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const { tabDiv, tabP, tabSpan } = this.createTabBox(fileName)
         document.getElementById('tab_container').appendChild(tabDiv)
 
@@ -58,7 +57,7 @@ export default class TabManager {
         })
         document.getElementById('editor_container').appendChild(editorBoxDiv)
 
-        this.tabs.push(new Tab(this.id++, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
+        this.tabs.push(new Tab(id, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
         if (activate) {
             this.tabs.forEach((tab, i) => {
                 tab.setActive(i === this.tabs.length - 1)
@@ -88,20 +87,18 @@ export default class TabManager {
         }))
     }
 
-    applySaveResult(result: SaveResponse) {
+    applySaveResult(result: TabData) {
         const tab = this.tabs.find(tab => tab.getId() === result.id)
-        tab.setModified(false)
         tab.setFilePath(result.filePath)
         tab.setFileName(result.fileName)
         tab.setTabPTextContent(result.fileName)
         tab.setTabSpanTextContent('x')
     }
 
-    applySaveAllResults(results: SaveResponse[]) {
+    applySaveAllResults(results: TabData[]) {
         results.forEach((result, i) => {
-            if (result.isSaved) {
+            if (!result.isModified) {
                 const tab = this.tabs[i]
-                tab.setModified(false)
                 tab.setFilePath(result.filePath)
                 tab.setFileName(result.fileName)
                 tab.setTabPTextContent(result.fileName)
