@@ -13,6 +13,7 @@ export const electronAPI = {
         close: 'close',
         open: 'open',
         save: 'save',
+        saveAs: 'saveAs',
         saveAll: 'saveAll',
 
         confirm: 'confirm',

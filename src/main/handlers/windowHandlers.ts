@@ -2,7 +2,6 @@ import { app, ipcMain, dialog, BrowserWindow } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
-import StateManager from '../modules/core/StateManager'
 import { electronAPI } from '../../shared/constants/electronAPI'
 
 export default function registerWindowHandlers(mainWindow: BrowserWindow) {

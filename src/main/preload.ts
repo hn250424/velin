@@ -1,11 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '../shared/constants/electronAPI'
 import TabData from '../shared/interface/TabData'
-import TabSession from '../shared/interface/TabSession'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
-    tabSession: (callback: (tabs: TabSession[]) => void) => {
+    tabSession: (callback: (tabs: TabData[]) => void) => {
         ipcRenderer.on(electronAPI.events.tabSession, (e, tabs) => { callback(tabs) })
     },
 
@@ -19,7 +18,8 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     close: () => { ipcRenderer.send(electronAPI.events.close) },
 
     open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
-    save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data)},
+    save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
+    saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
 
     confirm: (message: string) => { return ipcRenderer.invoke(electronAPI.events.confirm, message) },

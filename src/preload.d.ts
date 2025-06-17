@@ -10,7 +10,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Main -> Renderer.
-            tabSession: (callback: (tabs: TabSession[]) => void) => void
+            tabSession: (callback: (tabs: TabData[]) => void) => void
 
             // Renderer -> Main.
             loadedRenderer: () => void
@@ -23,6 +23,7 @@ declare global {
 
             open: () => Promise<OpenResponse>
             save: (data: TabData) => promise<SaveResponse>
+            saveAs: (data: TabData) => promise<SaveResponse>
             saveAll: (data: TabData[]) => Promise<SaveResponse[]>
 
             confirm: (message: string) => Promise<boolean>

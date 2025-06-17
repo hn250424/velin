@@ -47,7 +47,7 @@ function bindMenuEvents() {
 function bindMenuItemCommands() {
     const tabManager = TabManager.getInstance()
 
-    document.getElementById('new').addEventListener('click', async () => {
+    document.getElementById('new_tab').addEventListener('click', async () => {
         tabManager.addTab()
     })
 
@@ -60,6 +60,15 @@ function bindMenuItemCommands() {
         const tabData: TabsData = tabManager.getActivatedTab()
         if (tabData.isModified) {
             const response: SaveResponse = await window[electronAPI.channel].save(tabData)
+            if (response.isSaved) tabManager.applySaveResult(response)
+        }
+    })
+
+    document.getElementById('save_as').addEventListener('click', async () => {
+        const tabData: TabsData = tabManager.getActivatedTab()
+        const response: SaveResponse = await window[electronAPI.channel].saveAs(tabData)
+        if (response.isSaved) {
+            tabManager.addTab(response.filePath, response.fileName, tabData.content, true)
             tabManager.applySaveResult(response)
         }
     })

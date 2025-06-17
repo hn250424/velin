@@ -1,41 +1,41 @@
-import { app, ipcMain, dialog, BrowserWindow } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
-import StateManager from '../modules/core/StateManager'
 import { electronAPI } from '../../shared/constants/electronAPI'
-import { TAB_SESSION_PATH } from '../constants/file_info'
-import SavedTabSession from '../interface/SavedTabSession'
-import { log } from 'console'
+import TabSessionManager from '../modules/core/TabSessionManager'
 
 export default function registerLoadHandlers(mainWindow: BrowserWindow) {
     ipcMain.on(electronAPI.events.loadedRenderer, async (e) => {
-        const tabSessionPath = path.join(app.getPath('userData'), TAB_SESSION_PATH)
+        const tabSessionManager = TabSessionManager.getInstance()
+        const tabSessionArr = tabSessionManager.readTabSession()
 
-        if (! fs.existsSync(tabSessionPath)) {
-            mainWindow.webContents.send(electronAPI.events.tabSession, [])
+        if (tabSessionArr.length === 0) {
+            tabSessionArr.push({ id: 0, filePath: '' })
+            tabSessionManager.writeTabSession(tabSessionArr)
+            mainWindow.webContents.send(electronAPI.events.tabSession, tabSessionArr)
             return
         }
 
         try {
-            const jsonTabSession = fs.readFileSync(tabSessionPath, 'utf-8')
-            let objTabSession: SavedTabSession[] = JSON.parse(jsonTabSession)
-            objTabSession = objTabSession.sort((a, b) => a.order - b.order)
-
             const arr = await Promise.all(
-                objTabSession.map(async (data) => {
-                    const content = await fs.promises.readFile(data.filePath, 'utf-8')
+                tabSessionArr.map(async (data) => {
+                    const filePath = data.filePath !== '' ? data.filePath : ''
+                    const fileName = filePath !== '' ? path.basename(filePath) : ''
+                    const content = filePath !== '' ? await fs.promises.readFile(data.filePath, 'utf-8') : ''
                     return {
-                        filePath: data.filePath,
-                        fileName: path.basename(data.filePath),
-                        content,
+                        id: data.id,
+                        isModified: false,
+                        filePath: filePath,
+                        fileName: fileName,
+                        content: content,
                     }
                 })
             )
 
             mainWindow.webContents.send(electronAPI.events.tabSession, arr)
         } catch (e) {
-            mainWindow.webContents.send(electronAPI.events.tabSession, [])
+            console.log(e)
         }
     })
 

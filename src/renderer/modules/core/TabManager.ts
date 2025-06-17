@@ -6,13 +6,11 @@ import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import TabData from '../../../shared/interface/TabData'
 import SaveResponse from '../../../shared/interface/SaveResponse'
-import TabSession from '../../../shared/interface/TabSession'
 
 export default class TabManager {
     private static instance: TabManager | null = null
     private tabs: Tab[] = []
     private id = 0
-    private order = 0
     private activatedTabIndex = 0
 
     private constructor() { }
@@ -25,7 +23,7 @@ export default class TabManager {
         return this.instance
     }
 
-    async restoreTabs(tabs: TabSession[]) {
+    async restoreTabs(tabs: TabData[]) {
         const lastIndex = tabs.length - 1
         for (let i = 0; i < lastIndex; i++) {
             await this.addTab(tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
@@ -60,7 +58,7 @@ export default class TabManager {
         })
         document.getElementById('editor_container').appendChild(editorBoxDiv)
 
-        this.tabs.push(new Tab(this.id++, this.order++, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
+        this.tabs.push(new Tab(this.id++, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
         if (activate) {
             this.tabs.forEach((tab, i) => {
                 tab.setActive(i === this.tabs.length - 1)
@@ -74,7 +72,6 @@ export default class TabManager {
         return {
             id: tab.getId(),
             isModified: tab.isModified(),
-            order: tab.getOrder(),
             filePath: tab.getFilePath(),
             fileName: tab.resolveFileName(),
             content: tab.getContent(),
@@ -85,7 +82,6 @@ export default class TabManager {
         return this.tabs.map(tab => ({
             id: tab.getId(),
             isModified: tab.isModified(),
-            order: tab.getOrder(),
             filePath: tab.getFilePath(),
             fileName: tab.resolveFileName(),
             content: tab.getContent(),
@@ -93,14 +89,12 @@ export default class TabManager {
     }
 
     applySaveResult(result: SaveResponse) {
-        if (result.isSaved) {
-            const tab = this.tabs.find(tab => tab.getId() === result.id)
-            tab.setModified(false)
-            tab.setFilePath(result.filePath)
-            tab.setFileName(result.fileName)
-            tab.setTabPTextContent(result.fileName)
-            tab.setTabSpanTextContent('x')
-        }
+        const tab = this.tabs.find(tab => tab.getId() === result.id)
+        tab.setModified(false)
+        tab.setFilePath(result.filePath)
+        tab.setFileName(result.fileName)
+        tab.setTabPTextContent(result.fileName)
+        tab.setTabSpanTextContent('x')
     }
 
     applySaveAllResults(results: SaveResponse[]) {
@@ -159,7 +153,6 @@ class Tab {
 
     constructor(
         id: number,
-        order: number,
         filePath: string,
         fileName: string,
         tabDiv: HTMLElement,
@@ -169,7 +162,6 @@ class Tab {
         editor: Editor
     ) {
         this.id = id
-        this.order = order
         this.filePath = filePath
         this.fileName = fileName
         this.tabDiv = tabDiv
