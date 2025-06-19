@@ -3,7 +3,7 @@ import { electronAPI } from "../../shared/constants/electronAPI"
 import ViewManager from "../modules/feature/ViewManager"
 
 export default function registerWindowHandlers() {
-    const maximize = document.getElementById('maximize') as HTMLImageElement | null
+    const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null
 
     maximize.addEventListener('click', () => {
         const viewManager = ViewManager.getInstance()
@@ -11,14 +11,14 @@ export default function registerWindowHandlers() {
         if (viewManager.isWindowMax()) {
             maximize.src = 'src/renderer/assets/icons/maximize.png'
             viewManager.setWindowMax(false)
-            window[electronAPI.channel].unmaximize()
+            window[electronAPI.channel].unmaximizeWindow()
         } else {
             maximize.src = 'src/renderer/assets/icons/unmaximize.png'
             viewManager.setWindowMax(true)
-            window[electronAPI.channel].maximize() 
+            window[electronAPI.channel].maximizeWindow() 
         }
     })
 
-    document.getElementById('minimize').addEventListener('click', () => { window[electronAPI.channel].minimize() })
-    document.getElementById('close').addEventListener('click', () => { window[electronAPI.channel].close() })
+    document.getElementById('minimizeWindow').addEventListener('click', () => { window[electronAPI.channel].minimizeWindow() })
+    document.getElementById('closeWindow').addEventListener('click', () => { window[electronAPI.channel].closeWindow() })
 }

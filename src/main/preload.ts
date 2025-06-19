@@ -12,16 +12,17 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     loadedRenderer: () => { ipcRenderer.send(electronAPI.events.loadedRenderer) },
     showMainWindow: () => { ipcRenderer.send(electronAPI.events.showMainWindow) },
 
-    minimize: () => { ipcRenderer.send(electronAPI.events.minimize) },
-    maximize: () => { ipcRenderer.send(electronAPI.events.maximize) },
-    unmaximize: () => { ipcRenderer.send(electronAPI.events.unmaximize) },
-    close: () => { ipcRenderer.send(electronAPI.events.close) },
+    minimizeWindow: () => { ipcRenderer.send(electronAPI.events.minimizeWindow) },
+    maximizeWindow: () => { ipcRenderer.send(electronAPI.events.maximizeWindow) },
+    unmaximizeWindow: () => { ipcRenderer.send(electronAPI.events.unmaximizeWindow) },
+    closeWindow: () => { ipcRenderer.send(electronAPI.events.closeWindow) },
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
     save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
+    closeTab: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.closeTab, data) },
 
     confirm: (message: string) => { return ipcRenderer.invoke(electronAPI.events.confirm, message) },
 })

@@ -17,16 +17,17 @@ declare global {
             loadedRenderer: () => void
             showMainWindow: () => void
 
-            minimize: () => void
-            maximize: () => void
-            unmaximize: () => void
-            close: () => void
+            minimizeWindow: () => void
+            maximizeWindow: () => void
+            unmaximizeWindow: () => void
+            closeWindow: () => void
 
             newTab: () => Promise<Response<number>>
             open: () => Promise<Response<TabData>>
             save: (data: TabData) => promise<Response<TabData>>
             saveAs: (data: TabData) => promise<Response<TabData>>
             saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
+            closeTab: (data: TabData) => Promise<Response<void>>
 
             confirm: (message: string) => Promise<boolean>
         }

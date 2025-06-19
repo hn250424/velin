@@ -8,8 +8,9 @@ import TabData from '../../shared/interface/TabData'
 import TabSession from '../interface/TabSession'
 import TabSessionManager from '../modules/core/TabSessionManager'
 import { showConfirm } from '../utils/utils'
+import { resourceUsage } from 'process'
 
-export default function registerMenuHandlers(mainWindow: BrowserWindow) {
+export default function registerFileHandlers(mainWindow: BrowserWindow) {
     ipcMain.handle(electronAPI.events.newTab, async () => {
         const tabSessionManager = TabSessionManager.getInstance()
         const arr = tabSessionManager.readTabSession()
@@ -119,7 +120,7 @@ export default function registerMenuHandlers(mainWindow: BrowserWindow) {
             const id = arr[arr.length - 1].id + 1
             arr.push({ id: id, filePath: result.filePath })
             tabSessionManager.writeTabSession(arr)
-            
+
             const newData: TabData = {
                 id: id,
                 isModified: false,
@@ -177,6 +178,49 @@ export default function registerMenuHandlers(mainWindow: BrowserWindow) {
         return {
             result: true,
             data: responseArr
+        }
+    })
+
+    ipcMain.handle(electronAPI.events.closeTab, async (e, data: TabData) => {
+        let returnResult = false
+
+        if (data.isModified) {
+            const confirm = await showConfirm('Do you want to save this file?')
+
+            if (confirm) {
+                if (data.filePath === '') {
+                    const result = await dialog.showSaveDialog(mainWindow, {
+                        title: 'Save As',
+                        defaultPath: data.fileName,
+                        filters: [{ name: 'Markdown', extensions: ['md', 'markdown'] }]
+                    })
+
+                    if (result.canceled || !result.filePath) {
+                        return {
+                            result: returnResult,
+                            data: undefined
+                        }
+                    } else {
+                        await fs.promises.writeFile(result.filePath, data.content, 'utf-8')
+                    }
+                } else {
+                    await fs.promises.writeFile(data.filePath, data.content, 'utf-8')
+                }
+            } 
+        }
+
+        // Delete session.
+        try {
+            const tabSessionManager = TabSessionManager.getInstance()
+            const tabSession = tabSessionManager.readTabSession()
+            const updatedSession = tabSession.filter(session => session.id !== data.id)
+            tabSessionManager.writeTabSession(updatedSession)
+            returnResult = true
+        } catch (e) {}
+
+        return {
+            result: returnResult,
+            data: undefined
         }
     })
 

@@ -151,7 +151,7 @@ span {
     user-select: none;
 }
 
-.menu_item.active>.dropdown {
+.menu_item.active > .dropdown {
     display: block;
 }
 
@@ -227,6 +227,13 @@ span {
     background-color: gv.$grey-1;
 }
 
-.milkdown>.editor {
+.milkdown > .editor {
     height: inherit;
+}
+
+#tab_context_menu {
+    display: none;
+    position: fixed;
+    flex-direction: column;
+    z-index: 1000;
 }

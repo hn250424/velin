@@ -11,8 +11,6 @@ export default class TabSessionManager {
     private userDataPath = app.getPath('userData')
     private tabSessionPath = path.join(this.userDataPath, TAB_SESSION_PATH)
 
-    private tabSessionList: TabSession[] = []
-
     private constructor() {}
 
     static getInstance(): TabSessionManager {
@@ -24,17 +22,14 @@ export default class TabSessionManager {
 
     readTabSession(): TabSession[] {
         if (!fs.existsSync(this.tabSessionPath)) {
-            this.tabSessionList = []
+            return []
         } else {
             const jsonTabSession = fs.readFileSync(this.tabSessionPath, 'utf-8')
-            this.tabSessionList = JSON.parse(jsonTabSession)
+            return JSON.parse(jsonTabSession)
         }
-
-        return this.tabSessionList
     }
 
     writeTabSession(tabSessionArr: TabSession[]) {
         fs.writeFileSync(this.tabSessionPath, JSON.stringify(tabSessionArr, null, 4), 'utf-8')
-        this.tabSessionList = tabSessionArr
     }
 }

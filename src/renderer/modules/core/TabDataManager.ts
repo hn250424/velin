@@ -5,18 +5,19 @@ import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import TabData from '../../../shared/interface/TabData'
+import { DATASET_ATTR_TAB_ID } from '../../constants/dom'
 
-export default class TabManager {
-    private static instance: TabManager | null = null
+export default class TabDataManager {
+    private static instance: TabDataManager | null = null
     private tabs: Tab[] = []
     private id = 0
     private activatedTabIndex = 0
 
     private constructor() { }
 
-    static getInstance(): TabManager {
+    static getInstance(): TabDataManager {
         if (this.instance === null) {
-            this.instance = new TabManager()
+            this.instance = new TabDataManager()
         }
 
         return this.instance
@@ -33,6 +34,7 @@ export default class TabManager {
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const { tabDiv, tabP, tabSpan } = this.createTabBox(fileName)
+        tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
         document.getElementById('tab_container').appendChild(tabDiv)
 
         const editorBoxDiv = document.createElement('div')
@@ -107,6 +109,23 @@ export default class TabManager {
         })
     }
 
+    deleteTab(id: number) {
+        for (let i = 0; i < this.tabs.length; i++) {
+            const tab = this.tabs[i]
+            if (tab.getId() === id) {
+                tab.destroyTabDiv()
+                tab.destroyEditorBoxDiv()
+                this.tabs.splice(i, 1)
+                break
+            }
+        }
+
+        if (this.activatedTabIndex >= this.tabs.length - 1) {
+            this.activatedTabIndex = this.tabs.length - 1
+            this.tabs[this.tabs.length - 1].setActive(true)
+        }
+    }
+
     private createTabBox(fileName: string) {
         const div = document.createElement('div')
         div.classList.add('tab')
@@ -130,6 +149,7 @@ export default class TabManager {
                 this.activatedTabIndex = index
             }
         })
+        // Note: contextmenu event is handled globally in renderer.ts
 
         return { tabDiv: div, tabP: p, tabSpan: span }
     }
@@ -244,6 +264,10 @@ class Tab {
         return this.tabDiv
     }
 
+    destroyTabDiv() {
+        this.tabDiv.remove()
+    }
+
     // getTabPTextContent(): string {
     //     return this.tabP.textContent || ''
     // }
@@ -254,6 +278,10 @@ class Tab {
 
     setTabSpanTextContent(text: string) {
         this.tabSpan.textContent = text
+    }
+
+    destroyEditorBoxDiv() {
+        this.editorBoxDiv.remove()
     }
 
     setModified(status: boolean) {

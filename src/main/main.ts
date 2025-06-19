@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'url'
 
 import registerLoadHandlers from './handlers/loadHandlers'
-import registerMenuHandlers from './handlers/menuHandlers'
+import registerFileHandlers from './handlers/fileHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -14,7 +14,7 @@ const createMainWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        frame: false,
+        titleBarStyle: 'hidden',
         show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -40,7 +40,7 @@ const createWindow = () => {
 
     registerLoadHandlers(mainWindow)
     registerWindowHandlers(mainWindow)
-    registerMenuHandlers(mainWindow)
+    registerFileHandlers(mainWindow)
 
     loadUrl(mainWindow)
 }

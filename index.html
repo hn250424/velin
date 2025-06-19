@@ -8,20 +8,38 @@
 </head>
 
 <body>
+    <div id="tab_context_menu" class="dropdown">
+        <div id="tab_close" class="dropdown_item">
+            Close Tab<span class="shortcut">Ctrl+W</span>
+        </div>
+        <div id="tab_close_others" class="dropdown_item">
+            Close Other Tabs<span class="shortcut">Ctrl+Alt+O</span>
+        </div>
+        <div id="tab_close_left" class="dropdown_item">
+            Close Tabs to the Left<span class="shortcut">Ctrl+Alt+←</span>
+        </div>
+        <div id="tab_close_right" class="dropdown_item">
+            Close Tabs to the Right<span class="shortcut">Ctrl+Alt+→</span>
+        </div>
+        <div id="tab_close_all" class="dropdown_item">
+            Close All Tabs<span class="shortcut">Ctrl+Alt+A</span>
+        </div>
+    </div>
+
     <div id="container">
-        <div id="title_bar">
-            <div id="title_bar_left">
+        <div id="title_bar" class="drag">
+            <div id="title_bar_left" class="no_drag">
                 <img src="src/renderer/assets/icons/file.png" id="logo" />
                 <div id="tab_container">
-                    
+
                 </div>
                 <button id="addTabButton">+</button>
             </div>
 
-            <div id="title_bar_right">
-                <img src="src/renderer/assets/icons/minimize.png" id="minimize" />
-                <img src="src/renderer/assets/icons/maximize.png" id="maximize" />
-                <img src="src/renderer/assets/icons/close.png" id="close" />
+            <div id="title_bar_right" class="no_drag">
+                <img src="src/renderer/assets/icons/minimize.png" id="minimizeWindow" />
+                <img src="src/renderer/assets/icons/maximize.png" id="maximizeWindow" />
+                <img src="src/renderer/assets/icons/close.png" id="closeWindow" />
             </div>
         </div>
         <div id="menu_bar">
@@ -31,9 +49,11 @@
                     <div id="new_window" class="dropdown_item">New Window<span class="shortcut">Ctrl+W</span></div>
                     <div id="new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span></div>
                     <div id="open" class="dropdown_item">Open<span class="shortcut">Ctrl+O</span></div>
+                    <div id="Recent" class="dropdown_item">Recent<span class="shortcut">Ctrl+O</span></div>
                     <div id="save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
                     <div id="save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
                     <div id="save_all" class="dropdown_item">Save All<span class="shortcut">Ctrl+Alt+S</span></div>
+                    <div id="close_tab" class="dropdown_item">Close Tab<span class="shortcut">Ctrl+Alt+S</span></div>
                     <div class="dropdown_divider"></div>
                     <div id="settings" class="dropdown_item">Settings<span class="shortcut">Ctrl+,</span></div>
                     <div id="exit" class="dropdown_item">Exit</div>
