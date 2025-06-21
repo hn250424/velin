@@ -17,12 +17,16 @@ export default function registerLoadHandlers(mainWindow: BrowserWindow) {
             return
         }
 
-        try {
-            const arr = await Promise.all(
-                tabSessionArr.map(async (data) => {
-                    const filePath = data.filePath ? data.filePath : ''
-                    const fileName = filePath ? path.basename(filePath) : ''
-                    const content = filePath ? await fs.promises.readFile(data.filePath, 'utf-8') : ''
+        let isChanged = false
+        const arr = await Promise.all(
+            tabSessionArr.map(async (data) => {
+                const filePath = data.filePath ?? ''
+                try {
+                    if (!filePath) throw new Error('No file path')
+
+                    await fs.promises.access(filePath, fs.constants.R_OK)
+                    const fileName = path.basename(filePath)
+                    const content = await fs.promises.readFile(data.filePath, 'utf-8')
                     return {
                         id: data.id,
                         isModified: false,
@@ -30,13 +34,21 @@ export default function registerLoadHandlers(mainWindow: BrowserWindow) {
                         fileName: fileName,
                         content: content,
                     }
-                })
-            )
+                } catch (e) {
+                    if (!isChanged) isChanged = true
+                    return {
+                        id: data.id,
+                        isModified: false,
+                        filePath: '',
+                        fileName: '',
+                        content: '',
+                    }
+                }
+            })
+        )
 
-            mainWindow.webContents.send(electronAPI.events.tabSession, arr)
-        } catch (e) {
-            console.log(e)
-        }
+        if (isChanged) tabSessionManager.writeTabSession(arr)
+        mainWindow.webContents.send(electronAPI.events.tabSession, arr)
     })
 
     ipcMain.on(electronAPI.events.showMainWindow, () => {

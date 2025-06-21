@@ -33,7 +33,7 @@ export default class TabDataManager {
     }
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
-        const { tabDiv, tabP, tabSpan } = this.createTabBox(fileName)
+        const { tabDiv, tabSpan, tabButton } = this.createTabBox(fileName)
         tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
         document.getElementById('tab_container').appendChild(tabDiv)
 
@@ -59,10 +59,11 @@ export default class TabDataManager {
         })
         document.getElementById('editor_container').appendChild(editorBoxDiv)
 
-        this.tabs.push(new Tab(id, filePath, fileName, tabDiv, tabP, tabSpan, editorBoxDiv, editor))
+        this.tabs.push(new Tab(id, filePath, fileName, tabDiv, tabSpan, tabButton, editorBoxDiv, editor))
         if (activate) {
             this.tabs.forEach((tab, i) => {
-                tab.setActive(i === this.tabs.length - 1)
+                if (i === this.tabs.length - 1) tab.setActive()
+                else tab.setDeactive()
             })
             this.activatedTabIndex = this.tabs.length - 1
         }
@@ -71,40 +72,47 @@ export default class TabDataManager {
     getActivatedTab(): TabData {
         const tab = this.tabs[this.activatedTabIndex]
         return {
-            id: tab.getId(),
-            isModified: tab.isModified(),
-            filePath: tab.getFilePath(),
+            id: tab.id,
+            isModified: tab.isModified,
+            filePath: tab.filePath,
             fileName: tab.resolveFileName(),
             content: tab.getContent(),
         }
     }
 
+    setActivateTabWithId(id: number) {
+        this.tabs.forEach((tab, index) => {
+            if (tab.id === id) tab.setActive()
+            else tab.setDeactive()
+        })
+    }
+
     getTabData(): TabData[] {
         return this.tabs.map(tab => ({
-            id: tab.getId(),
-            isModified: tab.isModified(),
-            filePath: tab.getFilePath(),
+            id: tab.id,
+            isModified: tab.isModified,
+            filePath: tab.filePath,
             fileName: tab.resolveFileName(),
             content: tab.getContent(),
         }))
     }
 
     applySaveResult(result: TabData) {
-        const tab = this.tabs.find(tab => tab.getId() === result.id)
-        tab.setFilePath(result.filePath)
-        tab.setFileName(result.fileName)
-        tab.setTabPTextContent(result.fileName)
-        tab.setTabSpanTextContent('x')
+        const tab = this.tabs.find(tab => tab.id === result.id)
+        tab.filePath = result.filePath
+        tab.fileName = result.fileName
+        tab.tabSpanTextContent = result.fileName
+        tab.tabButtonTextContent = 'x'
     }
 
     applySaveAllResults(results: TabData[]) {
         results.forEach((result, i) => {
-            if (!result.isModified) {
+            if (!result.isModified && result.filePath !== '') {
                 const tab = this.tabs[i]
-                tab.setFilePath(result.filePath)
-                tab.setFileName(result.fileName)
-                tab.setTabPTextContent(result.fileName)
-                tab.setTabSpanTextContent('x')
+                tab.filePath = result.filePath
+                tab.fileName = result.fileName
+                tab.tabSpanTextContent = result.fileName
+                tab.tabButtonTextContent = 'x'
             }
         })
     }
@@ -112,7 +120,7 @@ export default class TabDataManager {
     deleteTab(id: number) {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
-            if (tab.getId() === id) {
+            if (tab.id === id) {
                 tab.destroyTabDiv()
                 tab.destroyEditorBoxDiv()
                 this.tabs.splice(i, 1)
@@ -122,7 +130,7 @@ export default class TabDataManager {
 
         if (this.activatedTabIndex >= this.tabs.length - 1) {
             this.activatedTabIndex = this.tabs.length - 1
-            this.tabs[this.tabs.length - 1].setActive(true)
+            this.tabs[this.tabs.length - 1].setActive()
         }
     }
 
@@ -130,62 +138,51 @@ export default class TabDataManager {
         const div = document.createElement('div')
         div.classList.add('tab')
 
-        const p = document.createElement('p')
-        p.textContent = fileName ? fileName : "Untitled"
-
         const span = document.createElement('span')
-        span.textContent = 'x'
+        span.textContent = fileName ? fileName : "Untitled"
 
-        div.appendChild(p)
+        const button = document.createElement('button')
+        button.textContent = 'x'
+
         div.appendChild(span)
+        div.appendChild(button)
 
-        div.addEventListener('click', () => {
-            const index = this.tabs.findIndex(tab => tab.getTabDiv() === div)
-            if (index !== -1) {
-                this.tabs.forEach((tab, i) => {
-                    tab.setActive(i === index)
-                })
-
-                this.activatedTabIndex = index
-            }
-        })
-        // Note: contextmenu event is handled globally in renderer.ts
-
-        return { tabDiv: div, tabP: p, tabSpan: span }
+        return { tabDiv: div, tabSpan: span, tabButton: button }
     }
 }
 
 class Tab {
-    private id: number
-    private order: number
-    private filePath: string
-    private fileName: string
-    private editor: Editor
-    private tabDiv: HTMLElement
-    private tabP: HTMLElement
-    private tabSpan: HTMLElement
-    private editorBoxDiv: HTMLElement
+    private _id: number
+    private _order: number
+    private _filePath: string
+    private _fileName: string
+    private _editor: Editor
+    private _tabDiv: HTMLElement
+    private _tabSpan: HTMLElement
+    private _tabButton: HTMLElement
+    private _editorBoxDiv: HTMLElement
 
-    private _isModified: boolean = false
+    private _isModified: boolean
 
     constructor(
         id: number,
         filePath: string,
         fileName: string,
         tabDiv: HTMLElement,
-        tabP: HTMLElement,
         tabSpan: HTMLElement,
+        tabButton: HTMLElement,
         editorBoxDiv: HTMLElement,
         editor: Editor
     ) {
-        this.id = id
-        this.filePath = filePath
-        this.fileName = fileName
-        this.tabDiv = tabDiv
-        this.tabP = tabP
-        this.tabSpan = tabSpan
-        this.editorBoxDiv = editorBoxDiv
-        this.editor = editor
+        this._id = id
+        this._filePath = filePath
+        this._fileName = fileName
+        this._tabDiv = tabDiv
+        this._tabSpan = tabSpan
+        this._tabButton = tabButton
+        this._editorBoxDiv = editorBoxDiv
+        this._editor = editor
+        this._isModified = false
 
         editor.action((ctx) => {
             const view = ctx.get(editorViewCtx)
@@ -193,18 +190,18 @@ class Tab {
             view.setProps({
                 handleDOMEvents: {
                     input: (view, event) => {
-                        if (!this.isModified()) {
-                            this.setTabSpanTextContent('o')
-                            this.setModified(true)
+                        if (!this.isModified) {
+                            this.tabButtonTextContent = 'o'
+                            this.isModified = true
                         }
                         return false
                     },
 
                     blur: (view, event) => {
-                        if (this.getFilePath() === '' && this.isModified()) {
+                        if (this.filePath === '' && this.isModified) {
                             const firstLine = view.state.doc.textBetween(0, view.state.doc.content.size).split('\n')[0].trim()
-                            if (firstLine) this.setTabPTextContent(firstLine)
-                            else this.setTabPTextContent('Untitled')
+                            if (firstLine) this.tabSpanTextContent = firstLine
+                            else this.tabSpanTextContent = 'Untitled'
                         }
                         return false
                     }
@@ -213,37 +210,18 @@ class Tab {
         })
     }
 
-    getId(): number {
-        return this.id
-    }
-
-    getOrder(): number {
-        return this.order
-    }
-
-    getFilePath(): string {
-        return this.filePath
-    }
-
-    setFilePath(filePath: string) {
-        this.filePath = filePath
-    }
-
     resolveFileName(): string {
         if (!this.fileName) {
-            const view = this.getEditor().ctx.get(editorViewCtx)
+            const view = this.editor.ctx.get(editorViewCtx)
             const firstLine = view.state.doc
                 .textBetween(0, view.state.doc.content.size)
                 .split('\n')[0]
                 .trim()
+            
             this.fileName = firstLine || 'Untitled'
         }
 
         return this.fileName
-    }
-
-    setFileName(fileName: string) {
-        this.fileName = fileName
     }
 
     getContent(): string {
@@ -256,44 +234,73 @@ class Tab {
         return content
     }
 
-    getEditor(): Editor {
-        return this.editor
-    }
-
-    getTabDiv() {
-        return this.tabDiv
-    }
-
     destroyTabDiv() {
         this.tabDiv.remove()
-    }
-
-    // getTabPTextContent(): string {
-    //     return this.tabP.textContent || ''
-    // }
-
-    setTabPTextContent(text: string) {
-        this.tabP.textContent = text
-    }
-
-    setTabSpanTextContent(text: string) {
-        this.tabSpan.textContent = text
     }
 
     destroyEditorBoxDiv() {
         this.editorBoxDiv.remove()
     }
 
-    setModified(status: boolean) {
+    setActive() {
+        this.editorBoxDiv.style.display = 'block'
+        this.tabDiv.style.background = 'red'
+    }
+
+    setDeactive() {
+        this.editorBoxDiv.style.display = 'none'
+        this.tabDiv.style.background = 'grey'
+    }
+
+    get id(): number {
+        return this._id
+    }
+
+    get order(): number {
+        return this._order
+    }
+
+    get filePath(): string {
+        return this._filePath
+    }
+
+    set filePath(filePath: string) {
+        this._filePath = filePath
+    }
+
+    get fileName() {
+        return this._fileName
+    }
+
+    set fileName(fileName: string) {
+        this._fileName = fileName
+    }
+
+    get editor(): Editor {
+        return this._editor
+    }
+
+    get tabDiv(): HTMLElement {
+        return this._tabDiv
+    }
+
+    set tabSpanTextContent(text: string) {
+        this._tabSpan.textContent = text
+    }
+
+    set tabButtonTextContent(text: string) {
+        this._tabButton.textContent = text
+    }
+
+    set isModified(status: boolean) {
         this._isModified = status
     }
 
-    isModified(): boolean {
+    get isModified(): boolean {
         return this._isModified
     }
 
-    setActive(isActive: boolean) {
-        this.editorBoxDiv.style.display = isActive ? 'block' : 'none';
-        this.tabDiv.style.background = isActive ? 'red' : 'grey';
+    get editorBoxDiv() {
+        return this._editorBoxDiv
     }
 }

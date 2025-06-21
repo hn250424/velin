@@ -2,10 +2,12 @@ import './index.scss'
 
 import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '../shared/constants/electronAPI'
+import { DATASET_ATTR_TAB_ID } from './constants/dom'
 
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
+import TabDataManager from './modules/core/TabDataManager'
 
 let contextMenu: HTMLElement
 let menuBar: HTMLElement
@@ -31,8 +33,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function bindDocumentContextMenuEvents() {
     document.addEventListener('contextmenu', (e) => {
-        const tab = (e.target as HTMLElement).closest('.tab') as HTMLElement
+        menuItems.forEach(i => i.classList.remove('active'))
 
+        const tab = (e.target as HTMLElement).closest('.tab') as HTMLElement
         if (!tab) {
             contextMenu.style.display = 'none'
         } else {
@@ -45,9 +48,24 @@ function bindDocumentContextMenuEvents() {
 }
 
 function bindDocumentClickEvents() {
-    document.addEventListener('click', () => {
+    document.addEventListener('click', (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
         contextMenu.style.display = 'none'
+
+        const target = e.target as HTMLElement
+        const tabDiv = target.closest('.tab') as HTMLElement   
+        if (tabDiv) {
+            if (target.tagName === 'BUTTON') {
+                const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
+                //
+            } else if (target.tagName === 'SPAN') {
+                const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
+                if (id) {
+                    const tabDataManager = TabDataManager.getInstance()
+                    tabDataManager.setActivateTabWithId(Number(id))
+                }
+            }
+        }
     })
 }
 
@@ -74,9 +92,5 @@ function bindMenuBarEvents() {
                 item.classList.add('active')
             }
         })
-    })
-
-    titleBar.addEventListener('mousedown', () => {
-        menuItems.forEach(item => item.classList.remove('active'))
     })
 }

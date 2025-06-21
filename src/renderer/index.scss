@@ -14,6 +14,7 @@ $logo_horizontal_margin: 10px;
 $tab_width: 150px;
 $tab_right_margin: 10px;
 $tab_elem_padding: 5px;
+$tab_button_width: 20px;
 $add_tab_button_size: $title_bar_left_height;
 
 $menu_bar_height: 20px;
@@ -80,25 +81,39 @@ $milkdown-padding: 16px;
     background-color: brown;
 }
 
-.tab:hover {
+.tab:hover, .tab * {
     cursor: pointer;
 }
 
-.tab>p,
-span {
+.tab > span {
+    flex: 1;
     display: flex;
     align-items: center;
     padding: $tab_elem_padding;
-}
-
-.tab>p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.tab>span {
+.tab > button {
+    width: $tab_button_width;
+
     background-color: aliceblue;
+    position: relative;
+}
+
+.tab > button:hover {
+    color: transparent;
+}
+
+.tab > button:hover::after {
+    content: 'x';
+    color: black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 #addTabButton {
