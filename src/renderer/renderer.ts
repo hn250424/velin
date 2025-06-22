@@ -1,7 +1,7 @@
 import './index.scss'
 
 import "@milkdown/theme-nord/style.css"
-import { electronAPI } from '../shared/constants/electronAPI'
+import { electronAPI } from '@shared/constants/electronAPI'
 import { DATASET_ATTR_TAB_ID } from './constants/dom'
 
 import registerFileHandlers from './handlers/fileHandlers'

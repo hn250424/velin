@@ -1,5 +1,9 @@
 {
     "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["src/shared/*"]
+        },
         "target": "ESNext",
         "module": "es2020",
         "allowJs": true,
@@ -7,10 +11,11 @@
         "esModuleInterop": true,
         "noImplicitAny": true,
         "sourceMap": true,
-        "baseUrl": ".",
         "outDir": "dist",
         "moduleResolution": "node",
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": [
         "src",

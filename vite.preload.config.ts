@@ -1,16 +1,12 @@
 import { defineConfig } from 'vite'
-import path from 'path'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-    resolve: {
-        alias: {
-            '@shared': path.resolve(__dirname, 'src/Shared')
-        }
-    },
     build: {
         lib: {
             entry: 'src/main/preload.ts',
             formats: ['cjs'],
         },
     },
+    plugins: [tsconfigPaths()],
 })

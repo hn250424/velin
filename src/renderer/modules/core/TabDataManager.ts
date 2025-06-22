@@ -4,14 +4,14 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import TabData from '../../../shared/interface/TabData'
+import TabData from '@shared/interface/TabData'
 import { DATASET_ATTR_TAB_ID } from '../../constants/dom'
 
 export default class TabDataManager {
     private static instance: TabDataManager | null = null
     private tabs: Tab[] = []
     private id = 0
-    private activatedTabIndex = 0
+    private _activatedTabIndex = 0
 
     private constructor() { }
 
@@ -82,8 +82,12 @@ export default class TabDataManager {
 
     setActivateTabWithId(id: number) {
         this.tabs.forEach((tab, index) => {
-            if (tab.id === id) tab.setActive()
-            else tab.setDeactive()
+            if (tab.id === id) {
+                tab.setActive()
+                this.activatedTabIndex = index
+            } else {
+                tab.setDeactive()
+            }
         })
     }
 
@@ -98,26 +102,29 @@ export default class TabDataManager {
     }
 
     applySaveResult(result: TabData) {
-        const tab = this.tabs.find(tab => tab.id === result.id)
-        tab.filePath = result.filePath
-        tab.fileName = result.fileName
-        tab.tabSpanTextContent = result.fileName
-        tab.tabButtonTextContent = 'x'
+        let wasApplied = false
+        for (let i = 0; i < this.tabs.length; i++) {
+            if ((this.tabs[i].id === result.id || this.tabs[i].filePath === result.filePath) && result.isModified === false) {
+                this.tabs[i].isModified = false
+                this.tabs[i].filePath = result.filePath
+                this.tabs[i].fileName = result.fileName
+                this.tabs[i].tabSpanTextContent = result.fileName
+                this.tabs[i].tabButtonTextContent = 'x'
+                this.tabs[i].setContent(result.content)
+
+                wasApplied = true
+            }
+        }
+        return wasApplied
     }
 
     applySaveAllResults(results: TabData[]) {
         results.forEach((result, i) => {
-            if (!result.isModified && result.filePath !== '') {
-                const tab = this.tabs[i]
-                tab.filePath = result.filePath
-                tab.fileName = result.fileName
-                tab.tabSpanTextContent = result.fileName
-                tab.tabButtonTextContent = 'x'
-            }
+            this.applySaveResult(result)
         })
     }
 
-    deleteTab(id: number) {
+    removeTab(id: number) {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
             if (tab.id === id) {
@@ -130,8 +137,9 @@ export default class TabDataManager {
 
         if (this.activatedTabIndex >= this.tabs.length - 1) {
             this.activatedTabIndex = this.tabs.length - 1
-            this.tabs[this.tabs.length - 1].setActive()
         }
+
+        this.tabs[this.activatedTabIndex].setActive()
     }
 
     private createTabBox(fileName: string) {
@@ -148,6 +156,14 @@ export default class TabDataManager {
         div.appendChild(button)
 
         return { tabDiv: div, tabSpan: span, tabButton: button }
+    }
+
+    get activatedTabIndex() {
+        return this._activatedTabIndex
+    }
+
+    set activatedTabIndex(index: number) {
+        this._activatedTabIndex = index
     }
 }
 
@@ -217,7 +233,7 @@ class Tab {
                 .textBetween(0, view.state.doc.content.size)
                 .split('\n')[0]
                 .trim()
-            
+
             this.fileName = firstLine || 'Untitled'
         }
 
@@ -232,6 +248,19 @@ class Tab {
             content = serializer(view.state.doc)
         })
         return content
+    }
+
+    setContent(content: string): void {
+        this.editor.action((ctx) => {
+            const view = ctx.get(editorViewCtx)
+            const parser = ctx.get(parserCtx)
+            const doc = parser(content)
+
+            if (doc) {
+                const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
+                view.dispatch(tr)
+            }
+        })
     }
 
     destroyTabDiv() {

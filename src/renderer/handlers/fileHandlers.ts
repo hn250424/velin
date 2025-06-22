@@ -1,8 +1,8 @@
 import "@milkdown/theme-nord/style.css"
 
-import { electronAPI } from '../../shared/constants/electronAPI'
-import Response from "../../shared/interface/Response"
-import { default as TabData, default as TabsData } from "../../shared/interface/TabData"
+import { electronAPI } from '@shared/constants/electronAPI'
+import Response from "@shared/interface/Response"
+import { default as TabData, default as TabsData } from "@shared/interface/TabData"
 import TabDataManager from "../modules/core/TabDataManager"
 
 export default function registerFileHandlers() {
@@ -36,8 +36,8 @@ function bindMenuFileCommands() {
         const tabData: TabsData = tabDataManager.getActivatedTab()
         const response: Response<TabData> = await window[electronAPI.channel].saveAs(tabData)
         if (response.result) {
-            const newData = response.data
-            tabDataManager.addTab(newData.id, newData.filePath, newData.fileName, newData.content, true)
+            const wasApplied = tabDataManager.applySaveResult(response.data)
+            if (!wasApplied) tabDataManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
         }
     })
 
@@ -48,8 +48,8 @@ function bindMenuFileCommands() {
     })
 
     document.getElementById('close_tab').addEventListener('click', async () => {
-        const tabsData: TabsData = tabDataManager.getActivatedTab()
-        const response: Response<void> = await window[electronAPI.channel].closeTab(tabsData)
-        if (response.result) tabDataManager.deleteTab(tabsData.id)
+        const tabData: TabsData = tabDataManager.getActivatedTab()
+        const response: Response<void> = await window[electronAPI.channel].closeTab(tabData)
+        if (response.result) tabDataManager.removeTab(tabData.id)
     })
 }
