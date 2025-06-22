@@ -2,7 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@shared/*": ["src/shared/*"]
+            "@shared/*": ["src/shared/*"],
+            "@services/*": ["src/main/services/*"],
+            "@ports/*": ["src/main/services/ports*"],
         },
         "target": "ESNext",
         "module": "es2020",
@@ -19,6 +21,7 @@
     },
     "include": [
         "src",
-        "src/preload.d.ts"
+        "src/preload.d.ts",
+        "tests"
     ]
 }

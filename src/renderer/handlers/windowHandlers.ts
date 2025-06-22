@@ -1,5 +1,5 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import ViewManager from "../modules/feature/ViewManager"
+import ViewManager from "../modules/features/ViewManager"
 
 export default function registerWindowHandlers() {
     const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null

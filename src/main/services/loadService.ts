@@ -1,9 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 import { electronAPI } from "../../shared/constants/electronAPI";
 import IFileManager from "./ports/IFileManager";
 import ITabSessionRepository from "./ports/ITabSessionRepository";
-import { TAB_SESSION_PATH } from "../constants/file_info";
-import path from 'path'
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
@@ -11,18 +9,22 @@ export async function loadedRenderer(
     fileManager: IFileManager,
     tabSessionRepository: ITabSessionRepository
 ) {
-    if (!await fileManager.exists(tabSessionPath)) {
-        const _session = [{ id: 0, filePath: '' }]
-        tabSessionRepository.writeTabSession(_session)
-        mainWindow.webContents.send(electronAPI.events.tabSession, _session)
-        return
-    }
-    
-    const tabSessionArr = await tabSessionRepository.readTabSession()
-    if (tabSessionArr.length === 0) {
-        tabSessionArr.push({ id: 0, filePath: '' })
-        tabSessionRepository.writeTabSession(tabSessionArr)
-        mainWindow.webContents.send(electronAPI.events.tabSession, tabSessionArr)
+    const exists = await fileManager.exists(tabSessionPath)
+    const tabSessionArr = exists ? await tabSessionRepository.readTabSession() : []
+
+    if (!exists || tabSessionArr.length === 0) {
+        const emptySession = [{ id: 0, filePath: '' }]
+        await tabSessionRepository.writeTabSession(emptySession)
+
+        const tabDataArr = emptySession.map(({ id, filePath }) => ({
+            id,
+            isModified: false,
+            filePath,
+            fileName: '',
+            content: '',
+        }))
+
+        mainWindow.webContents.send(electronAPI.events.tabSession, tabDataArr)
         return
     }
 
