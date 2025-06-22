@@ -1,9 +1,7 @@
-import { app } from 'electron'
-import path from 'path'
 
-import TabSession from 'src/main/interface/TabSession'
 import IFileManager from "@services/ports/IFileManager"
 import ITabSessionRepository from "@services/ports/ITabSessionRepository"
+import TabSession from 'src/main/interface/TabSession'
 
 export default class FakeTabSessionRepository implements ITabSessionRepository {
     constructor(private tabSessionPath: string, private fileManager: IFileManager) {
@@ -25,5 +23,9 @@ export default class FakeTabSessionRepository implements ITabSessionRepository {
 
     async writeTabSession(tabSessionArr: TabSession[]) {
         await this.fileManager.write(this.tabSessionPath, JSON.stringify(tabSessionArr, null, 4))
+    }
+
+    getTabSessionPath(): string {
+        return this.tabSessionPath
     }
 }

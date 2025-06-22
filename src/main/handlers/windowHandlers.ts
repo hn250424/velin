@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { electronAPI } from '../../shared/constants/electronAPI'
+import { electronAPI } from '@shared/constants/electronAPI'
 
 export default function registerWindowHandlers(mainWindow: BrowserWindow) {
     ipcMain.on(electronAPI.events.minimizeWindow, (e) => { mainWindow.minimize() })

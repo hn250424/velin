@@ -4,7 +4,7 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import TabData from '@shared/interface/TabData'
+import TabData from '../../../shared/interface/TabData'
 import { DATASET_ATTR_TAB_ID } from '../../constants/dom'
 
 export default class TabDataManager {
@@ -135,7 +135,12 @@ export default class TabDataManager {
             }
         }
 
-        if (this.activatedTabIndex >= this.tabs.length - 1) {
+        if (this.tabs.length === 0) {
+            this.activatedTabIndex = 0
+
+            // TODO: quit.
+            return 
+        } else if (this.activatedTabIndex >= this.tabs.length - 1) {
             this.activatedTabIndex = this.tabs.length - 1
         }
 

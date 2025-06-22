@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
     build: {
@@ -8,5 +7,11 @@ export default defineConfig({
             formats: ['es'],
         },
     },
-    plugins: [tsconfigPaths()],
+    resolve: {
+        alias: [
+            { find: '@shared', replacement: '/src/shared' },
+            { find: '@services', replacement: '/src/main/services' },
+            { find: '@ports', replacement: '/src/main/services/ports' },
+        ]
+    }
 })

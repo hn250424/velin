@@ -3,9 +3,10 @@ import started from 'electron-squirrel-startup'
 import path from 'node:path'
 import { fileURLToPath } from 'url'
 
-import registerLoadHandlers from './handlers/loadHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
+import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
+
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

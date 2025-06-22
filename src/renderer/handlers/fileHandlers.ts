@@ -1,8 +1,8 @@
 import "@milkdown/theme-nord/style.css"
 
-import { electronAPI } from '@shared/constants/electronAPI'
-import Response from "@shared/interface/Response"
-import { default as TabData, default as TabsData } from "@shared/interface/TabData"
+import { electronAPI } from '../../shared/constants/electronAPI'
+import Response from "../../shared/interface/Response"
+import { default as TabData, default as TabsData } from "../../shared/interface/TabData"
 import TabDataManager from "../modules/core/TabDataManager"
 
 export default function registerFileHandlers() {
@@ -14,14 +14,14 @@ function bindMenuFileCommands() {
 
     document.getElementById('new_tab').addEventListener('click', async () => {
         const response: Response<number> = await window[electronAPI.channel].newTab()
-        if (response.result) tabDataManager.addTab(response.data)
+        if (response.result) await tabDataManager.addTab(response.data)
     })
 
     document.getElementById('open').addEventListener('click', async () => {
         const response: Response<TabData> = await window[electronAPI.channel].open()
         if (response.result) {
             const data = response.data
-            tabDataManager.addTab(data.id, data.filePath, data.fileName, data.content)
+            await tabDataManager.addTab(data.id, data.filePath, data.fileName, data.content)
         }
     })
 
@@ -37,7 +37,7 @@ function bindMenuFileCommands() {
         const response: Response<TabData> = await window[electronAPI.channel].saveAs(tabData)
         if (response.result) {
             const wasApplied = tabDataManager.applySaveResult(response.data)
-            if (!wasApplied) tabDataManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
+            if (!wasApplied) await tabDataManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
         }
     })
 

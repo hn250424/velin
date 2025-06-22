@@ -30,7 +30,7 @@ test('loadedRenderer: normal', async () => {
     fakeTabSessionRepository.setTabSession(initialSession)
 
     // When.
-    await loadedRenderer(fakeMainWindow as any, tabSessionPath, fakeFileManager, fakeTabSessionRepository)
+    await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
 
     // Then.
     expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -56,26 +56,15 @@ test('loadedRenderer: normal', async () => {
 
 test('loadedRenderer: tabSession json file does not exist', async () => {
     // Given.
-    const tabSessionPath = TAB_SESSION_PATH
     const fakeFileManager = new FakeFileManager()
-    const fakeTabSessionRepository = new FakeTabSessionRepository('', fakeFileManager)
+    const fakeTabSessionRepository = new FakeTabSessionRepository(TAB_SESSION_PATH, fakeFileManager)
     const fakeMainWindow = new FakeMainWindow()
 
-    fakeFileManager.setPathExistence('', true)
-    fakeFileManager.setPathExistence('file1.txt', true)
-    fakeFileManager.setPathExistence('file2.txt', true)
-
-    fakeFileManager.setFilecontent('file1.txt', 'test1')
-    fakeFileManager.setFilecontent('file2.txt', 'test2')
-
-    const initialSession = [
-        { id: 0, filePath: 'file1.txt' },
-        { id: 1, filePath: 'file2.txt' },
-    ]
-    fakeTabSessionRepository.setTabSession(initialSession)
+    fakeFileManager.setPathExistence(TAB_SESSION_PATH, false)
+    fakeTabSessionRepository.setTabSession([])
 
     // When.
-    await loadedRenderer(fakeMainWindow as any, tabSessionPath, fakeFileManager, fakeTabSessionRepository)
+    await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
 
     // Then.
     expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -103,7 +92,7 @@ test('loadedRenderer: tabSession does not exist(length === 0)', async () => {
     fakeTabSessionRepository.setTabSession([])
 
     // When.
-    await loadedRenderer(fakeMainWindow as any, tabSessionPath, fakeFileManager, fakeTabSessionRepository)
+    await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
 
     // Then.
     expect(fakeMainWindow.webContents.send).toHaveBeenCalled()

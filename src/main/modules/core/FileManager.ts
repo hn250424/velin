@@ -1,8 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 import IFileManager from "src/main/services/ports/IFileManager"
+import { injectable } from 'inversify'
 
+@injectable()
 export default class FileManager implements IFileManager {
+    constructor() {}
+
     async exists(path: string): Promise<boolean> {
         try {
             await fs.promises.access(path)

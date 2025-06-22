@@ -1,15 +1,14 @@
 import { BrowserWindow } from "electron";
-import { electronAPI } from "../../shared/constants/electronAPI";
+import { electronAPI } from "@shared/constants/electronAPI";
 import IFileManager from "./ports/IFileManager";
 import ITabSessionRepository from "./ports/ITabSessionRepository";
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
-    tabSessionPath: string,
     fileManager: IFileManager,
     tabSessionRepository: ITabSessionRepository
 ) {
-    const exists = await fileManager.exists(tabSessionPath)
+    const exists = await fileManager.exists(tabSessionRepository.getTabSessionPath())
     const tabSessionArr = exists ? await tabSessionRepository.readTabSession() : []
 
     if (!exists || tabSessionArr.length === 0) {
