@@ -11,7 +11,7 @@ export default defineConfig({
         alias: [
             { find: '@shared', replacement: '/src/shared' },
             { find: '@services', replacement: '/src/main/services' },
-            { find: '@ports', replacement: '/src/main/services/ports' },
+            { find: '@contracts', replacement: '/src/main/contracts' },
         ]
     }
 })

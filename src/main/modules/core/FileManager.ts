@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import IFileManager from "src/main/services/ports/IFileManager"
+import IFileManager from "src/main/contracts/IFileManager"
 import { injectable } from 'inversify'
 
 @injectable()

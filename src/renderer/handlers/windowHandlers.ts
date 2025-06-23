@@ -1,4 +1,4 @@
-import { electronAPI } from "../../shared/constants/electronAPI"
+import { electronAPI } from "@shared/constants/electronAPI"
 import ViewManager from "../modules/features/ViewManager"
 
 export default function registerWindowHandlers() {

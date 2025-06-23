@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '../shared/constants/electronAPI'
-import TabData from '../shared/interface/TabData'
+import TabData from '../shared/types/TabData'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.

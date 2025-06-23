@@ -1,4 +1,4 @@
-import IFileManager from "@services/ports/IFileManager"
+import IFileManager from "@contracts/IFileManager"
 import path from 'path'
 
 export default class FakeFileManager implements IFileManager {

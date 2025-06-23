@@ -1,4 +1,4 @@
-import TabSession from "src/main/interface/TabSession"
+import TabSession from "src/main/models/TabSession"
 
 export default interface ITabSessionRepository {
     readTabSession(): Promise<TabSession[]>

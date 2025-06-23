@@ -1,51 +1,34 @@
-import IFileManager from '@services/ports/IFileManager'
-import ITabSessionRepository from '@services/ports/ITabSessionRepository'
+import IFileService from '@services/contracts/IFileService'
 import { electronAPI } from '@shared/constants/electronAPI'
-import TabData from '@shared/interface/TabData'
+import TabData from '@shared/types/TabData'
 import { BrowserWindow, ipcMain } from 'electron'
+import DI_KEYS from '../constants/di_keys'
 import diContainer from '../diContainer'
-import dialogService from '../modules/features/dialogService'
-import { closeTab, newTab, open, save, saveAll, saveAs } from '../services/fileService'
-import DI_KEYS from '../types/di_keys'
 
 export default function registerFileHandlers(mainWindow: BrowserWindow) {
+    const fileService: IFileService = diContainer.get(DI_KEYS.FileService)
+
     ipcMain.handle(electronAPI.events.newTab, async () => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        const id = await newTab(tabSessionRepository)
-        return {
-            result: true,
-            data: id
-        }
+        return await fileService.newTab()
     })
 
     ipcMain.handle(electronAPI.events.open, async () => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        return open(dialogService, fileManager, tabSessionRepository)
+        return fileService.open()
     })
 
     ipcMain.handle(electronAPI.events.save, async (event, data: TabData) => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        return save(data, mainWindow, dialogService, fileManager, tabSessionRepository)
+        return fileService.save(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.saveAs, async (e, data: TabData) => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        return saveAs(data, mainWindow, dialogService, fileManager, tabSessionRepository)
+        return fileService.saveAs(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.saveAll, async (event, data: TabData[]) => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        return saveAll(data, mainWindow, dialogService, fileManager, tabSessionRepository)
+        return fileService.saveAll(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.closeTab, async (e, data: TabData) => {
-        const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-        const tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-        return closeTab(data, mainWindow, dialogService, fileManager, tabSessionRepository)
+        return fileService.closeTab(data, mainWindow)
     })
 }

@@ -1,4 +1,4 @@
-import IDialogService from "@services/ports/IDialogService"
+import IDialogService from "src/main/contracts/IDialogService"
 import { dialog, BrowserWindow } from "electron"
 
 const dialogService: IDialogService = {

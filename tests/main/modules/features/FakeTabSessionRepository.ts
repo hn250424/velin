@@ -1,7 +1,7 @@
 
-import IFileManager from "@services/ports/IFileManager"
-import ITabSessionRepository from "@services/ports/ITabSessionRepository"
-import TabSession from 'src/main/interface/TabSession'
+import IFileManager from "src/main/contracts/IFileManager"
+import ITabSessionRepository from "src/main/contracts/ITabSessionRepository"
+import TabSession from 'src/main/models/TabSession'
 
 export default class FakeTabSessionRepository implements ITabSessionRepository {
     constructor(private tabSessionPath: string, private fileManager: IFileManager) {

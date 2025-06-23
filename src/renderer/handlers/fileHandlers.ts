@@ -1,8 +1,8 @@
 import "@milkdown/theme-nord/style.css"
 
-import { electronAPI } from '../../shared/constants/electronAPI'
-import Response from "../../shared/interface/Response"
-import { default as TabData, default as TabsData } from "../../shared/interface/TabData"
+import { electronAPI } from '@shared/constants/electronAPI'
+import Response from "@shared/types/Response"
+import { default as TabData, default as TabsData } from "@shared/types/TabData"
 import TabDataManager from "../modules/core/TabDataManager"
 
 export default function registerFileHandlers() {
