@@ -15,7 +15,6 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     minimizeWindow: () => { ipcRenderer.send(electronAPI.events.minimizeWindow) },
     maximizeWindow: () => { ipcRenderer.send(electronAPI.events.maximizeWindow) },
     unmaximizeWindow: () => { ipcRenderer.send(electronAPI.events.unmaximizeWindow) },
-    closeWindow: () => { ipcRenderer.send(electronAPI.events.closeWindow) },
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
@@ -23,6 +22,6 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
     closeTab: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.closeTab, data) },
-
-    confirm: (message: string) => { return ipcRenderer.invoke(electronAPI.events.confirm, message) },
+    
+    exit: (data: TabData[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) }
 })

@@ -29,8 +29,9 @@ diContainer.bind<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
 
 const _tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
 
-diContainer.bind<IFileService>(DI_KEYS.FileService)
-  .toDynamicValue(() => new FileService(_fileManager, _tabSessionRepository, _dialogService))
-  .inSingletonScope()
+diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
+// diContainer.bind<IFileService>(DI_KEYS.FileService)
+//     .toDynamicValue(() => new FileService(_fileManager, _tabSessionRepository, _dialogService))
+//     .inSingletonScope()
 
 export default diContainer

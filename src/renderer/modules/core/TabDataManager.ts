@@ -69,7 +69,7 @@ export default class TabDataManager {
         }
     }
 
-    getActivatedTab(): TabData {
+    getActivatedTabData(): TabData {
         const tab = this.tabs[this.activatedTabIndex]
         return {
             id: tab.id,
@@ -128,23 +128,18 @@ export default class TabDataManager {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
             if (tab.id === id) {
+                const wasActivate = this.activatedTabIndex === i
+                
                 tab.destroyTabDiv()
                 tab.destroyEditorBoxDiv()
                 this.tabs.splice(i, 1)
-                break
+
+                if (wasActivate) {
+                    this.activatedTabIndex = Math.min(i, this.tabs.length - 1)
+                    this.tabs[this.activatedTabIndex]?.setActive()
+                }
             }
         }
-
-        if (this.tabs.length === 0) {
-            this.activatedTabIndex = 0
-
-            // TODO: quit.
-            return 
-        } else if (this.activatedTabIndex >= this.tabs.length - 1) {
-            this.activatedTabIndex = this.tabs.length - 1
-        }
-
-        this.tabs[this.activatedTabIndex].setActive()
     }
 
     private createTabBox(fileName: string) {
@@ -239,10 +234,10 @@ class Tab {
                 .split('\n')[0]
                 .trim()
 
-            this.fileName = firstLine || 'Untitled'
+            return firstLine || 'Untitled'
+        } else {
+            return this.fileName
         }
-
-        return this.fileName
     }
 
     getContent(): string {

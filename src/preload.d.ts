@@ -20,7 +20,6 @@ declare global {
             minimizeWindow: () => void
             maximizeWindow: () => void
             unmaximizeWindow: () => void
-            closeWindow: () => void
 
             newTab: () => Promise<Response<number>>
             open: () => Promise<Response<TabData>>
@@ -28,8 +27,8 @@ declare global {
             saveAs: (data: TabData) => promise<Response<TabData>>
             saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
             closeTab: (data: TabData) => Promise<Response<void>>
-
-            confirm: (message: string) => Promise<boolean>
+            
+            exit: (data: TabData[]) => Promise<void>
         }
     }
 }

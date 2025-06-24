@@ -7,6 +7,8 @@ import { DATASET_ATTR_TAB_ID } from './constants/dom'
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
+import registerExitHandlers from './handlers/exitHandlers'
+
 import TabDataManager from './modules/core/TabDataManager'
 
 let contextMenu: HTMLElement
@@ -23,6 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerWindowHandlers()
     registerFileHandlers()
     registerLoadHandlers()
+    registerExitHandlers()
 
     bindMenuBarEvents()
     bindDocumentClickEvents()

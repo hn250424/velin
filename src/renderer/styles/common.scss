@@ -25,3 +25,8 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.not_implemented {
+    color: gv.$grey-3 !important;
+    cursor: default !important;
+}

@@ -71,14 +71,7 @@ describe('loadService.loadedRenderer: ', () => {
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('tabSession')
         const sentData = fakeMainWindow.webContents.send.mock.calls[0][1]
         expect(Array.isArray(sentData)).toBe(true)
-        expect(sentData.length).toBe(1)
-        expect(sentData[0]).toEqual({
-            id: 0,
-            isModified: false,
-            filePath: '',
-            fileName: '',
-            content: '',
-        })
+        expect(sentData.length).toBe(0)
     })
 
     test('loadedRenderer: tabSession text does not exist(length === 0)', async () => {
@@ -94,13 +87,6 @@ describe('loadService.loadedRenderer: ', () => {
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('tabSession')
         const sentData = fakeMainWindow.webContents.send.mock.calls[0][1]
         expect(Array.isArray(sentData)).toBe(true)
-        expect(sentData.length).toBe(1)
-        expect(sentData[0]).toEqual({
-            id: 0,
-            isModified: false,
-            filePath: '',
-            fileName: '',
-            content: '',
-        })
+        expect(sentData.length).toBe(0)
     })
 })

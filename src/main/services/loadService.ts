@@ -8,25 +8,12 @@ export async function loadedRenderer(
     fileManager: IFileManager,
     tabSessionRepository: ITabSessionRepository
 ) {
-    const exists = await fileManager.exists(tabSessionRepository.getTabSessionPath())
-    const tabSessionArr = exists ? await tabSessionRepository.readTabSession() : []
-
-    if (!exists || tabSessionArr.length === 0) {
-        const emptySession = [{ id: 0, filePath: '' }]
-        await tabSessionRepository.writeTabSession(emptySession)
-
-        const tabDataArr = emptySession.map(({ id, filePath }) => ({
-            id,
-            isModified: false,
-            filePath,
-            fileName: '',
-            content: '',
-        }))
-
-        mainWindow.webContents.send(electronAPI.events.tabSession, tabDataArr)
+    const tabSessionArr = await tabSessionRepository.readTabSession()
+    if (tabSessionArr.length === 0) {
+        mainWindow.webContents.send(electronAPI.events.tabSession, [])
         return
     }
-
+    
     let isChanged = false
     const arr = await Promise.all(
         tabSessionArr.map(async (data) => {

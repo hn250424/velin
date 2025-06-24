@@ -26,14 +26,14 @@ function bindMenuFileCommands() {
     })
 
     document.getElementById('save').addEventListener('click', async () => {
-        const tabData = tabDataManager.getActivatedTab()
+        const tabData = tabDataManager.getActivatedTabData()
         if (!tabData.isModified) return
         const response: Response<TabData> = await window[electronAPI.channel].save(tabData)
         if (response.result) tabDataManager.applySaveResult(response.data)
     })
 
     document.getElementById('save_as').addEventListener('click', async () => {
-        const tabData: TabsData = tabDataManager.getActivatedTab()
+        const tabData: TabsData = tabDataManager.getActivatedTabData()
         const response: Response<TabData> = await window[electronAPI.channel].saveAs(tabData)
         if (response.result) {
             const wasApplied = tabDataManager.applySaveResult(response.data)
@@ -48,7 +48,7 @@ function bindMenuFileCommands() {
     })
 
     document.getElementById('close_tab').addEventListener('click', async () => {
-        const tabData: TabsData = tabDataManager.getActivatedTab()
+        const tabData: TabsData = tabDataManager.getActivatedTabData()
         const response: Response<void> = await window[electronAPI.channel].closeTab(tabData)
         if (response.result) tabDataManager.removeTab(tabData.id)
     })

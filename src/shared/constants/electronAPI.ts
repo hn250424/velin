@@ -7,17 +7,18 @@ export const electronAPI = {
         // Renderer -> Main.
         loadedRenderer: 'loadedRenderer',
         showMainWindow: 'showMainWindow',
+
         minimizeWindow: 'minimizeWindow',
         maximizeWindow: 'maximizeWindow',
         unmaximizeWindow: 'unmaximizeWindow',
-        closeWindow: 'closeWindow',
+
         newTab: 'newTab',
         open: 'open',
         save: 'save',
         saveAs: 'saveAs',
         saveAll: 'saveAll',
         closeTab: 'closeTab',
-
-        confirm: 'confirm',
+        
+        exit: 'exit',
     }
 } as const

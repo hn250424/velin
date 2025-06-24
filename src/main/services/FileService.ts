@@ -5,17 +5,18 @@ import IDialogService from "../contracts/IDialogService"
 import IFileManager from "../contracts/IFileManager"
 import ITabSessionRepository from "../contracts/ITabSessionRepository"
 import IFileService from "./contracts/IFileService"
+import { inject } from "inversify"
+import DI_KEYS from "../constants/di_keys"
 
 export default class FileService implements IFileService {
     constructor(
-        private readonly fileManager: IFileManager,
-        private readonly tabSessionRepository: ITabSessionRepository,
-        private readonly dialogService: IDialogService,
+        @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
+        @inject(DI_KEYS.TabSessionRepository) private readonly tabSessionRepository: ITabSessionRepository,
+        @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
     ) {
 
     }
 
-    // TODO: return [] when json does not exist.
     async newTab() {
         const arr = await this.tabSessionRepository.readTabSession()
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
@@ -167,7 +168,7 @@ export default class FileService implements IFileService {
         let returnResult = false
 
         if (data.isModified) {
-            const confirm = await this.dialogService.showConfirmDialog('Do you want to save this file?')
+            const confirm = await this.dialogService.showConfirmDialog(`Do you want to save ${data.fileName} file?`)
 
             if (confirm) {
                 if (data.filePath === '') {
@@ -195,7 +196,7 @@ export default class FileService implements IFileService {
             returnResult = true
         } catch (e) {
             console.error(e)
-         }
+        }
 
         return {
             result: returnResult,

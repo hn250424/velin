@@ -13,22 +13,22 @@ export default function registerFileHandlers(mainWindow: BrowserWindow) {
     })
 
     ipcMain.handle(electronAPI.events.open, async () => {
-        return fileService.open()
+        return await fileService.open()
     })
 
     ipcMain.handle(electronAPI.events.save, async (event, data: TabData) => {
-        return fileService.save(data, mainWindow)
+        return await fileService.save(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.saveAs, async (e, data: TabData) => {
-        return fileService.saveAs(data, mainWindow)
+        return await fileService.saveAs(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.saveAll, async (event, data: TabData[]) => {
-        return fileService.saveAll(data, mainWindow)
+        return await fileService.saveAll(data, mainWindow)
     })
 
     ipcMain.handle(electronAPI.events.closeTab, async (e, data: TabData) => {
-        return fileService.closeTab(data, mainWindow)
+        return await fileService.closeTab(data, mainWindow)
     })
 }

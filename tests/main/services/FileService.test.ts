@@ -1,8 +1,7 @@
 import FileService from '@services/FileService'
 import Response from '@shared/types/Response'
 import TabData from '@shared/types/TabData'
-import TabSession from 'src/main/models/TabSession'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/core/FakeFileManager'
 import fakeDialogService, {
@@ -11,9 +10,6 @@ import fakeDialogService, {
     setFakeSaveDialogResult
 } from '../modules/features/fakeDialogService'
 import FakeTabSessionRepository from '../modules/features/FakeTabSessionRepository'
-import FileManager from 'src/main/modules/core/FileManager'
-
-//
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeFileManager: FakeFileManager
@@ -258,6 +254,7 @@ describe('FileService.saveAll', () => {
         await fakeTabSessionRepository.setTabSession(
             _dataArr.map(({ id, filePath }) => ({ id, filePath }))
         )
+        const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
         const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
@@ -275,6 +272,7 @@ describe('FileService.saveAll', () => {
         expect(file_3).toBe(_dataArr[3].content)
         expect(responseDataArr[3].isModified).toBe(false)
         expect(session[3].filePath).toBe(newFilePath)
+        expect(spy).toHaveBeenCalledTimes(3)
     })
 
     test('test all cases with cancel dialog', async () => {
@@ -288,6 +286,7 @@ describe('FileService.saveAll', () => {
         await fakeTabSessionRepository.setTabSession(
             _dataArr.map(({ id, filePath }) => ({ id, filePath }))
         )
+        const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
         const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
@@ -303,6 +302,7 @@ describe('FileService.saveAll', () => {
         expect(responseDataArr[2].isModified).toBe(false)
         expect(responseDataArr[3].isModified).toBe(true)
         expect(session[3].filePath).toBe('')
+        expect(spy).toHaveBeenCalledTimes(2)
     })
 })
 

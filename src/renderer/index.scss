@@ -15,7 +15,6 @@ $tab_width: 150px;
 $tab_right_margin: 10px;
 $tab_elem_padding: 5px;
 $tab_button_width: 20px;
-$add_tab_button_size: $title_bar_left_height;
 
 $menu_bar_height: 20px;
 $menu_bar_horizontal_margin: 10px;
@@ -114,13 +113,6 @@ $milkdown-padding: 16px;
     top: 50%;
     transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-}
-
-#addTabButton {
-    width: $add_tab_button_size;
-    height: $add_tab_button_size;
-
-    background-color: bisque;
 }
 
 #title_bar_right {

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
-
+import registerExitHandlers from './handlers/exitHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -42,6 +42,7 @@ const createWindow = () => {
     registerLoadHandlers(mainWindow)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow)
+    registerExitHandlers(mainWindow)
 
     loadUrl(mainWindow)
 }
@@ -49,8 +50,6 @@ const createWindow = () => {
 if (started) app.quit()
 app.on('ready', createWindow)
 app.on('window-all-closed', () => {
-    // TODO: Confirm save action.
-
     if (process.platform !== 'darwin') {
         app.quit()
     }

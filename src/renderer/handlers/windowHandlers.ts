@@ -19,5 +19,4 @@ export default function registerWindowHandlers() {
     })
 
     document.getElementById('minimizeWindow').addEventListener('click', () => { window[electronAPI.channel].minimizeWindow() })
-    document.getElementById('closeWindow').addEventListener('click', () => { window[electronAPI.channel].closeWindow() })
 }

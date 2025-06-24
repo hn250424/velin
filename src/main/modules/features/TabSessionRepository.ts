@@ -12,12 +12,12 @@ export default class TabSessionRepository implements ITabSessionRepository {
     }
 
     async readTabSession(): Promise<TabSession[]> {
-        if (!(await this.fileManager.exists(this.tabSessionPath))) {
+        try {
+            const json = await this.fileManager.read(this.tabSessionPath)
+            return JSON.parse(json)
+        } catch (e) {
             return []
         }
-
-        const json = await this.fileManager.read(this.tabSessionPath)
-        return json.trim() ? JSON.parse(json) : []
     }
 
     async writeTabSession(tabSessionArr: TabSession[]) {
