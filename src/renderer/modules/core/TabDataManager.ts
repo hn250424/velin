@@ -11,7 +11,8 @@ export default class TabDataManager {
     private static instance: TabDataManager | null = null
     private tabs: Tab[] = []
     private id = 0
-    private _activatedTabIndex = 0
+    private _activatedTabIndex = 0  // file.
+    private _contextTabId = -1  // contextmenu.
 
     private constructor() { }
 
@@ -35,6 +36,7 @@ export default class TabDataManager {
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const { tabDiv, tabSpan, tabButton } = this.createTabBox(fileName)
         tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
+        tabSpan.title = filePath || ''
         document.getElementById('tab_container').appendChild(tabDiv)
 
         const editorBoxDiv = document.createElement('div')
@@ -91,7 +93,23 @@ export default class TabDataManager {
         })
     }
 
-    getTabData(): TabData[] {
+    removeContextTabId() {
+        this._contextTabId = -1
+    }
+
+    getTabDataById(id: number): TabData {
+        const tab = this.tabs.find(tab => tab.id === id)
+        if (!tab) return null
+        return {
+            id: tab.id,
+            isModified: tab.isModified,
+            filePath: tab.filePath,
+            fileName: tab.resolveFileName(),
+            content: tab.getContent(),
+        }
+    }
+
+    getAllTabData(): TabData[] {
         return this.tabs.map(tab => ({
             id: tab.id,
             isModified: tab.isModified,
@@ -108,8 +126,8 @@ export default class TabDataManager {
                 this.tabs[i].isModified = false
                 this.tabs[i].filePath = result.filePath
                 this.tabs[i].fileName = result.fileName
-                this.tabs[i].tabSpanTextContent = result.fileName
-                this.tabs[i].tabButtonTextContent = 'x'
+                this.tabs[i].setTabSpanTextContent(result.fileName)
+                this.tabs[i].setTabButtonTextContent('×')
                 this.tabs[i].setContent(result.content)
 
                 wasApplied = true
@@ -124,21 +142,55 @@ export default class TabDataManager {
         })
     }
 
+    removeTabAt(index: number) {
+        this.tabs[index].destroyTabDiv()
+        this.tabs[index].destroyEditorBoxDiv()
+        this.tabs.splice(index, 1)
+    }
+
     removeTab(id: number) {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
             if (tab.id === id) {
                 const wasActivate = this.activatedTabIndex === i
-                
-                tab.destroyTabDiv()
-                tab.destroyEditorBoxDiv()
-                this.tabs.splice(i, 1)
+
+                this.removeTabAt(i)
 
                 if (wasActivate) {
                     this.activatedTabIndex = Math.min(i, this.tabs.length - 1)
                     this.tabs[this.activatedTabIndex]?.setActive()
                 }
             }
+        }
+    }
+
+    removeTabsExcept(results: boolean[]) {
+        for (let i = this.tabs.length - 1; i >= 0; i--) {
+            if (results[i]) this.removeTabAt(i)
+        }
+
+        this.activatedTabIndex = 0
+        this.tabs[this.activatedTabIndex].setActive()
+    }
+
+    removeTabsToRight(results: boolean[]) {
+        for (let i = this.tabs.length - 1; i >= 0; i--) {
+            if (results[i]) this.removeTabAt(i)
+        }
+
+        if (this.activatedTabIndex > this.tabs.length - 1) {
+            this.activatedTabIndex = this.tabs.length - 1
+            this.tabs[this.activatedTabIndex].setActive()
+        }
+    }
+
+    removeAllTabs(results: boolean[]) {
+        for (let i = this.tabs.length - 1; i >= 0; i--) {
+            if (results[i]) this.removeTabAt(i)
+        }
+        if (this.activatedTabIndex > this.tabs.length - 1) {
+            this.activatedTabIndex = this.tabs.length - 1
+            this.tabs[this.activatedTabIndex]?.setActive()
         }
     }
 
@@ -150,7 +202,7 @@ export default class TabDataManager {
         span.textContent = fileName ? fileName : "Untitled"
 
         const button = document.createElement('button')
-        button.textContent = 'x'
+        button.textContent = '×'
 
         div.appendChild(span)
         div.appendChild(button)
@@ -164,6 +216,14 @@ export default class TabDataManager {
 
     set activatedTabIndex(index: number) {
         this._activatedTabIndex = index
+    }
+
+    get contextTabId() {
+        return this._contextTabId
+    }
+
+    set contextTabId(id: number) {
+        this._contextTabId = id
     }
 }
 
@@ -207,17 +267,17 @@ class Tab {
                 handleDOMEvents: {
                     input: (view, event) => {
                         if (!this.isModified) {
-                            this.tabButtonTextContent = 'o'
+                            this.setTabButtonTextContent('•')
                             this.isModified = true
                         }
                         return false
                     },
 
                     blur: (view, event) => {
-                        if (this.filePath === '' && this.isModified) {
+                        if (!this.filePath && this.isModified) {
                             const firstLine = view.state.doc.textBetween(0, view.state.doc.content.size).split('\n')[0].trim()
-                            if (firstLine) this.tabSpanTextContent = firstLine
-                            else this.tabSpanTextContent = 'Untitled'
+                            if (firstLine) this.setTabSpanTextContent(firstLine)
+                            else this.setTabSpanTextContent('Untitled')
                         }
                         return false
                     }
@@ -281,6 +341,14 @@ class Tab {
         this.tabDiv.style.background = 'grey'
     }
 
+    setTabSpanTextContent(text: string) {
+        this._tabSpan.textContent = text
+    }
+
+    setTabButtonTextContent(text: string) {
+        this._tabButton.textContent = text
+    }
+
     get id(): number {
         return this._id
     }
@@ -313,12 +381,12 @@ class Tab {
         return this._tabDiv
     }
 
-    set tabSpanTextContent(text: string) {
-        this._tabSpan.textContent = text
+    get tabSpan() {
+        return this._tabSpan
     }
 
-    set tabButtonTextContent(text: string) {
-        this._tabButton.textContent = text
+    get tabButton() {
+        return this._tabButton
     }
 
     set isModified(status: boolean) {

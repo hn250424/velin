@@ -10,6 +10,7 @@ import registerWindowHandlers from './handlers/windowHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 
 import TabDataManager from './modules/core/TabDataManager'
+import Response from '@shared/types/Response'
 
 let contextMenu: HTMLElement
 let menuBar: HTMLElement
@@ -27,49 +28,75 @@ window.addEventListener('DOMContentLoaded', () => {
     registerLoadHandlers()
     registerExitHandlers()
 
+    const tabDataManager = TabDataManager.getInstance()
+    bindDocumentClickEvents(tabDataManager)
+    bindDocumentContextMenuEvents(tabDataManager)
+    bindDocumentHoverEvents(tabDataManager)
     bindMenuBarEvents()
-    bindDocumentClickEvents()
-    bindDocumentContextMenuEvents()
 
     window[electronAPI.channel].loadedRenderer()
 })
 
-function bindDocumentContextMenuEvents() {
+function bindDocumentContextMenuEvents(tabDataManager: TabDataManager) {
     document.addEventListener('contextmenu', (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
 
         const tab = (e.target as HTMLElement).closest('.tab') as HTMLElement
         if (!tab) {
             contextMenu.style.display = 'none'
+            tabDataManager.removeContextTabId()
         } else {
             e.preventDefault()
             contextMenu.style.display = 'flex'
             contextMenu.style.left = `${e.clientX}px`
             contextMenu.style.top = `${e.clientY}px`
+            tabDataManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
         }
     })
 }
 
-function bindDocumentClickEvents() {
-    document.addEventListener('click', (e) => {
+function bindDocumentClickEvents(tabDataManager: TabDataManager) {
+    document.addEventListener('click', async (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
         contextMenu.style.display = 'none'
 
         const target = e.target as HTMLElement
-        const tabDiv = target.closest('.tab') as HTMLElement   
+        const tabDiv = target.closest('.tab') as HTMLElement
         if (tabDiv) {
             if (target.tagName === 'BUTTON') {
-                const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
-                //
+                const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
+                const tabData = tabDataManager.getTabDataById(id)
+                const response: Response<void> = await window[electronAPI.channel].closeTab(tabData)
+                if (response.result) tabDataManager.removeTab(tabData.id)
             } else if (target.tagName === 'SPAN') {
                 const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
-                if (id) {
-                    const tabDataManager = TabDataManager.getInstance()
-                    tabDataManager.setActivateTabWithId(Number(id))
-                }
+                tabDataManager.setActivateTabWithId(parseInt(id, 10))
             }
         }
     })
+}
+
+function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
+    document.addEventListener('mouseenter', (e) => {
+        const target = e.target
+        if (!(target instanceof HTMLElement)) return
+        const tabDiv = target.closest('.tab') as HTMLElement
+        if (!tabDiv) return
+        const button = tabDiv.querySelector('button')
+        if (button) button.textContent = '×'
+    }, true)
+
+    document.addEventListener('mouseleave', (e) => {
+        const target = e.target
+        if (!(target instanceof HTMLElement)) return
+        const tabDiv = target.closest('.tab') as HTMLElement
+        if (!tabDiv) return
+        const button = tabDiv.querySelector('button')
+        if (!button) return
+        const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
+        const tab = tabDataManager.getTabDataById(id)
+        button.textContent = tab.isModified ? '•' : '×'
+    }, true)
 }
 
 function bindMenuBarEvents() {

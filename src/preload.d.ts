@@ -22,11 +22,15 @@ declare global {
             unmaximizeWindow: () => void
 
             newTab: () => Promise<Response<number>>
-            open: () => Promise<Response<TabData>>
-            save: (data: TabData) => promise<Response<TabData>>
-            saveAs: (data: TabData) => promise<Response<TabData>>
+            openFile: () => Promise<Response<TabData>>
+            save: (data: TabData) => Promise<Response<TabData>>
+            saveAs: (data: TabData) => Promise<Response<TabData>>
             saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
+
             closeTab: (data: TabData) => Promise<Response<void>>
+            closeTabsExcept: (exceptData: TabData, allData: TabData[]) => Promise<Response<boolean[]>>
+            closeTabsToRight: (referenceData: TabData, allData: TabData[]) => Promise<Response<boolean[]>>
+            closeAllTabs: (data: TabData[]) => Promise<Response<boolean[]>>
             
             exit: (data: TabData[]) => Promise<void>
         }

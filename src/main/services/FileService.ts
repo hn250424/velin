@@ -22,20 +22,14 @@ export default class FileService implements IFileService {
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: '' })
         await this.tabSessionRepository.writeTabSession(arr)
-        return {
-            result: true,
-            data: id
-        }
+        return id
     }
 
-    async open() {
+    async openFile() {
         const result = await this.dialogService.showOpenDialog()
 
         if (result.canceled || result.filePaths.length === 0) {
-            return {
-                result: false,
-                data: null
-            }
+            return null
         }
 
         const filePath = result.filePaths[0]
@@ -47,48 +41,36 @@ export default class FileService implements IFileService {
         arr.push({ id: id, filePath: filePath })
         await this.tabSessionRepository.writeTabSession(arr)
 
-        return {
-            result: true,
-            data: { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
-        }
+        return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
     }
 
-    async save(data: TabData, mainWindow: BrowserWindow) {
+    async save(data: TabData, mainWindow: BrowserWindow, writeSession = true) {
         if (!data.filePath) {
             const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
 
             if (result.canceled || !result.filePath) {
-                return {
-                    result: false,
-                    data: data
-                }
+                return data
             } else {
                 await this.fileManager.write(result.filePath, data.content)
 
                 const tabSession = await this.tabSessionRepository.readTabSession()
                 tabSession.find(s => s.id === data.id).filePath = result.filePath
-                await this.tabSessionRepository.writeTabSession(tabSession)
+                if (writeSession) await this.tabSessionRepository.writeTabSession(tabSession)
 
                 return {
-                    result: true,
-                    data: {
-                        ...data,
-                        isModified: false,
-                        filePath: result.filePath,
-                        fileName: this.fileManager.getBasename(result.filePath)
-                    }
+                    ...data,
+                    isModified: false,
+                    filePath: result.filePath,
+                    fileName: this.fileManager.getBasename(result.filePath)
                 }
             }
         } else {
             await this.fileManager.write(data.filePath, data.content)
             return {
-                result: true,
-                data: {
-                    ...data,
-                    isModified: false,
-                    filePath: data.filePath,
-                    fileName: this.fileManager.getBasename(data.filePath)
-                }
+                ...data,
+                isModified: false,
+                filePath: data.filePath,
+                fileName: this.fileManager.getBasename(data.filePath)
             }
         }
     }
@@ -97,10 +79,7 @@ export default class FileService implements IFileService {
         const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
 
         if (result.canceled || !result.filePath) {
-            return {
-                result: false,
-                data: data
-            }
+            return data
         } else {
             await this.fileManager.write(result.filePath, data.content)
 
@@ -117,10 +96,7 @@ export default class FileService implements IFileService {
                 content: data.content
             }
 
-            return {
-                result: true,
-                data: newData
-            }
+            return newData
         }
     }
 
@@ -131,54 +107,32 @@ export default class FileService implements IFileService {
         for (const tab of data) {
             const { id, isModified, filePath, fileName, content } = tab
 
-            if ((!filePath) && (!isModified)) {
+            if (!isModified) {
                 sessionArr.push({ id: id, filePath: filePath })
                 responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: fileName, content: content })
-            } else if ((!filePath) && isModified) {
-                const result = await this.dialogService.showSaveDialog(mainWindow, fileName)
-
-                if (result.canceled || !result.filePath) {
-                    sessionArr.push({ id: id, filePath: filePath })
-                    responseArr.push({ id: id, isModified: true, filePath: filePath, fileName: fileName, content: content })
-                } else {
-                    await this.fileManager.write(result.filePath, content)
-
-                    sessionArr.push({ id: id, filePath: result.filePath })
-                    responseArr.push({ id: id, isModified: false, filePath: result.filePath, fileName: this.fileManager.getBasename(result.filePath), content: content })
-                }
-            } else if (filePath && (!isModified)) {
-                sessionArr.push({ id: id, filePath: filePath })
-                responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: this.fileManager.getBasename(filePath), content: content })
-            } else if (filePath && isModified) {
-                await this.fileManager.write(filePath, content)
-                sessionArr.push({ id: id, filePath: filePath })
-                responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: this.fileManager.getBasename(filePath), content: content })
+                continue
             }
+            
+            const result = await this.save(tab, mainWindow, false)
+            sessionArr.push({ id: result.id, filePath: result.filePath })
+            responseArr.push(result)
         }
 
         await this.tabSessionRepository.writeTabSession(sessionArr)
 
-        return {
-            result: true,
-            data: responseArr
-        }
+        return responseArr
     }
 
-    async closeTab(data: TabData, mainWindow: BrowserWindow) {
-        let returnResult = false
-
+    async closeTab(data: TabData, mainWindow: BrowserWindow, writeSession = true) {
         if (data.isModified) {
             const confirm = await this.dialogService.showConfirmDialog(`Do you want to save ${data.fileName} file?`)
 
             if (confirm) {
-                if (data.filePath === '') {
+                if (!data.filePath) {
                     const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
 
                     if (result.canceled || !result.filePath) {
-                        return {
-                            result: returnResult,
-                            data: undefined as void
-                        }
+                        return false
                     } else {
                         await this.fileManager.write(result.filePath, data.content)
                     }
@@ -189,19 +143,87 @@ export default class FileService implements IFileService {
         }
 
         // Delete session.
-        try {
-            const tabSession = await this.tabSessionRepository.readTabSession()
-            const updatedSession = tabSession.filter(session => session.id !== data.id)
-            await this.tabSessionRepository.writeTabSession(updatedSession)
-            returnResult = true
-        } catch (e) {
-            console.error(e)
+        if (writeSession) {
+            try {
+                const tabSession = await this.tabSessionRepository.readTabSession()
+                const updatedSession = tabSession.filter(session => session.id !== data.id)
+                await this.tabSessionRepository.writeTabSession(updatedSession)
+            } catch (e) {
+                console.error(e)
+                return false
+            }
         }
 
-        return {
-            result: returnResult,
-            data: undefined as void
+        return true
+    }
+
+    async closeTabsExcept(exceptData: TabData, allData: TabData[], mainWindow: BrowserWindow): Promise<boolean[]> {
+        const sessionArr: TabSession[] = []
+        const responseArr: boolean[] = []
+
+        for (const data of allData) {
+            if (exceptData.id === data.id) {
+                sessionArr.push({ id: data.id, filePath: data.filePath })
+                responseArr.push(false)
+                continue
+            }
+
+            const result = await this.closeTab(data, mainWindow, false)
+            if (result) {
+                responseArr.push(true)
+            } else {
+                sessionArr.push({ id: data.id, filePath: data.filePath })
+                responseArr.push(false)
+            }
         }
+
+        await this.tabSessionRepository.writeTabSession(sessionArr)
+
+        return responseArr
+    }
+
+    async closeTabsToRight(referenceData: TabData, allData: TabData[], mainWindow: BrowserWindow): Promise<boolean[]> {
+        const refIdx = allData.findIndex(data => data.id === referenceData.id)
+
+        const sessionToKeep = []
+        const responseArr = []
+        for (let i = 0; i <= refIdx; i++) {
+            sessionToKeep.push({ id: allData[i].id, filePath: allData[i].filePath })
+            responseArr.push(false)
+        }
+
+        for (let i = refIdx + 1; i < allData.length; i++) {
+            const result = await this.closeTab(allData[i], mainWindow, false)
+            if (result) {
+                responseArr.push(true)
+            } else {
+                responseArr.push(false)
+                sessionToKeep.push({ id: allData[i].id, filePath: allData[i].filePath })
+            }
+        }
+
+        await this.tabSessionRepository.writeTabSession(sessionToKeep)
+
+        return responseArr
+    }
+
+    async closeAllTabs(data: TabData[], mainWindow: BrowserWindow): Promise<boolean[]> {
+        const sessionArr = []
+        const responseArr = []
+        
+        for (const tab of data) {
+            const result = await this.closeTab(tab, mainWindow, false)
+
+            if (result) {
+                responseArr.push(true)
+            } else {
+                responseArr.push(false)
+                sessionArr.push({ id: tab.id, filePath: tab.filePath })
+            }
+        }
+
+        await this.tabSessionRepository.writeTabSession(sessionArr)
+        return responseArr
     }
 }
 

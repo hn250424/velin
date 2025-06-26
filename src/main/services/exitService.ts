@@ -17,29 +17,30 @@ export default async function exit(
     for (const tab of data) {
         const { id, isModified, filePath, fileName, content } = tab
 
-        if ((!filePath) && (!isModified)) {
+        if (!isModified) {
             sessionArr.push({ id: id, filePath: filePath })
-        } else if ((!filePath) && isModified) {
-            const confirm = await dialogService.showConfirmDialog(`Do you want to save ${fileName} file?`)
-            if (confirm) {
-                const result = await dialogService.showSaveDialog(mainWindow, fileName)
+            continue
+        }
 
-                if (result.canceled || !result.filePath) {
-                    sessionArr.push({ id: id, filePath: filePath })
-                } else {
-                    await fileManager.write(result.filePath, content)
-
-                    sessionArr.push({ id: id, filePath: result.filePath })
-                }
-            }
-        } else if (filePath && (!isModified)) {
+        const confirm = await dialogService.showConfirmDialog(`Do you want to save ${fileName} file?`)
+        if (!confirm) {
             sessionArr.push({ id: id, filePath: filePath })
-        } else if (filePath && isModified) {
-            const confirm = await dialogService.showConfirmDialog(`Do you want to save ${fileName} file?`)
-            if (confirm) {
-                await fileManager.write(filePath, content)
+            continue
+        }
+
+        if (!filePath) {
+            const result = await dialogService.showSaveDialog(mainWindow, fileName)
+
+            if (result.canceled || !result.filePath) {
                 sessionArr.push({ id: id, filePath: filePath })
+            } else {
+                await fileManager.write(result.filePath, content)
+
+                sessionArr.push({ id: id, filePath: result.filePath })
             }
+        } else if (filePath) {
+            await fileManager.write(filePath, content)
+            sessionArr.push({ id: id, filePath: filePath })
         }
     }
 

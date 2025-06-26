@@ -9,20 +9,17 @@
 
 <body>
     <div id="tab_context_menu" class="dropdown">
-        <div id="tab_close" class="dropdown_item">
-            Close Tab<span class="shortcut">Ctrl+W</span>
+        <div id="tab_context_close" class="dropdown_item">
+            Close<span class="shortcut">Ctrl+W</span>
         </div>
-        <div id="tab_close_others" class="dropdown_item">
-            Close Other Tabs<span class="shortcut">Ctrl+Alt+O</span>
+        <div id="tab_context_close_others" class="dropdown_item">
+            Close Others<span class="shortcut"></span>
         </div>
-        <div id="tab_close_left" class="dropdown_item">
-            Close Tabs to the Left<span class="shortcut">Ctrl+Alt+←</span>
+        <div id="tab_context_close_right" class="dropdown_item">
+            Close to the Right<span class="shortcut"></span>
         </div>
-        <div id="tab_close_right" class="dropdown_item">
-            Close Tabs to the Right<span class="shortcut">Ctrl+Alt+→</span>
-        </div>
-        <div id="tab_close_all" class="dropdown_item">
-            Close All Tabs<span class="shortcut">Ctrl+Alt+A</span>
+        <div id="tab_context_close_all" class="dropdown_item">
+            Close All<span class="shortcut">Ctrl+K W</span>
         </div>
     </div>
 
@@ -45,17 +42,17 @@
             <div class="menu_item" tabindex="0">
                 File
                 <div class="dropdown">
-                    <div id="new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+W</span></div>
-                    <div id="new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span></div>
-                    <div id="open" class="dropdown_item">Open<span class="shortcut">Ctrl+O</span></div>
-                    <div id="Recent" class="dropdown_item not_implemented">Recent<span class="shortcut">Ctrl+O</span></div>
-                    <div id="save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
-                    <div id="save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
-                    <div id="save_all" class="dropdown_item">Save All<span class="shortcut">Ctrl+Alt+S</span></div>
-                    <div id="close_tab" class="dropdown_item">Close Tab<span class="shortcut">Ctrl+Alt+S</span></div>
+                    <!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
+                    <div id="file_menu_new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span></div>
+                    <div id="file_menu_open_file" class="dropdown_item">Open File<span class="shortcut">Ctrl+O</span></div>
+                    <!-- <div id="file_menu_open_folder" class="dropdown_item">Open Folder<span class="shortcut">Ctrl+K Ctrl+O</span></div> -->
+                    <!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
+                    <div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
+                    <div id="file_menu_save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
+                    <div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut">Ctrl+K S</span></div>
                     <div class="dropdown_divider"></div>
-                    <div id="settings" class="dropdown_item not_implemented">Settings<span class="shortcut">Ctrl+,</span></div>
-                    <div id="menu_item_exit" class="exit dropdown_item">Exit</div>
+                    <div id="file_menu_settings" class="dropdown_item not_implemented">Settings<span class="shortcut">Ctrl+,</span></div>
+                    <div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span></div>
                 </div>
             </div>
 
@@ -63,7 +60,7 @@
                 Edit
                 <div class="dropdown">
                     <div class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span></div>
-                    <div class="dropdown_item">Redo<span class="shortcut">Ctrl+Y</span></div>
+                    <div class="dropdown_item">Redo<span class="shortcut">Ctrl+Shift+Z</span></div>
                     <div class="dropdown_divider"></div>
                     <div class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
                     <div class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span></div>
@@ -74,8 +71,8 @@
                     <div class="dropdown_item">Find Next<span class="shortcut">F3</span></div>
                     <div class="dropdown_item">Find Previous<span class="shortcut">Shift+F3</span></div>
                     <div class="dropdown_item">Replace<span class="shortcut">Ctrl+H</span></div>
-                    <div class="dropdown_divider"></div>
-                    <div class="dropdown_item">Font</div>
+                    <!-- <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Font</div> -->
                 </div>
             </div>
 
@@ -93,8 +90,8 @@
             <div class="menu_item" tabindex="0">
                 Help
                 <div class="dropdown">
-                    <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+M</span></div>
-                    <div class="dropdown_item">Information<span class="shortcut">Ctrl+I</span></div>
+                    <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div>
+                    <div class="dropdown_item">Information<span class="shortcut">F1</span></div>
                 </div>
             </div>
         </div>

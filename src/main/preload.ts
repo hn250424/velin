@@ -17,11 +17,15 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     unmaximizeWindow: () => { ipcRenderer.send(electronAPI.events.unmaximizeWindow) },
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
-    open: () => { return ipcRenderer.invoke(electronAPI.events.open) },
+    openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
     save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
+
     closeTab: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.closeTab, data) },
+    closeTabsExcept: (exceptData: TabData, allData: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsExcept, exceptData, allData) },
+    closeTabsToRight: (referenceData: TabData, allData: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsToRight, referenceData, allData) },
+    closeAllTabs: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeAllTabs, data) },
     
     exit: (data: TabData[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) }
 })

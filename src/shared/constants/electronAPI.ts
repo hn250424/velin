@@ -13,11 +13,15 @@ export const electronAPI = {
         unmaximizeWindow: 'unmaximizeWindow',
 
         newTab: 'newTab',
-        open: 'open',
+        openFile: 'openFile',
         save: 'save',
         saveAs: 'saveAs',
         saveAll: 'saveAll',
+
         closeTab: 'closeTab',
+        closeTabsExcept: 'closeTabsExcept',
+        closeTabsToRight: 'closeTabsToRight',
+        closeAllTabs: 'closeAllTabs',
         
         exit: 'exit',
     }

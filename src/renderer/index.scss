@@ -77,11 +77,15 @@ $milkdown-padding: 16px;
     display: flex;
     justify-content: space-between;
 
-    background-color: brown;
+    background-color: grey;
 }
 
 .tab:hover, .tab * {
     cursor: pointer;
+}
+
+.tab.active {
+    background-color: red;
 }
 
 .tab > span {
@@ -101,12 +105,7 @@ $milkdown-padding: 16px;
     position: relative;
 }
 
-.tab > button:hover {
-    color: transparent;
-}
-
 .tab > button:hover::after {
-    content: 'x';
     color: black;
     position: absolute;
     left: 50%;

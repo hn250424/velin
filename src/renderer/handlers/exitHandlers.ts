@@ -5,7 +5,7 @@ export default function registerExitHandlers() {
     const tabDataManager = TabDataManager.getInstance()
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
-            const tabData = tabDataManager.getTabData()
+            const tabData = tabDataManager.getAllTabData()
             window[electronAPI.channel].exit(tabData)
         })
     })
