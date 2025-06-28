@@ -1,12 +1,12 @@
-export default class ViewManager {
-    private static instance: ViewManager | null = null
+export default class WindowManager {
+    private static instance: WindowManager | null = null
     private windowMaxStatus = false
     
     private constructor() {}
 
-    static getInstance(): ViewManager {
+    static getInstance(): WindowManager {
         if (this.instance === null) {
-            this.instance = new ViewManager()
+            this.instance = new WindowManager()
         }
 
         return this.instance

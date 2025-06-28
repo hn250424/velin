@@ -8,6 +8,8 @@ import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
+import registerEditHandlers from './handlers/editHandlers'
+import registerViewHandlers from './handlers/viewHandlers'
 
 import TabDataManager from './modules/core/TabDataManager'
 import Response from '@shared/types/Response'
@@ -20,7 +22,7 @@ let titleBar: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
     contextMenu = document.getElementById('tab_context_menu')
-    menuBar = document.getElementById('#menu_bar')
+    menuBar = document.getElementById('menu_bar')
     menuItems = document.querySelectorAll('#menu_bar .menu_item')
     titleBar = document.getElementById('title_bar')
 
@@ -28,6 +30,8 @@ window.addEventListener('DOMContentLoaded', () => {
     registerFileHandlers()
     registerLoadHandlers()
     registerExitHandlers()
+    registerEditHandlers()
+    registerViewHandlers()
 
     const tabDataManager = TabDataManager.getInstance()
     bindDocumentClickEvents(tabDataManager)

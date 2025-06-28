@@ -33,6 +33,8 @@ declare global {
             closeAllTabs: (data: TabData[]) => Promise<Response<boolean[]>>
             
             exit: (data: TabData[]) => Promise<void>
+
+            paste: () => Promise<string>
         }
     }
 }

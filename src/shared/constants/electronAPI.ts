@@ -24,5 +24,7 @@ export const electronAPI = {
         closeAllTabs: 'closeAllTabs',
         
         exit: 'exit',
+
+        paste: 'paste'
     }
 } as const

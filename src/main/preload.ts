@@ -27,5 +27,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     closeTabsToRight: (referenceData: TabData, allData: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsToRight, referenceData, allData) },
     closeAllTabs: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeAllTabs, data) },
     
-    exit: (data: TabData[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) }
+    exit: (data: TabData[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) },
+
+    paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) }
 })

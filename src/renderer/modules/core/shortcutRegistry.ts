@@ -1,6 +1,6 @@
 const shortcutMap = new Map<string, () => any>()
 
-const shortcutRegistry  = {
+const shortcutRegistry = {
     register(key: string, handler: () => any) {
         shortcutMap.set(key, handler)
     },
@@ -19,7 +19,14 @@ const shortcutRegistry  = {
         if (e.ctrlKey) parts.push('Ctrl')
         if (e.shiftKey) parts.push('Shift')
         if (e.altKey) parts.push('Alt')
-        parts.push(e.key.toUpperCase())
+
+        let key = e.key
+
+        if (key === '=') key = '+'
+        if (key === 'Escape') key = 'Esc'
+        if (key === ' ') key = 'Space'
+
+        parts.push(key.toUpperCase())
         return parts.join('+')
     }
 }

@@ -207,8 +207,9 @@ $milkdown-padding: 16px;
     width: 100%;
     flex: 1;
 
-    overflow-x: auto;
-    overflow-y: auto;
+    // overflow-x: auto;
+    // overflow-y: auto;
+    overflow: hidden;
 
     background-color: yellowgreen;
 }
@@ -216,8 +217,9 @@ $milkdown-padding: 16px;
 .editorBox {
     width: 100%;
     height: 100%;
-    overflow-x: auto;
     overflow-y: auto;
+    transform-origin: top left;
+    
     background-color: white;
 }
 

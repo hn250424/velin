@@ -3,6 +3,7 @@ import { Editor, editorViewCtx, parserCtx, rootCtx } from "@milkdown/kit/core"
 import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
+import { undo, redo } from 'prosemirror-history'
 import "@milkdown/theme-nord/style.css"
 import TabData from '@shared/types/TabData'
 import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from '../../constants/dom'
@@ -205,6 +206,22 @@ export default class TabDataManager {
         else this.activeTabIndex = idx
     }
 
+    undo() {
+        this.tabs[this.activeTabIndex].editor.action((ctx) => {
+            const view = ctx.get(editorViewCtx)
+            const { state, dispatch } = view
+            undo(state, dispatch)
+        })
+    }
+
+    redo() {
+        this.tabs[this.activeTabIndex].editor.action((ctx) => {
+            const view = ctx.get(editorViewCtx)
+            const { state, dispatch } = view
+            redo(state, dispatch)
+        })
+    }
+
     private createTabBox(fileName: string) {
         const div = document.createElement('div')
         div.classList.add('tab')
@@ -287,6 +304,10 @@ class Tab {
 
         editor.action((ctx) => {
             const view = ctx.get(editorViewCtx)
+
+            // const newPlugins = [...view.state.plugins, TypingLoggerPlugin]
+            // const newState = view.state.reconfigure({ plugins: newPlugins })
+            // view.updateState(newState)
 
             view.setProps({
                 handleDOMEvents: {
@@ -426,3 +447,15 @@ class Tab {
         return this._editorBoxDiv
     }
 }
+
+// import { Plugin } from 'prosemirror-state'
+// const TypingLoggerPlugin = new Plugin({
+//     props: {
+//         handleDOMEvents: {
+//             input(view, event) {
+//                 console.log('Typing detected!')
+//                 return false
+//             },
+//         },
+//     },
+// })
