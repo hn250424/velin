@@ -5,16 +5,22 @@ import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import TabData from '@shared/types/TabData'
-import { DATASET_ATTR_TAB_ID } from '../../constants/dom'
+import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from '../../constants/dom'
 
 export default class TabDataManager {
     private static instance: TabDataManager | null = null
     private tabs: Tab[] = []
-    private id = 0
-    private _activatedTabIndex = 0  // file.
+    private _activeTabId = -1
+    private _activeTabIndex = -1  // file.
     private _contextTabId = -1  // contextmenu.
 
-    private constructor() { }
+    private tabContainer: HTMLElement
+    private editorContainer: HTMLElement
+
+    private constructor() {
+        this.tabContainer = document.getElementById('tab_container')
+        this.editorContainer = document.getElementById('editor_container')
+    }
 
     static getInstance(): TabDataManager {
         if (this.instance === null) {
@@ -37,7 +43,7 @@ export default class TabDataManager {
         const { tabDiv, tabSpan, tabButton } = this.createTabBox(fileName)
         tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
         tabSpan.title = filePath || ''
-        document.getElementById('tab_container').appendChild(tabDiv)
+        this.tabContainer.appendChild(tabDiv)
 
         const editorBoxDiv = document.createElement('div')
         editorBoxDiv.className = 'editorBox'
@@ -59,20 +65,19 @@ export default class TabDataManager {
                 view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
             )
         })
-        document.getElementById('editor_container').appendChild(editorBoxDiv)
+        this.editorContainer.appendChild(editorBoxDiv)
 
         this.tabs.push(new Tab(id, filePath, fileName, tabDiv, tabSpan, tabButton, editorBoxDiv, editor))
         if (activate) {
-            this.tabs.forEach((tab, i) => {
-                if (i === this.tabs.length - 1) tab.setActive()
-                else tab.setDeactive()
-            })
-            this.activatedTabIndex = this.tabs.length - 1
+            this.tabs[this.activeTabIndex]?.setDeactive()
+            this.activeTabIndex = this.tabs.length - 1
+            this.tabs[this.activeTabIndex].setActive()
+            this.activeTabId = id
         }
     }
 
     getActivatedTabData(): TabData {
-        const tab = this.tabs[this.activatedTabIndex]
+        const tab = this.tabs[this.activeTabIndex]
         return {
             id: tab.id,
             isModified: tab.isModified,
@@ -82,11 +87,11 @@ export default class TabDataManager {
         }
     }
 
-    setActivateTabWithId(id: number) {
+    activateTabById(id: number) {
         this.tabs.forEach((tab, index) => {
             if (tab.id === id) {
                 tab.setActive()
-                this.activatedTabIndex = index
+                this.activeTabIndex = index
             } else {
                 tab.setDeactive()
             }
@@ -127,7 +132,7 @@ export default class TabDataManager {
                 this.tabs[i].filePath = result.filePath
                 this.tabs[i].fileName = result.fileName
                 this.tabs[i].setTabSpanTextContent(result.fileName)
-                this.tabs[i].setTabButtonTextContent('×')
+                this.tabs[i].setTabButtonTextContent(NOT_MODIFIED_TEXT)
                 this.tabs[i].setContent(result.content)
 
                 wasApplied = true
@@ -152,14 +157,20 @@ export default class TabDataManager {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
             if (tab.id === id) {
-                const wasActivate = this.activatedTabIndex === i
+                const couldModify = this.activeTabIndex >= i
 
                 this.removeTabAt(i)
 
-                if (wasActivate) {
-                    this.activatedTabIndex = Math.min(i, this.tabs.length - 1)
-                    this.tabs[this.activatedTabIndex]?.setActive()
+                if (couldModify) {
+                    this.activeTabIndex--
+
+                    if (this.activeTabIndex > -1) {
+                        this.tabs[this.activeTabIndex].setActive()
+                        this.activeTabId = this.tabs[this.activeTabIndex].id
+                    }
                 }
+
+                break
             }
         }
     }
@@ -169,8 +180,9 @@ export default class TabDataManager {
             if (results[i]) this.removeTabAt(i)
         }
 
-        this.activatedTabIndex = 0
-        this.tabs[this.activatedTabIndex].setActive()
+        const idx = this.tabs.findIndex(tab => tab.id === this.activeTabId)
+        if (idx === -1) this.setLastTabAsActive()
+        else this.activeTabIndex = idx
     }
 
     removeTabsToRight(results: boolean[]) {
@@ -178,20 +190,19 @@ export default class TabDataManager {
             if (results[i]) this.removeTabAt(i)
         }
 
-        if (this.activatedTabIndex > this.tabs.length - 1) {
-            this.activatedTabIndex = this.tabs.length - 1
-            this.tabs[this.activatedTabIndex].setActive()
-        }
+        const idx = this.tabs.findIndex(tab => tab.id === this.activeTabId)
+        if (idx === -1) this.setLastTabAsActive()
+        else this.activeTabIndex = idx
     }
 
     removeAllTabs(results: boolean[]) {
         for (let i = this.tabs.length - 1; i >= 0; i--) {
             if (results[i]) this.removeTabAt(i)
         }
-        if (this.activatedTabIndex > this.tabs.length - 1) {
-            this.activatedTabIndex = this.tabs.length - 1
-            this.tabs[this.activatedTabIndex]?.setActive()
-        }
+
+        const idx = this.tabs.findIndex(tab => tab.id === this.activeTabId)
+        if (idx === -1) this.setLastTabAsActive()
+        else this.activeTabIndex = idx
     }
 
     private createTabBox(fileName: string) {
@@ -202,7 +213,7 @@ export default class TabDataManager {
         span.textContent = fileName ? fileName : "Untitled"
 
         const button = document.createElement('button')
-        button.textContent = '×'
+        button.textContent = NOT_MODIFIED_TEXT
 
         div.appendChild(span)
         div.appendChild(button)
@@ -210,12 +221,26 @@ export default class TabDataManager {
         return { tabDiv: div, tabSpan: span, tabButton: button }
     }
 
-    get activatedTabIndex() {
-        return this._activatedTabIndex
+    private setLastTabAsActive() {
+        this.activeTabIndex = this.tabs.length - 1
+        this.activeTabId = this.activeTabIndex >= 0 ? this.tabs[this.activeTabIndex].id : -1
+        this.tabs[this.activeTabIndex].setActive()
     }
 
-    set activatedTabIndex(index: number) {
-        this._activatedTabIndex = index
+    get activeTabId() {
+        return this._activeTabId
+    }
+
+    set activeTabId(id: number) {
+        this._activeTabId = id
+    }
+
+    get activeTabIndex() {
+        return this._activeTabIndex
+    }
+
+    set activeTabIndex(index: number) {
+        this._activeTabIndex = index
     }
 
     get contextTabId() {
@@ -267,7 +292,7 @@ class Tab {
                 handleDOMEvents: {
                     input: (view, event) => {
                         if (!this.isModified) {
-                            this.setTabButtonTextContent('•')
+                            this.setTabButtonTextContent(MODIFIED_TEXT)
                             this.isModified = true
                         }
                         return false

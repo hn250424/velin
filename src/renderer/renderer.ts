@@ -2,7 +2,7 @@ import './index.scss'
 
 import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '../shared/constants/electronAPI'
-import { DATASET_ATTR_TAB_ID } from './constants/dom'
+import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from './constants/dom'
 
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
@@ -11,6 +11,7 @@ import registerExitHandlers from './handlers/exitHandlers'
 
 import TabDataManager from './modules/core/TabDataManager'
 import Response from '@shared/types/Response'
+import shortcutRegistry from './modules/core/shortcutRegistry'
 
 let contextMenu: HTMLElement
 let menuBar: HTMLElement
@@ -33,6 +34,10 @@ window.addEventListener('DOMContentLoaded', () => {
     bindDocumentContextMenuEvents(tabDataManager)
     bindDocumentHoverEvents(tabDataManager)
     bindMenuBarEvents()
+
+    document.addEventListener('keydown', (e) => {
+        shortcutRegistry.handleKeyEvent(e)
+    })
 
     window[electronAPI.channel].loadedRenderer()
 })
@@ -70,32 +75,36 @@ function bindDocumentClickEvents(tabDataManager: TabDataManager) {
                 if (response.result) tabDataManager.removeTab(tabData.id)
             } else if (target.tagName === 'SPAN') {
                 const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
-                tabDataManager.setActivateTabWithId(parseInt(id, 10))
+                tabDataManager.activateTabById(parseInt(id, 10))
             }
         }
     })
 }
 
 function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
-    document.addEventListener('mouseenter', (e) => {
+    titleBar.addEventListener('mouseenter', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
         if (!tabDiv) return
-        const button = tabDiv.querySelector('button')
-        if (button) button.textContent = '×'
+        if (target.tagName === 'BUTTON') {
+            const button = tabDiv.querySelector('button')
+            if (button) button.textContent = NOT_MODIFIED_TEXT
+        }
     }, true)
 
-    document.addEventListener('mouseleave', (e) => {
+    titleBar.addEventListener('mouseleave', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
         if (!tabDiv) return
-        const button = tabDiv.querySelector('button')
-        if (!button) return
-        const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
-        const tab = tabDataManager.getTabDataById(id)
-        button.textContent = tab.isModified ? '•' : '×'
+        if (target.tagName === 'BUTTON') {
+            const button = tabDiv.querySelector('button')
+            if (!button) return
+            const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
+            const tab = tabDataManager.getTabDataById(id)
+            button.textContent = tab.isModified ? MODIFIED_TEXT : NOT_MODIFIED_TEXT
+        }
     }, true)
 }
 

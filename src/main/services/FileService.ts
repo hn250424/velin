@@ -79,7 +79,7 @@ export default class FileService implements IFileService {
         const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
 
         if (result.canceled || !result.filePath) {
-            return data
+            return null
         } else {
             await this.fileManager.write(result.filePath, data.content)
 
@@ -88,15 +88,13 @@ export default class FileService implements IFileService {
             arr.push({ id: id, filePath: result.filePath })
             this.tabSessionRepository.writeTabSession(arr)
 
-            const newData: TabData = {
+            return {
                 id: id,
                 isModified: false,
                 filePath: result.filePath,
                 fileName: this.fileManager.getBasename(result.filePath),
                 content: data.content
             }
-
-            return newData
         }
     }
 
