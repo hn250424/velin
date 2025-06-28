@@ -3,14 +3,16 @@ export const electronAPI = {
     events: {
         // Main -> Renderer.
         tabSession: 'tabSession',
+        onMaximizeWindow: 'onMaximizeWindow',
+        onUnmaximizeWindow: 'onUnmaximizeWindow',
 
         // Renderer -> Main.
         loadedRenderer: 'loadedRenderer',
         showMainWindow: 'showMainWindow',
 
-        minimizeWindow: 'minimizeWindow',
-        maximizeWindow: 'maximizeWindow',
-        unmaximizeWindow: 'unmaximizeWindow',
+        requestMinimizeWindow: 'requestMinimizeWindow',
+        requestMaximizeWindow: 'requestMaximizeWindow',
+        requestUnmaximizeWindow: 'requestUnmaximizeWindow',
 
         newTab: 'newTab',
         openFile: 'openFile',

@@ -10,21 +10,22 @@ import registerWindowHandlers from './handlers/windowHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerEditHandlers from './handlers/editHandlers'
 import registerViewHandlers from './handlers/viewHandlers'
+import registerSideHandlers from './handlers/sideHandlers'
 
 import TabDataManager from './modules/core/TabDataManager'
 import Response from '@shared/types/Response'
 import shortcutRegistry from './modules/core/shortcutRegistry'
 
 let contextMenu: HTMLElement
-let menuBar: HTMLElement
+let menuContainer: HTMLElement
 let menuItems: NodeListOf<HTMLElement>
-let titleBar: HTMLElement
+let title: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
     contextMenu = document.getElementById('tab_context_menu')
-    menuBar = document.getElementById('menu_bar')
-    menuItems = document.querySelectorAll('#menu_bar .menu_item')
-    titleBar = document.getElementById('title_bar')
+    menuContainer = document.getElementById('menu_container')
+    menuItems = document.querySelectorAll('#menu_container .menu_item')
+    title = document.getElementById('title')
 
     registerWindowHandlers()
     registerFileHandlers()
@@ -32,12 +33,13 @@ window.addEventListener('DOMContentLoaded', () => {
     registerExitHandlers()
     registerEditHandlers()
     registerViewHandlers()
+    registerSideHandlers()
 
     const tabDataManager = TabDataManager.getInstance()
     bindDocumentClickEvents(tabDataManager)
     bindDocumentContextMenuEvents(tabDataManager)
     bindDocumentHoverEvents(tabDataManager)
-    bindMenuBarEvents()
+    bindMenucontainerEvents()
 
     document.addEventListener('keydown', (e) => {
         shortcutRegistry.handleKeyEvent(e)
@@ -86,7 +88,7 @@ function bindDocumentClickEvents(tabDataManager: TabDataManager) {
 }
 
 function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
-    titleBar.addEventListener('mouseenter', (e) => {
+    title.addEventListener('mouseenter', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
@@ -97,7 +99,7 @@ function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
         }
     }, true)
 
-    titleBar.addEventListener('mouseleave', (e) => {
+    title.addEventListener('mouseleave', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
@@ -112,7 +114,7 @@ function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
     }, true)
 }
 
-function bindMenuBarEvents() {
+function bindMenucontainerEvents() {
     menuItems.forEach(item => {
         item.addEventListener('click', e => {
             e.stopPropagation()

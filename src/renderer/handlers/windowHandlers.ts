@@ -1,22 +1,24 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import WndowManager from "../modules/features/WndowManager"
+import LayoutManager from "../modules/features/LayoutManager"
 
 export default function registerWindowHandlers() {
+    const layoutManager = LayoutManager.getInstance()
     const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null
 
-    maximize.addEventListener('click', () => {
-        const windowManager = WndowManager.getInstance()
-
-        if (windowManager.isWindowMax()) {
-            maximize.src = 'src/renderer/assets/icons/maximize.png'
-            windowManager.setWindowMax(false)
-            window[electronAPI.channel].unmaximizeWindow()
-        } else {
-            maximize.src = 'src/renderer/assets/icons/unmaximize.png'
-            windowManager.setWindowMax(true)
-            window[electronAPI.channel].maximizeWindow() 
-        }
+    window[electronAPI.channel].onMaximizeWindow(() => {
+        maximize.src = 'src/renderer/assets/icons/unmaximize.png'
+        layoutManager.setWindowMax(true)
     })
 
-    document.getElementById('minimizeWindow').addEventListener('click', () => { window[electronAPI.channel].minimizeWindow() })
+    window[electronAPI.channel].onUnmaximizeWindow(() => {
+        maximize.src = 'src/renderer/assets/icons/maximize.png'
+        layoutManager.setWindowMax(false)
+    })
+
+    maximize.addEventListener('click', () => {
+        if (layoutManager.isWindowMax()) window[electronAPI.channel].requestUnmaximizeWindow()
+        else window[electronAPI.channel].requestMaximizeWindow() 
+    })
+
+    document.getElementById('minimizeWindow').addEventListener('click', () => { window[electronAPI.channel].requestMinimizeWindow() })
 }

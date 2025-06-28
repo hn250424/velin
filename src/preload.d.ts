@@ -12,14 +12,16 @@ declare global {
         [electronAPI.channel]: {
             // Main -> Renderer.
             tabSession: (callback: (tabs: TabData[]) => void) => void
+            onMaximizeWindow: (callback: () => void) => void
+            onUnmaximizeWindow: (callback: () => void) => void
 
             // Renderer -> Main.
             loadedRenderer: () => void
             showMainWindow: () => void
 
-            minimizeWindow: () => void
-            maximizeWindow: () => void
-            unmaximizeWindow: () => void
+            requestMinimizeWindow: () => void
+            requestMaximizeWindow: () => void
+            requestUnmaximizeWindow: () => void
 
             newTab: () => Promise<Response<number>>
             openFile: () => Promise<Response<TabData>>

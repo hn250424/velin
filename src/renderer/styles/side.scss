@@ -1,0 +1,42 @@
+@use './global_variables.scss' as gv;
+
+#side {
+    height: 100%;
+
+    display: flex;
+
+    flex-shrink: 0;
+}
+
+#side_menu_container {
+    width: gv.$icon_size;
+    margin: gv.$icon_vertical_margin gv.$icon_horizontal_margin;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#side_menu_container img {
+    width: gv.$icon_size;
+    height: gv.$icon_size;
+
+    margin: gv.$icon_vertical_margin gv.$icon_horizontal_margin;
+
+    background-color: white;
+}
+
+#side_menu_container img:hover {
+    cursor: pointer;
+}
+
+#tree {
+    width: 0px;
+    height: 100%;
+
+    transition: width 0.3s ease;
+
+    background-color: black;
+}

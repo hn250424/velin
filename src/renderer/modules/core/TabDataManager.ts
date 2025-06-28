@@ -15,6 +15,7 @@ export default class TabDataManager {
     private _activeTabIndex = -1  // file.
     private _contextTabId = -1  // contextmenu.
 
+    // private tabContainer: HTMLElement
     private tabContainer: HTMLElement
     private editorContainer: HTMLElement
 
@@ -158,16 +159,18 @@ export default class TabDataManager {
         for (let i = 0; i < this.tabs.length; i++) {
             const tab = this.tabs[i]
             if (tab.id === id) {
-                const couldModify = this.activeTabIndex >= i
+                const wasActive = this.activeTabIndex >= i
 
                 this.removeTabAt(i)
+                
+                if (wasActive || this.activeTabIndex > i) {
+                    this.activeTabIndex = Math.max(0, this.activeTabIndex - 1)
 
-                if (couldModify) {
-                    this.activeTabIndex--
-
-                    if (this.activeTabIndex > -1) {
+                    if (this.tabs.length > 0) {
                         this.tabs[this.activeTabIndex].setActive()
                         this.activeTabId = this.tabs[this.activeTabIndex].id
+                    } else {
+                        this.activeTabId = -1
                     }
                 }
 

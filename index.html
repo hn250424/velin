@@ -24,77 +24,106 @@
     </div>
 
     <div id="container">
-        <div id="title_bar" class="drag">
-            <div id="title_bar_left" class="no_drag">
-                <img src="src/renderer/assets/icons/file.png" id="logo" />
-                <div id="tab_container">
+        <div id="title" class="drag">
+            <span id="logo">●</span>
 
+            <div id="menu_container" class="no_drag">
+                <div class="menu_item" tabindex="0">
+                    File
+                    <div class="dropdown">
+                        <!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
+                        <div id="file_menu_new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span>
+                        </div>
+                        <div id="file_menu_open_file" class="dropdown_item">Open File<span
+                                class="shortcut">Ctrl+O</span></div>
+                        <!-- <div id="file_menu_open_folder" class="dropdown_item">Open Folder<span class="shortcut">Ctrl+K Ctrl+O</span></div> -->
+                        <!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
+                        <div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span>
+                        </div>
+                        <div id="file_menu_save_as" class="dropdown_item">Save As<span
+                                class="shortcut">Ctrl+Shift+S</span></div>
+                        <div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut"></span>
+                        </div>
+                        <div class="dropdown_divider"></div>
+                        <div id="file_menu_settings" class="dropdown_item not_implemented">Settings<span
+                                class="shortcut">Ctrl+,</span></div>
+                        <div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu_item" tabindex="0">
+                    Edit
+                    <div class="dropdown">
+                        <div id="edit_menu_undo" class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span>
+                        </div>
+                        <div id="edit_menu_redo" class="dropdown_item">Redo<span class="shortcut">Ctrl+Shift+Z</span>
+                        </div>
+                        <div class="dropdown_divider"></div>
+                        <div id="edit_menu_cut" class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
+                        <div id="edit_menu_copy" class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span>
+                        </div>
+                        <div id="edit_menu_paste" class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span>
+                        </div>
+                        <div class="dropdown_divider"></div>
+                        <div id="edit_menu_find" class="dropdown_item">Find<span class="shortcut">Ctrl+F</span>
+                        </div>
+                        <div id="edit_menu_find_next" class="dropdown_item">Find Next<span class="shortcut">F3</span>
+                        </div>
+                        <div id="edit_menu_find_previous" class="dropdown_item">Find Previous<span
+                                class="shortcut">Shift+F3</span></div>
+                        <div id="edit_menu_replace" class="dropdown_item">Replace<span class="shortcut">Ctrl+H</span>
+                        </div>
+                        <!-- <div class="dropdown_divider"></div>
+                    <div class="dropdown_item">Font</div> -->
+                    </div>
+                </div>
+
+                <div class="menu_item" tabindex="0">
+                    View
+                    <div class="dropdown">
+                        <div id="view_menu_zoom_in" class="dropdown_item">Zoom In<span class="shortcut">Ctrl++</span>
+                        </div>
+                        <div id="view_menu_zoom_out" class="dropdown_item">Zoom Out<span class="shortcut">Ctrl+-</span>
+                        </div>
+                        <div id="view_menu_zoom_reset" class="dropdown_item">Reset Zoom<span
+                                class="shortcut">Ctrl+0</span></div>
+                        <div class="dropdown_divider"></div>
+                        <div id="view_menu_fullscreen" class="dropdown_item">Fullscreen<span class="shortcut">F11</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu_item" tabindex="0">
+                    Help
+                    <div class="dropdown">
+                        <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div>
+                        <div class="dropdown_item">Information<span class="shortcut">F1</span></div>
+                    </div>
                 </div>
             </div>
 
-            <div id="title_bar_right" class="no_drag">
+            <div id="window" class="no_drag">
                 <img src="src/renderer/assets/icons/minimize.png" id="minimizeWindow" />
                 <img src="src/renderer/assets/icons/maximize.png" id="maximizeWindow" />
-                <img src="src/renderer/assets/icons/close.png" id="title_bar_exit" class="exit" />
+                <img src="src/renderer/assets/icons/close.png" id="title_exit" class="exit" />
             </div>
         </div>
-        <div id="menu_bar">
-            <div class="menu_item" tabindex="0">
-                File
-                <div class="dropdown">
-                    <!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
-                    <div id="file_menu_new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span></div>
-                    <div id="file_menu_open_file" class="dropdown_item">Open File<span class="shortcut">Ctrl+O</span></div>
-                    <!-- <div id="file_menu_open_folder" class="dropdown_item">Open Folder<span class="shortcut">Ctrl+K Ctrl+O</span></div> -->
-                    <!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
-                    <div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
-                    <div id="file_menu_save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
-                    <div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut"></span></div>
-                    <div class="dropdown_divider"></div>
-                    <div id="file_menu_settings" class="dropdown_item not_implemented">Settings<span class="shortcut">Ctrl+,</span></div>
-                    <div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span></div>
+
+        <div id="content">
+            <div id="side">
+                <div id="side_menu_container">
+                    <img id="treeToggle" src="src/renderer/assets/icons/file.png" />
+                    <img src="src/renderer/assets/icons/setting.png" />
                 </div>
+                <div id="tree"></div>
             </div>
 
-            <div class="menu_item" tabindex="0">
-                Edit
-                <div class="dropdown">
-                    <div id="edit_menu_undo" class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span></div>
-                    <div id="edit_menu_redo" class="dropdown_item">Redo<span class="shortcut">Ctrl+Shift+Z</span></div>
-                    <div class="dropdown_divider"></div>
-                    <div id="edit_menu_cut" class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
-                    <div id="edit_menu_copy" class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span></div>
-                    <div id="edit_menu_paste" class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span></div>
-                    <div class="dropdown_divider"></div>
-                    <div id="edit_menu_find" class="dropdown_item">Find<span class="shortcut">Ctrl+F</span></div>
-                    <div id="edit_menu_find_next" class="dropdown_item">Find Next<span class="shortcut">F3</span></div>
-                    <div id="edit_menu_find_previous" class="dropdown_item">Find Previous<span class="shortcut">Shift+F3</span></div>
-                    <div id="edit_menu_replace" class="dropdown_item">Replace<span class="shortcut">Ctrl+H</span></div>
-                    <!-- <div class="dropdown_divider"></div>
-                    <div class="dropdown_item">Font</div> -->
-                </div>
-            </div>
-
-            <div class="menu_item" tabindex="0">
-                View
-                <div class="dropdown">
-                    <div id="view_menu_zoom_in" class="dropdown_item">Zoom In<span class="shortcut">Ctrl++</span></div>
-                    <div id="view_menu_zoom_out" class="dropdown_item">Zoom Out<span class="shortcut">Ctrl+-</span></div>
-                    <div id="view_menu_zoom_reset" class="dropdown_item">Reset Zoom<span class="shortcut">Ctrl+0</span></div>
-                    <div class="dropdown_divider"></div>
-                    <div id="view_menu_fullscreen" class="dropdown_item">Fullscreen<span class="shortcut">F11</span></div>
-                </div>
-            </div>
-
-            <div class="menu_item" tabindex="0">
-                Help
-                <div class="dropdown">
-                    <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div>
-                    <div class="dropdown_item">Information<span class="shortcut">F1</span></div>
-                </div>
+            <div id="workspace">
+                <div id="tab_container"></div>
+                <div id="editor_container"></div>
             </div>
         </div>
-        <div id="editor_container"></div>
     </div>
 
     <script type="module" src="/src/renderer/renderer.ts"></script>

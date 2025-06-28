@@ -1,0 +1,126 @@
+@use './global_variables.scss' as gv;
+
+$title_height: 40px;
+$window_width: 100px;
+$window_gap: 5px;
+
+$menu_container_horizontal_margin: 10px;
+$dropdown_min_width: 150px;
+$dropdown_border_color: gv.$grey-2;
+$dropdown_item_hover_color: gv.$grey-1;
+$dropdown_divider_color: gv.$grey-2;
+$dropdown_padding: 5px;
+$dropdown_item_padding: 5px 10px;
+$shortcut_font_size: 0.85em;
+$shortcut_left_margin: 20px;
+$shortcut_color: gv.$grey-4;
+
+#title,
+#title > :nth-child(-n+3) {
+    display: flex;
+    align-items: center;
+}
+
+#title {
+    width: 100%;
+    height: $title_height;
+    flex-shrink: 0;
+
+    background-color: gv.$blue-1;
+}
+
+#logo {
+    color: green;
+    margin-left: gv.$icon_horizontal_margin;
+    margin-right: gv.$icon_horizontal_margin;
+}
+
+#window {
+    margin-left: auto;
+    width: $window_width;
+
+    display: flex;
+    justify-content: space-between;
+
+    padding: $window_gap;
+
+    background-color: blueviolet;
+}
+
+#window img {
+    width: gv.$icon_size;
+    height: gv.$icon_size;
+
+    background-color: white;
+}
+
+#window img:hover {
+    cursor: pointer;
+}
+
+#menu_container {
+    flex-shrink: 0;
+
+    display: flex;
+
+    background-color: gv.$green-1;
+}
+
+#menu_container .menu_item {
+    margin-left: $menu_container_horizontal_margin;
+    margin-right: $menu_container_horizontal_margin;
+
+    background-color: chartreuse;
+}
+
+.menu_item {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu_item.active > .dropdown {
+    display: block;
+}
+
+.menu_item:hover {
+    cursor: pointer;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid $dropdown_border_color;
+    min-width: $dropdown_min_width;
+    z-index: 1000;
+    padding: $dropdown_padding;
+}
+
+.dropdown_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: $dropdown_item_padding;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.dropdown_item:hover {
+    background-color: $dropdown_item_hover_color;
+}
+
+.shortcut {
+    font-size: $shortcut_font_size;
+    margin-left: $shortcut_left_margin;
+    color: $shortcut_color;
+    user-select: none;
+}
+
+.dropdown_divider {
+    height: 1px;
+    margin: 1px;
+    background-color: $dropdown_divider_color;
+}
