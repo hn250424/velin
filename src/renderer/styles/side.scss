@@ -32,11 +32,20 @@
     cursor: pointer;
 }
 
+#tree_group {
+    display: flex;
+}
+
 #tree {
     width: 0px;
     height: 100%;
 
-    transition: width 0.3s ease;
-
     background-color: black;
+}
+
+#resizer {
+    width: 3px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color: blue;
 }

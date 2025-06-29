@@ -208,7 +208,7 @@ describe('FileService.saveAs', () => {
         const response = await fileService.saveAs(data, fakeMainWindow as any)
 
         // Then.
-        expect(response.isModified).toBe(true)
+        expect(response).toBe(null)
     })
 
     test('should save file and update tabSession when SaveDialog returns path', async () => {

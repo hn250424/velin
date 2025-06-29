@@ -2,7 +2,7 @@ import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '@shared/constants/electronAPI'
 import Response from "@shared/types/Response"
-import { default as TabData, default as TabsData } from "@shared/types/TabData"
+import TabData from "@shared/types/TabData"
 import TabDataManager from "../modules/core/TabDataManager"
 import shortcutRegistry from "../modules/core/shortcutRegistry"
 
@@ -36,7 +36,7 @@ function bindMenuFileCommands(tabDataManager: TabDataManager) {
     })
 
     document.getElementById('file_menu_save_all').addEventListener('click', async () => {
-        const tabsData: TabsData[] = tabDataManager.getAllTabData()
+        const tabsData: TabData[] = tabDataManager.getAllTabData()
         const response: Response<TabData[]> = await window[electronAPI.channel].saveAll(tabsData)
         if (response.result) tabDataManager.applySaveAllResults(response.data)
     })
@@ -87,7 +87,7 @@ async function performSave(tabDataManager: TabDataManager) {
 }
 
 async function performSaveAs(tabDataManager: TabDataManager) {
-    const tabData: TabsData = tabDataManager.getActivatedTabData()
+    const tabData: TabData = tabDataManager.getActivatedTabData()
     const response: Response<TabData> = await window[electronAPI.channel].saveAs(tabData)
     if (response.result && response.data) {
         const wasApplied = tabDataManager.applySaveResult(response.data)

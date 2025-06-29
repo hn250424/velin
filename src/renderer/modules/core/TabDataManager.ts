@@ -12,10 +12,9 @@ export default class TabDataManager {
     private static instance: TabDataManager | null = null
     private tabs: Tab[] = []
     private _activeTabId = -1
-    private _activeTabIndex = -1  // file.
-    private _contextTabId = -1  // contextmenu.
+    private _activeTabIndex = -1
+    private _contextTabId = -1
 
-    // private tabContainer: HTMLElement
     private tabContainer: HTMLElement
     private editorContainer: HTMLElement
 
