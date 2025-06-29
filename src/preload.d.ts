@@ -25,6 +25,7 @@ declare global {
 
             newTab: () => Promise<Response<number>>
             openFile: () => Promise<Response<TabData>>
+            openDirectory: (dirPath?: string, indent?: number) => Promise<Response<void>>
             save: (data: TabData) => Promise<Response<TabData>>
             saveAs: (data: TabData) => Promise<Response<TabData>>
             saveAll: (data: TabData[]) => Promise<Response<TabData[]>>

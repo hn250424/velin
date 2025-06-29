@@ -24,6 +24,14 @@ export default function registerFileHandlers(mainWindow: BrowserWindow) {
         }
     })
 
+    ipcMain.handle(electronAPI.events.openDirectory, async (e, dirPath?: string, indent?: number) => {
+        const tree = await fileService.openDirectory(dirPath, indent)
+        return {
+            result: true,
+            data: tree
+        }
+    })
+
     ipcMain.handle(electronAPI.events.save, async (e, data: TabData) => {
         const tabData: TabData = await fileService.save(data, mainWindow)
         return {

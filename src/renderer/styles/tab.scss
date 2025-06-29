@@ -1,10 +1,12 @@
 @use './global_variables.scss' as gv;
 
-$tab_width: 150px;
+$tab_min_width: 50px;
+$tab_max_width: 150px;
 $tab_height: 30px;
 $tab_right_margin: 10px;
 $tab_elem_padding: 5px;
 $tab_button_width: 20px;
+$tab_button_radius: 5px;
 
 #tab_container {
     display: flex;
@@ -33,12 +35,17 @@ $tab_button_width: 20px;
 }
 
 .tab {
-    min-width: $tab_width;
+    flex: 1;
+    min-width: $tab_min_width;
+    max-width: $tab_max_width;
     height: 100%;
     margin-right: $tab_right_margin;
 
     display: flex;
     justify-content: space-between;
+    align-items: center;
+
+    padding: $tab_elem_padding;
 
     background-color: grey;
 }
@@ -54,28 +61,26 @@ $tab_button_width: 20px;
 
 .tab>span {
     flex: 1;
-    display: flex;
-    align-items: center;
-    padding: $tab_elem_padding;
+    display: block;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.tab>button {
+.tab > button {
     width: $tab_button_width;
-
-    background-color: aliceblue;
-    position: relative;
+    height: $tab_button_width; 
+    border-radius: $tab_button_radius;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.tab>button:hover::after {
-    color: black;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+.tab > button:hover {
+    background-color: gv.$grey-1;
 }
 
 #tab_context_menu {

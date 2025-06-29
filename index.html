@@ -36,7 +36,8 @@
                         </div>
                         <div id="file_menu_open_file" class="dropdown_item">Open File<span
                                 class="shortcut">Ctrl+O</span></div>
-                        <!-- <div id="file_menu_open_folder" class="dropdown_item">Open Folder<span class="shortcut">Ctrl+K Ctrl+O</span></div> -->
+                        <div id="file_menu_open_directory" class="dropdown_item">Open Folder<span
+                                class="shortcut">Ctrl+Shift+O</span></div>
                         <!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
                         <div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span>
                         </div>
@@ -116,9 +117,19 @@
                     <img id="treeToggle" src="src/renderer/assets/icons/file.png" />
                     <img src="src/renderer/assets/icons/setting.png" />
                 </div>
-                
-                <div id="tree"></div>
-                <div id="resizer"></div>
+
+                <div id="tree">
+                    <div id="tree_top">
+                        <span id="tree_top_name"></span>
+                        <div id="tree_top_icons">
+                            <img id="tree_top_add_file" src="src/renderer/assets/icons/file.png" />
+                            <img id="tree_top_add_directory" src="src/renderer/assets/icons/add.png" />
+                        </div>
+                    </div>
+
+                    <div id="tree_content"></div>
+                </div>
+                <div id="tree_resizer"></div>
             </div>
 
             <div id="workspace">

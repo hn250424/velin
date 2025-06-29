@@ -6,14 +6,17 @@ import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/core/FakeFileManager'
 import fakeDialogService, {
     setFakeConfirmResult,
-    setFakeOpenDialogResult,
+    setFakeOpenFileDialogResult,
+    setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../modules/features/fakeDialogService'
 import FakeTabSessionRepository from '../modules/features/FakeTabSessionRepository'
+import FakeTreeRepository from '../modules/features/FakeTreeRepository'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeFileManager: FakeFileManager
 let fakeTabSessionRepository: FakeTabSessionRepository
+let fakeTreeRepository: FakeTreeRepository
 let fileService: FileService
 const fakeMainWindow = new FakeMainWindow()
 
@@ -75,7 +78,8 @@ describe('FileService.newTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should create a new tab with an incremented ID based on the existing session', async () => {
@@ -98,12 +102,13 @@ describe('FileService.openFile', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should return false when the open dialog is canceled', async () => {
         // Given.
-        setFakeOpenDialogResult({ canceled: true, filePaths: [] })
+        setFakeOpenFileDialogResult({ canceled: true, filePaths: [] })
 
         // When.
         const result = await fileService.openFile()
@@ -114,7 +119,7 @@ describe('FileService.openFile', () => {
 
     test('should open a file and return its path and content', async () => {
         // Given.
-        setFakeOpenDialogResult({ canceled: false, filePaths: ['openPath'] })
+        setFakeOpenFileDialogResult({ canceled: false, filePaths: ['openPath'] })
         fakeFileManager.setFilecontent('openPath', 'content')
 
         // When.
@@ -130,7 +135,8 @@ describe('FileService.save', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('Save with empty filePath and cancel dialog', async () => {
@@ -193,7 +199,8 @@ describe('FileService.saveAs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should return false when SaveDialog is canceled', async () => {
@@ -238,7 +245,8 @@ describe('FileService.saveAll', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('test all cases with confirmed dialog', async () => {
@@ -304,7 +312,8 @@ describe('FileService.closeTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should write when closeTab if data is modified', async () => {
@@ -403,7 +412,8 @@ describe('FileService.closeTabsExcept', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should retain only selected tab and save others modified file', async () => {
@@ -494,7 +504,8 @@ describe('FileService.closeTabsToRight', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should retain only the tabs to the left of the reference tab and save modified files', async () => {
@@ -585,7 +596,8 @@ describe('FileService.closeAllTabs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        fakeTreeRepository = new FakeTreeRepository()
+        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should close all tabs and save modified files', async () => {

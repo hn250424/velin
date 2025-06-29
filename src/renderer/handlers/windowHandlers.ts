@@ -1,22 +1,22 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import LayoutManager from "../modules/features/LayoutManager"
+import WindowLayoutManager from "../modules/features/WindowLayoutManager"
 
 export default function registerWindowHandlers() {
-    const layoutManager = LayoutManager.getInstance()
+    const windowLayoutManager = WindowLayoutManager.getInstance()
     const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null
 
     window[electronAPI.channel].onMaximizeWindow(() => {
         maximize.src = 'src/renderer/assets/icons/unmaximize.png'
-        layoutManager.setWindowMax(true)
+        windowLayoutManager.setWindowMax(true)
     })
 
     window[electronAPI.channel].onUnmaximizeWindow(() => {
         maximize.src = 'src/renderer/assets/icons/maximize.png'
-        layoutManager.setWindowMax(false)
+        windowLayoutManager.setWindowMax(false)
     })
 
     maximize.addEventListener('click', () => {
-        if (layoutManager.isWindowMax()) window[electronAPI.channel].requestUnmaximizeWindow()
+        if (windowLayoutManager.isWindowMax()) window[electronAPI.channel].requestUnmaximizeWindow()
         else window[electronAPI.channel].requestMaximizeWindow() 
     })
 

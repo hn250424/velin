@@ -1,9 +1,11 @@
+import TreeNode from "@shared/types/TreeNode"
 import TabData from "@shared/types/TabData"
 import { BrowserWindow } from "electron"
 
 export default interface IFileService {
     newTab(): Promise<number>
     openFile(): Promise<TabData>
+    openDirectory(dirPath?: string, indent?: number): Promise<TreeNode>
     save(data: TabData, mainWindow: BrowserWindow): Promise<TabData>
     saveAs(data: TabData, mainWindow: BrowserWindow): Promise<TabData>
     saveAll(data: TabData[], mainWindow: BrowserWindow): Promise<TabData[]>

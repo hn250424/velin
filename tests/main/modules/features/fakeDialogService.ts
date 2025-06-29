@@ -11,9 +11,14 @@ export function setFakeSaveDialogResult(result: Electron.SaveDialogReturnValue) 
     fakeSaveDialogResult = result
 }
 
-let fakeOpenDialogResult: Electron.OpenDialogReturnValue = { canceled: false, filePaths: [] }
-export function setFakeOpenDialogResult(result: Electron.OpenDialogReturnValue) {
-    fakeOpenDialogResult = result
+let fakeOpenFileDialogResult: Electron.OpenDialogReturnValue = { canceled: false, filePaths: [] }
+export function setFakeOpenFileDialogResult(result: Electron.OpenDialogReturnValue) {
+    fakeOpenFileDialogResult = result
+}
+
+let fakeOpenDirectoryDialogResult: Electron.OpenDialogReturnValue = { canceled: false, filePaths: [] }
+export function setFakeOpenDirectoryDialogResult(result: Electron.OpenDialogReturnValue) {
+    fakeOpenDirectoryDialogResult = result
 }
 
 const fakeDialogService: IDialogService = {
@@ -21,8 +26,12 @@ const fakeDialogService: IDialogService = {
         return fakeConfirmResult
     },
 
-    async showOpenDialog(): Promise<Electron.OpenDialogReturnValue> {
-        return fakeOpenDialogResult
+    async showOpenFileDialog(): Promise<Electron.OpenDialogReturnValue> {
+        return fakeOpenFileDialogResult
+    },
+
+    async showOpenDirectoryDialog() {
+        return fakeOpenDirectoryDialogResult
     },
 
     async showSaveDialog(mainWindow: BrowserWindow, fileName: string = ''): Promise<Electron.SaveDialogReturnValue> {

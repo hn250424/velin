@@ -7,12 +7,16 @@ import ITabSessionRepository from "../contracts/ITabSessionRepository"
 import IFileService from "./contracts/IFileService"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
+import TreeNode from "@shared/types/TreeNode"
+import TreeReposotory from "../modules/features/TreeReposotory"
+import ITreeRepository from "@contracts/ITreeRepository"
 
 export default class FileService implements IFileService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabSessionRepository) private readonly tabSessionRepository: ITabSessionRepository,
         @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
+        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
     ) {
 
     }
@@ -26,7 +30,7 @@ export default class FileService implements IFileService {
     }
 
     async openFile() {
-        const result = await this.dialogService.showOpenDialog()
+        const result = await this.dialogService.showOpenFileDialog()
 
         if (result.canceled || result.filePaths.length === 0) {
             return null
@@ -42,6 +46,30 @@ export default class FileService implements IFileService {
         await this.tabSessionRepository.writeTabSession(arr)
 
         return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
+    }
+
+    async openDirectory(dirPath?: string, indent?: number): Promise<TreeNode | null> {
+        if (!dirPath) {
+            const result = await this.dialogService.showOpenDirectoryDialog()
+
+            if (result.canceled || result.filePaths.length === 0) {
+                return null
+            }
+
+            dirPath = result.filePaths[0]
+            indent = 0
+        }
+
+        const dirName = this.fileManager.getBasename(dirPath)
+        const directoryTree = this.treeRepository.getDirectoryTree(dirPath, indent)
+
+        return {
+            path: dirPath,
+            name: dirName,
+            indent: indent,
+            directory: directoryTree.directory,
+            children: directoryTree?.children ?? [],
+        }
     }
 
     async save(data: TabData, mainWindow: BrowserWindow, writeSession = true) {
@@ -110,7 +138,7 @@ export default class FileService implements IFileService {
                 responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: fileName, content: content })
                 continue
             }
-            
+
             const result = await this.save(tab, mainWindow, false)
             sessionArr.push({ id: result.id, filePath: result.filePath })
             responseArr.push(result)
@@ -208,7 +236,7 @@ export default class FileService implements IFileService {
     async closeAllTabs(data: TabData[], mainWindow: BrowserWindow): Promise<boolean[]> {
         const sessionArr = []
         const responseArr = []
-        
+
         for (const tab of data) {
             const result = await this.closeTab(tab, mainWindow, false)
 

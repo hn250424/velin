@@ -1,5 +1,7 @@
 @use './global_variables.scss' as gv;
 
+$tree_horizontal_margin: 5px;
+
 #side {
     height: 100%;
 
@@ -39,13 +41,63 @@
 #tree {
     width: 0px;
     height: 100%;
+    cursor: default;
 
-    background-color: black;
+    background-color: white;
 }
 
-#resizer {
+#tree_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: aqua;
+}
+
+#tree_top_name {
+    margin: 0 $tree_horizontal_margin;
+    flex: 1;
+
+    background-color: aliceblue;
+}
+
+#tree_top_icons {
+    display: flex;
+}
+
+#tree_top_icons img {
+    width: gv.$icon_size;
+    height: gv.$icon_size;
+    margin-right: $tree_horizontal_margin;
+    background-color: white;
+}
+
+#tree_content {
+}
+
+#tree_resizer {
     width: 3px;
     height: 100%;
     cursor: ew-resize;
     background-color: blue;
+}
+
+.tree_node {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: $tree_horizontal_margin;
+}
+
+.tree_node:hover {
+    cursor: pointer;
+    background-color: gv.$grey-1;
+}
+
+.tree_node_open_status,
+.tree_node_icon {
+    min-width: gv.$icon_size;
+    min-height: gv.$icon_size;
+
+    text-align: center;
 }

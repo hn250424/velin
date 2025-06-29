@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
+    openDirectory: (dirPath?: string, indent?: number) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, dirPath, indent) },
     save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },

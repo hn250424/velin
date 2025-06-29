@@ -12,6 +12,8 @@ import IDialogService from '@contracts/IDialogService'
 import dialogService from './modules/features/dialogService'
 import FileService from '@services/FileService'
 import IFileService from '@services/contracts/IFileService'
+import ITreeRepository from '@contracts/ITreeRepository'
+import TreeReposotory from './modules/features/TreeReposotory'
 
 const diContainer = new Container()
 
@@ -28,6 +30,8 @@ diContainer.bind<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
     .inSingletonScope()
 
 const _tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
+
+diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory).to(TreeReposotory).inSingletonScope()
 
 diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
 // diContainer.bind<IFileService>(DI_KEYS.FileService)

@@ -16,6 +16,7 @@ export const electronAPI = {
 
         newTab: 'newTab',
         openFile: 'openFile',
+        openDirectory: 'openDirectory',
         save: 'save',
         saveAs: 'saveAs',
         saveAll: 'saveAll',

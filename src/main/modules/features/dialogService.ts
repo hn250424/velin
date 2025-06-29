@@ -13,13 +13,20 @@ const dialogService: IDialogService = {
         return result.response === 0
     },
 
-    async showOpenDialog() {
+    async showOpenFileDialog() {
         return await dialog.showOpenDialog({
             title: 'Open',
             filters: [
                 { name: 'Markdown', extensions: ['md', 'markdown'] }
             ],
             properties: ['openFile']
+        })
+    },
+
+    async showOpenDirectoryDialog() {
+        return await dialog.showOpenDialog({
+            title: 'Open Directory',
+            properties: ['openDirectory']
         })
     },
 

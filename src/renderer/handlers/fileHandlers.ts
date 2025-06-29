@@ -5,26 +5,42 @@ import Response from "@shared/types/Response"
 import TabData from "@shared/types/TabData"
 import TabDataManager from "../modules/core/TabDataManager"
 import shortcutRegistry from "../modules/core/shortcutRegistry"
+import TreeNode from "@shared/types/TreeNode"
+import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 
 export default function registerFileHandlers() {
     const tabDataManager = TabDataManager.getInstance()
+    const treeLayoutManager = TreeLayoutMaanger.getInstance()
 
-    bindMenuFileCommands(tabDataManager)
+    bindMenuFileCommands(tabDataManager, treeLayoutManager)
 
     shortcutRegistry.register('Ctrl+T', async () => await performNewTab(tabDataManager))
     shortcutRegistry.register('Ctrl+O', async () => await performOpenFile(tabDataManager))
+    shortcutRegistry.register('Ctrl+Shift+O', async () => {
+        treeLayoutManager.setTarget(null)
+        await performOpenDirectory(treeLayoutManager)
+    })
     shortcutRegistry.register('Ctrl+S', async () => await performSave(tabDataManager))
     shortcutRegistry.register('Ctrl+Shift+S', async () => await performSaveAs(tabDataManager))
     shortcutRegistry.register('Ctrl+W', async () => await performCloseTab(tabDataManager, tabDataManager.activeTabId))
+
+    ; (async () => {
+        await performOpenDirectory(treeLayoutManager)
+    })()
 }
 
-function bindMenuFileCommands(tabDataManager: TabDataManager) {
+function bindMenuFileCommands(tabDataManager: TabDataManager, treeLayoutManager: TreeLayoutMaanger) {
     document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
         await performNewTab(tabDataManager)
     })
 
     document.getElementById('file_menu_open_file').addEventListener('click', async () => {
         await performOpenFile(tabDataManager)
+    })
+
+    document.getElementById('file_menu_open_directory').addEventListener('click', async () => {
+        treeLayoutManager.setTarget(null)
+        await performOpenDirectory(treeLayoutManager)
     })
 
     document.getElementById('file_menu_save').addEventListener('click', async () => {
@@ -77,6 +93,16 @@ async function performOpenFile(tabDataManager: TabDataManager) {
         const data = response.data
         await tabDataManager.addTab(data.id, data.filePath, data.fileName, data.content)
     }
+}
+
+async function performOpenDirectory(treeLayoutManager: TreeLayoutMaanger) {
+    const dirPath = 'D:\\node-workspace\\velin\\test_file'
+    const indent = 0
+
+    const response: Response<TreeNode> = await window[electronAPI.channel].openDirectory(dirPath, indent)
+    treeLayoutManager.setTreeData(response.data)
+
+    console.log(response)
 }
 
 async function performSave(tabDataManager: TabDataManager) {

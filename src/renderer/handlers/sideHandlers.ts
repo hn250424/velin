@@ -1,7 +1,8 @@
-import LayoutManager from "../modules/features/LayoutManager"
+import TreeLayoutManger from "../modules/features/TreeLayoutManger"
 
 export default function registerSideHandlers() {
-    const layoutManager = LayoutManager.getInstance()
+    const treeLayoutMaanger = TreeLayoutManger.getInstance()
+
     let isDragging = false
     let treeWidth = 150
     let animationFrameId: number | null = null
@@ -12,18 +13,24 @@ export default function registerSideHandlers() {
     const side = document.getElementById('side')
     const treeToggle = document.getElementById('treeToggle')
     const tree = document.getElementById('tree')
-    const resizer = document.getElementById('resizer')
+    const resizer = document.getElementById('tree_resizer')
 
     treeToggle.addEventListener('click', () => {
-        const isTreeOpen = layoutManager.isTreeOpen()
+        const isTreeOpen = treeLayoutMaanger.isTreeOpen()
         tree.style.width = isTreeOpen ? '0px' : `${treeWidth}px`
-        layoutManager.setTreeOpen(!isTreeOpen)
+        treeLayoutMaanger.setTreeOpen(!isTreeOpen)
     })
 
+    // TODO deletee
+    const isTreeOpen = treeLayoutMaanger.isTreeOpen()
+    tree.style.width = isTreeOpen ? '0px' : `${treeWidth}px`
+    treeLayoutMaanger.setTreeOpen(!isTreeOpen)
+    //
+
     resizer.addEventListener('mousedown', (e) => {
-        if (!layoutManager.isTreeOpen()) {
+        if (!treeLayoutMaanger.isTreeOpen()) {
             tree.style.width = `${minWidth}px`
-            layoutManager.setTreeOpen(true)
+            treeLayoutMaanger.setTreeOpen(true)
             treeWidth = minWidth
         }
 

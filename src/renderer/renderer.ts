@@ -4,26 +4,28 @@ import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '../shared/constants/electronAPI'
 import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from './constants/dom'
 
+import registerEditHandlers from './handlers/editHandlers'
+import registerExitHandlers from './handlers/exitHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
-import registerWindowHandlers from './handlers/windowHandlers'
-import registerExitHandlers from './handlers/exitHandlers'
-import registerEditHandlers from './handlers/editHandlers'
-import registerViewHandlers from './handlers/viewHandlers'
 import registerSideHandlers from './handlers/sideHandlers'
+import registerViewHandlers from './handlers/viewHandlers'
+import registerWindowHandlers from './handlers/windowHandlers'
 
-import TabDataManager from './modules/core/TabDataManager'
 import Response from '@shared/types/Response'
 import shortcutRegistry from './modules/core/shortcutRegistry'
+import TabDataManager from './modules/core/TabDataManager'
 
 let contextMenu: HTMLElement
 let menuContainer: HTMLElement
+let tabContainer: HTMLElement
 let menuItems: NodeListOf<HTMLElement>
 let title: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
     contextMenu = document.getElementById('tab_context_menu')
     menuContainer = document.getElementById('menu_container')
+    tabContainer = document.getElementById('tab_container')
     menuItems = document.querySelectorAll('#menu_container .menu_item')
     title = document.getElementById('title')
 
@@ -88,7 +90,7 @@ function bindDocumentClickEvents(tabDataManager: TabDataManager) {
 }
 
 function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
-    title.addEventListener('mouseenter', (e) => {
+    tabContainer.addEventListener('mouseenter', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
@@ -99,7 +101,7 @@ function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
         }
     }, true)
 
-    title.addEventListener('mouseleave', (e) => {
+    tabContainer.addEventListener('mouseleave', (e) => {
         const target = e.target
         if (!(target instanceof HTMLElement)) return
         const tabDiv = target.closest('.tab') as HTMLElement
