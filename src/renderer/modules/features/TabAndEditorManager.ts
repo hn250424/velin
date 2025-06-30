@@ -8,8 +8,8 @@ import "@milkdown/theme-nord/style.css"
 import TabData from '@shared/types/TabData'
 import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from '../../constants/dom'
 
-export default class TabDataManager {
-    private static instance: TabDataManager | null = null
+export default class TabAndEditorManager {
+    private static instance: TabAndEditorManager | null = null
     private tabs: Tab[] = []
     private _activeTabId = -1
     private _activeTabIndex = -1
@@ -23,9 +23,9 @@ export default class TabDataManager {
         this.editorContainer = document.getElementById('editor_container')
     }
 
-    static getInstance(): TabDataManager {
+    static getInstance(): TabAndEditorManager {
         if (this.instance === null) {
-            this.instance = new TabDataManager()
+            this.instance = new TabAndEditorManager()
         }
 
         return this.instance
@@ -79,13 +79,7 @@ export default class TabDataManager {
 
     getActivatedTabData(): TabData {
         const tab = this.tabs[this.activeTabIndex]
-        return {
-            id: tab.id,
-            isModified: tab.isModified,
-            filePath: tab.filePath,
-            fileName: tab.resolveFileName(),
-            content: tab.getContent(),
-        }
+        return tab.getData()
     }
 
     activateTabById(id: number) {
@@ -106,23 +100,11 @@ export default class TabDataManager {
     getTabDataById(id: number): TabData {
         const tab = this.tabs.find(tab => tab.id === id)
         if (!tab) return null
-        return {
-            id: tab.id,
-            isModified: tab.isModified,
-            filePath: tab.filePath,
-            fileName: tab.resolveFileName(),
-            content: tab.getContent(),
-        }
+        return tab.getData()
     }
 
     getAllTabData(): TabData[] {
-        return this.tabs.map(tab => ({
-            id: tab.id,
-            isModified: tab.isModified,
-            filePath: tab.filePath,
-            fileName: tab.resolveFileName(),
-            content: tab.getContent(),
-        }))
+        return this.tabs.map(tab => tab.getData())
     }
 
     applySaveResult(result: TabData) {
@@ -161,7 +143,7 @@ export default class TabDataManager {
                 const wasActive = this.activeTabIndex >= i
 
                 this.removeTabAt(i)
-                
+
                 if (wasActive || this.activeTabIndex > i) {
                     this.activeTabIndex = Math.max(0, this.activeTabIndex - 1)
 
@@ -395,6 +377,16 @@ class Tab {
 
     setTabButtonTextContent(text: string) {
         this._tabButton.textContent = text
+    }
+
+    getData(): TabData {
+        return {
+            id: this.id,
+            isModified: this.isModified,
+            filePath: this.filePath,
+            fileName: this.resolveFileName(),
+            content: this.getContent()
+        }
     }
 
     get id(): number {

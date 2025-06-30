@@ -1,5 +1,5 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabDataManager from "../modules/core/TabDataManager"
+import TabDataManager from "../modules/features/TabAndEditorManager"
 
 export default function registerExitHandlers() {
     const tabDataManager = TabDataManager.getInstance()

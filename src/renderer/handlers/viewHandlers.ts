@@ -1,4 +1,4 @@
-import shortcutRegistry from "../modules/core/shortcutRegistry"
+import shortcutRegistry from "../modules/features/shortcutRegistry"
 import ZoomManager from "../modules/features/ZoomManager"
 
 export default function registerViewHandlers() {

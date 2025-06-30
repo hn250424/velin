@@ -68,19 +68,30 @@ $tab_button_radius: 5px;
     text-overflow: ellipsis;
 }
 
-.tab > button {
+.tab>button {
     width: $tab_button_width;
-    height: $tab_button_width; 
+    height: $tab_button_width;
     border-radius: $tab_button_radius;
     background-color: transparent;
     transition: background-color 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
-.tab > button:hover {
-    background-color: gv.$grey-1;
+.tab>button:hover {
+    background-color: gv.$grey-4;
+    color: transparent;
+}
+
+.tab>button:hover::after {
+    content: '×';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
 }
 
 #tab_context_menu {

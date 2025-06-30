@@ -3,8 +3,8 @@ import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '@shared/constants/electronAPI'
 import Response from "@shared/types/Response"
 import TabData from "@shared/types/TabData"
-import TabDataManager from "../modules/core/TabDataManager"
-import shortcutRegistry from "../modules/core/shortcutRegistry"
+import TabDataManager from "../modules/features/TabAndEditorManager"
+import shortcutRegistry from "../modules/features/shortcutRegistry"
 import TreeNode from "@shared/types/TreeNode"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 

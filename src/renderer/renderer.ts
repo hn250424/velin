@@ -13,8 +13,8 @@ import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 
 import Response from '@shared/types/Response'
-import shortcutRegistry from './modules/core/shortcutRegistry'
-import TabDataManager from './modules/core/TabDataManager'
+import shortcutRegistry from './modules/features/shortcutRegistry'
+import TabDataManager from './modules/features/TabAndEditorManager'
 
 let contextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -40,7 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const tabDataManager = TabDataManager.getInstance()
     bindDocumentClickEvents(tabDataManager)
     bindDocumentContextMenuEvents(tabDataManager)
-    bindDocumentHoverEvents(tabDataManager)
     bindMenucontainerEvents()
 
     document.addEventListener('keydown', (e) => {
@@ -87,33 +86,6 @@ function bindDocumentClickEvents(tabDataManager: TabDataManager) {
             }
         }
     })
-}
-
-function bindDocumentHoverEvents(tabDataManager: TabDataManager) {
-    tabContainer.addEventListener('mouseenter', (e) => {
-        const target = e.target
-        if (!(target instanceof HTMLElement)) return
-        const tabDiv = target.closest('.tab') as HTMLElement
-        if (!tabDiv) return
-        if (target.tagName === 'BUTTON') {
-            const button = tabDiv.querySelector('button')
-            if (button) button.textContent = NOT_MODIFIED_TEXT
-        }
-    }, true)
-
-    tabContainer.addEventListener('mouseleave', (e) => {
-        const target = e.target
-        if (!(target instanceof HTMLElement)) return
-        const tabDiv = target.closest('.tab') as HTMLElement
-        if (!tabDiv) return
-        if (target.tagName === 'BUTTON') {
-            const button = tabDiv.querySelector('button')
-            if (!button) return
-            const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
-            const tab = tabDataManager.getTabDataById(id)
-            button.textContent = tab.isModified ? MODIFIED_TEXT : NOT_MODIFIED_TEXT
-        }
-    }, true)
 }
 
 function bindMenucontainerEvents() {
