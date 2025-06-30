@@ -48,26 +48,31 @@ export default class FileService implements IFileService {
         return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
     }
 
-    async openDirectory(dirPath?: string, indent?: number): Promise<TreeNode | null> {
-        if (!dirPath) {
+    async openDirectory(treeNode?: TreeNode): Promise<TreeNode | null> {
+        let path
+        let indent
+        if (!treeNode || !treeNode.path) {
             const result = await this.dialogService.showOpenDirectoryDialog()
 
             if (result.canceled || result.filePaths.length === 0) {
                 return null
             }
 
-            dirPath = result.filePaths[0]
+            path = result.filePaths[0]
             indent = 0
+        } else {
+            path = treeNode.path
+            indent = treeNode.indent
         }
 
-        const dirName = this.fileManager.getBasename(dirPath)
-        const directoryTree = this.treeRepository.getDirectoryTree(dirPath, indent)
+        const directoryTree = this.treeRepository.getDirectoryTree(path, indent)
 
         return {
-            path: dirPath,
-            name: dirName,
-            indent: indent,
+            path,
+            name: this.fileManager.getBasename(path),
+            indent,
             directory: directoryTree.directory,
+            expanded: directoryTree.expanded,
             children: directoryTree?.children ?? [],
         }
     }

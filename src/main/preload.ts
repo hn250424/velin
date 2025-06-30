@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '../shared/constants/electronAPI'
 import TabData from '../shared/types/TabData'
+import TreeNode from '@shared/types/TreeNode'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
@@ -18,7 +19,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
-    openDirectory: (dirPath?: string, indent?: number) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, dirPath, indent) },
+    openDirectory: (treeNode?: TreeNode) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, treeNode) },
     save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },

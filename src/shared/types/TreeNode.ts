@@ -3,5 +3,6 @@ export default interface TreeNode {
     name: string
     indent: number
     directory: boolean
+    expanded: boolean
     children: TreeNode[] | null
 }

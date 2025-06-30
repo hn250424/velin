@@ -11,23 +11,34 @@ import registerLoadHandlers from './handlers/loadHandlers'
 import registerSideHandlers from './handlers/sideHandlers'
 import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
+import registerTabHandlers from './handlers/tabHandlers'
+import registerTreeHandlers from './handlers/treeHandlers'
 
 import Response from '@shared/types/Response'
 import shortcutRegistry from './modules/features/shortcutRegistry'
-import TabDataManager from './modules/features/TabAndEditorManager'
+import TabAndEditorManager from './modules/features/TabAndEditorManager'
+import TreeLayoutMaanger from './modules/features/TreeLayoutManger'
 
-let contextMenu: HTMLElement
+let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
 let tabContainer: HTMLElement
 let menuItems: NodeListOf<HTMLElement>
 let title: HTMLElement
+let treeContentContainer: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
-    contextMenu = document.getElementById('tab_context_menu')
-    menuContainer = document.getElementById('menu_container')
-    tabContainer = document.getElementById('tab_container')
-    menuItems = document.querySelectorAll('#menu_container .menu_item')
     title = document.getElementById('title')
+
+    tabContainer = document.getElementById('tab_container')
+    tabContextMenu = document.getElementById('tab_context_menu')
+
+    menuContainer = document.getElementById('menu_container')
+    menuItems = document.querySelectorAll('#menu_container .menu_item')
+
+    treeContentContainer = document.getElementById('tree_content')
+
+    const tabAndEditorManager = TabAndEditorManager.getInstance()
+    const treeLayoutManager = TreeLayoutMaanger.getInstance()
 
     registerWindowHandlers()
     registerFileHandlers()
@@ -36,10 +47,11 @@ window.addEventListener('DOMContentLoaded', () => {
     registerEditHandlers()
     registerViewHandlers()
     registerSideHandlers()
+    registerTabHandlers(tabContainer, tabAndEditorManager, tabContextMenu)
+    registerTreeHandlers(treeContentContainer, treeLayoutManager)
 
-    const tabDataManager = TabDataManager.getInstance()
-    bindDocumentClickEvents(tabDataManager)
-    bindDocumentContextMenuEvents(tabDataManager)
+    bindDocumentClickEvents()
+    bindDocumentContextMenuEvents()
     bindMenucontainerEvents()
 
     document.addEventListener('keydown', (e) => {
@@ -49,42 +61,16 @@ window.addEventListener('DOMContentLoaded', () => {
     window[electronAPI.channel].loadedRenderer()
 })
 
-function bindDocumentContextMenuEvents(tabDataManager: TabDataManager) {
+function bindDocumentContextMenuEvents() {
     document.addEventListener('contextmenu', (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
-
-        const tab = (e.target as HTMLElement).closest('.tab') as HTMLElement
-        if (!tab) {
-            contextMenu.style.display = 'none'
-            tabDataManager.removeContextTabId()
-        } else {
-            e.preventDefault()
-            contextMenu.style.display = 'flex'
-            contextMenu.style.left = `${e.clientX}px`
-            contextMenu.style.top = `${e.clientY}px`
-            tabDataManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
-        }
     })
 }
 
-function bindDocumentClickEvents(tabDataManager: TabDataManager) {
+function bindDocumentClickEvents() {
     document.addEventListener('click', async (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
-        contextMenu.style.display = 'none'
-
-        const target = e.target as HTMLElement
-        const tabDiv = target.closest('.tab') as HTMLElement
-        if (tabDiv) {
-            if (target.tagName === 'BUTTON') {
-                const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
-                const tabData = tabDataManager.getTabDataById(id)
-                const response: Response<void> = await window[electronAPI.channel].closeTab(tabData)
-                if (response.result) tabDataManager.removeTab(tabData.id)
-            } else if (target.tagName === 'SPAN') {
-                const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
-                tabDataManager.activateTabById(parseInt(id, 10))
-            }
-        }
+        tabContextMenu.style.display = 'none'
     })
 }
 
@@ -99,8 +85,8 @@ function bindMenucontainerEvents() {
 
             item.classList.toggle('active')
 
-            if (contextMenu.style.display === 'flex') {
-                contextMenu.style.display = 'none'
+            if (tabContextMenu.style.display === 'flex') {
+                tabContextMenu.style.display = 'none'
             }
         })
 

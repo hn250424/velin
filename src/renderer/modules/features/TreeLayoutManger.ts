@@ -1,4 +1,5 @@
 import TreeNode from "@shared/types/TreeNode"
+import { DATASET_ATTR_TREE_PATH, EXPANDED_TEXT, NOT_EXPANDED_TEXT } from "../../constants/dom"
 
 export default class TreeLayoutMaanger {
     private static instance: TreeLayoutMaanger | null = null
@@ -13,6 +14,8 @@ export default class TreeLayoutMaanger {
     private _tree_top_add_directory: HTMLElement
     private _tree_content: HTMLElement
     private _tree_resizer: HTMLElement
+
+    private _pathToTreeNodeMap: Map<string, TreeNode> = new Map()
 
     private constructor() {
         this._tree_content = document.getElementById('tree_content')
@@ -35,63 +38,83 @@ export default class TreeLayoutMaanger {
         this._treeOpenStatus = status
     }
 
-    clean() {
-        while (this._target.firstChild) {
-            this._target.removeChild(this._target.firstChild)
+    clean(container: HTMLElement) {
+        while (container.firstChild) {
+            container.removeChild(container.firstChild)
         }
     }
 
-    setTreeData(treeNode: TreeNode) {
-        if (!this.target) {
-            this._tree_top_name.textContent = treeNode.name
-            this._target = this._tree_content
+    renderTreeData(tree: TreeNode, container?: HTMLElement) {
+        if (tree.indent === 0 || !container) {
+            this._tree_top_name.textContent = tree.name
+            container = this._tree_content
         }
 
-        this.clean()
+        if (tree.expanded) container.style.display = 'block'
 
-        if (treeNode.children?.length) {
-            for (const child of treeNode.children) {
-                this.renderNode(this._target, child)
-            }
+        if (!container) return
+        this.clean(container)
+
+        for (const child of tree.children) {
+            this._renderNode(container, child)
         }
     }
 
-    renderNode(container: ParentNode, node: TreeNode) {
+    private _renderNode(container: HTMLElement, node: TreeNode) {
         const box = document.createElement('div')
         box.classList.add('tree_node')
         box.style.paddingLeft = `${(node.indent - 1) * 16}px`
-        box.id = this.safeIdFromPath(node.path)
+        box.dataset[DATASET_ATTR_TREE_PATH] = node.path
         box.title = node.path
+        this.setTreeNodeByPath(node.path, node)
 
-        const open_status = document.createElement('span')
-        open_status.classList.add('tree_node_open_status')
-        if (node.directory) open_status.textContent = '▷'
+        const openStatus = document.createElement('span')
+        openStatus.classList.add('tree_node_open_status')
+        if (node.directory) openStatus.textContent = node.expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
 
         const icon = document.createElement('img')
         icon.classList.add('tree_node_icon')
-        if (node.directory) icon.src = new URL('../../assets/icons/setting.png', import.meta.url).toString()
-        else icon.src = new URL('../../assets/icons/file.png', import.meta.url).toString()
+        icon.src = node.directory
+            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
+            : new URL('../../assets/icons/file.png', import.meta.url).toString()
 
         const text = document.createElement('span')
-        text.classList.add('tree_node_text')
-        text.classList.add('ellipsis')
+        text.classList.add('tree_node_text', 'ellipsis')
         text.textContent = node.name
 
-        box.appendChild(open_status)
+        const childrenContainer = document.createElement('div')
+        childrenContainer.classList.add('tree_children')
+        childrenContainer.style.display = node.expanded ? 'block' : 'none'
+
+        box.appendChild(openStatus)
         box.appendChild(icon)
         box.appendChild(text)
-        container.appendChild(box)
+
+        const wrapper = document.createElement('div')
+        wrapper.classList.add('tree_node_wrapper')
+        wrapper.appendChild(box)
+        wrapper.appendChild(childrenContainer)
+
+        container.appendChild(wrapper)
     }
 
-    safeIdFromPath(path: string): string {
-        return 'node-' + path.replace(/[^\w\-]/g, '_')
+    // safeIdFromPath(path: string): string {
+    //     return 'node-' + path.replace(/[^\w\-]/g, '_')
+    // }
+
+    // setTarget(target: HTMLElement) {
+    //     this._target = target
+    // }
+
+    getTreeNodeByPath(path: string) {
+        return this._pathToTreeNodeMap.get(path)
     }
 
-    setTarget(target: HTMLElement) {
-        this._target = target
+    setTreeNodeByPath(path: string, node: TreeNode) {
+        this._pathToTreeNodeMap.set(path, node)
     }
 
-    get target() {
-        return this._target
-    }
+    // get target() {
+    //     return this._target
+    // }
 }

@@ -38,6 +38,7 @@ export default class TreeReposotory implements ITreeReposotory {
                 name: dirent.name,
                 indent: indent + 1,
                 directory: dirent.isDirectory(),
+                expanded: false,
                 children: null,
             }))
         } catch {
@@ -49,6 +50,7 @@ export default class TreeReposotory implements ITreeReposotory {
             name: path.basename(dirPath),
             indent: indent + 1,
             directory: true,
+            expanded: true,
             children,
         }
     }

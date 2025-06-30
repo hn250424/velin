@@ -1,8 +1,8 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabDataManager from "../modules/features/TabAndEditorManager"
+import TabAndEditorManager from "../modules/features/TabAndEditorManager"
 
 export default function registerEditHandlers() {
-    const tabDataManager = TabDataManager.getInstance()
+    const tabAndEditorManager = TabAndEditorManager.getInstance()
 
     const commands: { id: string, cmd: 'undo' | 'redo' | 'cut' | 'copy' | 'paste' }[] = [
         { id: 'edit_menu_undo', cmd: 'undo' },
@@ -25,9 +25,9 @@ export default function registerEditHandlers() {
                 editable.focus()
                 document.execCommand('insertText', false, text)
             } else if (cmd === 'undo') {
-                tabDataManager.undo()
+                tabAndEditorManager.undo()
             } else if (cmd === 'redo') {
-                tabDataManager.redo() 
+                tabAndEditorManager.redo() 
             } else {
                 document.execCommand(cmd)
             }

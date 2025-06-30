@@ -1,11 +1,11 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabDataManager from "../modules/features/TabAndEditorManager"
+import TabAndEditorManager from "../modules/features/TabAndEditorManager"
 
 export default function registerExitHandlers() {
-    const tabDataManager = TabDataManager.getInstance()
+    const tabAndEditorManager = TabAndEditorManager.getInstance()
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
-            const tabData = tabDataManager.getAllTabData()
+            const tabData = tabAndEditorManager.getAllTabData()
             window[electronAPI.channel].exit(tabData)
         })
     })

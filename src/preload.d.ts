@@ -4,6 +4,7 @@ import SaveResponse from "./shared/interface/SaveResponse"
 import Response from "./shared/interface/Response"
 import TabData from "./shared/interface/TabData"
 import TabSession from "./shared/interface/TabSession"
+import TreeNode from "@shared/types/TreeNode"
 
 export { }
 
@@ -25,7 +26,7 @@ declare global {
 
             newTab: () => Promise<Response<number>>
             openFile: () => Promise<Response<TabData>>
-            openDirectory: (dirPath?: string, indent?: number) => Promise<Response<void>>
+            openDirectory: (treeNode?: TreeNode) => Promise<Response<void>>
             save: (data: TabData) => Promise<Response<TabData>>
             saveAs: (data: TabData) => Promise<Response<TabData>>
             saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
