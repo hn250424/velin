@@ -1,24 +1,24 @@
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 import Response from "@shared/types/Response"
 import { electronAPI } from "@shared/constants/electronAPI"
-import TreeNode from "@shared/types/TreeNode"
 import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
 import { EXPANDED_TEXT, NOT_EXPANDED_TEXT } from "../constants/dom"
+import TreeDto from "@shared/dto/TreeDto"
 
 export default async function performOpenDirectory(treeLayoutManager: TreeLayoutMaanger, treeDiv?: HTMLElement) {
     // New open when shortcut or file menu.
     if (!treeDiv) {
-        const response: Response<TreeNode> = await window[electronAPI.channel].openDirectory()
+        const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
         if (!response.data) return
 
         treeLayoutManager.renderTreeData(response.data)
-        treeLayoutManager.setTreeNodeByPath(response.data.path, response.data)
+        treeLayoutManager.setTreeDtoByPath(response.data.path, response.data)
         return
     }
 
     // When click directory in tree area.
     const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-    const treeNode = treeLayoutManager.getTreeNodeByPath(dirPath)
+    const treeNode = treeLayoutManager.getTreeDtoByPath(dirPath)
     const maybeChildren = treeDiv.nextElementSibling
     if (!maybeChildren || !maybeChildren.classList.contains('tree_children')) return
 
@@ -41,10 +41,10 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
         return
     }
 
-    const response: Response<TreeNode> = await window[electronAPI.channel].openDirectory(treeNode)
+    const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(treeNode)
     if (!response.data) return
 
     treeLayoutManager.renderTreeData(response.data, treeDivChildren)
-    treeLayoutManager.setTreeNodeByPath(response.data.path, response.data)
+    treeLayoutManager.setTreeDtoByPath(response.data.path, response.data)
     updateUI(true)
 }

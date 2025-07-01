@@ -1,9 +1,9 @@
 import { BrowserWindow } from "electron"
 import TabEditorDto from "@shared/dto/TabEditorDto"
-import IFileManager from "@contracts/IFileManager"
-import ITabSessionRepository from "@contracts/ITabSessionRepository"
-import IDialogService from "@contracts/IDialogService"
-import TabSession from "../models/TabSession"
+import IFileManager from "@contracts/out/IFileManager"
+import ITabSessionRepository from "@contracts/out/ITabSessionRepository"
+import IDialogService from "@contracts/out/IDialogService"
+import TabSessionModel from "../models/TabSessionModel"
 
 export default async function exit(
     data: TabEditorDto[],
@@ -12,7 +12,7 @@ export default async function exit(
     tabSessionRepository: ITabSessionRepository,
     dialogService: IDialogService
 ) {
-    const sessionArr: TabSession[] = []
+    const sessionArr: TabSessionModel[] = []
 
     for (const tab of data) {
         const { id, isModified, filePath, fileName, content } = tab

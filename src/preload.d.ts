@@ -1,10 +1,7 @@
+import TreeDto from "@shared/dto/TreeDto"
 import { electronAPI } from "./shared/constants/electronAPI"
-import OpenResponse from "./shared/interface/OpenResponse"
-import SaveResponse from "./shared/interface/SaveResponse"
 import Response from "./shared/interface/Response"
 import TabEditorDto from "./shared/interface/TabEditorDto"
-import TabSession from "./shared/interface/TabSession"
-import TreeNode from "@shared/types/TreeNode"
 
 export { }
 
@@ -26,7 +23,7 @@ declare global {
 
             newTab: () => Promise<Response<number>>
             openFile: () => Promise<Response<TabEditorDto>>
-            openDirectory: (treeNode?: TreeNode) => Promise<Response<void>>
+            openDirectory: (data?: TreeDto) => Promise<Response<void>>
             save: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
             saveAs: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
             saveAll: (data: TabEditorDto[]) => Promise<Response<TabEditorDto[]>>

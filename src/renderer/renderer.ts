@@ -2,19 +2,19 @@ import './index.scss'
 
 import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '../shared/constants/electronAPI'
-import { DATASET_ATTR_TAB_ID, MODIFIED_TEXT, NOT_MODIFIED_TEXT } from './constants/dom'
 
 import registerEditHandlers from './handlers/editHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
 import registerLoadHandlers from './handlers/loadHandlers'
 import registerSideHandlers from './handlers/sideHandlers'
-import registerViewHandlers from './handlers/viewHandlers'
-import registerWindowHandlers from './handlers/windowHandlers'
 import registerTabHandlers from './handlers/tabHandlers'
 import registerTreeHandlers from './handlers/treeHandlers'
+import registerViewHandlers from './handlers/viewHandlers'
+import registerWindowHandlers from './handlers/windowHandlers'
+import registerMenuHandlers from './handlers/menuHandlers'
 
-import Response from '@shared/types/Response'
+import FocusManager from './modules/core/FocusManager'
 import shortcutRegistry from './modules/features/shortcutRegistry'
 import TabEditorManager from './modules/features/TabEditorManager'
 import TreeLayoutMaanger from './modules/features/TreeLayoutManger'
@@ -37,6 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     treeContentContainer = document.getElementById('tree_content')
 
+    const focusManager = FocusManager.getInstance()
     const tabEditorManager = TabEditorManager.getInstance()
     const treeLayoutManager = TreeLayoutMaanger.getInstance()
 
@@ -49,10 +50,10 @@ window.addEventListener('DOMContentLoaded', () => {
     registerSideHandlers()
     registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
     registerTreeHandlers(treeContentContainer, treeLayoutManager)
+    registerMenuHandlers(menuItems, tabContextMenu)
 
-    bindDocumentClickEvents()
-    bindDocumentContextMenuEvents()
-    bindMenucontainerEvents()
+    bindDocumentClickEvents(focusManager)
+    bindDocumentContextMenuEvents(focusManager)
 
     document.addEventListener('keydown', (e) => {
         shortcutRegistry.handleKeyEvent(e)
@@ -61,41 +62,29 @@ window.addEventListener('DOMContentLoaded', () => {
     window[electronAPI.channel].loadedRenderer()
 })
 
-function bindDocumentContextMenuEvents() {
+function bindDocumentContextMenuEvents(focusManager: FocusManager) {
     document.addEventListener('contextmenu', (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
+        trackFocus(e.target as HTMLElement, focusManager)
     })
 }
 
-function bindDocumentClickEvents() {
+function bindDocumentClickEvents(focusManager: FocusManager) {
     document.addEventListener('click', async (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
         tabContextMenu.style.display = 'none'
+        trackFocus(e.target as HTMLElement, focusManager)
     })
 }
 
-function bindMenucontainerEvents() {
-    menuItems.forEach(item => {
-        item.addEventListener('click', e => {
-            e.stopPropagation()
-
-            menuItems.forEach(i => {
-                if (i !== item) i.classList.remove('active')
-            })
-
-            item.classList.toggle('active')
-
-            if (tabContextMenu.style.display === 'flex') {
-                tabContextMenu.style.display = 'none'
-            }
-        })
-
-        item.addEventListener('mouseenter', () => {
-            const anyActive = Array.from(menuItems).some(i => i.classList.contains('active'))
-            if (anyActive) {
-                menuItems.forEach(i => i.classList.remove('active'))
-                item.classList.add('active')
-            }
-        })
-    })
+function trackFocus(target: HTMLElement, focusManager: FocusManager) {
+    if (target.closest('#editor_container')) {
+        focusManager.setFocus('editor')
+    } else if (target.closest('#tab_container')) {
+        focusManager.setFocus('tab')
+    } else if (target.closest('#tree')) {
+        focusManager.setFocus('tree')
+    } else {
+        focusManager.setFocus('other')
+    }
 }

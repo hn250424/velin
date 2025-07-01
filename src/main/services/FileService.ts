@@ -1,15 +1,14 @@
-import { BrowserWindow } from "electron"
+import ITreeRepository from "@contracts/out/ITreeRepository"
 import TabEditorDto from "@shared/dto/TabEditorDto"
-import TabSession from "../models/TabSession"
-import IDialogService from "../contracts/IDialogService"
-import IFileManager from "../contracts/IFileManager"
-import ITabSessionRepository from "../contracts/ITabSessionRepository"
-import IFileService from "./contracts/IFileService"
+import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
-import TreeNode from "@shared/types/TreeNode"
-import TreeReposotory from "../modules/features/TreeReposotory"
-import ITreeRepository from "@contracts/ITreeRepository"
+import IDialogService from "../ports/out/IDialogService"
+import IFileManager from "../ports/out/IFileManager"
+import ITabSessionRepository from "../ports/out/ITabSessionRepository"
+import TabSession from "../models/TabSessionModel"
+import TreeDto from "@shared/dto/TreeDto"
+import IFileService from "./contracts/IFileService"
 
 export default class FileService implements IFileService {
     constructor(
@@ -48,10 +47,10 @@ export default class FileService implements IFileService {
         return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
     }
 
-    async openDirectory(treeNode?: TreeNode): Promise<TreeNode | null> {
+    async openDirectory(dto?: TreeDto): Promise<TreeDto | null> {
         let path
         let indent
-        if (!treeNode || !treeNode.path) {
+        if (!dto || !dto.path) {
             const result = await this.dialogService.showOpenDirectoryDialog()
 
             if (result.canceled || result.filePaths.length === 0) {
@@ -61,8 +60,8 @@ export default class FileService implements IFileService {
             path = result.filePaths[0]
             indent = 0
         } else {
-            path = treeNode.path
-            indent = treeNode.indent
+            path = dto.path
+            indent = dto.indent
         }
 
         const directoryTree = this.treeRepository.getDirectoryTree(path, indent)

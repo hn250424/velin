@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '../shared/constants/electronAPI'
 import TabEditorDto from '../shared/dto/TabEditorDto'
-import TreeNode from '@shared/types/TreeNode'
+import TreeDto from '@shared/dto/TreeDto'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
-    openDirectory: (treeNode?: TreeNode) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, treeNode) },
+    openDirectory: (data?: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, data) },
     save: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
     saveAll: (data: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },

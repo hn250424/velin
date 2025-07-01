@@ -2,9 +2,9 @@ import IFileService from '@services/contracts/IFileService'
 import { electronAPI } from '@shared/constants/electronAPI'
 import TabEditorDto from '@shared/dto/TabEditorDto'
 import { BrowserWindow, ipcMain } from 'electron'
-import DI_KEYS from '../constants/di_keys'
-import diContainer from '../diContainer'
-import TreeNode from '@shared/types/TreeNode'
+import DI_KEYS from '../../../constants/di_keys'
+import diContainer from '../../../diContainer'
+import TreeDto from '@shared/dto/TreeDto'
 
 export default function registerFileHandlers(mainWindow: BrowserWindow) {
     const fileService: IFileService = diContainer.get(DI_KEYS.FileService)
@@ -25,8 +25,8 @@ export default function registerFileHandlers(mainWindow: BrowserWindow) {
         }
     })
 
-    ipcMain.handle(electronAPI.events.openDirectory, async (e, treeNode?: TreeNode) => {
-        const tree = await fileService.openDirectory(treeNode)
+    ipcMain.handle(electronAPI.events.openDirectory, async (e, treeDto?: TreeDto) => {
+        const tree = await fileService.openDirectory(treeDto)
         return {
             result: true,
             data: tree

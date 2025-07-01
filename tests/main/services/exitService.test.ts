@@ -2,12 +2,12 @@ import exit from '@services/exitService'
 import TabEditorDto from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
-import FakeFileManager from '../modules/core/FakeFileManager'
+import FakeFileManager from '../adapters/out/fs/FakeFileManager'
 import fakeDialogService, {
     setFakeConfirmResult,
     setFakeSaveDialogResult
-} from '../modules/features/fakeDialogService'
-import FakeTabSessionRepository from '../modules/features/FakeTabSessionRepository'
+} from '../adapters/out/ui/fakeDialogService'
+import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeMainWindow: FakeMainWindow

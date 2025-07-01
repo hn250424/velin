@@ -24,7 +24,7 @@ export default class TabEditorView {
         this._editor = editor
     }
 
-    getViewId(): number {
+    getId(): number {
         return parseInt(this.tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
     }
 
@@ -79,12 +79,10 @@ export default class TabEditorView {
         })
     }
 
-    destroyTabDiv() {
-        this.tabDiv.remove()
-    }
-
-    destroyEditorBoxDiv() {
-        this.editorBoxDiv.remove()
+    destroy() {
+        this._editor.destroy()
+        this._editorBoxDiv.remove()
+        this._tabDiv.remove()
     }
 
     setActive() {

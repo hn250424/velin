@@ -77,6 +77,8 @@ function bindTabContextmenuCommands(tabEditorManager: TabEditorManager) {
 
 async function performCloseTab(tabEditorManager: TabEditorManager, id: number) {
     const data = tabEditorManager.getTabEditorDataById(id)
+    if (!data) return
+    
     const response: Response<void> = await window[electronAPI.channel].closeTab(data)
     if (response.result) tabEditorManager.removeTab(data.id)
 }

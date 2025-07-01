@@ -1,4 +1,7 @@
+import FocusManager from "../core/FocusManager"
+
 const shortcutMap = new Map<string, () => any>()
+const focusManager = FocusManager.getInstance()
 
 const shortcutRegistry = {
     register(key: string, handler: () => any) {
@@ -6,6 +9,7 @@ const shortcutRegistry = {
     },
 
     handleKeyEvent(e: KeyboardEvent) {
+        if (focusManager.getFocus() === 'editor') return
         const key = this.getKeyString(e)
         const handler = shortcutMap.get(key)
         if (handler) {

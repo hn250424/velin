@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import { electronAPI } from "@shared/constants/electronAPI";
-import IFileManager from "../contracts/IFileManager";
-import ITabSessionRepository from "../contracts/ITabSessionRepository";
+import IFileManager from "../ports/out/IFileManager";
+import ITabSessionRepository from "../ports/out/ITabSessionRepository";
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,

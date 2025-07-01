@@ -2,8 +2,8 @@ import { loadedRenderer } from '@services/loadService'
 import { TAB_SESSION_PATH } from 'src/main/constants/file_info'
 import { beforeEach, describe, expect, test } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
-import FakeFileManager from '../modules/core/FakeFileManager'
-import FakeTabSessionRepository from '../modules/features/FakeTabSessionRepository'
+import FakeFileManager from '../adapters/out/fs/FakeFileManager'
+import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
 
 describe('loadService.loadedRenderer: ', () => {
     const tabSessionPath = '/fake/path/tabSession.json'

@@ -5,7 +5,7 @@ import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import TabEditorDto from '@shared/dto/TabEditorDto'
 import { redo, undo } from 'prosemirror-history'
-import TabViewModel from '../../viewmodels/TabViewModel'
+import TabData from '../../types/TabData'
 import TabEditorView from '../../views/TabEditorView'
 import { DATASET_ATTR_TAB_ID, NOT_MODIFIED_TEXT } from '../../constants/dom'
 import { MODIFIED_TEXT } from "../../constants/dom"
@@ -20,7 +20,7 @@ export default class TabEditorManager {
     private tabContainer: HTMLElement
     private editorContainer: HTMLElement
 
-    private idToTabViewModelMap: Map<number, TabViewModel> = new Map()
+    private idToTabDataMap: Map<number, TabData> = new Map()
 
     private constructor() {
         this.tabContainer = document.getElementById('tab_container')
@@ -45,8 +45,8 @@ export default class TabEditorManager {
     }
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
-        const tabViewModel = new TabViewModel(id, false, filePath, fileName)
-        this.setIdToTabViewModel(id, tabViewModel)
+        const tabData = { id: id, isModified: false, filePath: filePath, fileName: fileName }
+        this.setTabDataById(id, tabData)
 
         const { tabDiv, tabSpan, tabButton } = this.createTabBox(fileName)
         tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
@@ -78,13 +78,13 @@ export default class TabEditorManager {
         const tabEditorView = new TabEditorView(tabDiv, tabSpan, tabButton, editorBoxDiv, editor)
         tabEditorView.observeEditor(
             () => {
-                if (!tabViewModel.isModified) {
-                    tabViewModel.isModified = true
+                if (!tabData.isModified) {
+                    tabData.isModified = true
                     tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
                 }
             },
             () => {
-                if (!tabViewModel.filePath && tabViewModel.isModified) {
+                if (!tabData.filePath && tabData.isModified) {
                     const firstLine = tabEditorView.getEditorFirstLine()
                     tabEditorView.setTabSpanTextContent(firstLine || 'Untitled')
                 }
@@ -100,13 +100,13 @@ export default class TabEditorManager {
     }
 
     getTabEditorData(view: TabEditorView): TabEditorDto {
-        const id = view.getViewId()
-        const viewModel = this.getIdToTabViewModel(id)
+        const id = view.getId()
+        const data = this.getTabDataById(id)
 
         return {
-            id: viewModel.id,
-            isModified: viewModel.isModified,
-            filePath: viewModel.filePath,
+            id: data.id,
+            isModified: data.isModified,
+            filePath: data.filePath,
             fileName: this.resolveFileName(view),
             content: view.getContent()
         }
@@ -119,7 +119,7 @@ export default class TabEditorManager {
 
     activateTabEditorById(id: number) {
         this.tabEditorViews.forEach((tabEditor, index) => {
-            if (tabEditor.getViewId() === id) {
+            if (tabEditor.getId() === id) {
                 tabEditor.setActive()
                 this.activeTabIndex = index
             } else {
@@ -129,7 +129,7 @@ export default class TabEditorManager {
     }
 
     getTabEditorDataById(id: number): TabEditorDto {
-        const view = this.tabEditorViews.find(_view => _view.getViewId() === id)
+        const view = this.tabEditorViews.find(_view => _view.getId() === id)
         if (!view) return null
         return this.getTabEditorData(view)
     }
@@ -141,11 +141,11 @@ export default class TabEditorManager {
     applySaveResult(result: TabEditorDto) {
         let wasApplied = false
         for (let i = 0; i < this.tabEditorViews.length; i++) {
-            const viewModel = this.getIdToTabViewModel(this.tabEditorViews[i].getViewId())
-            if ((viewModel.id === result.id || viewModel.filePath === result.filePath) && result.isModified === false) {
-                viewModel.isModified = false
-                viewModel.filePath = result.filePath
-                viewModel.fileName = result.fileName
+            const data = this.getTabDataById(this.tabEditorViews[i].getId())
+            if ((data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
+                data.isModified = false
+                data.filePath = result.filePath
+                data.fileName = result.fileName
                 this.tabEditorViews[i].setTabSpanTextContent(result.fileName)
                 this.tabEditorViews[i].setTabButtonTextContent(NOT_MODIFIED_TEXT)
                 this.tabEditorViews[i].setContent(result.content)
@@ -167,15 +167,14 @@ export default class TabEditorManager {
     }
 
     removeTabAt(index: number) {
-        this.tabEditorViews[index].destroyTabDiv()
-        this.tabEditorViews[index].destroyEditorBoxDiv()
+        this.tabEditorViews[index].destroy()
         this.tabEditorViews.splice(index, 1)
     }
 
     removeTab(id: number) {
         for (let i = 0; i < this.tabEditorViews.length; i++) {
             const view = this.tabEditorViews[i]
-            if (view.getViewId() === id) {
+            if (view.getId() === id) {
                 const wasActive = this.activeTabIndex >= i
 
                 this.removeTabAt(i)
@@ -185,7 +184,7 @@ export default class TabEditorManager {
 
                     if (this.tabEditorViews.length > 0) {
                         this.tabEditorViews[this.activeTabIndex].setActive()
-                        this.activeTabId = this.tabEditorViews[this.activeTabIndex].getViewId()
+                        this.activeTabId = this.tabEditorViews[this.activeTabIndex].getId()
                     } else {
                         this.activeTabId = -1
                     }
@@ -201,7 +200,7 @@ export default class TabEditorManager {
             if (results[i]) this.removeTabAt(i)
         }
 
-        const idx = this.tabEditorViews.findIndex(view => view.getViewId() === this.activeTabId)
+        const idx = this.tabEditorViews.findIndex(view => view.getId() === this.activeTabId)
         if (idx === -1) this.setLastTabAsActive()
         else this.activeTabIndex = idx
     }
@@ -211,7 +210,7 @@ export default class TabEditorManager {
             if (results[i]) this.removeTabAt(i)
         }
 
-        const idx = this.tabEditorViews.findIndex(view => view.getViewId() === this.activeTabId)
+        const idx = this.tabEditorViews.findIndex(view => view.getId() === this.activeTabId)
         if (idx === -1) this.setLastTabAsActive()
         else this.activeTabIndex = idx
     }
@@ -221,7 +220,7 @@ export default class TabEditorManager {
             if (results[i]) this.removeTabAt(i)
         }
 
-        const idx = this.tabEditorViews.findIndex(view => view.getViewId() === this.activeTabId)
+        const idx = this.tabEditorViews.findIndex(view => view.getId() === this.activeTabId)
         if (idx === -1) this.setLastTabAsActive()
         else this.activeTabIndex = idx
     }
@@ -260,24 +259,24 @@ export default class TabEditorManager {
 
     private setLastTabAsActive() {
         this.activeTabIndex = this.tabEditorViews.length - 1
-        this.activeTabId = this.activeTabIndex >= 0 ? this.tabEditorViews[this.activeTabIndex].getViewId() : -1
+        this.activeTabId = this.activeTabIndex >= 0 ? this.tabEditorViews[this.activeTabIndex].getId() : -1
         this.tabEditorViews[this.activeTabIndex].setActive()
     }
 
-    private getIdToTabViewModel(id: number) {
-        return this.idToTabViewModelMap.get(id)
+    private getTabDataById(id: number) {
+        return this.idToTabDataMap.get(id)
     }
 
-    private setIdToTabViewModel(id: number, viewModel: TabViewModel) {
-        this.idToTabViewModelMap.set(id, viewModel)
+    private setTabDataById(id: number, data: TabData) {
+        this.idToTabDataMap.set(id, data)
     }
 
     private resolveFileName(view: TabEditorView): string {
-        const id = view.getViewId()
-        const viewModel = this.getIdToTabViewModel(id)
+        const id = view.getId()
+        const data = this.getTabDataById(id)
 
-        if (!viewModel.fileName) return view.getEditorFirstLine()
-        else return viewModel.fileName
+        if (!data.fileName) return view.getEditorFirstLine()
+        else return data.fileName
     }
 
     get activeTabId() {

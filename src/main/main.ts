@@ -3,12 +3,12 @@ import started from 'electron-squirrel-startup'
 import path from 'node:path'
 import { fileURLToPath } from 'url'
 
-import registerFileHandlers from './handlers/fileHandlers'
-import registerLoadHandlers from './handlers/loadHandlers'
-import registerWindowHandlers from './handlers/windowHandlers'
-import registerExitHandlers from './handlers/exitHandlers'
-import registerEditHandlers from './handlers/editHandlers'
-import registerTabHandlers from './handlers/tabHandlers'
+import registerFileHandlers from './adapters/in/handlers/fileHandlers'
+import registerLoadHandlers from './adapters/in/handlers/loadHandlers'
+import registerWindowHandlers from './adapters/in/handlers/windowHandlers'
+import registerExitHandlers from './adapters/in/handlers/exitHandlers'
+import registerEditHandlers from './adapters/in/handlers/editHandlers'
+import registerTabHandlers from './adapters/in/handlers/tabHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

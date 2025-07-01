@@ -5,10 +5,10 @@ import Response from "@shared/types/Response"
 import TabEditorDto from "@shared/dto/TabEditorDto"
 import TabEditorManager from "../modules/features/TabEditorManager"
 import shortcutRegistry from "../modules/features/shortcutRegistry"
-import TreeNode from "@shared/types/TreeNode"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 import performOpenDirectory from "../actions/performOpenDirectory"
 import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
+import TreeDto from "@shared/dto/TreeDto"
 
 export default function registerFileHandlers() {
     const tabEditorManager = TabEditorManager.getInstance()
@@ -18,15 +18,13 @@ export default function registerFileHandlers() {
 
     shortcutRegistry.register('Ctrl+T', async () => await performNewTab(tabEditorManager))
     shortcutRegistry.register('Ctrl+O', async () => await performOpenFile(tabEditorManager))
-    shortcutRegistry.register('Ctrl+Shift+O', async () => {
-        await performOpenDirectory(treeLayoutManager)
-    })
+    shortcutRegistry.register('Ctrl+Shift+O', async () => await performOpenDirectory(treeLayoutManager))
     shortcutRegistry.register('Ctrl+S', async () => await performSave(tabEditorManager))
     shortcutRegistry.register('Ctrl+Shift+S', async () => await performSaveAs(tabEditorManager))
 
     // TODO test.
         ; (async () => {
-            const rootNode: TreeNode = {
+            const rootNode: TreeDto = {
                 path: 'D:\\node-workspace\\velin\\test_file',
                 indent: 0,
                 name: 'test_file',
@@ -34,7 +32,7 @@ export default function registerFileHandlers() {
                 expanded: false,
                 children: null
             }
-            treeLayoutManager.setTreeNodeByPath(rootNode.path, rootNode)
+            treeLayoutManager.setTreeDtoByPath(rootNode.path, rootNode)
 
             const treeDiv = document.createElement('div')
             treeDiv.classList.add('tree_node')

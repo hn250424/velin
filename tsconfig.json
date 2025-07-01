@@ -4,7 +4,7 @@
         "paths": {
             "@shared/*": ["src/shared/*"],
             "@services/*": ["src/main/services/*"],
-            "@contracts/*": ["src/main/contracts/*"],
+            "@contracts/*": ["src/main/ports/*"],
         },
         "target": "ESNext",
         "module": "es2020",
