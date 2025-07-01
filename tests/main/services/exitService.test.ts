@@ -1,5 +1,5 @@
 import exit from '@services/exitService'
-import TabData from '@shared/types/TabData'
+import TabEditorDto from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/core/FakeFileManager'
@@ -21,7 +21,7 @@ const newFileName = 'newFileName'
 const preFileContent = 'preFileContent'
 const newFileContent = 'newFileContent'
 
-const dataArr: TabData[] = [
+const dataArr: TabEditorDto[] = [
     {
         id: 0,
         isModified: false,

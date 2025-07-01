@@ -1,11 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '../shared/constants/electronAPI'
-import TabData from '../shared/types/TabData'
+import TabEditorDto from '../shared/dto/TabEditorDto'
 import TreeNode from '@shared/types/TreeNode'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
-    tabSession: (callback: (tabs: TabData[]) => void) => { ipcRenderer.on(electronAPI.events.tabSession, (e, tabs) => { callback(tabs) }) },
+    tabSession: (callback: (tabs: TabEditorDto[]) => void) => { ipcRenderer.on(electronAPI.events.tabSession, (e, tabs) => { callback(tabs) }) },
     onMaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.onMaximizeWindow, () => { callback() }) },
     onUnmaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.onUnmaximizeWindow, () => { callback() }) },
 
@@ -20,16 +20,16 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
     openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
     openDirectory: (treeNode?: TreeNode) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, treeNode) },
-    save: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
-    saveAs: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
-    saveAll: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
+    save: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
+    saveAs: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },
+    saveAll: (data: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.saveAll, data) },
 
-    closeTab: (data: TabData) => { return ipcRenderer.invoke(electronAPI.events.closeTab, data) },
-    closeTabsExcept: (exceptData: TabData, allData: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsExcept, exceptData, allData) },
-    closeTabsToRight: (referenceData: TabData, allData: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsToRight, referenceData, allData) },
-    closeAllTabs: (data: TabData[]) => { return ipcRenderer.invoke(electronAPI.events.closeAllTabs, data) },
+    closeTab: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.closeTab, data) },
+    closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsExcept, exceptData, allData) },
+    closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsToRight, referenceData, allData) },
+    closeAllTabs: (data: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.closeAllTabs, data) },
 
-    exit: (data: TabData[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) },
+    exit: (data: TabEditorDto[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) },
 
     paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) }
 })

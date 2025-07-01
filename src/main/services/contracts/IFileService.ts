@@ -1,16 +1,12 @@
 import TreeNode from "@shared/types/TreeNode"
-import TabData from "@shared/types/TabData"
+import TabEditorDto from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 
 export default interface IFileService {
     newTab(): Promise<number>
-    openFile(): Promise<TabData>
+    openFile(): Promise<TabEditorDto>
     openDirectory(treeNode?: TreeNode): Promise<TreeNode>
-    save(data: TabData, mainWindow: BrowserWindow): Promise<TabData>
-    saveAs(data: TabData, mainWindow: BrowserWindow): Promise<TabData>
-    saveAll(data: TabData[], mainWindow: BrowserWindow): Promise<TabData[]>
-    closeTab(data: TabData, mainWindow: BrowserWindow): Promise<boolean>
-    closeTabsExcept(exceptData: TabData, allData: TabData[], mainWindow: BrowserWindow): Promise<boolean[]>
-    closeTabsToRight(referenceData: TabData, allData: TabData[], mainWindow: BrowserWindow): Promise<boolean[]>
-    closeAllTabs(data: TabData[], mainWindow: BrowserWindow): Promise<boolean[]>
+    save(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto>
+    saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto>
+    saveAll(data: TabEditorDto[], mainWindow: BrowserWindow): Promise<TabEditorDto[]>
 }

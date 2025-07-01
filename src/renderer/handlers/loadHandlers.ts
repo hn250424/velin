@@ -1,12 +1,12 @@
-import TabData from "@shared/types/TabData"
+import TabEditorDto from "@shared/dto/TabEditorDto"
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabAndEditorManager from "../modules/features/TabAndEditorManager"
+import TabEditorManager from "../modules/features/TabEditorManager"
 
 export default function registerLoadHandlers() {
-    window[electronAPI.channel].tabSession(async (tabs: TabData[]) => {
+    window[electronAPI.channel].tabSession(async (tabs: TabEditorDto[]) => {
         if (tabs.length > 0) {
-            const tabAndEditorManager = TabAndEditorManager.getInstance()
-            await tabAndEditorManager.restoreTabs(tabs)
+            const tabEditorManager = TabEditorManager.getInstance()
+            await tabEditorManager.restoreTabs(tabs)
         }
         window[electronAPI.channel].showMainWindow()
     })

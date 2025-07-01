@@ -1,12 +1,12 @@
 import { BrowserWindow } from "electron"
-import TabData from "@shared/types/TabData"
+import TabEditorDto from "@shared/dto/TabEditorDto"
 import IFileManager from "@contracts/IFileManager"
 import ITabSessionRepository from "@contracts/ITabSessionRepository"
 import IDialogService from "@contracts/IDialogService"
 import TabSession from "../models/TabSession"
 
 export default async function exit(
-    data: TabData[],
+    data: TabEditorDto[],
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
     tabSessionRepository: ITabSessionRepository,

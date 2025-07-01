@@ -16,7 +16,7 @@ import registerTreeHandlers from './handlers/treeHandlers'
 
 import Response from '@shared/types/Response'
 import shortcutRegistry from './modules/features/shortcutRegistry'
-import TabAndEditorManager from './modules/features/TabAndEditorManager'
+import TabEditorManager from './modules/features/TabEditorManager'
 import TreeLayoutMaanger from './modules/features/TreeLayoutManger'
 
 let tabContextMenu: HTMLElement
@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     treeContentContainer = document.getElementById('tree_content')
 
-    const tabAndEditorManager = TabAndEditorManager.getInstance()
+    const tabEditorManager = TabEditorManager.getInstance()
     const treeLayoutManager = TreeLayoutMaanger.getInstance()
 
     registerWindowHandlers()
@@ -47,7 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerEditHandlers()
     registerViewHandlers()
     registerSideHandlers()
-    registerTabHandlers(tabContainer, tabAndEditorManager, tabContextMenu)
+    registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
     registerTreeHandlers(treeContentContainer, treeLayoutManager)
 
     bindDocumentClickEvents()

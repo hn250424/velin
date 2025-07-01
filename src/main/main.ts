@@ -8,6 +8,7 @@ import registerLoadHandlers from './handlers/loadHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerEditHandlers from './handlers/editHandlers'
+import registerTabHandlers from './handlers/tabHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -44,6 +45,7 @@ const createWindow = () => {
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow)
     registerExitHandlers(mainWindow)
+    registerTabHandlers(mainWindow)
     registerEditHandlers()
 
     loadUrl(mainWindow)

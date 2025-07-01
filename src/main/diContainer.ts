@@ -14,6 +14,8 @@ import FileService from '@services/FileService'
 import IFileService from '@services/contracts/IFileService'
 import ITreeRepository from '@contracts/ITreeRepository'
 import TreeReposotory from './modules/features/TreeReposotory'
+import ITabService from '@services/contracts/ITabService'
+import TabService from '@services/tabService'
 
 const diContainer = new Container()
 
@@ -37,5 +39,7 @@ diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonS
 // diContainer.bind<IFileService>(DI_KEYS.FileService)
 //     .toDynamicValue(() => new FileService(_fileManager, _tabSessionRepository, _dialogService))
 //     .inSingletonScope()
+
+diContainer.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()
 
 export default diContainer

@@ -2,7 +2,7 @@ import { electronAPI } from "./shared/constants/electronAPI"
 import OpenResponse from "./shared/interface/OpenResponse"
 import SaveResponse from "./shared/interface/SaveResponse"
 import Response from "./shared/interface/Response"
-import TabData from "./shared/interface/TabData"
+import TabEditorDto from "./shared/interface/TabEditorDto"
 import TabSession from "./shared/interface/TabSession"
 import TreeNode from "@shared/types/TreeNode"
 
@@ -12,7 +12,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Main -> Renderer.
-            tabSession: (callback: (tabs: TabData[]) => void) => void
+            tabSession: (callback: (tabs: TabEditorDto[]) => void) => void
             onMaximizeWindow: (callback: () => void) => void
             onUnmaximizeWindow: (callback: () => void) => void
 
@@ -25,18 +25,18 @@ declare global {
             requestUnmaximizeWindow: () => void
 
             newTab: () => Promise<Response<number>>
-            openFile: () => Promise<Response<TabData>>
+            openFile: () => Promise<Response<TabEditorDto>>
             openDirectory: (treeNode?: TreeNode) => Promise<Response<void>>
-            save: (data: TabData) => Promise<Response<TabData>>
-            saveAs: (data: TabData) => Promise<Response<TabData>>
-            saveAll: (data: TabData[]) => Promise<Response<TabData[]>>
+            save: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
+            saveAs: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
+            saveAll: (data: TabEditorDto[]) => Promise<Response<TabEditorDto[]>>
 
-            closeTab: (data: TabData) => Promise<Response<void>>
-            closeTabsExcept: (exceptData: TabData, allData: TabData[]) => Promise<Response<boolean[]>>
-            closeTabsToRight: (referenceData: TabData, allData: TabData[]) => Promise<Response<boolean[]>>
-            closeAllTabs: (data: TabData[]) => Promise<Response<boolean[]>>
+            closeTab: (data: TabEditorDto) => Promise<Response<void>>
+            closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorDto[]) => Promise<Response<boolean[]>>
+            closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorDto[]) => Promise<Response<boolean[]>>
+            closeAllTabs: (data: TabEditorDto[]) => Promise<Response<boolean[]>>
             
-            exit: (data: TabData[]) => Promise<void>
+            exit: (data: TabEditorDto[]) => Promise<void>
 
             paste: () => Promise<string>
         }

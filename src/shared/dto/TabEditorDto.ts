@@ -1,4 +1,4 @@
-export default interface TabData {
+export default interface TabEditorDto {
     id: number,
     isModified: boolean,
     filePath: string,

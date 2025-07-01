@@ -5,6 +5,7 @@ const DI_KEYS = {
     TreeReposotory: Symbol('TreeReposotory'),
 
     FileService: Symbol('FileService'),
+    TabService: Symbol('TabService'),
 }
 
 export default DI_KEYS
