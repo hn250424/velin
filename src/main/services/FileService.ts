@@ -9,13 +9,15 @@ import ITabSessionRepository from "../ports/out/ITabSessionRepository"
 import TabSession from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
 import IFileService from "../ports/in/IFileService"
+import ITreeManager from "@contracts/out/ITreeManager"
 
 export default class FileService implements IFileService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabSessionRepository) private readonly tabSessionRepository: ITabSessionRepository,
         @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
-        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
+        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository,
+        @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,
     ) {
 
     }
@@ -64,15 +66,20 @@ export default class FileService implements IFileService {
             indent = dto.indent
         }
 
-        const directoryTree = this.treeRepository.getDirectoryTree(path, indent)
+        const fsTree = await this.treeManager.getDirectoryTree(path, indent)
+        const updatedNode = await this.treeRepository.updateSessionWithFsData(
+            path,
+            indent,
+            fsTree.children
+        )
 
         return {
             path,
             name: this.fileManager.getBasename(path),
             indent,
-            directory: directoryTree.directory,
-            expanded: directoryTree.expanded,
-            children: directoryTree?.children ?? [],
+            directory: fsTree.directory,
+            expanded: fsTree.expanded,
+            children: fsTree?.children ?? [],
         }
     }
 

@@ -3,6 +3,7 @@ const DI_KEYS = {
     TabSessionRepository: Symbol('TabSessionRepository'),
     dialogService: Symbol('dialogService'),
     TreeReposotory: Symbol('TreeReposotory'),
+    TreeManager: Symbol('TreeManager'),
 
     FileService: Symbol('FileService'),
     TabService: Symbol('TabService'),

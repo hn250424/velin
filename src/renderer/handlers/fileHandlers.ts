@@ -51,7 +51,7 @@ export default function registerFileHandlers() {
             const treeContainer = document.getElementById('tree_content')!
             treeContainer.appendChild(treeDiv)
             treeContainer.appendChild(treeChildren)
-
+            
             await performOpenDirectory(treeLayoutManager, treeDiv)
         })()
 }
