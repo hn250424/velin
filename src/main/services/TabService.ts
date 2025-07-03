@@ -7,7 +7,7 @@ import IDialogService from "../ports/out/IDialogService"
 import IFileManager from "../ports/out/IFileManager"
 import ITabSessionRepository from "../ports/out/ITabSessionRepository"
 import TabSession from "../models/TabSessionModel"
-import ITabService from "./contracts/ITabService"
+import ITabService from "../ports/in/ITabService"
 
 export default class TabService implements ITabService {
     constructor(

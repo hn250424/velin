@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import ITabService from '@services/contracts/ITabService'
+import ITabService from '@contracts/in/ITabService'
 import { electronAPI } from '@shared/constants/electronAPI'
 import TabEditorDto from '@shared/dto/TabEditorDto'
 import DI_KEYS from '../../../constants/di_keys'

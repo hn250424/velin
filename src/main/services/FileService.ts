@@ -8,7 +8,7 @@ import IFileManager from "../ports/out/IFileManager"
 import ITabSessionRepository from "../ports/out/ITabSessionRepository"
 import TabSession from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
-import IFileService from "./contracts/IFileService"
+import IFileService from "../ports/in/IFileService"
 
 export default class FileService implements IFileService {
     constructor(

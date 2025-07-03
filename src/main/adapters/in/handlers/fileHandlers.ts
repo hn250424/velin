@@ -1,4 +1,4 @@
-import IFileService from '@services/contracts/IFileService'
+import IFileService from '@contracts/in/IFileService'
 import { electronAPI } from '@shared/constants/electronAPI'
 import TabEditorDto from '@shared/dto/TabEditorDto'
 import { BrowserWindow, ipcMain } from 'electron'

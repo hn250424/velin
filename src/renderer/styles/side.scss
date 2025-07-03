@@ -34,10 +34,6 @@ $tree_horizontal_margin: 5px;
     cursor: pointer;
 }
 
-#tree_group {
-    display: flex;
-}
-
 #tree {
     width: 0px;
     height: 100%;
@@ -72,14 +68,21 @@ $tree_horizontal_margin: 5px;
     background-color: white;
 }
 
-#tree_content {
-}
+#tree_content {}
 
 #tree_resizer {
     width: 3px;
     height: 100%;
     cursor: ew-resize;
     background-color: blue;
+}
+
+.tree_node_wrapper {
+    // width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 100px;
 }
 
 .tree_node {
@@ -100,4 +103,13 @@ $tree_horizontal_margin: 5px;
     min-height: gv.$icon_size;
 
     text-align: center;
+    flex-shrink: 0; /* prevent icon from shrinking on resize */
+
+}
+
+#tree_context_menu {
+    display: none;
+    position: fixed;
+    flex-direction: column;
+    z-index: 1000;
 }

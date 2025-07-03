@@ -25,12 +25,14 @@ let tabContainer: HTMLElement
 let menuItems: NodeListOf<HTMLElement>
 let title: HTMLElement
 let treeContentContainer: HTMLElement
+let treeContextMenu: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
     title = document.getElementById('title')
 
     tabContainer = document.getElementById('tab_container')
     tabContextMenu = document.getElementById('tab_context_menu')
+    treeContextMenu = document.getElementById('tree_context_menu')
 
     menuContainer = document.getElementById('menu_container')
     menuItems = document.querySelectorAll('#menu_container .menu_item')
@@ -49,8 +51,8 @@ window.addEventListener('DOMContentLoaded', () => {
     registerViewHandlers()
     registerSideHandlers()
     registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
-    registerTreeHandlers(treeContentContainer, treeLayoutManager)
-    registerMenuHandlers(menuItems, tabContextMenu)
+    registerTreeHandlers(treeContentContainer, treeLayoutManager, treeContextMenu)
+    registerMenuHandlers(menuItems, tabContextMenu, treeContextMenu)
 
     bindDocumentClickEvents(focusManager)
     bindDocumentContextMenuEvents(focusManager)
@@ -73,6 +75,7 @@ function bindDocumentClickEvents(focusManager: FocusManager) {
     document.addEventListener('click', async (e) => {
         menuItems.forEach(i => i.classList.remove('active'))
         tabContextMenu.style.display = 'none'
+        treeContextMenu.style.display = 'none'
         trackFocus(e.target as HTMLElement, focusManager)
     })
 }

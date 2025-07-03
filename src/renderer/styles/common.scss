@@ -1,5 +1,15 @@
 @use './global_variables.scss' as gv;
 
+$dropdown_min_width: 150px;
+$dropdown_border_color: gv.$grey-2;
+$dropdown_item_hover_color: gv.$grey-1;
+$dropdown_divider_color: gv.$grey-2;
+$dropdown_padding: 5px;
+$dropdown_item_padding: 5px 10px;
+$shortcut_font_size: 0.85em;
+$shortcut_left_margin: 20px;
+$shortcut_color: gv.$grey-4;
+
 * {
     margin: 0;
     padding: 0;
@@ -12,6 +22,45 @@
 
 .no_drag {
     -webkit-app-region: no-drag;
+}
+
+
+.dropdown {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid $dropdown_border_color;
+    min-width: $dropdown_min_width;
+    z-index: 1000;
+    padding: $dropdown_padding;
+}
+
+.dropdown_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: $dropdown_item_padding;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.dropdown_item:hover {
+    background-color: $dropdown_item_hover_color;
+}
+
+.dropdown_divider {
+    height: 1px;
+    margin: 1px;
+    background-color: $dropdown_divider_color;
+}
+
+.shortcut {
+    font-size: $shortcut_font_size;
+    margin-left: $shortcut_left_margin;
+    color: $shortcut_color;
+    user-select: none;
 }
 
 .ellipsis {

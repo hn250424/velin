@@ -12,10 +12,10 @@ import IDialogService from '@contracts/out/IDialogService'
 import dialogService from './adapters/out/ui/dialogService'
 import FileService from '@services/FileService'
 import TabService from '@services/TabService'
-import IFileService from '@services/contracts/IFileService'
+import IFileService from '@contracts/in/IFileService'
 import ITreeRepository from '@contracts/out/ITreeRepository'
 import TreeReposotory from './adapters/out/persistence/TreeReposotory'
-import ITabService from '@services/contracts/ITabService'
+import ITabService from '@contracts/in/ITabService'
 
 const diContainer = new Container()
 

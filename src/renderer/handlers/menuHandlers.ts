@@ -1,9 +1,8 @@
-
-export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement) {
-    bindMenucontainerEvents(menuItems, tabContextMenu)
+export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
+    bindMenucontainerEvents(menuItems, tabContextMenu, treeContextMenu)
 }
 
-function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement) {
+function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
     menuItems.forEach(item => {
         item.addEventListener('click', e => {
             e.stopPropagation()
@@ -14,9 +13,8 @@ function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>, tabContextM
 
             item.classList.toggle('active')
 
-            if (tabContextMenu.style.display === 'flex') {
-                tabContextMenu.style.display = 'none'
-            }
+            if (tabContextMenu.style.display === 'flex') tabContextMenu.style.display = 'none'
+            if (treeContextMenu.style.display === 'flex') treeContextMenu.style.display = 'none'
         })
 
         item.addEventListener('mouseenter', () => {
