@@ -10,7 +10,6 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
     if (!treeDiv) {
         const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
         if (!response.data) return
-        
 
         treeLayoutManager.renderTreeData(response.data)
         treeLayoutManager.setTreeDtoByPath(response.data.path, response.data)

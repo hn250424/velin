@@ -7,12 +7,12 @@ import fakeDialogService, {
     setFakeConfirmResult,
     setFakeSaveDialogResult
 } from '../adapters/out/ui/fakeDialogService'
-import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
+import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeMainWindow: FakeMainWindow
 let fakeFileManager: FakeFileManager
-let fakeTabSessionRepository: FakeTabSessionRepository
+let fakeTabRepository: FakeTabRepository
 
 const preFilePath = 'preFilePath'
 const newFilePath = 'newFilePath'
@@ -56,7 +56,7 @@ describe('exitService.exit', () => {
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
     })
 
     test('test when user cancels confirm dialog', async () => {
@@ -71,16 +71,16 @@ describe('exitService.exit', () => {
         copyedData.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             copyedData.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeDialogService)
 
         // Then.
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session[0].filePath).toBe('')
         expect(session[1].filePath).toBe(copyedData[1].filePath)
         const file_2 = await fakeFileManager.read(copyedData[2].filePath)
@@ -106,10 +106,10 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeDialogService)
 
         // Then.
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session[0].filePath).toBe('')
         expect(session[1].filePath).toBe(copyedData[1].filePath)
         const file_2 = await fakeFileManager.read(copyedData[2].filePath)
@@ -135,10 +135,10 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository, fakeDialogService)
+        await exit(copyedData, fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeDialogService)
 
         // Then.
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session[0].filePath).toBe('')
         expect(session[1].filePath).toBe(copyedData[1].filePath)
         const file_2 = await fakeFileManager.read(copyedData[2].filePath)

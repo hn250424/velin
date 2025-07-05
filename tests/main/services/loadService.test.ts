@@ -3,19 +3,19 @@ import { TAB_SESSION_PATH } from 'src/main/constants/file_info'
 import { beforeEach, describe, expect, test } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../adapters/out/fs/FakeFileManager'
-import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
+import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 
 describe('loadService.loadedRenderer: ', () => {
     const tabSessionPath = '/fake/path/tabSession.json'
 
     let fakeMainWindow: FakeMainWindow
     let fakeFileManager: FakeFileManager
-    let fakeTabSessionRepository: FakeTabSessionRepository
+    let fakeTabRepository: FakeTabRepository
 
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
     })
 
     test('loadedRenderer: normal', async () => {
@@ -31,10 +31,10 @@ describe('loadService.loadedRenderer: ', () => {
             { id: 0, filePath: 'file1.txt' },
             { id: 1, filePath: 'file2.txt' },
         ]
-        fakeTabSessionRepository.setTabSession(initialSession)
+        fakeTabRepository.setTabSession(initialSession)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -61,10 +61,10 @@ describe('loadService.loadedRenderer: ', () => {
     test('loadedRenderer: tabSession json file does not exist', async () => {
         // Given.
         fakeFileManager.setPathExistence(TAB_SESSION_PATH, false)
-        fakeTabSessionRepository.setTabSession([])
+        fakeTabRepository.setTabSession([])
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -77,10 +77,10 @@ describe('loadService.loadedRenderer: ', () => {
     test('loadedRenderer: tabSession text does not exist(length === 0)', async () => {
         // Given.
         fakeFileManager.setPathExistence(TAB_SESSION_PATH, true)
-        fakeTabSessionRepository.setTabSession([])
+        fakeTabRepository.setTabSession([])
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabSessionRepository)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()

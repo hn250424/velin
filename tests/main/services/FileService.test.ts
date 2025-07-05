@@ -10,13 +10,13 @@ import fakeDialogService, {
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../adapters/out/ui/fakeDialogService'
-import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
+import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import FakeTreeManager from '../adapters/out/persistence/FakeTreeManager'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeFileManager: FakeFileManager
-let fakeTabSessionRepository: FakeTabSessionRepository
+let fakeTabRepository: FakeTabRepository
 let fakeTreeManager: FakeTreeManager
 let fakeTreeRepository: FakeTreeRepository
 let fileService: FileService
@@ -79,23 +79,23 @@ const dataArr: TabEditorDto[] = [
 describe('FileService.newTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
         fakeTreeManager = new FakeTreeManager()
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
     test('should create a new tab with an incremented ID based on the existing session', async () => {
         // Given.        
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabSessionRepository.setTabSession([{ id: 5, filePath: 'file.md' }])
+        await fakeTabRepository.setTabSession([{ id: 5, filePath: 'file.md' }])
 
         // When.
         const id = await fileService.newTab()
 
         // Then.
         expect(id).toBe(6)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(2)
         expect(session[1].id).toBe(6)
     })
@@ -104,10 +104,10 @@ describe('FileService.newTab', () => {
 describe('FileService.openFile', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
         fakeTreeManager = new FakeTreeManager()
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
     test('should return false when the open dialog is canceled', async () => {
@@ -138,10 +138,10 @@ describe('FileService.openFile', () => {
 describe('FileService.save', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
         fakeTreeManager = new FakeTreeManager()
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
     test('Save with empty filePath and cancel dialog', async () => {
@@ -169,7 +169,7 @@ describe('FileService.save', () => {
             filePath: newFilePath
         })
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        await fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await fileService.save(data, fakeMainWindow as any)
@@ -177,7 +177,7 @@ describe('FileService.save', () => {
         // Then.
         expect(response.isModified).toBe(false)
         expect(await fakeFileManager.read(newFilePath)).toBe(data.content)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession[0].id).toBe(0)
         expect(tabSession[0].filePath).toBe(newFilePath)
     })
@@ -186,7 +186,7 @@ describe('FileService.save', () => {
         // Given.
         const data = { ...defaultData }
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        await fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await fileService.save(data, fakeMainWindow as any)
@@ -194,7 +194,7 @@ describe('FileService.save', () => {
         // Then.
         expect(response.isModified).toBe(false)
         expect(await fakeFileManager.read(data.filePath)).toBe(data.content)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession[0].id).toBe(0)
         expect(tabSession[0].filePath).toBe(data.filePath)
     })
@@ -203,10 +203,10 @@ describe('FileService.save', () => {
 describe('FileService.saveAs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
         fakeTreeManager = new FakeTreeManager()
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
     test('should return false when SaveDialog is canceled', async () => {
@@ -232,7 +232,7 @@ describe('FileService.saveAs', () => {
             filePath: newFilePath
         })
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await fileService.saveAs(data, fakeMainWindow as any)
@@ -241,7 +241,7 @@ describe('FileService.saveAs', () => {
         expect(response.isModified).toBe(false)
         const savedFile = await fakeFileManager.read(newFilePath)
         expect(savedFile).toBe(data.content)
-        const updatedTabSession = await fakeTabSessionRepository.readTabSession()
+        const updatedTabSession = await fakeTabRepository.readTabSession()
         expect(updatedTabSession[updatedTabSession.length - 1].id).toBe(data.id + 1)
         expect(updatedTabSession[updatedTabSession.length - 1].filePath).toBe(newFilePath)
     })
@@ -250,10 +250,10 @@ describe('FileService.saveAs', () => {
 describe('FileService.saveAll', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
         fakeTreeManager = new FakeTreeManager()
-        fileService = new FileService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
     test('test all cases with confirmed dialog', async () => {
@@ -264,7 +264,7 @@ describe('FileService.saveAll', () => {
             canceled: false,
             filePath: newFilePath
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             _dataArr.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -273,7 +273,7 @@ describe('FileService.saveAll', () => {
         const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
 
         // Then.
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session[0].filePath).toBe('')
         expect(session[1].filePath).toBe(_dataArr[1].filePath)
         const file_2 = await fakeFileManager.read(_dataArr[2].filePath)
@@ -294,7 +294,7 @@ describe('FileService.saveAll', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             _dataArr.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -303,7 +303,7 @@ describe('FileService.saveAll', () => {
         const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
 
         // Then.
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session[0].filePath).toBe('')
         expect(session[1].filePath).toBe(_dataArr[1].filePath)
         const file_2 = await fakeFileManager.read(_dataArr[2].filePath)

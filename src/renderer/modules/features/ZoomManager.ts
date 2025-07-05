@@ -32,12 +32,5 @@ export default class ZoomManager {
         this.contentContainer.style.transform = `scale(${this.zoomLevel})`
         this.contentContainer.style.width = `${100 / this.zoomLevel}%`
         this.contentContainer.style.height = `${100 / this.zoomLevel}%`
-
-        // document.querySelectorAll('.editorBox').forEach(box => {
-        //     const el = box as HTMLElement
-        //     el.style.transform = `scale(${this.zoomLevel})`
-        //     el.style.width = `${100 / this.zoomLevel}%`
-        //     el.style.height = `${100 / this.zoomLevel}%`
-        // })
     }
 }

@@ -5,14 +5,14 @@ import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
 import IDialogService from "../ports/out/IDialogService"
 import IFileManager from "../ports/out/IFileManager"
-import ITabSessionRepository from "../ports/out/ITabSessionRepository"
+import ITabRepository from "../ports/out/ITabRepository"
 import TabSession from "../models/TabSessionModel"
 import ITabService from "../ports/in/ITabService"
 
 export default class TabService implements ITabService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-        @inject(DI_KEYS.TabSessionRepository) private readonly tabSessionRepository: ITabSessionRepository,
+        @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
         @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
         @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
     ) {
@@ -41,9 +41,9 @@ export default class TabService implements ITabService {
         // Delete session.
         if (writeSession) {
             try {
-                const tabSession = await this.tabSessionRepository.readTabSession()
+                const tabSession = await this.tabRepository.readTabSession()
                 const updatedSession = tabSession.filter(session => session.id !== data.id)
-                await this.tabSessionRepository.writeTabSession(updatedSession)
+                await this.tabRepository.writeTabSession(updatedSession)
             } catch (e) {
                 console.error(e)
                 return false
@@ -73,7 +73,7 @@ export default class TabService implements ITabService {
             }
         }
 
-        await this.tabSessionRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession(sessionArr)
 
         return responseArr
     }
@@ -98,7 +98,7 @@ export default class TabService implements ITabService {
             }
         }
 
-        await this.tabSessionRepository.writeTabSession(sessionToKeep)
+        await this.tabRepository.writeTabSession(sessionToKeep)
 
         return responseArr
     }
@@ -118,7 +118,7 @@ export default class TabService implements ITabService {
             }
         }
 
-        await this.tabSessionRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession(sessionArr)
         return responseArr
     }
 }

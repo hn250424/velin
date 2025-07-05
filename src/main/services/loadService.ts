@@ -1,21 +1,21 @@
 import { BrowserWindow } from "electron";
 import { electronAPI } from "@shared/constants/electronAPI";
 import IFileManager from "../ports/out/IFileManager";
-import ITabSessionRepository from "../ports/out/ITabSessionRepository";
+import ITabRepository from "../ports/out/ITabRepository";
 import ITreeRepository from "@contracts/out/ITreeRepository";
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
-    tabSessionRepository: ITabSessionRepository,
+    tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
 ) {
-    await sendTabSession(mainWindow, fileManager, tabSessionRepository)
+    await sendTabSession(mainWindow, fileManager, tabRepository)
     await sendTreeSession(mainWindow, fileManager, treeRepository)
 }
 
-async function sendTabSession(mainWindow: BrowserWindow, fileManager: IFileManager, tabSessionRepository: ITabSessionRepository) {
-    const tabSessionArr = await tabSessionRepository.readTabSession()
+async function sendTabSession(mainWindow: BrowserWindow, fileManager: IFileManager, tabRepository: ITabRepository) {
+    const tabSessionArr = await tabRepository.readTabSession()
     if (tabSessionArr.length === 0) {
         mainWindow.webContents.send(electronAPI.events.tabSession, [])
         return
@@ -53,7 +53,7 @@ async function sendTabSession(mainWindow: BrowserWindow, fileManager: IFileManag
 
     if (isChanged) {
         const sessionArr = arr.map(({ id, filePath }) => ({ id, filePath }))
-        await tabSessionRepository.writeTabSession(sessionArr)
+        await tabRepository.writeTabSession(sessionArr)
     }
     mainWindow.webContents.send(electronAPI.events.tabSession, arr)
 }

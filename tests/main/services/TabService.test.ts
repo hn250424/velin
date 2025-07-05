@@ -9,13 +9,13 @@ import fakeDialogService, {
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../adapters/out/ui/fakeDialogService'
-import FakeTabSessionRepository from '../adapters/out/persistence/FakeTabSessionRepository'
+import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import TabService from '@services/TabService'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 let fakeFileManager: FakeFileManager
-let fakeTabSessionRepository: FakeTabSessionRepository
+let fakeTabRepository: FakeTabRepository
 let fakeTreeRepository: FakeTreeRepository
 let tabService: TabService
 const fakeMainWindow = new FakeMainWindow()
@@ -77,9 +77,9 @@ const dataArr: TabEditorDto[] = [
 describe('tabService.closeTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
-        tabService = new TabService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should write when closeTab if data is modified', async () => {
@@ -87,14 +87,14 @@ describe('tabService.closeTab', () => {
         const data = { ...defaultData }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await tabService.closeTab(data, fakeMainWindow as any)
 
         // Then.
         expect(response).toBe(true)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(0)
         const file = await fakeFileManager.read(data.filePath)
         expect(file).toBe(data.content)
@@ -105,14 +105,14 @@ describe('tabService.closeTab', () => {
         const data = { ...defaultData }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await tabService.closeTab(data, fakeMainWindow as any)
 
         // Then.
         expect(response).toBe(true)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(0)
     })
 
@@ -125,14 +125,14 @@ describe('tabService.closeTab', () => {
             canceled: false,
             filePath: newFilePath
         })
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await tabService.closeTab(data, fakeMainWindow as any)
 
         // Then.
         expect(response).toBe(true)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(0)
         const file = await fakeFileManager.read(newFilePath)
         expect(file).toBe(data.content)
@@ -147,14 +147,14 @@ describe('tabService.closeTab', () => {
             canceled: true,
             filePath: ''
         })
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await tabService.closeTab(data, fakeMainWindow as any)
 
         // Then.
         expect(response).toBe(false)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(1)
     })
 
@@ -162,14 +162,14 @@ describe('tabService.closeTab', () => {
         // Given.
         const data = { ...defaultData }
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        fakeTabSessionRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
 
         // When.
         const response = await tabService.closeTab(data, fakeMainWindow as any)
 
         // Then.
         expect(response).toBe(true)
-        const session = await fakeTabSessionRepository.readTabSession()
+        const session = await fakeTabRepository.readTabSession()
         expect(session.length).toBe(0)
     })
 })
@@ -177,9 +177,9 @@ describe('tabService.closeTab', () => {
 describe('tabService.closeTabsExcept', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
-        tabService = new TabService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should retain only selected tab and save others modified file', async () => {
@@ -191,7 +191,7 @@ describe('tabService.closeTabsExcept', () => {
             canceled: false,
             filePath: newFilePath
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -203,7 +203,7 @@ describe('tabService.closeTabsExcept', () => {
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
         expect(await fakeFileManager.read(newFilePath)).toBe(allData[3].content)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(1)
         expect(tabSession[0].id).toBe(exceptData.id)
         expect(tabSession[0].filePath).toBe(exceptData.filePath)
@@ -218,7 +218,7 @@ describe('tabService.closeTabsExcept', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -229,7 +229,7 @@ describe('tabService.closeTabsExcept', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(1)
         expect(tabSession[0].id).toBe(exceptData.id)
         expect(tabSession[0].filePath).toBe(exceptData.filePath)
@@ -244,7 +244,7 @@ describe('tabService.closeTabsExcept', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         for (const { filePath } of allData) {
@@ -258,7 +258,7 @@ describe('tabService.closeTabsExcept', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(2)
         expect(tabSession[0].id).toBe(exceptData.id)
         expect(tabSession[0].filePath).toBe(exceptData.filePath)
@@ -269,9 +269,9 @@ describe('tabService.closeTabsExcept', () => {
 describe('tabService.closeTabsToRight', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
-        tabService = new TabService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should retain only the tabs to the left of the reference tab and save modified files', async () => {
@@ -283,7 +283,7 @@ describe('tabService.closeTabsToRight', () => {
             canceled: false,
             filePath: newFilePath
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -295,7 +295,7 @@ describe('tabService.closeTabsToRight', () => {
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
         expect(await fakeFileManager.read(newFilePath)).toBe(allData[3].content)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(2)
         expect(tabSession[tabSession.length - 1].id).toBe(refData.id)
         expect(tabSession[tabSession.length - 1].filePath).toBe(refData.filePath)
@@ -310,7 +310,7 @@ describe('tabService.closeTabsToRight', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -321,7 +321,7 @@ describe('tabService.closeTabsToRight', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(2)
         expect(tabSession[tabSession.length - 1].id).toBe(refData.id)
         expect(tabSession[tabSession.length - 1].filePath).toBe(refData.filePath)
@@ -336,7 +336,7 @@ describe('tabService.closeTabsToRight', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             allData.map(({ id, filePath }) => ({ id, filePath }))
         )
         for (const { filePath } of allData) {
@@ -350,7 +350,7 @@ describe('tabService.closeTabsToRight', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(3)
         expect(tabSession[tabSession.length - 1].id).toBe(allData[3].id)
         expect(tabSession[tabSession.length - 1].filePath).toBe(allData[3].filePath)
@@ -361,9 +361,9 @@ describe('tabService.closeTabsToRight', () => {
 describe('tabService.closeAllTabs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTabSessionRepository = new FakeTabSessionRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository()
-        tabService = new TabService(fakeFileManager, fakeTabSessionRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
     test('should close all tabs and save modified files', async () => {
@@ -375,7 +375,7 @@ describe('tabService.closeAllTabs', () => {
             canceled: false,
             filePath: newFilePath
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             data.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -386,7 +386,7 @@ describe('tabService.closeAllTabs', () => {
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
         expect(await fakeFileManager.read(newFilePath)).toBe(data[3].content)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(0)
     })
 
@@ -399,7 +399,7 @@ describe('tabService.closeAllTabs', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             data.map(({ id, filePath }) => ({ id, filePath }))
         )
         const spy = vi.spyOn(fakeFileManager, 'write')
@@ -409,7 +409,7 @@ describe('tabService.closeAllTabs', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(0)
     })
 
@@ -422,7 +422,7 @@ describe('tabService.closeAllTabs', () => {
             canceled: true,
             filePath: ''
         })
-        await fakeTabSessionRepository.setTabSession(
+        await fakeTabRepository.setTabSession(
             data.map(({ id, filePath }) => ({ id, filePath }))
         )
         for (const { filePath } of data) {
@@ -435,7 +435,7 @@ describe('tabService.closeAllTabs', () => {
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
-        const tabSession = await fakeTabSessionRepository.readTabSession()
+        const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.length).toBe(1)
         expect(await fakeFileManager.read(data[2].filePath)).toBe(data[2].content)
     })

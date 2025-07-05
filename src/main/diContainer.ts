@@ -6,8 +6,8 @@ import { Container } from 'inversify'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from '@contracts/out/IFileManager'
 import FileManager from './adapters/out/fs/FileManager'
-import ITabSessionRepository from '@contracts/out/ITabSessionRepository'
-import TabSessionRepository from './adapters/out/persistence/TabSessionRepository'
+import ITabRepository from '@contracts/out/ITabRepository'
+import TabRepository from './adapters/out/persistence/TabRepository'
 import IDialogService from '@contracts/out/IDialogService'
 import dialogService from './adapters/out/ui/dialogService'
 import FileService from '@services/FileService'
@@ -30,11 +30,11 @@ const _dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
 
 const userDataPath = app.getPath('userData')
 const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
-diContainer.bind<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
-    .toDynamicValue(() => new TabSessionRepository(tabSessionPath, _fileManager))
+diContainer.bind<ITabRepository>(DI_KEYS.TabRepository)
+    .toDynamicValue(() => new TabRepository(tabSessionPath, _fileManager))
     .inSingletonScope()
 
-const _tabSessionRepository = diContainer.get<ITabSessionRepository>(DI_KEYS.TabSessionRepository)
+const _tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
 
 const treeSessionPath = path.join(userDataPath, Tree_SESSION_PATH)
 diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
@@ -43,7 +43,7 @@ diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
 
 diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
 // diContainer.bind<IFileService>(DI_KEYS.FileService)
-//     .toDynamicValue(() => new FileService(_fileManager, _tabSessionRepository, _dialogService))
+//     .toDynamicValue(() => new FileService(_fileManager, _tabRepository, _dialogService))
 //     .inSingletonScope()
 
 diContainer.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()

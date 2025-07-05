@@ -5,7 +5,7 @@ import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
 import IDialogService from "../ports/out/IDialogService"
 import IFileManager from "../ports/out/IFileManager"
-import ITabSessionRepository from "../ports/out/ITabSessionRepository"
+import ITabRepository from "../ports/out/ITabRepository"
 import TabSession from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
 import IFileService from "../ports/in/IFileService"
@@ -14,7 +14,7 @@ import ITreeManager from "@contracts/out/ITreeManager"
 export default class FileService implements IFileService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-        @inject(DI_KEYS.TabSessionRepository) private readonly tabSessionRepository: ITabSessionRepository,
+        @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
         @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
         @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository,
         @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,
@@ -23,10 +23,10 @@ export default class FileService implements IFileService {
     }
 
     async newTab() {
-        const arr = await this.tabSessionRepository.readTabSession()
+        const arr = await this.tabRepository.readTabSession()
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: '' })
-        await this.tabSessionRepository.writeTabSession(arr)
+        await this.tabRepository.writeTabSession(arr)
         return id
     }
 
@@ -41,10 +41,10 @@ export default class FileService implements IFileService {
         const fileName = this.fileManager.getBasename(filePath)
         const content = await this.fileManager.read(filePath)
 
-        const arr = await this.tabSessionRepository.readTabSession()
+        const arr = await this.tabRepository.readTabSession()
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: filePath })
-        await this.tabSessionRepository.writeTabSession(arr)
+        await this.tabRepository.writeTabSession(arr)
 
         return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
     }
@@ -67,11 +67,8 @@ export default class FileService implements IFileService {
         }
 
         const fsTree = await this.treeManager.getDirectoryTree(path, indent)
-        const updatedNode = await this.treeRepository.updateSessionWithFsData(
-            path,
-            indent,
-            fsTree.children
-        )
+        if (indent === 0) await this.treeRepository.writeTreeSession(fsTree)
+        else await this.treeRepository.updateSessionWithFsData(path, indent, fsTree.children)
 
         return {
             path,
@@ -92,9 +89,9 @@ export default class FileService implements IFileService {
             } else {
                 await this.fileManager.write(result.filePath, data.content)
 
-                const tabSession = await this.tabSessionRepository.readTabSession()
+                const tabSession = await this.tabRepository.readTabSession()
                 tabSession.find(s => s.id === data.id).filePath = result.filePath
-                if (writeSession) await this.tabSessionRepository.writeTabSession(tabSession)
+                if (writeSession) await this.tabRepository.writeTabSession(tabSession)
 
                 return {
                     ...data,
@@ -122,10 +119,10 @@ export default class FileService implements IFileService {
         } else {
             await this.fileManager.write(result.filePath, data.content)
 
-            const arr = await this.tabSessionRepository.readTabSession()
+            const arr = await this.tabRepository.readTabSession()
             const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
             arr.push({ id: id, filePath: result.filePath })
-            this.tabSessionRepository.writeTabSession(arr)
+            this.tabRepository.writeTabSession(arr)
 
             return {
                 id: id,
@@ -155,7 +152,7 @@ export default class FileService implements IFileService {
             responseArr.push(result)
         }
 
-        await this.tabSessionRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession(sessionArr)
 
         return responseArr
     }

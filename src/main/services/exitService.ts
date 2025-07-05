@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron"
 import TabEditorDto from "@shared/dto/TabEditorDto"
 import IFileManager from "@contracts/out/IFileManager"
-import ITabSessionRepository from "@contracts/out/ITabSessionRepository"
+import ITabRepository from "@contracts/out/ITabRepository"
 import IDialogService from "@contracts/out/IDialogService"
 import TabSessionModel from "../models/TabSessionModel"
 
@@ -9,7 +9,7 @@ export default async function exit(
     data: TabEditorDto[],
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
-    tabSessionRepository: ITabSessionRepository,
+    tabRepository: ITabRepository,
     dialogService: IDialogService
 ) {
     const sessionArr: TabSessionModel[] = []
@@ -44,6 +44,6 @@ export default async function exit(
         }
     }
 
-    await tabSessionRepository.writeTabSession(sessionArr)
+    await tabRepository.writeTabSession(sessionArr)
     mainWindow.close()
 }
