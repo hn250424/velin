@@ -2,6 +2,7 @@ import "@milkdown/theme-nord/style.css"
 
 import performOpenDirectory from "../actions/performOpenDirectory"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
+import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
 
 export default function registerTreeHandlers(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, contextMenu: HTMLElement) {
     bindTreeClickEvents(treeContentContainer, treeLayoutManager)
@@ -14,6 +15,9 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
         const target = e.target as HTMLElement
         const treeDiv = target.closest('.tree_node') as HTMLElement
         if (!treeDiv) return
+
+        // console.log(treeLayoutManager.getTreeDtoByPath(treeDiv.dataset[DATASET_ATTR_TREE_PATH]))
+        // console.log(treeLayoutManager.flattenTreeArray)
 
         // TODO: Check directory or file.
         await performOpenDirectory(treeLayoutManager, treeDiv)

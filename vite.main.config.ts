@@ -6,6 +6,7 @@ export default defineConfig({
             entry: 'src/main/main.ts',
             formats: ['es'],
         },
+        // sourcemap: true
     },
     resolve: {
         alias: [

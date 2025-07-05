@@ -5,7 +5,9 @@ import TreeDto from '@shared/dto/TreeDto'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Main -> Renderer.
-    tabSession: (callback: (tabs: TabEditorDto[]) => void) => { ipcRenderer.on(electronAPI.events.tabSession, (e, tabs) => { callback(tabs) }) },
+    session: (callback: (tabs: TabEditorDto[], tree: TreeDto) => void) => { 
+        ipcRenderer.on(electronAPI.events.session, (e, tabs, tree) => { callback(tabs, tree) }) 
+    },
     onMaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.onMaximizeWindow, () => { callback() }) },
     onUnmaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.onUnmaximizeWindow, () => { callback() }) },
 
@@ -29,7 +31,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.closeTabsToRight, referenceData, allData) },
     closeAllTabs: (data: TabEditorDto[]) => { return ipcRenderer.invoke(electronAPI.events.closeAllTabs, data) },
 
-    exit: (data: TabEditorDto[]) => { ipcRenderer.invoke(electronAPI.events.exit, data) },
+    exit: (tabSessionData: TabEditorDto[], treeSessionData: TreeDto) => { ipcRenderer.invoke(electronAPI.events.exit, tabSessionData, treeSessionData) },
 
     paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) }
 })

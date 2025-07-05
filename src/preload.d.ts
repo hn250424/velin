@@ -9,7 +9,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Main -> Renderer.
-            tabSession: (callback: (tabs: TabEditorDto[]) => void) => void
+            session: (callback: (tabs: TabEditorDto[], tree: TreeDto) => void) => void
             onMaximizeWindow: (callback: () => void) => void
             onUnmaximizeWindow: (callback: () => void) => void
 
@@ -33,7 +33,7 @@ declare global {
             closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorDto[]) => Promise<Response<boolean[]>>
             closeAllTabs: (data: TabEditorDto[]) => Promise<Response<boolean[]>>
             
-            exit: (data: TabEditorDto[]) => Promise<void>
+            exit: (tabSessionData: TabEditorDto[], treeSessionData: TreeDto) => Promise<void>
 
             paste: () => Promise<string>
         }

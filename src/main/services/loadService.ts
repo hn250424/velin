@@ -1,28 +1,28 @@
-import { BrowserWindow } from "electron";
+import ITreeManager from "@contracts/out/ITreeManager";
+import ITreeRepository from "@contracts/out/ITreeRepository";
 import { electronAPI } from "@shared/constants/electronAPI";
+import TreeDto from "@shared/dto/TreeDto";
+import { BrowserWindow } from "electron";
 import IFileManager from "../ports/out/IFileManager";
 import ITabRepository from "../ports/out/ITabRepository";
-import ITreeRepository from "@contracts/out/ITreeRepository";
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
+    treeManager: ITreeManager
 ) {
-    await sendTabSession(mainWindow, fileManager, tabRepository)
-    await sendTreeSession(mainWindow, fileManager, treeRepository)
+    const newTabSessionArr = await getUpdatedTabSession(fileManager, tabRepository)
+    const newTreeSession = await getUpdatedTreeSession(fileManager, treeRepository, treeManager)
+    mainWindow.webContents.send(electronAPI.events.session, newTabSessionArr, newTreeSession as TreeDto)
 }
 
-async function sendTabSession(mainWindow: BrowserWindow, fileManager: IFileManager, tabRepository: ITabRepository) {
+async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: ITabRepository) {
     const tabSessionArr = await tabRepository.readTabSession()
-    if (tabSessionArr.length === 0) {
-        mainWindow.webContents.send(electronAPI.events.tabSession, [])
-        return
-    }
-    
+
     let isChanged = false
-    const arr = await Promise.all(
+    const newTabSessionArr = await Promise.all(
         tabSessionArr.map(async (data) => {
             const filePath = data.filePath ?? ''
             try {
@@ -52,12 +52,51 @@ async function sendTabSession(mainWindow: BrowserWindow, fileManager: IFileManag
     )
 
     if (isChanged) {
-        const sessionArr = arr.map(({ id, filePath }) => ({ id, filePath }))
+        const sessionArr = newTabSessionArr.map(({ id, filePath }) => ({ id, filePath }))
         await tabRepository.writeTabSession(sessionArr)
     }
-    mainWindow.webContents.send(electronAPI.events.tabSession, arr)
+
+    return newTabSessionArr
 }
 
-async function sendTreeSession(mainWindow: BrowserWindow, fileManager: IFileManager, treeRepository: ITreeRepository) {
-    
+// TODO: Check.
+async function getUpdatedTreeSession(fileManager: IFileManager, treeRepository: ITreeRepository, treeManager: ITreeManager) {
+    async function syncTree(node: TreeDto): Promise<TreeDto | null> {
+        const exists = await fileManager.exists(node.path)
+        if (!exists) return null
+
+        if (!node.directory) return node
+
+        if (!node.expanded) {
+            return {
+                ...node,
+                children: null
+            }
+        }
+
+        const current = await treeManager.getDirectoryTree(node.path, node.indent)
+        const sessionChildren = node.children ?? []
+        const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]))
+
+        const updatedChildren: TreeDto[] = []
+
+        for (const child of current.children ?? []) {
+            const sessionChild = sessionMap.get(child.path)
+            const merged = await syncTree(sessionChild ?? child)
+            if (merged) updatedChildren.push(merged)
+        }
+
+        return {
+            ...node,
+            expanded: node.expanded,
+            children: updatedChildren.length > 0 ? updatedChildren : null,
+        }
+    }
+
+    const treeSession = await treeRepository.readTreeSession()
+    if (!treeSession) return null
+
+    const newTreeSession = await syncTree(treeSession)
+    await treeRepository.writeTreeSession(newTreeSession)
+    return newTreeSession
 }

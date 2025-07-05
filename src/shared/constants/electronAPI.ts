@@ -2,7 +2,8 @@ export const electronAPI = {
     channel: 'electronAPI',
     events: {
         // Main -> Renderer.
-        tabSession: 'tabSession',
+        session: 'session',
+        
         onMaximizeWindow: 'onMaximizeWindow',
         onUnmaximizeWindow: 'onUnmaximizeWindow',
 

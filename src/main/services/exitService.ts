@@ -4,17 +4,34 @@ import IFileManager from "@contracts/out/IFileManager"
 import ITabRepository from "@contracts/out/ITabRepository"
 import IDialogService from "@contracts/out/IDialogService"
 import TabSessionModel from "../models/TabSessionModel"
+import TreeDto from "@shared/dto/TreeDto"
+import ITreeRepository from "@contracts/out/ITreeRepository"
+import TreeSessionModel from "../models/TreeSessionModel"
 
 export default async function exit(
-    data: TabEditorDto[],
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
+    dialogService: IDialogService,
     tabRepository: ITabRepository,
-    dialogService: IDialogService
+    treeRepository: ITreeRepository,
+    tabSessionData: TabEditorDto[],
+    treeSessionData: TreeDto,
+) {
+    await syncTab(mainWindow, fileManager, dialogService, tabRepository, tabSessionData)
+    await syncTree(treeRepository, treeSessionData as TreeSessionModel)
+    mainWindow.close()
+}
+
+async function syncTab(
+    mainWindow: BrowserWindow,
+    fileManager: IFileManager,
+    dialogService: IDialogService,
+    tabRepository: ITabRepository,
+    tabSessionData: TabEditorDto[],
 ) {
     const sessionArr: TabSessionModel[] = []
 
-    for (const tab of data) {
+    for (const tab of tabSessionData) {
         const { id, isModified, filePath, fileName, content } = tab
 
         if (!isModified) {
@@ -45,5 +62,11 @@ export default async function exit(
     }
 
     await tabRepository.writeTabSession(sessionArr)
-    mainWindow.close()
+}
+
+async function syncTree(
+    treeRepository: ITreeRepository,
+    treeSessionData: TreeSessionModel
+) {
+    await treeRepository.writeTreeSession(treeSessionData as TreeSessionModel)
 }

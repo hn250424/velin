@@ -22,38 +22,38 @@ export default function registerFileHandlers() {
     shortcutRegistry.register('Ctrl+S', async () => await performSave(tabEditorManager))
     shortcutRegistry.register('Ctrl+Shift+S', async () => await performSaveAs(tabEditorManager))
 
-    // TODO test.
-        ; (async () => {
-            const rootNode: TreeDto = {
-                path: 'D:\\node-workspace\\velin\\test_file',
-                indent: 0,
-                name: 'test_file',
-                directory: true,
-                expanded: false,
-                children: null
-            }
-            treeLayoutManager.setTreeDtoByPath(rootNode.path, rootNode)
+    // TODO-delete test.
+        // ; (async () => {
+        //     const rootNode: TreeDto = {
+        //         path: 'D:\\node-workspace\\velin\\test_file',
+        //         indent: 0,
+        //         name: 'test_file',
+        //         directory: true,
+        //         expanded: false,
+        //         children: null
+        //     }
+        //     treeLayoutManager.setTreeDtoByPath(rootNode.path, rootNode)
 
-            const treeDiv = document.createElement('div')
-            treeDiv.classList.add('tree_node')
-            treeDiv.dataset[DATASET_ATTR_TREE_PATH] = rootNode.path
-            treeDiv.title = rootNode.path
+        //     const treeDiv = document.createElement('div')
+        //     treeDiv.classList.add('tree_node')
+        //     treeDiv.dataset[DATASET_ATTR_TREE_PATH] = rootNode.path
+        //     treeDiv.title = rootNode.path
 
-            const openStatus = document.createElement('span')
-            openStatus.classList.add('tree_node_open_status')
-            openStatus.textContent = '▶'
-            treeDiv.appendChild(openStatus)
+        //     const openStatus = document.createElement('span')
+        //     openStatus.classList.add('tree_node_open_status')
+        //     openStatus.textContent = '▶'
+        //     treeDiv.appendChild(openStatus)
 
-            const treeChildren = document.createElement('div')
-            treeChildren.classList.add('tree_children')
-            treeChildren.style.display = 'none'
+        //     const treeChildren = document.createElement('div')
+        //     treeChildren.classList.add('tree_children')
+        //     treeChildren.style.display = 'none'
 
-            const treeContainer = document.getElementById('tree_content')!
-            treeContainer.appendChild(treeDiv)
-            treeContainer.appendChild(treeChildren)
+        //     const treeContainer = document.getElementById('tree_content')!
+        //     treeContainer.appendChild(treeDiv)
+        //     treeContainer.appendChild(treeChildren)
             
-            await performOpenDirectory(treeLayoutManager, treeDiv)
-        })()
+        //     await performOpenDirectory(treeLayoutManager, treeDiv)
+        // })()
 }
 
 function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutMaanger) {
@@ -91,7 +91,7 @@ async function performNewTab(tabEditorManager: TabEditorManager) {
 
 async function performOpenFile(tabEditorManager: TabEditorManager) {
     const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile()
-    if (response.result) {
+    if (response.result && response.data) {
         const data = response.data
         await tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
     }
