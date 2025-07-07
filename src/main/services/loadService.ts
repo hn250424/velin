@@ -59,7 +59,6 @@ async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: IT
     return newTabSessionArr
 }
 
-// TODO: Check.
 async function getUpdatedTreeSession(fileManager: IFileManager, treeRepository: ITreeRepository, treeManager: ITreeManager) {
     async function syncTree(node: TreeDto): Promise<TreeDto | null> {
         const exists = await fileManager.exists(node.path)

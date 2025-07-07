@@ -4,8 +4,8 @@ import { electronAPI } from "@shared/constants/electronAPI"
 import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
 import { EXPANDED_TEXT, NOT_EXPANDED_TEXT } from "../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
+import TreeViewModel from "../viewmodels/TreeViewModel"
 
-// TODO: Check.
 /**
  * Opens or expands a directory in the file tree.
  * 
@@ -25,34 +25,36 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
         const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
         if (!response.data) return
 
-        treeLayoutManager.renderTreeData(response.data)
-        treeLayoutManager.restoreFlattenTree(response.data)
+        const responseViewModel = treeLayoutManager.toTreeViewModel(response.data)
+
+        treeLayoutManager.renderTreeData(responseViewModel)
+        treeLayoutManager.restoreFlattenTree(responseViewModel)
         return
     }
 
     // When click directory in tree area.
     const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-    const treeNode = treeLayoutManager.getTreeDtoByPath(dirPath)
+    const treeNode = treeLayoutManager.getTreeViewModelByPath(dirPath)
     const maybeChildren = treeDiv.nextElementSibling
     if (!maybeChildren || !maybeChildren.classList.contains('tree_children')) return
 
     const openStatus = treeDiv.querySelector('.tree_node_open_status') as HTMLElement
     const treeDivChildren = maybeChildren as HTMLElement
 
-    function updateUI(expanded: boolean) {
+    function updateUI(treeNode: TreeViewModel, expanded: boolean) {
         treeNode.expanded = expanded
         openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
         treeDivChildren.style.display = expanded ? 'block' : 'none'
+    }
 
-        if (expanded) {
-            treeLayoutManager.expandNode(treeNode)
-        } else {
-            treeLayoutManager.collapseNode(treeNode)
-        }
+    function syncFlattenTreeArray(treeNode: TreeViewModel, expanded: boolean) {
+        if (expanded) treeLayoutManager.expandNode(treeNode)
+        else treeLayoutManager.collapseNode(treeNode)
     }
 
     if (treeNode.expanded) {
-        updateUI(false)
+        updateUI(treeNode, false)
+        syncFlattenTreeArray(treeNode, false)
         return
     }
 
@@ -60,14 +62,18 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
         if (treeDivChildren.children.length === 0) {
             treeLayoutManager.renderTreeData(treeNode, treeDivChildren)
         }
-        updateUI(true)
+        updateUI(treeNode, true)
+        syncFlattenTreeArray(treeNode, true)
         return
     }
 
     const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(treeNode)
     if (!response.data) return
 
-    treeNode.children = response.data.children
-    treeLayoutManager.renderTreeData(response.data, treeDivChildren)
-    updateUI(true)
+    const responseTreeData = treeLayoutManager.toTreeViewModel(response.data)
+
+    treeNode.children = responseTreeData.children
+    treeLayoutManager.renderTreeData(responseTreeData, treeDivChildren)
+    updateUI(treeNode, true)
+    syncFlattenTreeArray(treeNode, true)
 }

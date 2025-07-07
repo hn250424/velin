@@ -89,7 +89,7 @@ typings/
 .vite/
 
 # Electron-Forge
-out/
+# out/
 
 test_file
 TODO.txt

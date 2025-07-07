@@ -13,8 +13,9 @@ export default function registerLoadHandlers() {
 
         if (tree) {
             const treeLayoutManager = TreeLayoutMaanger.getInstance()
-            treeLayoutManager.renderTreeData(tree)
-            treeLayoutManager.restoreFlattenTree(tree)
+            const viewModel = treeLayoutManager.toTreeViewModel(tree)
+            treeLayoutManager.renderTreeData(viewModel)
+            treeLayoutManager.restoreFlattenTree(viewModel)
         }
 
         window[electronAPI.channel].showMainWindow()

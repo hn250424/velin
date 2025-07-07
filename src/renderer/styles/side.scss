@@ -4,10 +4,9 @@ $tree_horizontal_margin: 5px;
 
 #side {
     height: 100%;
-
     display: flex;
-
     flex-shrink: 0;
+    user-select: none;
 }
 
 #side_menu_container {

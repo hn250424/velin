@@ -16,11 +16,55 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
         const treeDiv = target.closest('.tree_node') as HTMLElement
         if (!treeDiv) return
 
-        // console.log(treeLayoutManager.getTreeDtoByPath(treeDiv.dataset[DATASET_ATTR_TREE_PATH]))
-        // console.log(treeLayoutManager.flattenTreeArray)
+        const treeNodes = Array.from(document.querySelectorAll('.tree_node'))
 
-        // TODO: Check directory or file.
-        await performOpenDirectory(treeLayoutManager, treeDiv)
+        if (treeLayoutManager.isTreeSelected()) {
+            const preViewModel = treeLayoutManager.getTreeViewModelByIndex(treeLayoutManager.getLastSelectedIndex())
+            const preDiv = treeNodes.find(div => (div as HTMLElement).dataset[DATASET_ATTR_TREE_PATH] === preViewModel.path) as HTMLElement
+            preDiv.style.border = 'none'
+        }
+
+        treeDiv.style.border = '1px solid red'
+
+        if (e.shiftKey && treeLayoutManager.isTreeSelected()) {
+            const allNodes = document.querySelectorAll('.tree_node') as NodeListOf<HTMLElement>
+            allNodes.forEach(node => node.style.background = '')
+            
+            const startIndex = treeLayoutManager.getLastSelectedIndex()
+            const endIndex = treeLayoutManager.getIndexByPath( treeDiv.dataset[DATASET_ATTR_TREE_PATH] )
+            treeLayoutManager.setLastSelectedIndexByPath( treeDiv.dataset[DATASET_ATTR_TREE_PATH] )
+            const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
+
+            for (let i = start; i <= end; i++) {
+                treeLayoutManager.addMultiSelectedIndex(i)
+                const dataset_path = treeLayoutManager.getTreeViewModelByIndex(i).path
+
+                const nodeDiv = treeNodes.find(div => (div as HTMLElement).dataset[DATASET_ATTR_TREE_PATH] === dataset_path) as HTMLElement
+                nodeDiv.style.background = 'grey'
+            }
+
+        } else if (e.ctrlKey) {
+            treeDiv.style.background = 'grey'
+            const path = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
+            const index = treeLayoutManager.getIndexByPath(path)
+            treeLayoutManager.setLastSelectedIndexByPath(path)
+            treeLayoutManager.addMultiSelectedIndex(index)
+
+        } else {
+            const allNodes = document.querySelectorAll('.tree_node') as NodeListOf<HTMLElement>
+            allNodes.forEach(node => node.style.background = '')
+
+            treeLayoutManager.clearMultiSelectedIndex()
+            treeDiv.style.background = 'grey'
+            const path = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
+            treeLayoutManager.setLastSelectedIndexByPath(path)
+            const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
+            if (viewModel.directory) {
+                await performOpenDirectory(treeLayoutManager, treeDiv)
+            } else {
+                // TODO: OpenTab
+            }
+        }
     })
 }
 
@@ -35,6 +79,9 @@ function bindTreeContextmenuEvents(treeContentContainer: HTMLElement, treeLayout
             contextMenu.style.display = 'flex'
             contextMenu.style.left = `${e.clientX}px`    
             contextMenu.style.top = `${e.clientY}px`
+
+            const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
+            
             // tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
         }
     })

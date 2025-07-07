@@ -8,7 +8,7 @@ export default function registerExitHandlers() {
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
             const tabSessionData = tabEditorManager.getAllTabEditorData()
-            const treeSessionData = treeLayoutManager.extractTreeDto()
+            const treeSessionData = treeLayoutManager.toTreeDto( treeLayoutManager.extractTreeViewModel() )
             window[electronAPI.channel].exit(tabSessionData, treeSessionData)
         })
     })
