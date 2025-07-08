@@ -15,8 +15,8 @@ export default class TreeLayoutMaanger {
     private _tree_content: HTMLElement
     private _tree_resizer: HTMLElement
 
-    private pathToTreeViewModelMap: Map<string, TreeViewModel> = new Map()
-
+    // private pathToTreeViewModelMap: Map<string, TreeViewModel> = new Map()
+    private pathToFlattenArrayIndexMap: Map<string, number> = new Map()
     private flattenTreeArray: TreeViewModel[] = []
     private _lastSelectedIndex: number = -1
     private _multiSelectedIndex = new Set<number>
@@ -61,7 +61,7 @@ export default class TreeLayoutMaanger {
         box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
         box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
         box.title = viewModel.path
-        this.setTreeViewModelByPath(viewModel.path, viewModel)
+        // this.setTreeViewModelByPath(viewModel.path, viewModel)
 
         const openStatus = document.createElement('span')
         openStatus.classList.add('tree_node_open_status')
@@ -99,8 +99,22 @@ export default class TreeLayoutMaanger {
         }
     }
 
-    restoreFlattenTree(tree: TreeViewModel) {
+    restoreFlattenArrayAndMaps(tree: TreeViewModel) {
         this.flattenTreeArray = this.flattenTree(tree)
+        this.rebuildIndexMap()
+    }
+
+    rebuildIndexMap() {
+        // this.pathToTreeViewModelMap.clear()
+        this.pathToFlattenArrayIndexMap.clear()
+
+        for (let i = 0; i < this.flattenTreeArray.length; i++) {
+            const viewModel = this.flattenTreeArray[i]
+            const path = viewModel.path
+
+            // this.pathToTreeViewModelMap.set(path, viewModel)
+            this.pathToFlattenArrayIndexMap.set(path, i)
+        }
     }
 
     private flattenTree(tree: TreeViewModel): TreeViewModel[] {
@@ -153,6 +167,8 @@ export default class TreeLayoutMaanger {
 
         const childrenToInsert = this.flattenTree(node).slice(1) // Remove the first element (the node itself) using slice(1)
         this.flattenTreeArray.splice(index + 1, 0, ...childrenToInsert)
+
+        this.rebuildIndexMap()
     }
 
     collapseNode(node: TreeViewModel) {
@@ -165,6 +181,8 @@ export default class TreeLayoutMaanger {
             removeCount++
         }
         this.flattenTreeArray.splice(index + 1, removeCount)
+
+        this.rebuildIndexMap()
     }
 
     isTreeOpen(): boolean {
@@ -175,12 +193,20 @@ export default class TreeLayoutMaanger {
         this._treeOpenStatus = status
     }
 
-    setTreeViewModelByPath(path: string, viewModel: TreeViewModel) {
-        this.pathToTreeViewModelMap.set(path, viewModel)
+    // setTreeViewModelByPath(path: string, viewModel: TreeViewModel) {
+    //     this.pathToTreeViewModelMap.set(path, viewModel)
+    // }
+
+    // getTreeViewModelByPath(path: string) {
+    //     return this.pathToTreeViewModelMap.get(path)
+    // }
+
+    setFlattenTreeIndexByPath(path: string, index: number) {
+        this.pathToFlattenArrayIndexMap.set(path, index)
     }
 
-    getTreeViewModelByPath(path: string) {
-        return this.pathToTreeViewModelMap.get(path)
+    getFlattenTreeIndexByPath(path: string) {
+        return this.pathToFlattenArrayIndexMap.get(path)
     }
 
     toTreeDto(viewModel: TreeViewModel): TreeDto {
@@ -246,4 +272,12 @@ export default class TreeLayoutMaanger {
     clearMultiSelectedIndex() {
         this._multiSelectedIndex.clear()
     }
+
+    // test.
+    getSize() {
+        const map_size = this.pathToFlattenArrayIndexMap.size
+        const arr_size = this.flattenTreeArray.length
+        console.log(`map: ${map_size}, arr: ${arr_size}`)
+    }
+
 }

@@ -28,13 +28,15 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
         const responseViewModel = treeLayoutManager.toTreeViewModel(response.data)
 
         treeLayoutManager.renderTreeData(responseViewModel)
-        treeLayoutManager.restoreFlattenTree(responseViewModel)
+        treeLayoutManager.restoreFlattenArrayAndMaps(responseViewModel)
         return
     }
 
     // When click directory in tree area.
     const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-    const treeNode = treeLayoutManager.getTreeViewModelByPath(dirPath)
+    // const treeNode = treeLayoutManager.getTreeViewModelByPath(dirPath)
+    const idx = treeLayoutManager.getFlattenTreeIndexByPath(dirPath)
+    const treeNode = treeLayoutManager.getTreeViewModelByIndex(idx)
     const maybeChildren = treeDiv.nextElementSibling
     if (!maybeChildren || !maybeChildren.classList.contains('tree_children')) return
 

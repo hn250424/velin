@@ -3,11 +3,18 @@ import "@milkdown/theme-nord/style.css"
 import performOpenDirectory from "../actions/performOpenDirectory"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
+import shortcutRegistry from "../modules/features/shortcutRegistry"
 
 export default function registerTreeHandlers(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, contextMenu: HTMLElement) {
     bindTreeClickEvents(treeContentContainer, treeLayoutManager)
     bindTreeContextmenuEvents(treeContentContainer, treeLayoutManager, contextMenu)
     bindTreeContextmenuCommands(treeLayoutManager)
+
+    // Test.
+    shortcutRegistry.register('Ctrl+A', async () => {
+        treeLayoutManager.getSize()
+    })
+
 }
 
 function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger) {
@@ -58,7 +65,9 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
             treeDiv.style.background = 'grey'
             const path = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
             treeLayoutManager.setLastSelectedIndexByPath(path)
-            const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
+            // const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
+            const idx = treeLayoutManager.getFlattenTreeIndexByPath(path)
+            const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
             if (viewModel.directory) {
                 await performOpenDirectory(treeLayoutManager, treeDiv)
             } else {
