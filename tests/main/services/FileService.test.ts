@@ -15,6 +15,7 @@ import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import FakeTreeManager from '../adapters/out/persistence/FakeTreeManager'
 
 const tabSessionPath = '/fake/path/tabSession.json'
+const treeSessionPath = '/fake/path/treeSession.json'
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeManager: FakeTreeManager
@@ -80,7 +81,7 @@ describe('FileService.newTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
@@ -105,7 +106,7 @@ describe('FileService.openFile', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
@@ -139,7 +140,7 @@ describe('FileService.save', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
@@ -204,7 +205,7 @@ describe('FileService.saveAs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
@@ -251,7 +252,7 @@ describe('FileService.saveAll', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })

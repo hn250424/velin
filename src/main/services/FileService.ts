@@ -30,14 +30,15 @@ export default class FileService implements IFileService {
         return id
     }
 
-    async openFile() {
-        const result = await this.dialogService.showOpenFileDialog()
-
-        if (result.canceled || result.filePaths.length === 0) {
-            return null
+    async openFile(filePath?: string) {
+        if (!filePath) {
+            const result = await this.dialogService.showOpenFileDialog()
+            if (result.canceled || result.filePaths.length === 0) {
+                return null
+            }
+            filePath = result.filePaths[0]
         }
 
-        const filePath = result.filePaths[0]
         const fileName = this.fileManager.getBasename(filePath)
         const content = await this.fileManager.read(filePath)
 

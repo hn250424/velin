@@ -28,5 +28,6 @@ export default class FakeFileManager implements IFileManager {
 
     async write(path: string, data: string, encoding: BufferEncoding = 'utf8'): Promise<void> {
         this.savedFiles[path] = data
+        this.pathExists[path] = true
     }
 }

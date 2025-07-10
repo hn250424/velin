@@ -1,14 +1,13 @@
 import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '@shared/constants/electronAPI'
-import Response from "@shared/types/Response"
 import TabEditorDto from "@shared/dto/TabEditorDto"
-import TabEditorManager from "../modules/features/TabEditorManager"
-import shortcutRegistry from "../modules/features/shortcutRegistry"
-import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
+import Response from "@shared/types/Response"
+import performOpenFile from "../actions/pertormOpenFile"
 import performOpenDirectory from "../actions/performOpenDirectory"
-import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
-import TreeDto from "@shared/dto/TreeDto"
+import shortcutRegistry from "../modules/features/shortcutRegistry"
+import TabEditorManager from "../modules/features/TabEditorManager"
+import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 
 export default function registerFileHandlers() {
     const tabEditorManager = TabEditorManager.getInstance()
@@ -21,39 +20,6 @@ export default function registerFileHandlers() {
     shortcutRegistry.register('Ctrl+Shift+O', async () => await performOpenDirectory(treeLayoutManager))
     shortcutRegistry.register('Ctrl+S', async () => await performSave(tabEditorManager))
     shortcutRegistry.register('Ctrl+Shift+S', async () => await performSaveAs(tabEditorManager))
-
-    // TODO-delete test.
-        // ; (async () => {
-        //     const rootNode: TreeDto = {
-        //         path: 'D:\\node-workspace\\velin\\test_file',
-        //         indent: 0,
-        //         name: 'test_file',
-        //         directory: true,
-        //         expanded: false,
-        //         children: null
-        //     }
-        //     treeLayoutManager.setTreeDtoByPath(rootNode.path, rootNode)
-
-        //     const treeDiv = document.createElement('div')
-        //     treeDiv.classList.add('tree_node')
-        //     treeDiv.dataset[DATASET_ATTR_TREE_PATH] = rootNode.path
-        //     treeDiv.title = rootNode.path
-
-        //     const openStatus = document.createElement('span')
-        //     openStatus.classList.add('tree_node_open_status')
-        //     openStatus.textContent = '▶'
-        //     treeDiv.appendChild(openStatus)
-
-        //     const treeChildren = document.createElement('div')
-        //     treeChildren.classList.add('tree_children')
-        //     treeChildren.style.display = 'none'
-
-        //     const treeContainer = document.getElementById('tree_content')!
-        //     treeContainer.appendChild(treeDiv)
-        //     treeContainer.appendChild(treeChildren)
-            
-        //     await performOpenDirectory(treeLayoutManager, treeDiv)
-        // })()
 }
 
 function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutMaanger) {
@@ -89,13 +55,13 @@ async function performNewTab(tabEditorManager: TabEditorManager) {
     if (response.result) await tabEditorManager.addTab(response.data)
 }
 
-async function performOpenFile(tabEditorManager: TabEditorManager) {
-    const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile()
-    if (response.result && response.data) {
-        const data = response.data
-        await tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
-    }
-}
+// async function performOpenFile(tabEditorManager: TabEditorManager) {
+//     const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile()
+//     if (response.result && response.data) {
+//         const data = response.data
+//         await tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
+//     }
+// }
 
 async function performSave(tabEditorManager: TabEditorManager) {
     const data = tabEditorManager.getActiveTabEditorData()

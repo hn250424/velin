@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     requestUnmaximizeWindow: () => { ipcRenderer.send(electronAPI.events.requestUnmaximizeWindow) },
 
     newTab: () => { return ipcRenderer.invoke(electronAPI.events.newTab) },
-    openFile: () => { return ipcRenderer.invoke(electronAPI.events.openFile) },
+    openFile: (filePath?: string) => { return ipcRenderer.invoke(electronAPI.events.openFile, filePath) },
     openDirectory: (data?: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.openDirectory, data) },
     save: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.save, data) },
     saveAs: (data: TabEditorDto) => { return ipcRenderer.invoke(electronAPI.events.saveAs, data) },

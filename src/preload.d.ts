@@ -22,7 +22,7 @@ declare global {
             requestUnmaximizeWindow: () => void
 
             newTab: () => Promise<Response<number>>
-            openFile: () => Promise<Response<TabEditorDto>>
+            openFile: (filePath?: string) => Promise<Response<TabEditorDto>>
             openDirectory: (data?: TreeDto) => Promise<Response<void>>
             save: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
             saveAs: (data: TabEditorDto) => Promise<Response<TabEditorDto>>

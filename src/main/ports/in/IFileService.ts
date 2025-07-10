@@ -4,7 +4,7 @@ import TreeDto from "@shared/dto/TreeDto"
 
 export default interface IFileService {
     newTab(): Promise<number>
-    openFile(): Promise<TabEditorDto>
+    openFile(filePath?: string): Promise<TabEditorDto>
     openDirectory(dto?: TreeDto): Promise<TreeDto>
     save(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto>
     saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto>

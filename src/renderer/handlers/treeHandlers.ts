@@ -4,20 +4,21 @@ import performOpenDirectory from "../actions/performOpenDirectory"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
 import shortcutRegistry from "../modules/features/shortcutRegistry"
+import performOpenFile from "../actions/pertormOpenFile"
+import TabEditorManager from "../modules/features/TabEditorManager"
 
-export default function registerTreeHandlers(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, contextMenu: HTMLElement) {
-    bindTreeClickEvents(treeContentContainer, treeLayoutManager)
+export default function registerTreeHandlers(
+    treeContentContainer: HTMLElement,
+    treeLayoutManager: TreeLayoutMaanger,
+    tabEditorManager: TabEditorManager,
+    contextMenu: HTMLElement
+) {
+    bindTreeClickEvents(treeContentContainer, treeLayoutManager, tabEditorManager)
     bindTreeContextmenuEvents(treeContentContainer, treeLayoutManager, contextMenu)
     bindTreeContextmenuCommands(treeLayoutManager)
-
-    // Test.
-    shortcutRegistry.register('Ctrl+A', async () => {
-        treeLayoutManager.getSize()
-    })
-
 }
 
-function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger) {
+function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, tabEditorManager: TabEditorManager) {
     treeContentContainer.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement
         const treeDiv = target.closest('.tree_node') as HTMLElement
@@ -36,10 +37,10 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
         if (e.shiftKey && treeLayoutManager.isTreeSelected()) {
             const allNodes = document.querySelectorAll('.tree_node') as NodeListOf<HTMLElement>
             allNodes.forEach(node => node.style.background = '')
-            
+
             const startIndex = treeLayoutManager.getLastSelectedIndex()
-            const endIndex = treeLayoutManager.getIndexByPath( treeDiv.dataset[DATASET_ATTR_TREE_PATH] )
-            treeLayoutManager.setLastSelectedIndexByPath( treeDiv.dataset[DATASET_ATTR_TREE_PATH] )
+            const endIndex = treeLayoutManager.getIndexByPath(treeDiv.dataset[DATASET_ATTR_TREE_PATH])
+            treeLayoutManager.setLastSelectedIndexByPath(treeDiv.dataset[DATASET_ATTR_TREE_PATH])
             const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
             for (let i = start; i <= end; i++) {
@@ -65,13 +66,12 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
             treeDiv.style.background = 'grey'
             const path = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
             treeLayoutManager.setLastSelectedIndexByPath(path)
-            // const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
             const idx = treeLayoutManager.getFlattenTreeIndexByPath(path)
             const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
             if (viewModel.directory) {
                 await performOpenDirectory(treeLayoutManager, treeDiv)
             } else {
-                // TODO: OpenTab
+                await performOpenFile(tabEditorManager, path)
             }
         }
     })
@@ -82,15 +82,15 @@ function bindTreeContextmenuEvents(treeContentContainer: HTMLElement, treeLayout
         const treeNode = (e.target as HTMLElement).closest('.tree_node') as HTMLElement
         if (!treeNode) {
             contextMenu.style.display = 'none'
-        //     tabEditorManager.removeContextTabId()    
+            //     tabEditorManager.removeContextTabId()    
         } else {
             e.preventDefault()
             contextMenu.style.display = 'flex'
-            contextMenu.style.left = `${e.clientX}px`    
+            contextMenu.style.left = `${e.clientX}px`
             contextMenu.style.top = `${e.clientY}px`
 
             const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
-            
+
             // tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
         }
     })
@@ -115,7 +115,7 @@ function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutMaanger) {
 }
 
 async function performTreeNodeCut() {
-// const response: Response<void> = await window[electronAPI.channel].closeTab(data)
+    // const response: Response<void> = await window[electronAPI.channel].closeTab(data)
 }
 
 async function performTreeNodeCopy() {

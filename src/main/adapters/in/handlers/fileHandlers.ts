@@ -17,8 +17,8 @@ export default function registerFileHandlers(mainWindow: BrowserWindow) {
         }
     })
 
-    ipcMain.handle(electronAPI.events.openFile, async () => {
-        const data: TabEditorDto = await fileService.openFile()
+    ipcMain.handle(electronAPI.events.openFile, async (e, filePath?: string) => {
+        const data: TabEditorDto = await fileService.openFile(filePath)
         return {
             result: true,
             data: data

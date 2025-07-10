@@ -15,9 +15,9 @@ export default class TreeLayoutMaanger {
     private _tree_content: HTMLElement
     private _tree_resizer: HTMLElement
 
-    // private pathToTreeViewModelMap: Map<string, TreeViewModel> = new Map()
     private pathToFlattenArrayIndexMap: Map<string, number> = new Map()
     private flattenTreeArray: TreeViewModel[] = []
+
     private _lastSelectedIndex: number = -1
     private _multiSelectedIndex = new Set<number>
 
@@ -61,7 +61,6 @@ export default class TreeLayoutMaanger {
         box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
         box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
         box.title = viewModel.path
-        // this.setTreeViewModelByPath(viewModel.path, viewModel)
 
         const openStatus = document.createElement('span')
         openStatus.classList.add('tree_node_open_status')
@@ -105,14 +104,12 @@ export default class TreeLayoutMaanger {
     }
 
     rebuildIndexMap() {
-        // this.pathToTreeViewModelMap.clear()
         this.pathToFlattenArrayIndexMap.clear()
 
         for (let i = 0; i < this.flattenTreeArray.length; i++) {
             const viewModel = this.flattenTreeArray[i]
             const path = viewModel.path
 
-            // this.pathToTreeViewModelMap.set(path, viewModel)
             this.pathToFlattenArrayIndexMap.set(path, i)
         }
     }
@@ -193,14 +190,6 @@ export default class TreeLayoutMaanger {
         this._treeOpenStatus = status
     }
 
-    // setTreeViewModelByPath(path: string, viewModel: TreeViewModel) {
-    //     this.pathToTreeViewModelMap.set(path, viewModel)
-    // }
-
-    // getTreeViewModelByPath(path: string) {
-    //     return this.pathToTreeViewModelMap.get(path)
-    // }
-
     setFlattenTreeIndexByPath(path: string, index: number) {
         this.pathToFlattenArrayIndexMap.set(path, index)
     }
@@ -274,10 +263,9 @@ export default class TreeLayoutMaanger {
     }
 
     // test.
-    getSize() {
-        const map_size = this.pathToFlattenArrayIndexMap.size
-        const arr_size = this.flattenTreeArray.length
-        console.log(`map: ${map_size}, arr: ${arr_size}`)
-    }
-
+    // getSize() {
+    //     const map_size = this.pathToFlattenArrayIndexMap.size
+    //     const arr_size = this.flattenTreeArray.length
+    //     console.log(`map: ${map_size}, arr: ${arr_size}`)
+    // }
 }

@@ -14,6 +14,7 @@ import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import TabService from '@services/TabService'
 
 const tabSessionPath = '/fake/path/tabSession.json'
+const treeSessionPath = '/fake/path/treeSession.json'
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeRepository: FakeTreeRepository
@@ -78,7 +79,7 @@ describe('tabService.closeTab', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
@@ -178,7 +179,7 @@ describe('tabService.closeTabsExcept', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
@@ -270,7 +271,7 @@ describe('tabService.closeTabsToRight', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 
@@ -362,7 +363,7 @@ describe('tabService.closeAllTabs', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
     })
 

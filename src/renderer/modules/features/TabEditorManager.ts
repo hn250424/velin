@@ -12,15 +12,17 @@ import { MODIFIED_TEXT } from "../../constants/dom"
 
 export default class TabEditorManager {
     private static instance: TabEditorManager | null = null
+    
     private tabEditorViews: TabEditorView[] = []
+    private idToTabViewModelMap: Map<number, TabViewModel> = new Map()
+    private pathToTabEditorViewMap: Map<string, TabEditorView> = new Map()
+
     private _activeTabId = -1
     private _activeTabIndex = -1
     private _contextTabId = -1
 
     private tabContainer: HTMLElement
     private editorContainer: HTMLElement
-
-    private idToTabViewModelMap: Map<number, TabViewModel> = new Map()
 
     private constructor() {
         this.tabContainer = document.getElementById('tab_container')
@@ -91,6 +93,7 @@ export default class TabEditorManager {
             }
         )
         this.tabEditorViews.push(tabEditorView)
+        this.setTabEditorViewByPath(filePath, tabEditorView)
         if (activate) {
             this.tabEditorViews[this.activeTabIndex]?.setDeactive()
             this.activeTabIndex = this.tabEditorViews.length - 1
@@ -167,6 +170,13 @@ export default class TabEditorManager {
     }
 
     removeTabAt(index: number) {
+        const tabEditorView = this.tabEditorViews[index]
+        const id = tabEditorView.getId()
+        const viewModel = this.getTabViewModelById(id)
+        
+        this.pathToTabEditorViewMap.delete(viewModel.filePath)
+        this.idToTabViewModelMap.delete(id)
+
         this.tabEditorViews[index].destroy()
         this.tabEditorViews.splice(index, 1)
     }
@@ -269,6 +279,14 @@ export default class TabEditorManager {
 
     private setTabViewModelById(id: number, viewModel: TabViewModel) {
         this.idToTabViewModelMap.set(id, viewModel)
+    }
+
+    getTabEditorViewByPath(path: string) {
+        return this.pathToTabEditorViewMap.get(path)
+    }
+
+    private setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
+        this.pathToTabEditorViewMap.set(path, tabEditorVeiw)
     }
 
     private resolveFileName(view: TabEditorView): string {
