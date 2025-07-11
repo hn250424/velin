@@ -1,6 +1,6 @@
 import FileService from '@services/FileService'
 import Response from '@shared/types/Response'
-import TabEditorDto from '@shared/dto/TabEditorDto'
+import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../adapters/out/fs/FakeFileManager'
@@ -46,36 +46,40 @@ const defaultData: TabEditorDto = {
     content: preFileContent
 }
 
-const dataArr: TabEditorDto[] = [
-    {
-        id: 0,
-        isModified: false,
-        filePath: '',
-        fileName: 'Untitled',
-        content: ''
-    },
-    {
-        id: 1,
-        isModified: false,
-        filePath: `${preFilePath}_1`,
-        fileName: `${preFileName}_1`,
-        content: `${preFileContent}_1`
-    },
-    {
-        id: 2,
-        isModified: true,
-        filePath: `${preFilePath}_2`,
-        fileName: `${preFileName}_2`,
-        content: `${preFileContent}_2`
-    },
-    {
-        id: 3,
-        isModified: true,
-        filePath: '',
-        fileName: `${preFileName}_3`,
-        content: `${preFileContent}_3`
-    },
-]
+const tabEidtorDto: TabEditorsDto = {
+    activatedId: 1,
+    data: [
+        {
+            id: 0,
+            isModified: false,
+            filePath: '',
+            fileName: 'Untitled',
+            content: ''
+        },
+        {
+            id: 1,
+            isModified: false,
+            filePath: `${preFilePath}_1`,
+            fileName: `${preFileName}_1`,
+            content: `${preFileContent}_1`
+        },
+        {
+            id: 2,
+            isModified: true,
+            filePath: `${preFilePath}_2`,
+            fileName: `${preFileName}_2`,
+            content: `${preFileContent}_2`
+        },
+        {
+            id: 3,
+            isModified: true,
+            filePath: '',
+            fileName: `${preFileName}_3`,
+            content: `${preFileContent}_3`
+        },
+    ]
+}
+
 
 describe('FileService.newTab', () => {
     beforeEach(() => {
@@ -89,7 +93,10 @@ describe('FileService.newTab', () => {
     test('should create a new tab with an incremented ID based on the existing session', async () => {
         // Given.        
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabRepository.setTabSession([{ id: 5, filePath: 'file.md' }])
+        await fakeTabRepository.setTabSession({
+            activatedId: -1,
+            data: [{ id: 5, filePath: 'file.md' }]
+        })
 
         // When.
         const id = await fileService.newTab()
@@ -97,8 +104,8 @@ describe('FileService.newTab', () => {
         // Then.
         expect(id).toBe(6)
         const session = await fakeTabRepository.readTabSession()
-        expect(session.length).toBe(2)
-        expect(session[1].id).toBe(6)
+        expect(session.data.length).toBe(2)
+        expect(session.data[1].id).toBe(6)
     })
 })
 
@@ -126,6 +133,13 @@ describe('FileService.openFile', () => {
         // Given.
         setFakeOpenFileDialogResult({ canceled: false, filePaths: ['openPath'] })
         fakeFileManager.setFilecontent('openPath', 'content')
+        fakeTabRepository.setTabSession({
+            activatedId: 0,
+            data: [
+                { id: 0, filePath: 'path1' },
+                { id: 1, filePath: 'path2' },
+            ]
+        })
 
         // When.
         const data = await fileService.openFile()
@@ -133,6 +147,10 @@ describe('FileService.openFile', () => {
         // Then.
         expect(data.filePath).toBe('openPath')
         expect(data.content).toBe('content')
+        const session = await fakeTabRepository.readTabSession()
+        expect(session.activatedId).toBe(2)
+        expect(session.data.length).toBe(3)
+        expect(session.data[2].filePath).toBe('openPath')
     })
 })
 
@@ -164,13 +182,17 @@ describe('FileService.save', () => {
     test('Save with empty filePath and confirmed dialog', async () => {
         // Given.
         const data: TabEditorDto = { ...emptyFilePathData }
-
         setFakeSaveDialogResult({
             canceled: false,
             filePath: newFilePath
         })
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        await fakeTabRepository.setTabSession({
+            activatedId: 1,
+            data: [
+                { id: data.id, filePath: data.filePath }
+            ]
+        })
 
         // When.
         const response = await fileService.save(data, fakeMainWindow as any)
@@ -179,15 +201,20 @@ describe('FileService.save', () => {
         expect(response.isModified).toBe(false)
         expect(await fakeFileManager.read(newFilePath)).toBe(data.content)
         const tabSession = await fakeTabRepository.readTabSession()
-        expect(tabSession[0].id).toBe(0)
-        expect(tabSession[0].filePath).toBe(newFilePath)
+        expect(tabSession.data[0].id).toBe(0)
+        expect(tabSession.data[0].filePath).toBe(newFilePath)
     })
 
     test('Save with filePath', async () => {
         // Given.
         const data = { ...defaultData }
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        await fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        await fakeTabRepository.setTabSession({
+            activatedId: 1,
+            data: [
+                { id: data.id, filePath: data.filePath }
+            ]
+        })
 
         // When.
         const response = await fileService.save(data, fakeMainWindow as any)
@@ -196,8 +223,8 @@ describe('FileService.save', () => {
         expect(response.isModified).toBe(false)
         expect(await fakeFileManager.read(data.filePath)).toBe(data.content)
         const tabSession = await fakeTabRepository.readTabSession()
-        expect(tabSession[0].id).toBe(0)
-        expect(tabSession[0].filePath).toBe(data.filePath)
+        expect(tabSession.data[0].id).toBe(0)
+        expect(tabSession.data[0].filePath).toBe(data.filePath)
     })
 })
 
@@ -233,7 +260,12 @@ describe('FileService.saveAs', () => {
             filePath: newFilePath
         })
         fakeFileManager.setPathExistence(tabSessionPath, true)
-        fakeTabRepository.setTabSession([{ id: data.id, filePath: data.filePath }])
+        await fakeTabRepository.setTabSession({
+            activatedId: 1,
+            data: [
+                { id: data.id, filePath: data.filePath }
+            ]
+        })
 
         // When.
         const response = await fileService.saveAs(data, fakeMainWindow as any)
@@ -243,8 +275,8 @@ describe('FileService.saveAs', () => {
         const savedFile = await fakeFileManager.read(newFilePath)
         expect(savedFile).toBe(data.content)
         const updatedTabSession = await fakeTabRepository.readTabSession()
-        expect(updatedTabSession[updatedTabSession.length - 1].id).toBe(data.id + 1)
-        expect(updatedTabSession[updatedTabSession.length - 1].filePath).toBe(newFilePath)
+        expect(updatedTabSession.data[updatedTabSession.data.length - 1].id).toBe(data.id + 1)
+        expect(updatedTabSession.data[updatedTabSession.data.length - 1].filePath).toBe(newFilePath)
     })
 })
 
@@ -259,59 +291,61 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with confirmed dialog', async () => {
         // Given.
-        const _dataArr = [...dataArr]
+        const copyedDto = {...tabEidtorDto}
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: false,
             filePath: newFilePath
         })
-        await fakeTabRepository.setTabSession(
-            _dataArr.map(({ id, filePath }) => ({ id, filePath }))
-        )
+        await fakeTabRepository.setTabSession({
+            activatedId: copyedDto.activatedId,
+            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+        })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
+        const response = await fileService.saveAll(copyedDto, fakeMainWindow as any)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session[0].filePath).toBe('')
-        expect(session[1].filePath).toBe(_dataArr[1].filePath)
-        const file_2 = await fakeFileManager.read(_dataArr[2].filePath)
-        expect(file_2).toBe(_dataArr[2].content)
+        expect(session.data[0].filePath).toBe('')
+        expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
+        expect(file_2).toBe(copyedDto.data[2].content)
         expect(response[2].isModified).toBe(false)
         const file_3 = await fakeFileManager.read(newFilePath)
-        expect(file_3).toBe(_dataArr[3].content)
+        expect(file_3).toBe(copyedDto.data[3].content)
         expect(response[3].isModified).toBe(false)
-        expect(session[3].filePath).toBe(newFilePath)
+        expect(session.data[3].filePath).toBe(newFilePath)
         expect(spy).toHaveBeenCalledTimes(3)
     })
 
     test('test all cases with cancel dialog', async () => {
         // Given.
-        const _dataArr = [...dataArr]
+        const copyedDto = {...tabEidtorDto}
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: true,
             filePath: ''
         })
-        await fakeTabRepository.setTabSession(
-            _dataArr.map(({ id, filePath }) => ({ id, filePath }))
-        )
+        await fakeTabRepository.setTabSession({
+            activatedId: copyedDto.activatedId,
+            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+        })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await fileService.saveAll(_dataArr, fakeMainWindow as any)
+        const response = await fileService.saveAll(copyedDto, fakeMainWindow as any)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session[0].filePath).toBe('')
-        expect(session[1].filePath).toBe(_dataArr[1].filePath)
-        const file_2 = await fakeFileManager.read(_dataArr[2].filePath)
-        expect(file_2).toBe(_dataArr[2].content)
+        expect(session.data[0].filePath).toBe('')
+        expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
+        expect(file_2).toBe(copyedDto.data[2].content)
         expect(response[2].isModified).toBe(false)
         expect(response[3].isModified).toBe(true)
-        expect(session[3].filePath).toBe('')
+        expect(session.data[3].filePath).toBe('')
         expect(spy).toHaveBeenCalledTimes(2)
     })
 })

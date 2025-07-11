@@ -1,7 +1,7 @@
 import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '@shared/constants/electronAPI'
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import performOpenFile from "../actions/pertormOpenFile"
 import performOpenDirectory from "../actions/performOpenDirectory"
@@ -44,8 +44,8 @@ function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutMana
     })
 
     document.getElementById('file_menu_save_all').addEventListener('click', async () => {
-        const tabsData: TabEditorDto[] = tabEditorManager.getAllTabEditorData()
-        const response: Response<TabEditorDto[]> = await window[electronAPI.channel].saveAll(tabsData)
+        const tabsData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
+        const response: Response<TabEditorsDto> = await window[electronAPI.channel].saveAll(tabsData)
         if (response.result) tabEditorManager.applySaveAllResults(response.data)
     })
 }
@@ -54,14 +54,6 @@ async function performNewTab(tabEditorManager: TabEditorManager) {
     const response: Response<number> = await window[electronAPI.channel].newTab()
     if (response.result) await tabEditorManager.addTab(response.data)
 }
-
-// async function performOpenFile(tabEditorManager: TabEditorManager) {
-//     const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile()
-//     if (response.result && response.data) {
-//         const data = response.data
-//         await tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
-//     }
-// }
 
 async function performSave(tabEditorManager: TabEditorManager) {
     const data = tabEditorManager.getActiveTabEditorData()

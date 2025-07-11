@@ -1,5 +1,5 @@
 import exit from '@services/exitService'
-import TabEditorDto from '@shared/dto/TabEditorDto'
+import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../adapters/out/fs/FakeFileManager'
@@ -10,6 +10,7 @@ import fakeDialogService, {
 import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
+import { TabSessionModel } from 'src/main/models/TabSessionModel'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
@@ -25,36 +26,39 @@ const newFileName = 'newFileName'
 const preFileContent = 'preFileContent'
 const newFileContent = 'newFileContent'
 
-const tabEidtorDtoArr: TabEditorDto[] = [
-    {
-        id: 0,
-        isModified: false,
-        filePath: '',
-        fileName: 'Untitled',
-        content: ''
-    },
-    {
-        id: 1,
-        isModified: false,
-        filePath: `${preFilePath}_1`,
-        fileName: `${preFileName}_1`,
-        content: `${preFileContent}_1`
-    },
-    {
-        id: 2,
-        isModified: true,
-        filePath: `${preFilePath}_2`,
-        fileName: `${preFileName}_2`,
-        content: `${preFileContent}_2`
-    },
-    {
-        id: 3,
-        isModified: true,
-        filePath: '',
-        fileName: `${preFileName}_3`,
-        content: `${preFileContent}_3`
-    },
-]
+const tabEidtorDto: TabEditorsDto = {
+    activatedId: 1,
+    data: [
+        {
+            id: 0,
+            isModified: false,
+            filePath: '',
+            fileName: 'Untitled',
+            content: ''
+        },
+        {
+            id: 1,
+            isModified: false,
+            filePath: `${preFilePath}_1`,
+            fileName: `${preFileName}_1`,
+            content: `${preFileContent}_1`
+        },
+        {
+            id: 2,
+            isModified: true,
+            filePath: `${preFilePath}_2`,
+            fileName: `${preFileName}_2`,
+            content: `${preFileContent}_2`
+        },
+        {
+            id: 3,
+            isModified: true,
+            filePath: '',
+            fileName: `${preFileName}_3`,
+            content: `${preFileContent}_3`
+        },
+    ]
+}
 
 const treeDto: TreeDto = {
     path: '/project',
@@ -101,7 +105,7 @@ describe('exitService.exit', () => {
 
     test('test when user cancels confirm dialog', async () => {
         // Given.
-        const copyedTabEditorDtoArr = [...tabEidtorDtoArr]
+        const copyedTabEditorDto = {...tabEidtorDto}
         const copyedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -110,12 +114,14 @@ describe('exitService.exit', () => {
             canceled: false,
             filePath: newFilePath
         })
-        copyedTabEditorDtoArr.forEach((data, i) => {
+        copyedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
-        await fakeTabRepository.setTabSession(
-            copyedTabEditorDtoArr.map(({ id, filePath }) => ({ id, filePath }))
-        )
+        const model: TabSessionModel = {
+            activatedId: 99,
+            data: copyedTabEditorDto.data.map(({ id, filePath }) => ({ id, filePath }))
+        }
+        await fakeTabRepository.setTabSession(model)
         await fakeTreeRepository.setTreeSession({
             path: '/old',
             name: 'old',
@@ -127,16 +133,18 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDtoArr, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session[0].filePath).toBe('')
-        expect(session[1].filePath).toBe(copyedTabEditorDtoArr[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDtoArr[2].filePath)
-        expect(file_2).not.toBe(copyedTabEditorDtoArr[2].content)
-        const file_3 = await fakeFileManager.read(copyedTabEditorDtoArr[3].filePath)
-        expect(file_3).not.toBe(copyedTabEditorDtoArr[3].content)
+        expect(session.activatedId).toBe(copyedTabEditorDto.activatedId)
+        const sessionData = session.data
+        expect(sessionData[0].filePath).toBe('')
+        expect(sessionData[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
+        expect(file_2).not.toBe(copyedTabEditorDto.data[2].content)
+        const file_3 = await fakeFileManager.read(copyedTabEditorDto.data[3].filePath)
+        expect(file_3).not.toBe(copyedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(2)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()
@@ -145,7 +153,7 @@ describe('exitService.exit', () => {
 
     test('test when user confirm dialog and cancels open dialog', async () => {
         // Given.
-        const copyedTabEditorDtoArr = [...tabEidtorDtoArr]
+        const copyedTabEditorDto = {...tabEidtorDto}
         const copyedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -154,7 +162,7 @@ describe('exitService.exit', () => {
             canceled: true,
             filePath: ''
         })
-        copyedTabEditorDtoArr.forEach((data, i) => {
+        copyedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
         await fakeTreeRepository.setTreeSession({
@@ -168,16 +176,16 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDtoArr, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session[0].filePath).toBe('')
-        expect(session[1].filePath).toBe(copyedTabEditorDtoArr[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDtoArr[2].filePath)
-        expect(file_2).toBe(copyedTabEditorDtoArr[2].content)
-        const file_3 = await fakeFileManager.read(copyedTabEditorDtoArr[3].filePath)
-        expect(file_3).not.toBe(copyedTabEditorDtoArr[3].content)
+        expect(session.data[0].filePath).toBe('')
+        expect(session.data[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
+        expect(file_2).toBe(copyedTabEditorDto.data[2].content)
+        const file_3 = await fakeFileManager.read(copyedTabEditorDto.data[3].filePath)
+        expect(file_3).not.toBe(copyedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(3)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()
@@ -186,7 +194,7 @@ describe('exitService.exit', () => {
 
     test('test when user confirm dialog and select file path', async () => {
         // Given.
-        const copyedTabEditorDtoArr = [...tabEidtorDtoArr]
+        const copyedTabEditorDto = {...tabEidtorDto}
         const copyedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -195,7 +203,7 @@ describe('exitService.exit', () => {
             canceled: false,
             filePath: newFilePath
         })
-        copyedTabEditorDtoArr.forEach((data, i) => {
+        copyedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
         await fakeTreeRepository.setTreeSession({
@@ -209,17 +217,17 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDtoArr, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session[0].filePath).toBe('')
-        expect(session[1].filePath).toBe(copyedTabEditorDtoArr[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDtoArr[2].filePath)
-        expect(file_2).toBe(copyedTabEditorDtoArr[2].content)
-        expect(session[3].filePath).toBe(newFilePath)
+        expect(session.data[0].filePath).toBe('')
+        expect(session.data[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
+        expect(file_2).toBe(copyedTabEditorDto.data[2].content)
+        expect(session.data[3].filePath).toBe(newFilePath)
         const file_3 = await fakeFileManager.read(newFilePath)
-        expect(file_3).toBe(copyedTabEditorDtoArr[3].content)
+        expect(file_3).toBe(copyedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(4)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()

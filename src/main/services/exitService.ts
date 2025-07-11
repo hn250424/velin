@@ -1,9 +1,9 @@
 import { BrowserWindow } from "electron"
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import IFileManager from "@contracts/out/IFileManager"
 import ITabRepository from "@contracts/out/ITabRepository"
 import IDialogService from "@contracts/out/IDialogService"
-import TabSessionModel from "../models/TabSessionModel"
+import { TabSessionModel, TabSessionData } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
 import ITreeRepository from "@contracts/out/ITreeRepository"
 import TreeSessionModel from "../models/TreeSessionModel"
@@ -14,7 +14,7 @@ export default async function exit(
     dialogService: IDialogService,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
-    tabSessionData: TabEditorDto[],
+    tabSessionData: TabEditorsDto,
     treeSessionData: TreeDto,
 ) {
     await syncTab(mainWindow, fileManager, dialogService, tabRepository, tabSessionData)
@@ -27,21 +27,21 @@ async function syncTab(
     fileManager: IFileManager,
     dialogService: IDialogService,
     tabRepository: ITabRepository,
-    tabSessionData: TabEditorDto[],
+    tabSessionData: TabEditorsDto,
 ) {
-    const sessionArr: TabSessionModel[] = []
+    const data: TabSessionData[] = []
 
-    for (const tab of tabSessionData) {
+    for (const tab of tabSessionData.data) {
         const { id, isModified, filePath, fileName, content } = tab
 
         if (!isModified) {
-            sessionArr.push({ id: id, filePath: filePath })
+            data.push({ id: id, filePath: filePath })
             continue
         }
 
         const confirm = await dialogService.showConfirmDialog(`Do you want to save ${fileName} file?`)
         if (!confirm) {
-            sessionArr.push({ id: id, filePath: filePath })
+            data.push({ id: id, filePath: filePath })
             continue
         }
 
@@ -49,19 +49,22 @@ async function syncTab(
             const result = await dialogService.showSaveDialog(mainWindow, fileName)
 
             if (result.canceled || !result.filePath) {
-                sessionArr.push({ id: id, filePath: filePath })
+                data.push({ id: id, filePath: filePath })
             } else {
                 await fileManager.write(result.filePath, content)
 
-                sessionArr.push({ id: id, filePath: result.filePath })
+                data.push({ id: id, filePath: result.filePath })
             }
         } else if (filePath) {
             await fileManager.write(filePath, content)
-            sessionArr.push({ id: id, filePath: filePath })
+            data.push({ id: id, filePath: filePath })
         }
     }
 
-    await tabRepository.writeTabSession(sessionArr)
+    await tabRepository.writeTabSession({
+        activatedId: tabSessionData.activatedId,
+        data: data
+    })
 }
 
 async function syncTree(

@@ -1,12 +1,12 @@
 import ITreeRepository from "@contracts/out/ITreeRepository"
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto} from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
 import IDialogService from "../ports/out/IDialogService"
 import IFileManager from "../ports/out/IFileManager"
 import ITabRepository from "../ports/out/ITabRepository"
-import TabSession from "../models/TabSessionModel"
+import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import ITabService from "../ports/in/ITabService"
 
 export default class TabService implements ITabService {
@@ -42,8 +42,11 @@ export default class TabService implements ITabService {
         if (writeSession) {
             try {
                 const tabSession = await this.tabRepository.readTabSession()
-                const updatedSession = tabSession.filter(session => session.id !== data.id)
-                await this.tabRepository.writeTabSession(updatedSession)
+                const updatedData = tabSession.data.filter(session => session.id !== data.id)
+                await this.tabRepository.writeTabSession({
+                    activatedId: tabSession.activatedId,
+                    data: updatedData
+                })
             } catch (e) {
                 console.error(e)
                 return false
@@ -53,11 +56,11 @@ export default class TabService implements ITabService {
         return true
     }
 
-    async closeTabsExcept(exceptData: TabEditorDto, allData: TabEditorDto[], mainWindow: BrowserWindow): Promise<boolean[]> {
-        const sessionArr: TabSession[] = []
+    async closeTabsExcept(exceptData: TabEditorDto, dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
+        const sessionArr: TabSessionData[] = []
         const responseArr: boolean[] = []
 
-        for (const data of allData) {
+        for (const data of dto.data) {
             if (exceptData.id === data.id) {
                 sessionArr.push({ id: data.id, filePath: data.filePath })
                 responseArr.push(false)
@@ -73,41 +76,48 @@ export default class TabService implements ITabService {
             }
         }
 
-        await this.tabRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession({
+            activatedId: dto.activatedId,
+            data: sessionArr
+        })
 
         return responseArr
     }
 
-    async closeTabsToRight(referenceData: TabEditorDto, allData: TabEditorDto[], mainWindow: BrowserWindow): Promise<boolean[]> {
-        const refIdx = allData.findIndex(data => data.id === referenceData.id)
+    async closeTabsToRight(referenceData: TabEditorDto, dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
+        const data = dto.data
+        const refIdx = data.findIndex(_data => _data.id === referenceData.id)
 
         const sessionToKeep = []
         const responseArr = []
         for (let i = 0; i <= refIdx; i++) {
-            sessionToKeep.push({ id: allData[i].id, filePath: allData[i].filePath })
+            sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath })
             responseArr.push(false)
         }
 
-        for (let i = refIdx + 1; i < allData.length; i++) {
-            const result = await this.closeTab(allData[i], mainWindow, false)
+        for (let i = refIdx + 1; i < data.length; i++) {
+            const result = await this.closeTab(data[i], mainWindow, false)
             if (result) {
                 responseArr.push(true)
             } else {
                 responseArr.push(false)
-                sessionToKeep.push({ id: allData[i].id, filePath: allData[i].filePath })
+                sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath })
             }
         }
 
-        await this.tabRepository.writeTabSession(sessionToKeep)
+        await this.tabRepository.writeTabSession({
+            activatedId: dto.activatedId,
+            data: sessionToKeep
+        })
 
         return responseArr
     }
 
-    async closeAllTabs(data: TabEditorDto[], mainWindow: BrowserWindow): Promise<boolean[]> {
+    async closeAllTabs(dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
         const sessionArr = []
         const responseArr = []
 
-        for (const tab of data) {
+        for (const tab of dto.data) {
             const result = await this.closeTab(tab, mainWindow, false)
 
             if (result) {
@@ -118,7 +128,10 @@ export default class TabService implements ITabService {
             }
         }
 
-        await this.tabRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession({
+            activatedId: dto.activatedId,
+            data: sessionArr
+        })
         return responseArr
     }
 }

@@ -1,6 +1,6 @@
 import IFileService from '@contracts/in/IFileService'
 import { electronAPI } from '@shared/constants/electronAPI'
-import TabEditorDto from '@shared/dto/TabEditorDto'
+import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { BrowserWindow, ipcMain } from 'electron'
 import DI_KEYS from '../../../constants/di_keys'
 import diContainer from '../../../diContainer'
@@ -49,8 +49,8 @@ export default function registerFileHandlers(mainWindow: BrowserWindow) {
         }
     })
 
-    ipcMain.handle(electronAPI.events.saveAll, async (e, data: TabEditorDto[]) => {
-        const dataArr: TabEditorDto[] = await fileService.saveAll(data, mainWindow)
+    ipcMain.handle(electronAPI.events.saveAll, async (e, data: TabEditorsDto) => {
+        const dataArr: TabEditorsDto = await fileService.saveAll(data, mainWindow)
         return {
             result: true,
             data: dataArr

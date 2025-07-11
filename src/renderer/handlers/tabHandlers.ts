@@ -1,7 +1,7 @@
 import "@milkdown/theme-nord/style.css"
 
 import { electronAPI } from '@shared/constants/electronAPI'
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import { DATASET_ATTR_TAB_ID } from "../constants/dom"
 import TabEditorManager from "../modules/features/TabEditorManager"
@@ -56,20 +56,20 @@ function bindTabContextmenuCommands(tabEditorManager: TabEditorManager) {
 
     document.getElementById('tab_context_close_others').addEventListener('click', async () => {
         const exceptData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
-        const allData: TabEditorDto[] = tabEditorManager.getAllTabEditorData()
+        const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
         const response: Response<boolean[]> = await window[electronAPI.channel].closeTabsExcept(exceptData, allData)
         if (response.result) tabEditorManager.removeTabsExcept(response.data)
     })
 
     document.getElementById('tab_context_close_right').addEventListener('click', async () => {
         const referenceData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
-        const allData: TabEditorDto[] = tabEditorManager.getAllTabEditorData()
+        const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
         const response: Response<boolean[]> = await window[electronAPI.channel].closeTabsToRight(referenceData, allData)
         if (response.result) tabEditorManager.removeTabsToRight(response.data)
     })
 
     document.getElementById('tab_context_close_all').addEventListener('click', async () => {
-        const data: TabEditorDto[] = tabEditorManager.getAllTabEditorData()
+        const data: TabEditorsDto = tabEditorManager.getAllTabEditorData()
         const response: Response<boolean[]> = await window[electronAPI.channel].closeAllTabs(data)
         if (response.result) tabEditorManager.removeAllTabs(response.data)
     })

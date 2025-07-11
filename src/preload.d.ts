@@ -1,7 +1,7 @@
 import TreeDto from "@shared/dto/TreeDto"
 import { electronAPI } from "./shared/constants/electronAPI"
 import Response from "./shared/interface/Response"
-import TabEditorDto from "./shared/interface/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "./shared/interface/TabEditorDto"
 
 export { }
 
@@ -9,7 +9,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Main -> Renderer.
-            session: (callback: (tabs: TabEditorDto[], tree: TreeDto) => void) => void
+            session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => void
             onMaximizeWindow: (callback: () => void) => void
             onUnmaximizeWindow: (callback: () => void) => void
 
@@ -26,14 +26,14 @@ declare global {
             openDirectory: (data?: TreeDto) => Promise<Response<void>>
             save: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
             saveAs: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
-            saveAll: (data: TabEditorDto[]) => Promise<Response<TabEditorDto[]>>
+            saveAll: (data: TabEditorsDto) => Promise<Response<TabEditorsDto>>
 
             closeTab: (data: TabEditorDto) => Promise<Response<void>>
-            closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorDto[]) => Promise<Response<boolean[]>>
-            closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorDto[]) => Promise<Response<boolean[]>>
-            closeAllTabs: (data: TabEditorDto[]) => Promise<Response<boolean[]>>
+            closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>
+            closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>
+            closeAllTabs: (data: TabEditorsDto) => Promise<Response<boolean[]>>
             
-            exit: (tabSessionData: TabEditorDto[], treeSessionData: TreeDto) => Promise<void>
+            exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => Promise<void>
 
             paste: () => Promise<string>
         }

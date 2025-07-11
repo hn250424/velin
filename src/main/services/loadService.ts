@@ -5,6 +5,7 @@ import TreeDto from "@shared/dto/TreeDto";
 import { BrowserWindow } from "electron";
 import IFileManager from "../ports/out/IFileManager";
 import ITabRepository from "../ports/out/ITabRepository";
+import { TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
@@ -19,11 +20,13 @@ export async function loadedRenderer(
 }
 
 async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: ITabRepository) {
-    const tabSessionArr = await tabRepository.readTabSession()
+    const session = await tabRepository.readTabSession()
+    if (!session) return null
+    const sessionData = session.data
 
     let isChanged = false
     const newTabSessionArr = await Promise.all(
-        tabSessionArr.map(async (data) => {
+        sessionData.map(async (data) => {
             const filePath = data.filePath ?? ''
             try {
                 if (!filePath) throw new Error('No file path')
@@ -53,10 +56,16 @@ async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: IT
 
     if (isChanged) {
         const sessionArr = newTabSessionArr.map(({ id, filePath }) => ({ id, filePath }))
-        await tabRepository.writeTabSession(sessionArr)
+        await tabRepository.writeTabSession({
+            activatedId: session.activatedId,
+            data: sessionArr
+        })
     }
 
-    return newTabSessionArr
+    return {
+        activatedId: session.activatedId,
+        data: newTabSessionArr
+    }
 }
 
 async function getUpdatedTreeSession(fileManager: IFileManager, treeRepository: ITreeRepository, treeManager: ITreeManager) {

@@ -6,6 +6,7 @@ import FakeFileManager from '../adapters/out/fs/FakeFileManager'
 import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
 import FakeTreeManager from '../adapters/out/persistence/FakeTreeManager'
+import { TabSessionModel } from 'src/main/models/TabSessionModel'
 
 describe('loadService.loadedRenderer: ', () => {
     const tabSessionPath = '/fake/path/tabSession.json'
@@ -27,10 +28,14 @@ describe('loadService.loadedRenderer: ', () => {
 
     test('loadedRenderer: normal', async () => {
         // Given.
-        const initialSession = [
-            { id: 0, filePath: 'file1.txt' },
-            { id: 1, filePath: 'file2.txt' },
-        ]
+        const initialSession: TabSessionModel = {
+            activatedId: 1,
+            data: [
+                { id: 0, filePath: 'file1.txt' },
+                { id: 1, filePath: 'file2.txt' },
+            ]
+        }
+
         const initialTreeSession = {
             path: '/project',
             name: 'project',
@@ -88,16 +93,15 @@ describe('loadService.loadedRenderer: ', () => {
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
         const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][1]
-        expect(Array.isArray(tabSentData)).toBe(true)
-        expect(tabSentData.length).toBe(2)
-        expect(tabSentData[0]).toEqual({
+        expect(tabSentData.data.length).toBe(2)
+        expect(tabSentData.data[0]).toEqual({
             id: 0,
             isModified: false,
             filePath: 'file1.txt',
             fileName: 'file1.txt',
             content: 'test1',
         })
-        expect(tabSentData[1]).toEqual({
+        expect(tabSentData.data[1]).toEqual({
             id: 1,
             isModified: false,
             filePath: 'file2.txt',
@@ -111,7 +115,7 @@ describe('loadService.loadedRenderer: ', () => {
     test('loadedRenderer: tabSession json file does not exist', async () => {
         // Given.
         fakeFileManager.setPathExistence(TAB_SESSION_PATH, false)
-        fakeTabRepository.setTabSession([])
+        fakeTabRepository.setTabSession(null)
 
         // When.
         await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeTreeRepository, fakeTreeManager)
@@ -120,23 +124,6 @@ describe('loadService.loadedRenderer: ', () => {
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
         const sentData = fakeMainWindow.webContents.send.mock.calls[0][1]
-        expect(Array.isArray(sentData)).toBe(true)
-        expect(sentData.length).toBe(0)
-    })
-
-    test('loadedRenderer: tabSession text does not exist(length === 0)', async () => {
-        // Given.
-        fakeFileManager.setPathExistence(TAB_SESSION_PATH, true)
-        fakeTabRepository.setTabSession([])
-
-        // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeTreeRepository, fakeTreeManager)
-
-        // Then.
-        expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
-        expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
-        const sentData = fakeMainWindow.webContents.send.mock.calls[0][1]
-        expect(Array.isArray(sentData)).toBe(true)
-        expect(sentData.length).toBe(0)
+        expect(Array.isArray(sentData)).toBe(false)
     })
 })

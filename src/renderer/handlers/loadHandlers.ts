@@ -1,12 +1,13 @@
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { electronAPI } from "@shared/constants/electronAPI"
 import TabEditorManager from "../modules/features/TabEditorManager"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 
 export default function registerLoadHandlers() {
-    window[electronAPI.channel].session(async (tabs: TabEditorDto[], tree: TreeDto) => {
-        if (tabs.length > 0) {
+    window[electronAPI.channel].session(async (tabs: TabEditorsDto, tree: TreeDto) => {
+        console.log(tabs)
+        if (tabs && tabs.data.length > 0) {
             const tabEditorManager = TabEditorManager.getInstance()
             await tabEditorManager.restoreTabs(tabs)
         }

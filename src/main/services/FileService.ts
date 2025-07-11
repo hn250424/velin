@@ -1,12 +1,12 @@
 import ITreeRepository from "@contracts/out/ITreeRepository"
-import TabEditorDto from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
 import IDialogService from "../ports/out/IDialogService"
 import IFileManager from "../ports/out/IFileManager"
 import ITabRepository from "../ports/out/ITabRepository"
-import TabSession from "../models/TabSessionModel"
+import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
 import IFileService from "../ports/in/IFileService"
 import ITreeManager from "@contracts/out/ITreeManager"
@@ -23,10 +23,12 @@ export default class FileService implements IFileService {
     }
 
     async newTab() {
-        const arr = await this.tabRepository.readTabSession()
+        const model = await this.tabRepository.readTabSession()
+        const arr = model.data
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: '' })
-        await this.tabRepository.writeTabSession(arr)
+        model.data = arr
+        await this.tabRepository.writeTabSession(model)
         return id
     }
 
@@ -42,10 +44,13 @@ export default class FileService implements IFileService {
         const fileName = this.fileManager.getBasename(filePath)
         const content = await this.fileManager.read(filePath)
 
-        const arr = await this.tabRepository.readTabSession()
+        const model = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] }
+        const arr = model.data
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: filePath })
-        await this.tabRepository.writeTabSession(arr)
+        model.activatedId = id
+        model.data = arr
+        await this.tabRepository.writeTabSession(model)
 
         return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
     }
@@ -91,7 +96,8 @@ export default class FileService implements IFileService {
                 await this.fileManager.write(result.filePath, data.content)
 
                 const tabSession = await this.tabRepository.readTabSession()
-                tabSession.find(s => s.id === data.id).filePath = result.filePath
+                const tabSessionData = tabSession.data
+                tabSessionData.find(s => s.id === data.id).filePath = result.filePath
                 if (writeSession) await this.tabRepository.writeTabSession(tabSession)
 
                 return {
@@ -120,10 +126,12 @@ export default class FileService implements IFileService {
         } else {
             await this.fileManager.write(result.filePath, data.content)
 
-            const arr = await this.tabRepository.readTabSession()
+            const model = await this.tabRepository.readTabSession()
+            const arr = model.data
             const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
             arr.push({ id: id, filePath: result.filePath })
-            this.tabRepository.writeTabSession(arr)
+            model.data = arr
+            this.tabRepository.writeTabSession(model)
 
             return {
                 id: id,
@@ -135,11 +143,11 @@ export default class FileService implements IFileService {
         }
     }
 
-    async saveAll(data: TabEditorDto[], mainWindow: BrowserWindow) {
-        const sessionArr: TabSession[] = []
+    async saveAll(dto: TabEditorsDto, mainWindow: BrowserWindow) {
+        const sessionArr: TabSessionData[] = []
         const responseArr: TabEditorDto[] = []
 
-        for (const tab of data) {
+        for (const tab of dto.data) {
             const { id, isModified, filePath, fileName, content } = tab
 
             if (!isModified) {
@@ -153,7 +161,10 @@ export default class FileService implements IFileService {
             responseArr.push(result)
         }
 
-        await this.tabRepository.writeTabSession(sessionArr)
+        await this.tabRepository.writeTabSession({
+            activatedId: dto.activatedId,
+            data: sessionArr
+        })
 
         return responseArr
     }

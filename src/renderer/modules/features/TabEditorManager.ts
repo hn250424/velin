@@ -3,7 +3,7 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import TabEditorDto from '@shared/dto/TabEditorDto'
+import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { redo, undo } from 'prosemirror-history'
 import TabViewModel from '../../viewmodels/TabViewModel'
 import TabEditorView from '../../views/TabEditorView'
@@ -37,13 +37,14 @@ export default class TabEditorManager {
         return this.instance
     }
 
-    async restoreTabs(tabs: TabEditorDto[]) {
-        const lastIndex = tabs.length - 1
-        for (let i = 0; i < lastIndex; i++) {
-            await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
-        }
+    async restoreTabs(dto: TabEditorsDto) {
+        this._activeTabId = dto.activatedId
+        const tabs = dto.data
 
-        await this.addTab(tabs[lastIndex].id, tabs[lastIndex].filePath, tabs[lastIndex].fileName, tabs[lastIndex].content, true)
+        for (let i = 0; i < tabs.length; i++) {
+            if (tabs[i].id === this._activeTabId) await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, true)
+            else await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
+        }
     }
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
@@ -124,6 +125,7 @@ export default class TabEditorManager {
         this.tabEditorViews.forEach((tabEditor, index) => {
             if (tabEditor.getId() === id) {
                 tabEditor.setActive()
+                this.activeTabId = id
                 this.activeTabIndex = index
             } else {
                 tabEditor.setDeactive()
@@ -137,8 +139,11 @@ export default class TabEditorManager {
         return this.getTabEditorData(view)
     }
 
-    getAllTabEditorData(): TabEditorDto[] {
-        return this.tabEditorViews.map(view => this.getTabEditorData(view))
+    getAllTabEditorData(): TabEditorsDto {
+        return {
+            activatedId: this._activeTabId,
+            data: this.tabEditorViews.map(view => this.getTabEditorData(view))
+        }
     }
 
     applySaveResult(result: TabEditorDto) {
@@ -159,8 +164,8 @@ export default class TabEditorManager {
         return wasApplied
     }
 
-    applySaveAllResults(results: TabEditorDto[]) {
-        results.forEach((result, i) => {
+    applySaveAllResults(results: TabEditorsDto) {
+        results.data.forEach((result, i) => {
             this.applySaveResult(result)
         })
     }

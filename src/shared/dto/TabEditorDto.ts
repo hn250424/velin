@@ -1,4 +1,9 @@
-export default interface TabEditorDto {
+export interface TabEditorsDto {
+    activatedId: number,
+    data: TabEditorDto[]
+}
+
+export interface TabEditorDto {
     id: number,
     isModified: boolean,
     filePath: string,
