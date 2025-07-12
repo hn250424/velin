@@ -17,7 +17,7 @@ import ITreeRepository from '@contracts/out/ITreeRepository'
 import TreeReposotory from './adapters/out/persistence/TreeReposotory'
 import ITabService from '@contracts/in/ITabService'
 import ITreeManager from '@contracts/out/ITreeManager'
-import TreeManager from './adapters/out/persistence/TreeManager'
+import TreeManager from './adapters/out/fs/TreeManager'
 
 const diContainer = new Container()
 

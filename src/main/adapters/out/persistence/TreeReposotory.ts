@@ -26,7 +26,7 @@ export default class TreeReposotory implements ITreeReposotory {
     async updateSessionWithFsData(
         dirPath: string,
         indent: number,
-        fsChildren: TreeDto[]
+        fsChildren: TreeDto[] | null
     ): Promise<TreeSessionModel | null> {
         let preTree = await this.readTreeSession()
 
@@ -37,7 +37,7 @@ export default class TreeReposotory implements ITreeReposotory {
                 indent,
                 directory: true,
                 expanded: true,
-                children: fsChildren.map(child => ({
+                children: fsChildren?.map(child => ({
                     ...child,
                     children: null as null
                 })),

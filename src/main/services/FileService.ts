@@ -166,7 +166,10 @@ export default class FileService implements IFileService {
             data: sessionArr
         })
 
-        return responseArr
+        return {
+            activatedId: dto.activatedId,
+            data: responseArr
+        }
     }
 }
 

@@ -1,11 +1,10 @@
-import ITreeManager from "@contracts/out/ITreeManager";
-import ITreeRepository from "@contracts/out/ITreeRepository";
-import { electronAPI } from "@shared/constants/electronAPI";
-import TreeDto from "@shared/dto/TreeDto";
-import { BrowserWindow } from "electron";
-import IFileManager from "../ports/out/IFileManager";
-import ITabRepository from "../ports/out/ITabRepository";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import ITreeManager from "@contracts/out/ITreeManager"
+import ITreeRepository from "@contracts/out/ITreeRepository"
+import { electronAPI } from "@shared/constants/electronAPI"
+import TreeDto from "@shared/dto/TreeDto"
+import { BrowserWindow } from "electron"
+import IFileManager from "../ports/out/IFileManager"
+import ITabRepository from "../ports/out/ITabRepository"
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,

@@ -23,7 +23,7 @@ export default class TreeManager implements ITreeManager {
         const stats = fs.statSync(dirPath)
         if (!stats.isDirectory()) return null
 
-        let children: TreeDto[] = []
+        let children: TreeDto[] | null = null
 
         try {
             const dirents = fs.readdirSync(dirPath, { withFileTypes: true })
@@ -43,7 +43,7 @@ export default class TreeManager implements ITreeManager {
                 children: null,
             }))
         } catch {
-            children = []
+            children = null
         }
 
         return {

@@ -12,7 +12,8 @@ import fakeDialogService, {
 } from '../adapters/out/ui/fakeDialogService'
 import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
-import FakeTreeManager from '../adapters/out/persistence/FakeTreeManager'
+import FakeTreeManager from '../adapters/out/fs/FakeTreeManager'
+import TreeDto from '@shared/dto/TreeDto'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
@@ -80,6 +81,40 @@ const tabEidtorDto: TabEditorsDto = {
     ]
 }
 
+const treeDto: TreeDto = {
+    path: '/project',
+    name: 'project',
+    indent: 0,
+    directory: true,
+    expanded: true,
+    children: [
+        {
+            path: '/project/index.ts',
+            name: 'index.ts',
+            indent: 1,
+            directory: false,
+            expanded: false,
+            children: null,
+        },
+        {
+            path: '/project/src',
+            name: 'src',
+            indent: 1,
+            directory: true,
+            expanded: false,
+            children: [
+                {
+                    path: '/project/src/main.ts',
+                    name: 'main.ts',
+                    indent: 2,
+                    directory: false,
+                    expanded: false,
+                    children: null as null,
+                },
+            ],
+        },
+    ],
+}
 
 describe('FileService.newTab', () => {
     beforeEach(() => {
@@ -151,6 +186,106 @@ describe('FileService.openFile', () => {
         expect(session.activatedId).toBe(2)
         expect(session.data.length).toBe(3)
         expect(session.data[2].filePath).toBe('openPath')
+    })
+
+    test('should return correct response when called with path arg', async () => {
+        // Given.
+        fakeFileManager.setFilecontent('testPath', 'testContent')
+        fakeTabRepository.setTabSession({
+            activatedId: 0,
+            data: [
+                { id: 0, filePath: 'path1' },
+                { id: 1, filePath: 'path2' },
+            ]
+        })
+
+        // When.
+        const response = await fileService.openFile('testPath')
+
+        // Then.
+        expect(response.content).toBe('testContent')
+        expect(response.id).toBe(2)
+        const session = await fakeTabRepository.readTabSession()
+        expect(session.activatedId).toBe(2)
+        expect(session.data[2].filePath).toBe('testPath')
+    })
+})
+
+describe('FileService.openDirectory', () => {
+    beforeEach(() => {
+        fakeFileManager = new FakeFileManager()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
+        fakeTreeManager = new FakeTreeManager()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+    })
+
+    test('should return correctly updated root tree without dto', async () => {
+        // Given.
+        const copyedDto = {...treeDto}
+        fakeTreeManager.setTree(copyedDto)
+        setFakeOpenDirectoryDialogResult({
+            canceled: false,
+            filePaths: ['/project']
+        })
+
+        // When.
+        const response = await fileService.openDirectory()
+        
+        // Then.
+        expect(response).toEqual(copyedDto)
+        const session = await fakeTreeRepository.readTreeSession()
+        expect(response.path).toEqual(session.path)
+    })
+
+    test('should return correctly updated children tree without dto', async () => {
+        // Given.
+        const copyedDto = {...treeDto}
+        fakeTreeManager.setTree(copyedDto)
+        fakeTreeRepository.setTreeSession(copyedDto)
+        setFakeOpenDirectoryDialogResult({
+            canceled: false,
+            filePaths: ['/project/src']
+        })
+
+        // When.
+        const response = await fileService.openDirectory()
+
+        // Then.
+        expect(response.path).toBe('/project/src')
+        const session = await fakeTreeRepository.readTreeSession()
+        expect(response.path).toBe(session.path)
+    })
+
+    test('should return the correctly updated root tree when opening the root dto', async () => {
+        // Given.
+        const copyedDto = {...treeDto}
+        fakeTreeManager.setTree(copyedDto)
+
+        // When.
+        const response = await fileService.openDirectory(copyedDto)
+        
+        // Then.
+        expect(response).toEqual(copyedDto)
+        const session = await fakeTreeRepository.readTreeSession()
+        expect(response.path).toEqual(session.path)
+    })
+
+    test('should return the correctly updated child tree and mark it as expanded when opening a child dto', async () => {
+        // Given.
+        const copyedDto = {...treeDto}
+        fakeTreeManager.setTree(copyedDto)
+        fakeTreeRepository.setTreeSession(copyedDto)
+
+        // When.
+        const response = await fileService.openDirectory(copyedDto.children[1])
+
+        // Then.
+        expect(response.path).toBe('/project/src')
+        const session = await fakeTreeRepository.readTreeSession()
+        expect(response.path).toBe(session.children[1].path)
+        expect(session.children[1].expanded).toBe(true)
     })
 })
 
@@ -291,7 +426,7 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with confirmed dialog', async () => {
         // Given.
-        const copyedDto = {...tabEidtorDto}
+        const copyedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: false,
@@ -312,17 +447,17 @@ describe('FileService.saveAll', () => {
         expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
         const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
         expect(file_2).toBe(copyedDto.data[2].content)
-        expect(response[2].isModified).toBe(false)
+        expect(response.data[2].isModified).toBe(false)
         const file_3 = await fakeFileManager.read(newFilePath)
         expect(file_3).toBe(copyedDto.data[3].content)
-        expect(response[3].isModified).toBe(false)
+        expect(response.data[3].isModified).toBe(false)
         expect(session.data[3].filePath).toBe(newFilePath)
         expect(spy).toHaveBeenCalledTimes(3)
     })
 
     test('test all cases with cancel dialog', async () => {
         // Given.
-        const copyedDto = {...tabEidtorDto}
+        const copyedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: true,
@@ -343,8 +478,8 @@ describe('FileService.saveAll', () => {
         expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
         const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
         expect(file_2).toBe(copyedDto.data[2].content)
-        expect(response[2].isModified).toBe(false)
-        expect(response[3].isModified).toBe(true)
+        expect(response.data[2].isModified).toBe(false)
+        expect(response.data[3].isModified).toBe(true)
         expect(session.data[3].filePath).toBe('')
         expect(spy).toHaveBeenCalledTimes(2)
     })

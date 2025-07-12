@@ -5,7 +5,7 @@ import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../adapters/out/fs/FakeFileManager'
 import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
 import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
-import FakeTreeManager from '../adapters/out/persistence/FakeTreeManager'
+import FakeTreeManager from '../adapters/out/fs/FakeTreeManager'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 
 describe('loadService.loadedRenderer: ', () => {

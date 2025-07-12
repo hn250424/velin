@@ -6,8 +6,7 @@ import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 
 export default function registerLoadHandlers() {
     window[electronAPI.channel].session(async (tabs: TabEditorsDto, tree: TreeDto) => {
-        console.log(tabs)
-        if (tabs && tabs.data.length > 0) {
+        if (tabs) {
             const tabEditorManager = TabEditorManager.getInstance()
             await tabEditorManager.restoreTabs(tabs)
         }
