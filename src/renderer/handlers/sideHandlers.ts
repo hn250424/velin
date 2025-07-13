@@ -16,21 +16,21 @@ export default function registerSideHandlers() {
     const resizer = document.getElementById('tree_resizer')
 
     treeToggle.addEventListener('click', () => {
-        const isTreeOpen = treeLayoutMaanger.isTreeOpen()
-        tree.style.width = isTreeOpen ? '0px' : `${treeWidth}px`
-        treeLayoutMaanger.setTreeOpen(!isTreeOpen)
+        const isSideOpen = treeLayoutMaanger.isSideOpen()
+        tree.style.width = isSideOpen ? '0px' : `${treeWidth}px`
+        treeLayoutMaanger.setSideOpen(!isSideOpen)
     })
 
     // TODO deletee
-    const isTreeOpen = treeLayoutMaanger.isTreeOpen()
-    tree.style.width = isTreeOpen ? '0px' : `${treeWidth}px`
-    treeLayoutMaanger.setTreeOpen(!isTreeOpen)
+    const isSideOpen = treeLayoutMaanger.isSideOpen()
+    tree.style.width = isSideOpen ? '0px' : `${treeWidth}px`
+    treeLayoutMaanger.setSideOpen(!isSideOpen)
     //
 
     resizer.addEventListener('mousedown', (e) => {
-        if (!treeLayoutMaanger.isTreeOpen()) {
+        if (!treeLayoutMaanger.isSideOpen()) {
             tree.style.width = `${minWidth}px`
-            treeLayoutMaanger.setTreeOpen(true)
+            treeLayoutMaanger.setSideOpen(true)
             treeWidth = minWidth
         }
 

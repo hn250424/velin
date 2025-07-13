@@ -51,7 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerViewHandlers()
     registerSideHandlers()
     registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
-    registerTreeHandlers(treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
+    registerTreeHandlers(focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
     registerMenuHandlers(menuItems, tabContextMenu, treeContextMenu)
 
     bindDocumentClickEvents(focusManager)

@@ -1,8 +1,13 @@
 import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
 import Response from "@shared/types/Response"
 import { electronAPI } from "@shared/constants/electronAPI"
-import { DATASET_ATTR_TREE_PATH } from "../constants/dom"
-import { EXPANDED_TEXT, NOT_EXPANDED_TEXT } from "../constants/dom"
+import { CLASS_EXPANDED, DATASET_ATTR_TREE_PATH } from "../constants/dom"
+import { 
+    EXPANDED_TEXT, 
+    NOT_EXPANDED_TEXT,
+    CLASS_TREE_NODE_CHILDREN,
+    SELECTOR_TREE_NODE_OPEN
+} from "../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../viewmodels/TreeViewModel"
 
@@ -34,19 +39,19 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
 
     // When click directory in tree area.
     const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-    // const treeNode = treeLayoutManager.getTreeViewModelByPath(dirPath)
     const idx = treeLayoutManager.getFlattenTreeIndexByPath(dirPath)
     const treeNode = treeLayoutManager.getTreeViewModelByIndex(idx)
     const maybeChildren = treeDiv.nextElementSibling
-    if (!maybeChildren || !maybeChildren.classList.contains('tree_children')) return
+    if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
 
-    const openStatus = treeDiv.querySelector('.tree_node_open_status') as HTMLElement
+    const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLElement
     const treeDivChildren = maybeChildren as HTMLElement
 
     function updateUI(treeNode: TreeViewModel, expanded: boolean) {
         treeNode.expanded = expanded
         openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
-        treeDivChildren.style.display = expanded ? 'block' : 'none'
+        if (expanded) treeDivChildren.classList.add(CLASS_EXPANDED)
+        else treeDivChildren.classList.remove(CLASS_EXPANDED)
     }
 
     function syncFlattenTreeArray(treeNode: TreeViewModel, expanded: boolean) {

@@ -1,11 +1,23 @@
-import { DATASET_ATTR_TREE_PATH, EXPANDED_TEXT, NOT_EXPANDED_TEXT } from "../../constants/dom"
+import { 
+    DATASET_ATTR_TREE_PATH,
+    EXPANDED_TEXT,
+    NOT_EXPANDED_TEXT,
+    CLASS_FOCUSED, 
+    CLASS_SELECTED,
+    CLASS_EXPANDED,
+    CLASS_TREE_NODE,
+    CLASS_TREE_NODE_ICON,
+    CLASS_TREE_NODE_OPEN,
+    CLASS_TREE_NODE_WRAPPER,
+    CLASS_TREE_NODE_CHILDREN
+} from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 
 export default class TreeLayoutMaanger {
     private static instance: TreeLayoutMaanger | null = null
 
-    private _treeOpenStatus = false
+    private _sideOpenStatus = false
 
     private _tree: HTMLElement
     private _tree_top: HTMLElement
@@ -16,6 +28,7 @@ export default class TreeLayoutMaanger {
     private _tree_resizer: HTMLElement
 
     private pathToFlattenArrayIndexMap: Map<string, number> = new Map()
+    private pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
     private flattenTreeArray: TreeViewModel[] = []
 
     private _lastSelectedIndex: number = -1
@@ -32,6 +45,41 @@ export default class TreeLayoutMaanger {
         }
 
         return this.instance
+    }
+
+    isSideOpen(): boolean {
+        return this._sideOpenStatus
+    }
+
+    setSideOpen(status: boolean) {
+        this._sideOpenStatus = status
+    }
+
+    toTreeDto(viewModel: TreeViewModel): TreeDto {
+        return {
+            path: viewModel.path,
+            name: viewModel.name,
+            indent: viewModel.indent,
+            directory: viewModel.directory,
+            expanded: viewModel.expanded,
+            children: viewModel.children
+                ? viewModel.children.map(child => this.toTreeDto(child))
+                : null
+        }
+    }
+
+    toTreeViewModel(dto: TreeDto): TreeViewModel {
+        return {
+            path: dto.path,
+            name: dto.name,
+            indent: dto.indent,
+            directory: dto.directory,
+            expanded: dto.expanded,
+            selected: false,
+            children: dto.children
+                ? dto.children.map(child => this.toTreeViewModel(child))
+                : null
+        }
     }
 
     clean(container: HTMLElement) {
@@ -57,17 +105,17 @@ export default class TreeLayoutMaanger {
 
     private _renderNode(container: HTMLElement, viewModel: TreeViewModel) {
         const box = document.createElement('div')
-        box.classList.add('tree_node')
+        box.classList.add(CLASS_TREE_NODE)
         box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
         box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
         box.title = viewModel.path
 
         const openStatus = document.createElement('span')
-        openStatus.classList.add('tree_node_open_status')
+        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
         if (viewModel.directory) openStatus.textContent = viewModel.expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
 
         const icon = document.createElement('img')
-        icon.classList.add('tree_node_icon')
+        icon.classList.add(CLASS_TREE_NODE_ICON)
         icon.src = viewModel.directory
             ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
             : new URL('../../assets/icons/file.png', import.meta.url).toString()
@@ -77,18 +125,20 @@ export default class TreeLayoutMaanger {
         text.textContent = viewModel.name
 
         const childrenContainer = document.createElement('div')
-        childrenContainer.classList.add('tree_children')
-        childrenContainer.style.display = viewModel.expanded ? 'block' : 'none'
+        childrenContainer.classList.add(CLASS_TREE_NODE_CHILDREN)
+        if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED)
+        else childrenContainer.classList.remove(CLASS_EXPANDED)
 
         box.appendChild(openStatus)
         box.appendChild(icon)
         box.appendChild(text)
 
         const wrapper = document.createElement('div')
-        wrapper.classList.add('tree_node_wrapper')
+        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
         wrapper.appendChild(box)
         wrapper.appendChild(childrenContainer)
 
+        this.pathToTreeWrapperMap.set(viewModel.path, wrapper)
         container.appendChild(wrapper)
 
         if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
@@ -182,76 +232,48 @@ export default class TreeLayoutMaanger {
         this.rebuildIndexMap()
     }
 
-    isTreeOpen(): boolean {
-        return this._treeOpenStatus
-    }
-
-    setTreeOpen(status: boolean) {
-        this._treeOpenStatus = status
-    }
-
-    setFlattenTreeIndexByPath(path: string, index: number) {
-        this.pathToFlattenArrayIndexMap.set(path, index)
+    isTreeSelected(): boolean {
+        return this._lastSelectedIndex !== -1
     }
 
     getFlattenTreeIndexByPath(path: string) {
         return this.pathToFlattenArrayIndexMap.get(path)
     }
 
-    toTreeDto(viewModel: TreeViewModel): TreeDto {
-        return {
-            path: viewModel.path,
-            name: viewModel.name,
-            indent: viewModel.indent,
-            directory: viewModel.directory,
-            expanded: viewModel.expanded,
-            children: viewModel.children
-                ? viewModel.children.map(child => this.toTreeDto(child))
-                : null
-        }
+    setFlattenTreeIndexByPath(path: string, index: number) {
+        this.pathToFlattenArrayIndexMap.set(path, index)
     }
 
-    toTreeViewModel(dto: TreeDto): TreeViewModel {
-        return {
-            path: dto.path,
-            name: dto.name,
-            indent: dto.indent,
-            directory: dto.directory,
-            expanded: dto.expanded,
-            selected: false,
-            children: dto.children
-                ? dto.children.map(child => this.toTreeViewModel(child))
-                : null
-        }
+    getTreeWrapperByPath(path: string) {
+        return this.pathToTreeWrapperMap.get(path)
+    }
+
+    setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
+        this.pathToTreeWrapperMap.set(path, wrapper)
+    }
+
+    getIndexByPath(path: string) {
+        return this.pathToFlattenArrayIndexMap.get(path)
     }
 
     getTreeViewModelByIndex(index: number) {
         return this.flattenTreeArray[index]
     }
 
-    isTreeSelected(): boolean {
-        return this._lastSelectedIndex !== -1
-    }
-
     getLastSelectedIndex(): number {
         return this._lastSelectedIndex
+    }
+
+    setLastSelectedIndexByPath(path: string) {
+        this._lastSelectedIndex = this.pathToFlattenArrayIndexMap.get(path)
     }
 
     removeLastSelectedIndex() {
         this._lastSelectedIndex = -1
     }
 
-    getIndexByPath(path: string) {
-        return this.flattenTreeArray.findIndex(node => node.path === path)
-    }
-
-    setLastSelectedIndexByPath(path: string) {
-        this._lastSelectedIndex = this.flattenTreeArray.findIndex(node => node.path === path)
-    }
-
     addMultiSelectedIndex(index: number) {
         this._multiSelectedIndex.add(index)
-
     }
 
     getMultiSelectedIndex(): number[] {
@@ -261,11 +283,4 @@ export default class TreeLayoutMaanger {
     clearMultiSelectedIndex() {
         this._multiSelectedIndex.clear()
     }
-
-    // test.
-    // getSize() {
-    //     const map_size = this.pathToFlattenArrayIndexMap.size
-    //     const arr_size = this.flattenTreeArray.length
-    //     console.log(`map: ${map_size}, arr: ${arr_size}`)
-    // }
 }

@@ -91,19 +91,34 @@ $tree_horizontal_margin: 5px;
     gap: $tree_horizontal_margin;
 }
 
+.tree_node.focused {
+    border: 1px solid red;
+}
+
+.tree_node.selected {
+    background-color: grey;
+}
+
 .tree_node:hover {
     cursor: pointer;
     background-color: gv.$grey-1;
 }
 
-.tree_node_open_status,
+.tree_node_open,
 .tree_node_icon {
     min-width: gv.$icon_size;
     min-height: gv.$icon_size;
 
     text-align: center;
     flex-shrink: 0; /* prevent icon from shrinking on resize */
+}
 
+.tree_node_children {
+    display: none;
+}
+
+.tree_node_children.expanded {
+    display: block;
 }
 
 #tree_context_menu {
