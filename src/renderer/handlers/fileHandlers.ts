@@ -5,17 +5,23 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import performOpenFile from "../actions/pertormOpenFile"
 import performOpenDirectory from "../actions/performOpenDirectory"
-import shortcutRegistry from "../modules/features/shortcutRegistry"
-import TabEditorManager from "../modules/features/TabEditorManager"
-import TreeLayoutManager from "../modules/features/TreeLayoutManager"
+import shortcutRegistry from "../modules/input/shortcutRegistry"
+import TabEditorManager from "../modules/manager/TabEditorManager"
+import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
 
-export default function registerFileHandlers() {
-    const tabEditorManager = TabEditorManager.getInstance()
-    const treeLayoutManager = TreeLayoutManager.getInstance()
-
+export default function registerFileHandlers(
+    commandDispatcher: CommandDispatcher, 
+    tabEditorManager: TabEditorManager, 
+    treeLayoutManager: TreeLayoutManager) {
     bindMenuFileCommands(tabEditorManager, treeLayoutManager)
 
-    shortcutRegistry.register('Ctrl+T', async (e: KeyboardEvent) => await performNewTab(tabEditorManager))
+    document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
+        await commandDispatcher.execute('newTab', 'menu')
+    })
+
+    // shortcutRegistry.register('Ctrl+T', async (e: KeyboardEvent) => await performNewTab(tabEditorManager))
+    shortcutRegistry.register('Ctrl+T', async (e: KeyboardEvent) => await commandDispatcher.execute('newTab', 'shortcut'))
     shortcutRegistry.register('Ctrl+O', async (e: KeyboardEvent) => await performOpenFile(tabEditorManager))
     shortcutRegistry.register('Ctrl+Shift+O', async (e: KeyboardEvent) => await performOpenDirectory(treeLayoutManager))
     shortcutRegistry.register('Ctrl+S', async (e: KeyboardEvent) => await performSave(tabEditorManager))
@@ -23,9 +29,9 @@ export default function registerFileHandlers() {
 }
 
 function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
-    document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
-        await performNewTab(tabEditorManager)
-    })
+    // document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
+    //     await commandDispatcher.execute('newTab', 'shortcut')
+    // })
 
     document.getElementById('file_menu_open_file').addEventListener('click', async () => {
         await performOpenFile(tabEditorManager)
@@ -50,10 +56,10 @@ function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutMana
     })
 }
 
-async function performNewTab(tabEditorManager: TabEditorManager) {
-    const response: Response<number> = await window[electronAPI.channel].newTab()
-    if (response.result) await tabEditorManager.addTab(response.data)
-}
+// async function performNewTab(tabEditorManager: TabEditorManager) {
+//     const response: Response<number> = await window[electronAPI.channel].newTab()
+//     if (response.result) await tabEditorManager.addTab(response.data)
+// }
 
 async function performSave(tabEditorManager: TabEditorManager) {
     const data = tabEditorManager.getActiveTabEditorData()

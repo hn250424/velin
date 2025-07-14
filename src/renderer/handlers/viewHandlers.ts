@@ -1,9 +1,8 @@
-import shortcutRegistry from "../modules/features/shortcutRegistry"
-import ZoomManager from "../modules/features/ZoomManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
+import shortcutRegistry from "../modules/input/shortcutRegistry"
+import ZoomManager from "../modules/layout/ZoomManager"
 
-export default function registerViewHandlers() {
-    const zoomManager = ZoomManager.getInstance()
-
+export default function registerViewHandlers(commandDispatcher: CommandDispatcher, zoomManager: ZoomManager) {
     shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
     shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
     shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())

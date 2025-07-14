@@ -1,8 +1,6 @@
 import './index.scss'
-
 import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '../shared/constants/electronAPI'
-
 import registerEditHandlers from './handlers/editHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
@@ -13,18 +11,21 @@ import registerTreeHandlers from './handlers/treeHandlers'
 import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
-
-import FocusManager from './modules/core/FocusManager'
-import shortcutRegistry from './modules/features/shortcutRegistry'
-import TabEditorManager from './modules/features/TabEditorManager'
-import TreeLayoutManager from './modules/features/TreeLayoutManager'
-
+import FocusManager from './modules/state/FocusManager'
+import shortcutRegistry from './modules/input/shortcutRegistry'
+import TabEditorManager from './modules/manager/TabEditorManager'
+import TreeLayoutManager from './modules/manager/TreeLayoutManager'
+import diContainer from './diContainer'
+import DI_KEYS from './constants/di_keys'
+import CommandDispatcher from './modules/command/CommandDispatcher'
 import {
     SELECTOR_TREE_NODE,
     CLASS_TREE_NODE,
     CLASS_FOCUSED,
     CLASS_SELECTED
 } from './constants/dom'
+import WindowLayoutManager from './modules/layout/WindowLayoutManager'
+import ZoomManager from './modules/layout/ZoomManager'
 
 let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -46,32 +47,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
     treeContentContainer = document.getElementById('tree_content')
 
-    const focusManager = FocusManager.getInstance()
-    const tabEditorManager = TabEditorManager.getInstance()
-    const treeLayoutManager = TreeLayoutManager.getInstance()
+    const windowLayoutManager = WindowLayoutManager.getInstance()
+    const zoomManager = ZoomManager.getInstance()
 
-    registerWindowHandlers()
-    registerFileHandlers()
-    registerLoadHandlers()
-    registerExitHandlers()
-    registerEditHandlers()
-    registerViewHandlers()
-    registerSideHandlers()
-    registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
-    registerTreeHandlers(focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
-    registerMenuHandlers(menuItems)
+    const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
+    const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
+    const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
+
+    const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
+
+    registerWindowHandlers(commandDispatcher, windowLayoutManager)
+    registerFileHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
+    registerLoadHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
+    registerExitHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
+    registerEditHandlers(commandDispatcher, tabEditorManager)
+    registerViewHandlers(commandDispatcher, zoomManager)
+    registerSideHandlers(commandDispatcher, treeLayoutManager)
+    registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu)
+    registerTreeHandlers(commandDispatcher, focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
+    registerMenuHandlers(commandDispatcher, menuItems)
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
     bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
-
     window[electronAPI.channel].loadedRenderer()
 })
 
 function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
     document.addEventListener('click', () => {
-        tabContextMenu.style.display = 'none'
-        treeContextMenu.style.display = 'none'
+        tabContextMenu.classList.remove(CLASS_SELECTED)
+        treeContextMenu.classList.remove(CLASS_SELECTED)
+        // tabContextMenu.style.display = 'none'
+        // treeContextMenu.style.display = 'none'
     })
 }
 

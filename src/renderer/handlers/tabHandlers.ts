@@ -3,11 +3,13 @@ import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
-import { DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
-import shortcutRegistry from "../modules/features/shortcutRegistry"
-import TabEditorManager from "../modules/features/TabEditorManager"
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
+import shortcutRegistry from "../modules/input/shortcutRegistry"
+import TabEditorManager from "../modules/manager/TabEditorManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
 
 export default function registerTabHandlers(
+    commandDispatcher: CommandDispatcher,
     tabContainer: HTMLElement, 
     tabEditorManager: TabEditorManager, 
     tabContextMenu: HTMLElement,
@@ -46,7 +48,7 @@ function bindTabContextmenuEvents(
         const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
         if (!tab) return
         
-        tabContextMenu.style.display = 'flex'
+        tabContextMenu.classList.add(CLASS_SELECTED)
         tabContextMenu.style.left = `${e.clientX}px`
         tabContextMenu.style.top = `${e.clientY}px`
         tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)

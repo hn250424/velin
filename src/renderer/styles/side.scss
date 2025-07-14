@@ -128,3 +128,7 @@ $tree_horizontal_margin: 5px;
     flex-direction: column;
     z-index: 1000;
 }
+
+#tree_context_menu.selected {
+    display: flex;
+}

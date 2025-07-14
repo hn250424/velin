@@ -1,9 +1,8 @@
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabEditorManager from "../modules/features/TabEditorManager"
+import TabEditorManager from "../modules/manager/TabEditorManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
 
-export default function registerEditHandlers() {
-    const tabEditorManager = TabEditorManager.getInstance()
-
+export default function registerEditHandlers(commandDispatcher: CommandDispatcher, tabEditorManager: TabEditorManager) {
     const commands: { id: string, cmd: 'undo' | 'redo' | 'cut' | 'copy' | 'paste' }[] = [
         { id: 'edit_menu_undo', cmd: 'undo' },
         { id: 'edit_menu_redo', cmd: 'redo' },

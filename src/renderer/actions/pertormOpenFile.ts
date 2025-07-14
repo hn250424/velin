@@ -1,7 +1,7 @@
 import { electronAPI } from "@shared/constants/electronAPI"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
-import TabEditorManager from "../modules/features/TabEditorManager"
+import TabEditorManager from "../modules/manager/TabEditorManager"
 
 export default async function performOpenFile(tabEditorManager: TabEditorManager, filePath?: string) {
     if (filePath) {

@@ -1,4 +1,4 @@
-import TreeLayoutManager from "../modules/features/TreeLayoutManager"
+import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
 import Response from "@shared/types/Response"
 import { electronAPI } from "@shared/constants/electronAPI"
 import { CLASS_EXPANDED, DATASET_ATTR_TREE_PATH } from "../constants/dom"

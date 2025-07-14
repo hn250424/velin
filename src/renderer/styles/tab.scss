@@ -105,6 +105,10 @@ $tab_button_radius: 5px;
     z-index: 1000;
 }
 
+#tab_context_menu.selected {
+    display: flex;
+}
+
 .editorBox {
     display: none;
 }

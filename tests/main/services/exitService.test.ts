@@ -2,13 +2,13 @@ import exit from '@services/exitService'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
-import FakeFileManager from '../adapters/out/fs/FakeFileManager'
+import FakeFileManager from '../modules/fs/FakeFileManager'
 import fakeDialogService, {
     setFakeConfirmResult,
     setFakeSaveDialogResult
-} from '../adapters/out/ui/fakeDialogService'
-import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
-import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
+} from '../modules/ui/fakeDialogService'
+import FakeTabRepository from '../modules/persistence/FakeTabRepository'
+import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 

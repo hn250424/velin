@@ -1,8 +1,7 @@
-import TreeLayoutManager from "../modules/features/TreeLayoutManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
+import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
 
-export default function registerSideHandlers() {
-    const treeLayoutManager = TreeLayoutManager.getInstance()
-
+export default function registerSideHandlers(commandDispatcher: CommandDispatcher, treeLayoutManager: TreeLayoutManager) {
     let isDragging = false
     let treeWidth = 150
     let animationFrameId: number | null = null
@@ -21,11 +20,10 @@ export default function registerSideHandlers() {
         treeLayoutManager.setSideOpen(!isSideOpen)
     })
 
-    // TODO deletee
+    // TODO
     const isSideOpen = treeLayoutManager.isSideOpen()
     tree.style.width = isSideOpen ? '0px' : `${treeWidth}px`
     treeLayoutManager.setSideOpen(!isSideOpen)
-    //
 
     resizer.addEventListener('mousedown', (e) => {
         if (!treeLayoutManager.isSideOpen()) {

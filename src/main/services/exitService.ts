@@ -1,11 +1,11 @@
 import { BrowserWindow } from "electron"
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
-import IFileManager from "@contracts/out/IFileManager"
-import ITabRepository from "@contracts/out/ITabRepository"
-import IDialogService from "@contracts/out/IDialogService"
+import IFileManager from "src/main/modules/contracts/IFileManager"
+import ITabRepository from "src/main/modules/contracts/ITabRepository"
+import IDialogService from "src/main/modules/contracts/IDialogService"
 import { TabSessionModel, TabSessionData } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
-import ITreeRepository from "@contracts/out/ITreeRepository"
+import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
 import TreeSessionModel from "../models/TreeSessionModel"
 
 export default async function exit(

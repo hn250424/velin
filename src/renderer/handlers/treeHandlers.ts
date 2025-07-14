@@ -1,7 +1,7 @@
 import "@milkdown/theme-nord/style.css"
 
 import performOpenDirectory from "../actions/performOpenDirectory"
-import TreeLayoutManager from "../modules/features/TreeLayoutManager"
+import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
 import {
     DATASET_ATTR_TREE_PATH,
     CLASS_FOCUSED,
@@ -10,12 +10,14 @@ import {
     SELECTOR_TREE_NODE_WRAPPER,
     SELECTOR_TREE_NODE_CHILDREN
 } from "../constants/dom"
-import shortcutRegistry from "../modules/features/shortcutRegistry"
+import shortcutRegistry from "../modules/input/shortcutRegistry"
 import performOpenFile from "../actions/pertormOpenFile"
-import TabEditorManager from "../modules/features/TabEditorManager"
-import FocusManager from "../modules/core/FocusManager"
+import TabEditorManager from "../modules/manager/TabEditorManager"
+import FocusManager from "../modules/state/FocusManager"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
 
 export default function registerTreeHandlers(
+    commandDispatcher: CommandDispatcher,
     focusManager: FocusManager,
     treeContentContainer: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
@@ -95,7 +97,7 @@ function bindTreeContextmenuEvents(
         const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
         if (!treeNode) return
         
-        treeContextMenu.style.display = 'flex'
+        treeContextMenu.classList.add(CLASS_SELECTED)
         treeContextMenu.style.left = `${e.clientX}px`
         treeContextMenu.style.top = `${e.clientY}px`
 

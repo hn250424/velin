@@ -1,15 +1,15 @@
-import ITreeRepository from "@contracts/out/ITreeRepository"
+import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
-import IDialogService from "../ports/out/IDialogService"
-import IFileManager from "../ports/out/IFileManager"
-import ITabRepository from "../ports/out/ITabRepository"
+import IDialogService from "../modules/contracts/IDialogService"
+import IFileManager from "../modules/contracts/IFileManager"
+import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
-import IFileService from "../ports/in/IFileService"
-import ITreeManager from "@contracts/out/ITreeManager"
+import IFileService from "./contracts/IFileService"
+import ITreeManager from "src/main/modules/contracts/ITreeManager"
 
 export default class FileService implements IFileService {
     constructor(

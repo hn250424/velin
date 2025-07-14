@@ -3,16 +3,16 @@ import Response from '@shared/types/Response'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
-import FakeFileManager from '../adapters/out/fs/FakeFileManager'
+import FakeFileManager from '../modules/fs/FakeFileManager'
 import fakeDialogService, {
     setFakeConfirmResult,
     setFakeOpenFileDialogResult,
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
-} from '../adapters/out/ui/fakeDialogService'
-import FakeTabRepository from '../adapters/out/persistence/FakeTabRepository'
-import FakeTreeRepository from '../adapters/out/persistence/FakeTreeRepository'
-import FakeTreeManager from '../adapters/out/fs/FakeTreeManager'
+} from '../modules/ui/fakeDialogService'
+import FakeTabRepository from '../modules/persistence/FakeTabRepository'
+import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
+import FakeTreeManager from '../modules/fs/FakeTreeManager'
 import TreeDto from '@shared/dto/TreeDto'
 
 const tabSessionPath = '/fake/path/tabSession.json'
