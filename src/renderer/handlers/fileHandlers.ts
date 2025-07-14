@@ -7,22 +7,22 @@ import performOpenFile from "../actions/pertormOpenFile"
 import performOpenDirectory from "../actions/performOpenDirectory"
 import shortcutRegistry from "../modules/features/shortcutRegistry"
 import TabEditorManager from "../modules/features/TabEditorManager"
-import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
+import TreeLayoutManager from "../modules/features/TreeLayoutManager"
 
 export default function registerFileHandlers() {
     const tabEditorManager = TabEditorManager.getInstance()
-    const treeLayoutManager = TreeLayoutMaanger.getInstance()
+    const treeLayoutManager = TreeLayoutManager.getInstance()
 
     bindMenuFileCommands(tabEditorManager, treeLayoutManager)
 
-    shortcutRegistry.register('Ctrl+T', async () => await performNewTab(tabEditorManager))
-    shortcutRegistry.register('Ctrl+O', async () => await performOpenFile(tabEditorManager))
-    shortcutRegistry.register('Ctrl+Shift+O', async () => await performOpenDirectory(treeLayoutManager))
-    shortcutRegistry.register('Ctrl+S', async () => await performSave(tabEditorManager))
-    shortcutRegistry.register('Ctrl+Shift+S', async () => await performSaveAs(tabEditorManager))
+    shortcutRegistry.register('Ctrl+T', async (e: KeyboardEvent) => await performNewTab(tabEditorManager))
+    shortcutRegistry.register('Ctrl+O', async (e: KeyboardEvent) => await performOpenFile(tabEditorManager))
+    shortcutRegistry.register('Ctrl+Shift+O', async (e: KeyboardEvent) => await performOpenDirectory(treeLayoutManager))
+    shortcutRegistry.register('Ctrl+S', async (e: KeyboardEvent) => await performSave(tabEditorManager))
+    shortcutRegistry.register('Ctrl+Shift+S', async (e: KeyboardEvent) => await performSaveAs(tabEditorManager))
 }
 
-function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutMaanger) {
+function bindMenuFileCommands(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
     document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
         await performNewTab(tabEditorManager)
     })

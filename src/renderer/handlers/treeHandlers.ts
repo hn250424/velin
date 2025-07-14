@@ -1,10 +1,10 @@
 import "@milkdown/theme-nord/style.css"
 
 import performOpenDirectory from "../actions/performOpenDirectory"
-import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
-import { 
-    DATASET_ATTR_TREE_PATH, 
-    CLASS_FOCUSED, 
+import TreeLayoutManager from "../modules/features/TreeLayoutManager"
+import {
+    DATASET_ATTR_TREE_PATH,
+    CLASS_FOCUSED,
     CLASS_SELECTED,
     SELECTOR_TREE_NODE,
     SELECTOR_TREE_NODE_WRAPPER,
@@ -18,44 +18,42 @@ import FocusManager from "../modules/core/FocusManager"
 export default function registerTreeHandlers(
     focusManager: FocusManager,
     treeContentContainer: HTMLElement,
-    treeLayoutManager: TreeLayoutMaanger,
+    treeLayoutManager: TreeLayoutManager,
     tabEditorManager: TabEditorManager,
-    contextMenu: HTMLElement
+    treeContextMenu: HTMLElement,
 ) {
     bindTreeClickEvents(treeContentContainer, treeLayoutManager, tabEditorManager)
-    bindTreeContextmenuEvents(treeContentContainer, treeLayoutManager, contextMenu)
+    bindTreeContextmenuEvents(treeContentContainer, treeContextMenu, treeLayoutManager)
     bindTreeContextmenuCommands(treeLayoutManager)
 
-    shortcutRegistry.register('ARROWUP', () => moveUpFocus(focusManager))
-    shortcutRegistry.register('ARROWDOWN', () => moveDownFocus(focusManager))
+    shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
 }
 
-function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, tabEditorManager: TabEditorManager) {
+function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutManager, tabEditorManager: TabEditorManager) {
     treeContentContainer.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement
         const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
         if (!treeNode) return
 
         if (treeLayoutManager.isTreeSelected()) {
-            const idx = treeLayoutManager.getLastSelectedIndex()
-            const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
-            const preSelectedWrapper = treeLayoutManager.getTreeWrapperByPath(viewModel.path)
-            const treeNode = preSelectedWrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+            const idx = treeLayoutManager.lastSelectedIndex
+            const treeNode = treeLayoutManager.getTreeNodeByIndex(idx)
             treeNode.classList.remove(CLASS_FOCUSED)
         }
         treeNode.classList.add(CLASS_FOCUSED)
 
         if (e.shiftKey && treeLayoutManager.isTreeSelected()) {
-            const startIndex = treeLayoutManager.getLastSelectedIndex()
+            const startIndex = treeLayoutManager.lastSelectedIndex
             const endIndex = treeLayoutManager.getIndexByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
             treeLayoutManager.setLastSelectedIndexByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
             const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
             for (let i = start; i <= end; i++) {
                 treeLayoutManager.addMultiSelectedIndex(i)
-                const dataset_path = treeLayoutManager.getTreeViewModelByIndex(i).path
-                const wrapper = treeLayoutManager.getTreeWrapperByPath(dataset_path)
-                const div = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+                const div = treeLayoutManager.getTreeNodeByIndex(i)
                 div.classList.add(CLASS_SELECTED)
             }
 
@@ -69,8 +67,7 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
         } else {
             const multiSelectedIndexArr = treeLayoutManager.getMultiSelectedIndex()
             for (const i of multiSelectedIndexArr) {
-                const wrapper = treeLayoutManager.getTreeWrapperByPath( treeLayoutManager.getTreeViewModelByIndex(i).path  )
-                const div = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+                const div = treeLayoutManager.getTreeNodeByIndex(i)
                 div.classList.remove(CLASS_SELECTED)
             }
 
@@ -78,9 +75,8 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
             treeNode.classList.add(CLASS_SELECTED)
             const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
             treeLayoutManager.setLastSelectedIndexByPath(path)
-            treeLayoutManager.addMultiSelectedIndex( treeLayoutManager.getIndexByPath(path) )
-            const idx = treeLayoutManager.getFlattenTreeIndexByPath(path)
-            const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
+            treeLayoutManager.addMultiSelectedIndex(treeLayoutManager.getIndexByPath(path))
+            const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
             if (viewModel.directory) {
                 await performOpenDirectory(treeLayoutManager, treeNode)
             } else {
@@ -90,26 +86,26 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
     })
 }
 
-function bindTreeContextmenuEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutMaanger, contextMenu: HTMLElement) {
+function bindTreeContextmenuEvents(
+    treeContentContainer: HTMLElement, 
+    treeContextMenu: HTMLElement,
+    treeLayoutManager: TreeLayoutManager
+) {
     treeContentContainer.addEventListener('contextmenu', (e) => {
         const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
-        if (!treeNode) {
-            contextMenu.style.display = 'none'
-            //     tabEditorManager.removeContextTabId()    
-        } else {
-            e.preventDefault()
-            contextMenu.style.display = 'flex'
-            contextMenu.style.left = `${e.clientX}px`
-            contextMenu.style.top = `${e.clientY}px`
+        if (!treeNode) return
+        
+        treeContextMenu.style.display = 'flex'
+        treeContextMenu.style.left = `${e.clientX}px`
+        treeContextMenu.style.top = `${e.clientY}px`
 
-            const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
-
-            // tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
-        }
+        const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
+        treeLayoutManager.setLastSelectedIndexByPath(path)
+        treeNode.classList.add(CLASS_FOCUSED)
     })
 }
 
-function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutMaanger) {
+function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutManager) {
     document.getElementById('tree_context_cut').addEventListener('click', async () => {
         await performTreeNodeCut()
     })
@@ -127,14 +123,45 @@ function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutMaanger) {
     })
 }
 
-function moveUpFocus(focusManager: FocusManager) {
+function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
     if (focusManager.getFocus() !== 'tree') return
 
+    let lastIdx = treeLayoutManager.lastSelectedIndex
+    if (lastIdx <= 0) return
+
+    const preTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    preTreeNode.classList.remove(CLASS_FOCUSED)
+
+    lastIdx--
+    treeLayoutManager.lastSelectedIndex = lastIdx
+    const newTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    newTreeNode.classList.add(CLASS_FOCUSED)
+
+    if (e.shiftKey) {
+        newTreeNode.classList.add(CLASS_SELECTED)
+        treeLayoutManager.addMultiSelectedIndex(lastIdx)
+    } 
 }
 
-function moveDownFocus(focusManager: FocusManager) {
+function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
     if (focusManager.getFocus() !== 'tree') return
 
+    let lastIdx = treeLayoutManager.lastSelectedIndex
+    let totalLength = treeLayoutManager.getFlattenTreeArrayLength()
+    if (lastIdx >= totalLength) return
+
+    const preTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    preTreeNode.classList.remove(CLASS_FOCUSED)
+
+    lastIdx++
+    treeLayoutManager.lastSelectedIndex = lastIdx
+    const newTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    newTreeNode.classList.add(CLASS_FOCUSED)
+
+    if (e.shiftKey) {
+        newTreeNode.classList.add(CLASS_SELECTED)
+        treeLayoutManager.addMultiSelectedIndex(lastIdx)
+    } 
 }
 
 async function performTreeNodeCut() {

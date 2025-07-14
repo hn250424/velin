@@ -55,7 +55,11 @@ $tab_button_radius: 5px;
     cursor: pointer;
 }
 
-.tab.active {
+.tab {
+    background-color: gv.$grey-2;
+}
+
+.tab.selected {
     background-color: red;
 }
 
@@ -99,4 +103,12 @@ $tab_button_radius: 5px;
     position: fixed;
     flex-direction: column;
     z-index: 1000;
+}
+
+.editorBox {
+    display: none;
+}
+
+.editorBox.selected {
+    display: block;
 }

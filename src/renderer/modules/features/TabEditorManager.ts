@@ -7,8 +7,13 @@ import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { redo, undo } from 'prosemirror-history'
 import TabViewModel from '../../viewmodels/TabViewModel'
 import TabEditorView from '../../views/TabEditorView'
-import { DATASET_ATTR_TAB_ID, NOT_MODIFIED_TEXT } from '../../constants/dom'
-import { MODIFIED_TEXT } from "../../constants/dom"
+import { 
+    CLASS_TAB, 
+    DATASET_ATTR_TAB_ID, 
+    MODIFIED_TEXT,
+    CLASS_EDITOR_BOX,
+    NOT_MODIFIED_TEXT
+} from '../../constants/dom'
 
 export default class TabEditorManager {
     private static instance: TabEditorManager | null = null
@@ -57,8 +62,7 @@ export default class TabEditorManager {
         this.tabContainer.appendChild(tabDiv)
 
         const editorBoxDiv = document.createElement('div')
-        editorBoxDiv.className = 'editorBox'
-        editorBoxDiv.style.display = 'none'
+        editorBoxDiv.className = CLASS_EDITOR_BOX
         const editor = await Editor.make()
             .config((ctx) => {
                 ctx.set(rootCtx, editorBoxDiv)
@@ -258,7 +262,7 @@ export default class TabEditorManager {
 
     private createTabBox(fileName: string) {
         const div = document.createElement('div')
-        div.classList.add('tab')
+        div.classList.add(CLASS_TAB)
 
         const span = document.createElement('span')
         span.textContent = fileName ? fileName : "Untitled"
@@ -275,7 +279,7 @@ export default class TabEditorManager {
     private setLastTabAsActive() {
         this.activeTabIndex = this.tabEditorViews.length - 1
         this.activeTabId = this.activeTabIndex >= 0 ? this.tabEditorViews[this.activeTabIndex].getId() : -1
-        this.tabEditorViews[this.activeTabIndex].setActive()
+        this.tabEditorViews[this.activeTabIndex]?.setActive()
     }
 
     private getTabViewModelById(id: number) {

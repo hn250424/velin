@@ -1,11 +1,11 @@
 import { electronAPI } from "@shared/constants/electronAPI"
 import TabEditorManager from "../modules/features/TabEditorManager"
-import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
+import TreeLayoutManager from "../modules/features/TreeLayoutManager"
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 export default function registerExitHandlers() {
     const tabEditorManager = TabEditorManager.getInstance()
-    const treeLayoutManager = TreeLayoutMaanger.getInstance()
+    const treeLayoutManager = TreeLayoutManager.getInstance()
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
             const tabSessionData: TabEditorsDto = tabEditorManager.getAllTabEditorData()

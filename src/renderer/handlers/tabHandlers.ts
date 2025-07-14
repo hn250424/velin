@@ -3,22 +3,26 @@ import "@milkdown/theme-nord/style.css"
 import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
-import { DATASET_ATTR_TAB_ID } from "../constants/dom"
-import TabEditorManager from "../modules/features/TabEditorManager"
+import { DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
 import shortcutRegistry from "../modules/features/shortcutRegistry"
+import TabEditorManager from "../modules/features/TabEditorManager"
 
-export default function registerTabHandlers(tabContainer: HTMLElement, tabEditorManager: TabEditorManager, contextMenu: HTMLElement) {
+export default function registerTabHandlers(
+    tabContainer: HTMLElement, 
+    tabEditorManager: TabEditorManager, 
+    tabContextMenu: HTMLElement,
+) {
     bindTabClickEvents(tabContainer, tabEditorManager)
-    bindTabContextmenuEvents(tabContainer, tabEditorManager, contextMenu)
+    bindTabContextmenuEvents(tabContainer, tabEditorManager, tabContextMenu)
     bindTabContextmenuCommands(tabEditorManager)
 
-    shortcutRegistry.register('Ctrl+W', async () => await performCloseTab(tabEditorManager, tabEditorManager.activeTabId))
+    shortcutRegistry.register('Ctrl+W', async (e: KeyboardEvent) => await performCloseTab(tabEditorManager, tabEditorManager.activeTabId))
 }
 
 function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEditorManager) {
     tabContainer.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement
-        const tabDiv = target.closest('.tab') as HTMLElement
+        const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement
         if (tabDiv) {
             if (target.tagName === 'BUTTON') {
                 const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
@@ -33,19 +37,19 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEdit
     })
 }
 
-function bindTabContextmenuEvents(tabContainer: HTMLElement, tabEditorManager: TabEditorManager, contextMenu: HTMLElement) {
+function bindTabContextmenuEvents(
+    tabContainer: HTMLElement, 
+    tabEditorManager: TabEditorManager, 
+    tabContextMenu: HTMLElement, 
+) {
     tabContainer.addEventListener('contextmenu', (e) => {
-        const tab = (e.target as HTMLElement).closest('.tab') as HTMLElement
-        if (!tab) {
-            contextMenu.style.display = 'none'
-            tabEditorManager.removeContextTabId()
-        } else {
-            e.preventDefault()
-            contextMenu.style.display = 'flex'
-            contextMenu.style.left = `${e.clientX}px`
-            contextMenu.style.top = `${e.clientY}px`
-            tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
-        }
+        const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
+        if (!tab) return
+        
+        tabContextMenu.style.display = 'flex'
+        tabContextMenu.style.left = `${e.clientX}px`
+        tabContextMenu.style.top = `${e.clientY}px`
+        tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
     })
 }
 

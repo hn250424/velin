@@ -89,6 +89,7 @@ $tree_horizontal_margin: 5px;
     display: flex;
     align-items: center;
     gap: $tree_horizontal_margin;
+    border: 1px solid transparent;
 }
 
 .tree_node.focused {

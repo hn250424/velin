@@ -70,7 +70,7 @@ $menu_container_horizontal_margin: 10px;
     user-select: none;
 }
 
-.menu_item.active > .dropdown {
+.menu_item.selected > .dropdown {
     display: block;
 }
 

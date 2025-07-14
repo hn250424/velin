@@ -1,21 +1,22 @@
-import { 
+import {
     DATASET_ATTR_TREE_PATH,
     EXPANDED_TEXT,
     NOT_EXPANDED_TEXT,
-    CLASS_FOCUSED, 
+    CLASS_FOCUSED,
     CLASS_SELECTED,
     CLASS_EXPANDED,
     CLASS_TREE_NODE,
     CLASS_TREE_NODE_ICON,
     CLASS_TREE_NODE_OPEN,
     CLASS_TREE_NODE_WRAPPER,
-    CLASS_TREE_NODE_CHILDREN
+    CLASS_TREE_NODE_CHILDREN,
+    SELECTOR_TREE_NODE
 } from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 
-export default class TreeLayoutMaanger {
-    private static instance: TreeLayoutMaanger | null = null
+export default class TreeLayoutManager {
+    private static instance: TreeLayoutManager | null = null
 
     private _sideOpenStatus = false
 
@@ -39,9 +40,9 @@ export default class TreeLayoutMaanger {
         this._tree_top_name = document.getElementById('tree_top_name')
     }
 
-    static getInstance(): TreeLayoutMaanger {
+    static getInstance(): TreeLayoutManager {
         if (this.instance === null) {
-            this.instance = new TreeLayoutMaanger()
+            this.instance = new TreeLayoutManager()
         }
 
         return this.instance
@@ -244,12 +245,30 @@ export default class TreeLayoutMaanger {
         this.pathToFlattenArrayIndexMap.set(path, index)
     }
 
+    getTreeNodeByPath(path: string) {
+        const wrapper = this.pathToTreeWrapperMap.get(path)
+        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+    }
+
     getTreeWrapperByPath(path: string) {
         return this.pathToTreeWrapperMap.get(path)
     }
 
     setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
         this.pathToTreeWrapperMap.set(path, wrapper)
+    }
+
+    getTreeNodeByIndex(index: number) {
+        const wrapper = this.pathToTreeWrapperMap.get( this.getTreeViewModelByIndex(index).path )
+        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+    }
+
+    getTreeWrapperByIndex(index: number) {
+        return this.pathToTreeWrapperMap.get( this.getTreeViewModelByIndex(index).path )
+    }
+
+    setTreeWrapperByIndex(index: number, wrapper: HTMLElement) {
+        this.pathToTreeWrapperMap.set(this.getTreeViewModelByIndex(index).path, wrapper)
     }
 
     getIndexByPath(path: string) {
@@ -260,8 +279,16 @@ export default class TreeLayoutMaanger {
         return this.flattenTreeArray[index]
     }
 
-    getLastSelectedIndex(): number {
+    getTreeViewModelByPath(path: string) {
+        return this.flattenTreeArray[ this.pathToFlattenArrayIndexMap.get(path) ]
+    }
+
+    get lastSelectedIndex() {
         return this._lastSelectedIndex
+    }
+
+    set lastSelectedIndex(index: number) {
+        this._lastSelectedIndex = index
     }
 
     setLastSelectedIndexByPath(path: string) {
@@ -282,5 +309,9 @@ export default class TreeLayoutMaanger {
 
     clearMultiSelectedIndex() {
         this._multiSelectedIndex.clear()
+    }
+
+    getFlattenTreeArrayLength(): number {
+        return this.flattenTreeArray.length
     }
 }

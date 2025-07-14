@@ -5,6 +5,12 @@ export const CLASS_FOCUSED = 'focused'
 export const CLASS_SELECTED = 'selected'
 export const CLASS_EXPANDED = 'expanded'
 
+export const CLASS_TAB = 'tab'
+export const SELECTOR_TAB = `.${CLASS_TAB}`
+
+export const CLASS_EDITOR_BOX = 'editorBox'
+export const SELECTOR_EDITOR_BOX = `.${CLASS_EDITOR_BOX}`
+
 export const CLASS_TREE_NODE = 'tree_node'
 export const SELECTOR_TREE_NODE = `.${CLASS_TREE_NODE}`
 

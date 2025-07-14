@@ -4,10 +4,10 @@ import ZoomManager from "../modules/features/ZoomManager"
 export default function registerViewHandlers() {
     const zoomManager = ZoomManager.getInstance()
 
-    shortcutRegistry.register('Ctrl++', () => zoomManager.zoomIn())
-    shortcutRegistry.register('Ctrl+-', () => zoomManager.zoomOut())
-    shortcutRegistry.register('Ctrl+0', () => zoomManager.resetZoom())
-    shortcutRegistry.register('F11', () => performFullscreen())
+    shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
+    shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
+    shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())
+    shortcutRegistry.register('F11', (e: KeyboardEvent) => performFullscreen())
 
     document.getElementById('view_menu_zoom_in').addEventListener('click', () => {
         zoomManager.zoomIn()

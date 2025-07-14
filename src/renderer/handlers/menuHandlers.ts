@@ -1,27 +1,24 @@
-export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
-    bindMenucontainerEvents(menuItems, tabContextMenu, treeContextMenu)
+import { CLASS_SELECTED } from "../constants/dom"
+
+export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>) {
+    bindMenucontainerEvents(menuItems)
 }
 
-function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>, tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
+function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>) {
     menuItems.forEach(item => {
         item.addEventListener('click', e => {
-            e.stopPropagation()
-
             menuItems.forEach(i => {
-                if (i !== item) i.classList.remove('active')
+                if (i !== item) i.classList.remove(CLASS_SELECTED)
             })
 
-            item.classList.toggle('active')
-
-            if (tabContextMenu.style.display === 'flex') tabContextMenu.style.display = 'none'
-            if (treeContextMenu.style.display === 'flex') treeContextMenu.style.display = 'none'
+            item.classList.toggle(CLASS_SELECTED)
         })
 
         item.addEventListener('mouseenter', () => {
-            const anyActive = Array.from(menuItems).some(i => i.classList.contains('active'))
+            const anyActive = Array.from(menuItems).some(i => i.classList.contains(CLASS_SELECTED))
             if (anyActive) {
-                menuItems.forEach(i => i.classList.remove('active'))
-                item.classList.add('active')
+                menuItems.forEach(i => i.classList.remove(CLASS_SELECTED))
+                item.classList.add(CLASS_SELECTED)
             }
         })
     })

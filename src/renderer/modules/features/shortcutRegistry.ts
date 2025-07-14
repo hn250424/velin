@@ -1,10 +1,10 @@
 import FocusManager from "../core/FocusManager"
 
-const shortcutMap = new Map<string, () => any>()
+const shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
 const focusManager = FocusManager.getInstance()
 
 const shortcutRegistry = {
-    register(key: string, handler: () => any) {
+    register(key: string, handler: (e: KeyboardEvent) => any) {
         shortcutMap.set(key, handler)
     },
 
@@ -15,7 +15,7 @@ const shortcutRegistry = {
         const handler = shortcutMap.get(key)
         if (handler) {
             e.preventDefault()
-            handler()
+            handler(e)
         }
     },
 

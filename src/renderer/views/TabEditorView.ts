@@ -1,7 +1,7 @@
 import { serializerCtx } from '@milkdown/core'
 import { Editor, editorViewCtx, parserCtx } from "@milkdown/kit/core"
 import "@milkdown/theme-nord/style.css"
-import { DATASET_ATTR_TAB_ID } from '../constants/dom'
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from '../constants/dom'
 
 export default class TabEditorView {
     private _editor: Editor
@@ -86,13 +86,13 @@ export default class TabEditorView {
     }
 
     setActive() {
-        this.editorBoxDiv.style.display = 'block'
-        this.tabDiv.style.background = 'red'
+        this.editorBoxDiv.classList.add(CLASS_SELECTED)
+        this.tabDiv.classList.add(CLASS_SELECTED)
     }
 
     setDeactive() {
-        this.editorBoxDiv.style.display = 'none'
-        this.tabDiv.style.background = 'grey'
+        this.editorBoxDiv.classList.remove(CLASS_SELECTED)
+        this.tabDiv.classList.remove(CLASS_SELECTED)
     }
 
     setTabSpanTextContent(text: string) {

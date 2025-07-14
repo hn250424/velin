@@ -17,7 +17,14 @@ import registerMenuHandlers from './handlers/menuHandlers'
 import FocusManager from './modules/core/FocusManager'
 import shortcutRegistry from './modules/features/shortcutRegistry'
 import TabEditorManager from './modules/features/TabEditorManager'
-import TreeLayoutMaanger from './modules/features/TreeLayoutManger'
+import TreeLayoutManager from './modules/features/TreeLayoutManager'
+
+import {
+    SELECTOR_TREE_NODE,
+    CLASS_TREE_NODE,
+    CLASS_FOCUSED,
+    CLASS_SELECTED
+} from './constants/dom'
 
 let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -41,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const focusManager = FocusManager.getInstance()
     const tabEditorManager = TabEditorManager.getInstance()
-    const treeLayoutManager = TreeLayoutMaanger.getInstance()
+    const treeLayoutManager = TreeLayoutManager.getInstance()
 
     registerWindowHandlers()
     registerFileHandlers()
@@ -52,31 +59,48 @@ window.addEventListener('DOMContentLoaded', () => {
     registerSideHandlers()
     registerTabHandlers(tabContainer, tabEditorManager, tabContextMenu)
     registerTreeHandlers(focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
-    registerMenuHandlers(menuItems, tabContextMenu, treeContextMenu)
+    registerMenuHandlers(menuItems)
 
-    bindDocumentClickEvents(focusManager)
-    bindDocumentContextMenuEvents(focusManager)
-
-    document.addEventListener('keydown', (e) => {
-        shortcutRegistry.handleKeyEvent(e)
-    })
+    bindDocumentClickEvent(tabContextMenu, treeContextMenu)
+    bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
+    document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
 
     window[electronAPI.channel].loadedRenderer()
 })
 
-function bindDocumentContextMenuEvents(focusManager: FocusManager) {
-    document.addEventListener('contextmenu', (e) => {
-        menuItems.forEach(i => i.classList.remove('active'))
-        trackFocus(e.target as HTMLElement, focusManager)
+function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
+    document.addEventListener('click', () => {
+        tabContextMenu.style.display = 'none'
+        treeContextMenu.style.display = 'none'
     })
 }
 
-function bindDocumentClickEvents(focusManager: FocusManager) {
-    document.addEventListener('click', async (e) => {
-        menuItems.forEach(i => i.classList.remove('active'))
-        tabContextMenu.style.display = 'none'
-        treeContextMenu.style.display = 'none'
+function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
+    document.addEventListener('mousedown', (e) => {
+        const target = e.target as HTMLElement
+        const isInTree = !!target.closest('#tree_context_menu')
+        const isInTab = !!target.closest('#tab_context_menu')
+        const isInMenuItem = !!target.closest('.menu_item')
+
+        if (!isInMenuItem) menuItems.forEach(i => i.classList.remove(CLASS_SELECTED))
+        if (!isInTab) tabContextMenu.classList.remove(CLASS_SELECTED)
+        if (!isInTree) treeContextMenu.classList.remove(CLASS_SELECTED)
         trackFocus(e.target as HTMLElement, focusManager)
+
+        if (!isInTab) {
+            tabEditorManager.removeContextTabId()
+        }
+
+        if (!isInTree) {
+            const idx = treeLayoutManager.lastSelectedIndex
+            if (idx < 0) return
+
+            const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
+            const treeWrapper = treeLayoutManager.getTreeWrapperByPath(viewModel.path)
+            const treeNode = treeWrapper.querySelector(SELECTOR_TREE_NODE)
+            treeNode.classList.remove(CLASS_FOCUSED)
+            treeLayoutManager.removeLastSelectedIndex()
+        }
     })
 }
 

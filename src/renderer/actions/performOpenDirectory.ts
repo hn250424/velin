@@ -1,4 +1,4 @@
-import TreeLayoutMaanger from "../modules/features/TreeLayoutManger"
+import TreeLayoutManager from "../modules/features/TreeLayoutManager"
 import Response from "@shared/types/Response"
 import { electronAPI } from "@shared/constants/electronAPI"
 import { CLASS_EXPANDED, DATASET_ATTR_TREE_PATH } from "../constants/dom"
@@ -24,7 +24,7 @@ import TreeViewModel from "../viewmodels/TreeViewModel"
  * @param treeDiv The DOM element of the clicked directory node; if omitted, a new root directory is opened
  * @returns Promise<void>
  */
-export default async function performOpenDirectory(treeLayoutManager: TreeLayoutMaanger, treeDiv?: HTMLElement) {
+export default async function performOpenDirectory(treeLayoutManager: TreeLayoutManager, treeDiv?: HTMLElement) {
     // New open when shortcut or file menu.
     if (!treeDiv) {
         const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
@@ -39,48 +39,47 @@ export default async function performOpenDirectory(treeLayoutManager: TreeLayout
 
     // When click directory in tree area.
     const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-    const idx = treeLayoutManager.getFlattenTreeIndexByPath(dirPath)
-    const treeNode = treeLayoutManager.getTreeViewModelByIndex(idx)
+    const viewModel = treeLayoutManager.getTreeViewModelByPath(dirPath)
     const maybeChildren = treeDiv.nextElementSibling
     if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
 
     const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLElement
     const treeDivChildren = maybeChildren as HTMLElement
 
-    function updateUI(treeNode: TreeViewModel, expanded: boolean) {
-        treeNode.expanded = expanded
+    function updateUI(viewModel: TreeViewModel, expanded: boolean) {
+        viewModel.expanded = expanded
         openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
         if (expanded) treeDivChildren.classList.add(CLASS_EXPANDED)
         else treeDivChildren.classList.remove(CLASS_EXPANDED)
     }
 
-    function syncFlattenTreeArray(treeNode: TreeViewModel, expanded: boolean) {
-        if (expanded) treeLayoutManager.expandNode(treeNode)
-        else treeLayoutManager.collapseNode(treeNode)
+    function syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
+        if (expanded) treeLayoutManager.expandNode(viewModel)
+        else treeLayoutManager.collapseNode(viewModel)
     }
 
-    if (treeNode.expanded) {
-        updateUI(treeNode, false)
-        syncFlattenTreeArray(treeNode, false)
+    if (viewModel.expanded) {
+        updateUI(viewModel, false)
+        syncFlattenTreeArray(viewModel, false)
         return
     }
 
-    if (treeNode.children && treeNode.children.length > 0) {
+    if (viewModel.children && viewModel.children.length > 0) {
         if (treeDivChildren.children.length === 0) {
-            treeLayoutManager.renderTreeData(treeNode, treeDivChildren)
+            treeLayoutManager.renderTreeData(viewModel, treeDivChildren)
         }
-        updateUI(treeNode, true)
-        syncFlattenTreeArray(treeNode, true)
+        updateUI(viewModel, true)
+        syncFlattenTreeArray(viewModel, true)
         return
     }
 
-    const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(treeNode)
+    const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(viewModel)
     if (!response.data) return
 
     const responseTreeData = treeLayoutManager.toTreeViewModel(response.data)
 
-    treeNode.children = responseTreeData.children
+    viewModel.children = responseTreeData.children
     treeLayoutManager.renderTreeData(responseTreeData, treeDivChildren)
-    updateUI(treeNode, true)
-    syncFlattenTreeArray(treeNode, true)
+    updateUI(viewModel, true)
+    syncFlattenTreeArray(viewModel, true)
 }
