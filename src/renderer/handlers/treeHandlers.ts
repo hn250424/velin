@@ -1,6 +1,4 @@
 import "@milkdown/theme-nord/style.css"
-
-import performOpenDirectory from "../actions/performOpenDirectory"
 import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
 import {
     DATASET_ATTR_TREE_PATH,
@@ -11,10 +9,10 @@ import {
     SELECTOR_TREE_NODE_CHILDREN
 } from "../constants/dom"
 import shortcutRegistry from "../modules/input/shortcutRegistry"
-import performOpenFile from "../actions/pertormOpenFile"
 import TabEditorManager from "../modules/manager/TabEditorManager"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
+import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
@@ -24,17 +22,13 @@ export default function registerTreeHandlers(
     tabEditorManager: TabEditorManager,
     treeContextMenu: HTMLElement,
 ) {
-    bindTreeClickEvents(treeContentContainer, treeLayoutManager, tabEditorManager)
+    bindTreeClickEvents(commandDispatcher, treeContentContainer, treeLayoutManager, tabEditorManager)
     bindTreeContextmenuEvents(treeContentContainer, treeContextMenu, treeLayoutManager)
-    bindTreeContextmenuCommands(treeLayoutManager)
-
-    shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
+    bindCommandsWithContextmenu(treeLayoutManager)
+    bindCommandsWithShortcut(shortcutRegistry, focusManager, treeLayoutManager)
 }
 
-function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutManager, tabEditorManager: TabEditorManager) {
+function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutManager, tabEditorManager: TabEditorManager) {
     treeContentContainer.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement
         const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
@@ -80,23 +74,23 @@ function bindTreeClickEvents(treeContentContainer: HTMLElement, treeLayoutManage
             treeLayoutManager.addMultiSelectedIndex(treeLayoutManager.getIndexByPath(path))
             const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
             if (viewModel.directory) {
-                await performOpenDirectory(treeLayoutManager, treeNode)
+                await commandDispatcher.performOpenDirectory('element', treeNode)
             } else {
-                await performOpenFile(tabEditorManager, path)
+                await commandDispatcher.performOpenFile('element', path)
             }
         }
     })
 }
 
 function bindTreeContextmenuEvents(
-    treeContentContainer: HTMLElement, 
+    treeContentContainer: HTMLElement,
     treeContextMenu: HTMLElement,
     treeLayoutManager: TreeLayoutManager
 ) {
     treeContentContainer.addEventListener('contextmenu', (e) => {
         const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
         if (!treeNode) return
-        
+
         treeContextMenu.classList.add(CLASS_SELECTED)
         treeContextMenu.style.left = `${e.clientX}px`
         treeContextMenu.style.top = `${e.clientY}px`
@@ -107,7 +101,7 @@ function bindTreeContextmenuEvents(
     })
 }
 
-function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutManager) {
+function bindCommandsWithContextmenu(treeLayoutManager: TreeLayoutManager) {
     document.getElementById('tree_context_cut').addEventListener('click', async () => {
         await performTreeNodeCut()
     })
@@ -123,6 +117,13 @@ function bindTreeContextmenuCommands(treeLayoutManager: TreeLayoutManager) {
     document.getElementById('tree_context_delete').addEventListener('click', async () => {
         await performTreeNodeDelete()
     })
+}
+
+function bindCommandsWithShortcut(shortcutRegistry: IShortcutRegistry, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
+    shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
 }
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
@@ -142,7 +143,7 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutMan
     if (e.shiftKey) {
         newTreeNode.classList.add(CLASS_SELECTED)
         treeLayoutManager.addMultiSelectedIndex(lastIdx)
-    } 
+    }
 }
 
 function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
@@ -163,8 +164,19 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutM
     if (e.shiftKey) {
         newTreeNode.classList.add(CLASS_SELECTED)
         treeLayoutManager.addMultiSelectedIndex(lastIdx)
-    } 
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 async function performTreeNodeCut() {
     // const response: Response<void> = await window[electronAPI.channel].closeTab(data)

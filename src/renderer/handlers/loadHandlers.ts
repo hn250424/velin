@@ -1,11 +1,10 @@
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { electronAPI } from "@shared/constants/electronAPI"
-import TabEditorManager from "../modules/manager/TabEditorManager"
+import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import TreeDto from "@shared/dto/TreeDto"
+import TabEditorManager from "../modules/manager/TabEditorManager"
 import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
 
-export default function registerLoadHandlers(commandDispatcher: CommandDispatcher, tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
+export default function registerLoadHandlers(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
     window[electronAPI.channel].session(async (tabs: TabEditorsDto, tree: TreeDto) => {
         if (tabs) {
             await tabEditorManager.restoreTabs(tabs)

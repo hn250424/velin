@@ -1,15 +1,28 @@
-import { inject, injectable } from "inversify";
-import DI_KEYS from "../../constants/di_keys";
-import FocusManager from "../state/FocusManager";
-import TabEditorManager from "../manager/TabEditorManager";
-import TreeLayoutManager from "../manager/TreeLayoutManager";
-import performNewTab from "../../actions/performNewTab";
+import { inject, injectable } from "inversify"
+import DI_KEYS from "../../constants/di_keys"
+import { electronAPI } from "@shared/constants/electronAPI"
+import Response from "@shared/types/Response"
+
+import {
+    CLASS_EXPANDED,
+    CLASS_TREE_NODE_CHILDREN,
+    DATASET_ATTR_TAB_ID,
+    DATASET_ATTR_TREE_PATH,
+    EXPANDED_TEXT,
+    NOT_EXPANDED_TEXT,
+    SELECTOR_TREE_NODE_OPEN
+} from "../../constants/dom"
+
+import TreeDto from "@shared/dto/TreeDto"
+
+import FocusManager from "../state/FocusManager"
+import TabEditorManager from "../manager/TabEditorManager"
+import TreeLayoutManager from "../manager/TreeLayoutManager"
+
+import TreeViewModel from "../../viewmodels/TreeViewModel"
+import { TabEditorDto } from "@shared/dto/TabEditorDto"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
-type CommandName =
-    | 'newTab'
-    | 'openFile'
-    | 'openDirectory'
 
 /**
  * CommandDispatcher centrally handles commands
@@ -23,7 +36,6 @@ type CommandName =
  */
 @injectable()
 export default class CommandDispatcher {
-
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
         @inject(DI_KEYS.TabEditorManager) private readonly tabEditorManager: TabEditorManager,
@@ -32,16 +44,122 @@ export default class CommandDispatcher {
 
     }
 
-    async execute(command: CommandName, source: CommandSource, args?: any) {
-        switch (command) {
-            case 'newTab':
-                console.log(source)
-                await performNewTab(this.tabEditorManager)
-                break
+    async performNewTab(source: CommandSource) {
+        const response: Response<number> = await window[electronAPI.channel].newTab()
+        if (response.result) await this.tabEditorManager.addTab(response.data)
+    }
 
+    async performOpenFile(source: CommandSource, filePath?: string) {
+        if (filePath) {
+            const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(filePath)
 
-            default:
-                console.warn(`Unknown command: ${command}`)
+            if (tabEditorView) {
+                this.tabEditorManager.activateTabEditorById(tabEditorView.getId())
+                return
+            }
         }
+
+        const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile(filePath)
+        if (response.result && response.data) {
+            const data = response.data
+            await this.tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
+        }
+    }
+
+    /**
+     * Opens or expands a directory in the file tree.
+     * 
+     * - If `treeDiv` is not provided, it is assumed that the user is opening a new root directory
+     *   via menu or shortcut, so the tree is initialized by loading that directory.
+     * 
+     * - If `treeDiv` is provided, it represents a clicked directory node,
+     *   and this function dynamically loads and expands its child nodes.
+     * 
+     * @param treeLayoutManager
+     * @param treeDiv The DOM element of the clicked directory node if omitted, a new root directory is opened
+     * @returns Promise<void>
+     */
+    async performOpenDirectory(source: CommandSource, treeDiv?: HTMLElement) {
+        // New open when shortcut or file menu.
+        if (!treeDiv) {
+            const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
+            if (!response.data) return
+
+            const responseViewModel = this.treeLayoutManager.toTreeViewModel(response.data)
+
+            this.treeLayoutManager.renderTreeData(responseViewModel)
+            this.treeLayoutManager.restoreFlattenArrayAndMaps(responseViewModel)
+            return
+        }
+
+        // When click directory in tree area.
+        const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
+        const viewModel = this.treeLayoutManager.getTreeViewModelByPath(dirPath)
+        const maybeChildren = treeDiv.nextElementSibling
+        if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
+
+        const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLElement
+        const treeDivChildren = maybeChildren as HTMLElement
+
+        function updateUI(viewModel: TreeViewModel, expanded: boolean) {
+            viewModel.expanded = expanded
+            openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
+            if (expanded) treeDivChildren.classList.add(CLASS_EXPANDED)
+            else treeDivChildren.classList.remove(CLASS_EXPANDED)
+        }
+
+        function syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
+            if (expanded) this.treeLayoutManager.expandNode(viewModel)
+            else this.treeLayoutManager.collapseNode(viewModel)
+        }
+
+        if (viewModel.expanded) {
+            updateUI(viewModel, false)
+            syncFlattenTreeArray(viewModel, false)
+            return
+        }
+
+        if (viewModel.children && viewModel.children.length > 0) {
+            if (treeDivChildren.children.length === 0) {
+                this.treeLayoutManager.renderTreeData(viewModel, treeDivChildren)
+            }
+            updateUI(viewModel, true)
+            syncFlattenTreeArray(viewModel, true)
+            return
+        }
+
+        const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(viewModel)
+        if (!response.data) return
+
+        const responseTreeData = this.treeLayoutManager.toTreeViewModel(response.data)
+
+        viewModel.children = responseTreeData.children
+        this.treeLayoutManager.renderTreeData(responseTreeData, treeDivChildren)
+        updateUI(viewModel, true)
+        syncFlattenTreeArray(viewModel, true)
+    }
+
+    async performSave(source: CommandSource) {
+        const data = this.tabEditorManager.getActiveTabEditorData()
+        if (!data.isModified) return
+        const response: Response<TabEditorDto> = await window[electronAPI.channel].save(data)
+        if (response.result && !response.data.isModified) this.tabEditorManager.applySaveResult(response.data)
+    }
+
+    async performSaveAs(source: CommandSource) {
+        const data: TabEditorDto = this.tabEditorManager.getActiveTabEditorData()
+        const response: Response<TabEditorDto> = await window[electronAPI.channel].saveAs(data)
+        if (response.result && response.data) {
+            const wasApplied = this.tabEditorManager.applySaveResult(response.data)
+            if (!wasApplied) await this.tabEditorManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
+        }
+    }
+
+    async performCloseTab(source: CommandSource, id: number) {
+        const data = this.tabEditorManager.getTabEditorDataById(id)
+        if (!data) return
+
+        const response: Response<void> = await window[electronAPI.channel].closeTab(data)
+        if (response.result) this.tabEditorManager.removeTab(data.id)
     }
 }

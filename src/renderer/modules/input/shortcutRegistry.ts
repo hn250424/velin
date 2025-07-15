@@ -1,9 +1,7 @@
-// import FocusManager from "../state/FocusManager"
+import IShortcutRegistry from "../contracts/IShortcutRegistry"
 
 const shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
-// const focusManager = FocusManager.getInstance()
-
-const shortcutRegistry = {
+const shortcutRegistry: IShortcutRegistry = {
     register(key: string, handler: (e: KeyboardEvent) => any) {
         shortcutMap.set(key, handler)
     },

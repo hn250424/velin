@@ -37,35 +37,30 @@ let treeContextMenu: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
     title = document.getElementById('title')
-
     tabContainer = document.getElementById('tab_container')
     tabContextMenu = document.getElementById('tab_context_menu')
     treeContextMenu = document.getElementById('tree_context_menu')
-
     menuContainer = document.getElementById('menu_container')
     menuItems = document.querySelectorAll('#menu_container .menu_item')
-
     treeContentContainer = document.getElementById('tree_content')
 
     const windowLayoutManager = WindowLayoutManager.getInstance()
     const zoomManager = ZoomManager.getInstance()
-
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
     const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
     const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
-
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
-    registerWindowHandlers(commandDispatcher, windowLayoutManager)
-    registerFileHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
-    registerLoadHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
-    registerExitHandlers(commandDispatcher, tabEditorManager, treeLayoutManager)
+    registerWindowHandlers(windowLayoutManager)
+    registerFileHandlers(commandDispatcher, tabEditorManager)
+    registerLoadHandlers(tabEditorManager, treeLayoutManager)
+    registerExitHandlers(tabEditorManager, treeLayoutManager)
     registerEditHandlers(commandDispatcher, tabEditorManager)
-    registerViewHandlers(commandDispatcher, zoomManager)
-    registerSideHandlers(commandDispatcher, treeLayoutManager)
+    registerViewHandlers(zoomManager)
+    registerSideHandlers(treeLayoutManager)
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu)
     registerTreeHandlers(commandDispatcher, focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
-    registerMenuHandlers(commandDispatcher, menuItems)
+    registerMenuHandlers(menuItems)
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
     bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
@@ -77,8 +72,6 @@ function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HT
     document.addEventListener('click', () => {
         tabContextMenu.classList.remove(CLASS_SELECTED)
         treeContextMenu.classList.remove(CLASS_SELECTED)
-        // tabContextMenu.style.display = 'none'
-        // treeContextMenu.style.display = 'none'
     })
 }
 

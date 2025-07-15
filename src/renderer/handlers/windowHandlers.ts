@@ -1,8 +1,7 @@
 import { electronAPI } from "@shared/constants/electronAPI"
 import WindowLayoutManager from "../modules/layout/WindowLayoutManager"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
 
-export default function registerWindowHandlers(commandDispatcher: CommandDispatcher, windowLayoutManager: WindowLayoutManager) {
+export default function registerWindowHandlers(windowLayoutManager: WindowLayoutManager) {
     const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null
 
     window[electronAPI.channel].onMaximizeWindow(() => {

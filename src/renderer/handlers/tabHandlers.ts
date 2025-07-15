@@ -4,21 +4,21 @@ import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
+import CommandDispatcher from "../modules/command/CommandDispatcher"
+import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
 import shortcutRegistry from "../modules/input/shortcutRegistry"
 import TabEditorManager from "../modules/manager/TabEditorManager"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
 
 export default function registerTabHandlers(
     commandDispatcher: CommandDispatcher,
-    tabContainer: HTMLElement, 
-    tabEditorManager: TabEditorManager, 
+    tabContainer: HTMLElement,
+    tabEditorManager: TabEditorManager,
     tabContextMenu: HTMLElement,
 ) {
     bindTabClickEvents(tabContainer, tabEditorManager)
     bindTabContextmenuEvents(tabContainer, tabEditorManager, tabContextMenu)
-    bindTabContextmenuCommands(tabEditorManager)
-
-    shortcutRegistry.register('Ctrl+W', async (e: KeyboardEvent) => await performCloseTab(tabEditorManager, tabEditorManager.activeTabId))
+    bindCommandsWithContextmenu(commandDispatcher, tabEditorManager)
+    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorManager)
 }
 
 function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEditorManager) {
@@ -40,14 +40,14 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEdit
 }
 
 function bindTabContextmenuEvents(
-    tabContainer: HTMLElement, 
-    tabEditorManager: TabEditorManager, 
-    tabContextMenu: HTMLElement, 
+    tabContainer: HTMLElement,
+    tabEditorManager: TabEditorManager,
+    tabContextMenu: HTMLElement,
 ) {
     tabContainer.addEventListener('contextmenu', (e) => {
         const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
         if (!tab) return
-        
+
         tabContextMenu.classList.add(CLASS_SELECTED)
         tabContextMenu.style.left = `${e.clientX}px`
         tabContextMenu.style.top = `${e.clientY}px`
@@ -55,9 +55,9 @@ function bindTabContextmenuEvents(
     })
 }
 
-function bindTabContextmenuCommands(tabEditorManager: TabEditorManager) {
+function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorManager: TabEditorManager) {
     document.getElementById('tab_context_close').addEventListener('click', async () => {
-        await performCloseTab(tabEditorManager, tabEditorManager.contextTabId)
+        await commandDispatcher.performCloseTab('context_menu', tabEditorManager.contextTabId)
     })
 
     document.getElementById('tab_context_close_others').addEventListener('click', async () => {
@@ -81,10 +81,8 @@ function bindTabContextmenuCommands(tabEditorManager: TabEditorManager) {
     })
 }
 
-async function performCloseTab(tabEditorManager: TabEditorManager, id: number) {
-    const data = tabEditorManager.getTabEditorDataById(id)
-    if (!data) return
-    
-    const response: Response<void> = await window[electronAPI.channel].closeTab(data)
-    if (response.result) tabEditorManager.removeTab(data.id)
+function bindCommandsWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: IShortcutRegistry, tabEditorManager: TabEditorManager) {
+    shortcutRegistry.register('Ctrl+W', 
+        async (e: KeyboardEvent) => await commandDispatcher.performCloseTab('shortcut', tabEditorManager.activeTabId)
+    )
 }

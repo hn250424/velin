@@ -1,7 +1,6 @@
 import { CLASS_SELECTED } from "../constants/dom"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
 
-export default function registerMenuHandlers(commandDispatcher: CommandDispatcher, menuItems: NodeListOf<HTMLElement>) {
+export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>) {
     bindMenucontainerEvents(menuItems)
 }
 

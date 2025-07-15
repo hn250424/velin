@@ -1,13 +1,13 @@
-import CommandDispatcher from "../modules/command/CommandDispatcher"
+import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
 import shortcutRegistry from "../modules/input/shortcutRegistry"
 import ZoomManager from "../modules/layout/ZoomManager"
 
-export default function registerViewHandlers(commandDispatcher: CommandDispatcher, zoomManager: ZoomManager) {
-    shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
-    shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
-    shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())
-    shortcutRegistry.register('F11', (e: KeyboardEvent) => performFullscreen())
+export default function registerViewHandlers(zoomManager: ZoomManager) {
+    bindCommandsWithMenu(zoomManager)
+    bindCommandsWithShortcut(shortcutRegistry, zoomManager)
+}
 
+function bindCommandsWithMenu(zoomManager: ZoomManager) {
     document.getElementById('view_menu_zoom_in').addEventListener('click', () => {
         zoomManager.zoomIn()
     })
@@ -23,6 +23,13 @@ export default function registerViewHandlers(commandDispatcher: CommandDispatche
     document.getElementById('view_menu_fullscreen').addEventListener('click', () => {
         performFullscreen()
     })
+}
+
+function bindCommandsWithShortcut(shortcutRegistry: IShortcutRegistry, zoomManager: ZoomManager) {
+    shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
+    shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
+    shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())
+    shortcutRegistry.register('F11', (e: KeyboardEvent) => performFullscreen())
 }
 
 function performFullscreen() {
