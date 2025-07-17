@@ -1,8 +1,7 @@
-import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
-import shortcutRegistry from "../modules/input/shortcutRegistry"
+import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import ZoomManager from "../modules/layout/ZoomManager"
 
-export default function registerViewHandlers(zoomManager: ZoomManager) {
+export default function registerViewHandlers(shortcutRegistry: ShortcutRegistry, zoomManager: ZoomManager) {
     bindCommandsWithMenu(zoomManager)
     bindCommandsWithShortcut(shortcutRegistry, zoomManager)
 }
@@ -25,7 +24,7 @@ function bindCommandsWithMenu(zoomManager: ZoomManager) {
     })
 }
 
-function bindCommandsWithShortcut(shortcutRegistry: IShortcutRegistry, zoomManager: ZoomManager) {
+function bindCommandsWithShortcut(shortcutRegistry: ShortcutRegistry, zoomManager: ZoomManager) {
     shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
     shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
     shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())

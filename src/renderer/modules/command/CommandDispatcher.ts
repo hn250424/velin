@@ -162,4 +162,108 @@ export default class CommandDispatcher {
         const response: Response<void> = await window[electronAPI.channel].closeTab(data)
         if (response.result) this.tabEditorManager.removeTab(data.id)
     }
+
+    async performUndo(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        
+        if (focus === 'editor' && source === 'shortcut') return
+
+        if (focus === 'editor') {
+            this.tabEditorManager.undo()
+            return
+        } 
+        
+        if (focus === 'tree') {
+
+            return
+        }
+    }
+
+    async performRedo(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'editor' && source === 'shortcut') return
+
+        if (focus === 'editor') {
+            this.tabEditorManager.redo()
+            return
+        } 
+        
+        if (focus === 'tree') {
+
+            return
+        }
+    }
+
+    async performCut(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'editor' && source === 'shortcut') return
+
+        if (focus === 'editor') {
+            const sel = window.getSelection()
+            const selectedText = window.getSelection()?.toString()
+            if (!sel || !selectedText) return
+            await window[electronAPI.channel].cut(selectedText)
+            sel.deleteFromDocument()
+
+            return
+        } 
+        
+        if (focus === 'tree') {
+
+            return
+        }
+    }
+
+    async performCopy(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'editor' && source === 'shortcut') return
+
+        if (focus === 'editor') {
+            const sel = window.getSelection()
+            const selectedText = window.getSelection()?.toString()
+            if (!sel || !selectedText) return
+            await window[electronAPI.channel].copy(selectedText)
+
+            return
+        } 
+        
+        if (focus === 'tree') {
+
+            return
+        }
+    }
+
+    async performPaste(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'editor' && source === 'shortcut') return
+
+        if (focus === 'editor') {
+            const editable = document.querySelector('#editor_container [contenteditable="true"]') as HTMLElement
+            if (!editable) return
+            editable.focus()
+            const sel = window.getSelection()
+            if (!sel || !sel.rangeCount) return
+            sel.deleteFromDocument()
+            const text = await window[electronAPI.channel].paste()
+            const textNode = document.createTextNode(text)
+            const range = sel.getRangeAt(0)
+            range.insertNode(textNode)
+            range.setStartAfter(textNode)
+            // Defensive code to ensure cursor positioning
+            range.collapse(true)
+            sel.removeAllRanges()
+            sel.addRange(range)
+
+            return
+        }
+
+        if (focus === 'tree') {
+
+            return
+        }
+    }
 }

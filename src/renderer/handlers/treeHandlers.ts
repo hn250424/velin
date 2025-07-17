@@ -8,11 +8,10 @@ import {
     SELECTOR_TREE_NODE_WRAPPER,
     SELECTOR_TREE_NODE_CHILDREN
 } from "../constants/dom"
-import shortcutRegistry from "../modules/input/shortcutRegistry"
+import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorManager from "../modules/manager/TabEditorManager"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
-import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
@@ -21,6 +20,7 @@ export default function registerTreeHandlers(
     treeLayoutManager: TreeLayoutManager,
     tabEditorManager: TabEditorManager,
     treeContextMenu: HTMLElement,
+    shortcutRegistry: ShortcutRegistry
 ) {
     bindTreeClickEvents(commandDispatcher, treeContentContainer, treeLayoutManager, tabEditorManager)
     bindTreeContextmenuEvents(treeContentContainer, treeContextMenu, treeLayoutManager)
@@ -119,7 +119,7 @@ function bindCommandsWithContextmenu(treeLayoutManager: TreeLayoutManager) {
     })
 }
 
-function bindCommandsWithShortcut(shortcutRegistry: IShortcutRegistry, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
+function bindCommandsWithShortcut(shortcutRegistry: ShortcutRegistry, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
     shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
     shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
     shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))

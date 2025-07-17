@@ -1,21 +1,29 @@
-import IShortcutRegistry from "../contracts/IShortcutRegistry"
+import { inject, injectable } from "inversify"
+import DI_KEYS from "../../constants/di_keys"
+import FocusManager from "../state/FocusManager"
 
-const shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
-const shortcutRegistry: IShortcutRegistry = {
+@injectable()
+export default class ShortcutRegistry {
+    private shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
+
+    constructor(
+        @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
+    ) {
+
+    }
+
     register(key: string, handler: (e: KeyboardEvent) => any) {
-        shortcutMap.set(key, handler)
-    },
+        this.shortcutMap.set(key, handler)
+    }
 
     handleKeyEvent(e: KeyboardEvent) {
-        // if (focusManager.getFocus() === 'editor') return
         const key = this.getKeyString(e)
-        // console.log(key)
-        const handler = shortcutMap.get(key)
+        const handler = this.shortcutMap.get(key)
         if (handler) {
-            e.preventDefault()
+            if (this.focusManager.getFocus() !== 'editor') e.preventDefault()
             handler(e)
         }
-    },
+    }
 
     getKeyString(e: KeyboardEvent): string {
         const parts = []
@@ -33,5 +41,3 @@ const shortcutRegistry: IShortcutRegistry = {
         return parts.join('+')
     }
 }
-
-export default shortcutRegistry

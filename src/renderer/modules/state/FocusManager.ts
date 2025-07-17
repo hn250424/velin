@@ -1,10 +1,10 @@
 import { injectable } from "inversify"
 
-type Target = 'editor' | 'tab' | 'tree' | 'other'
+type Target = 'editor' | 'tree' | null
 
 @injectable()
 export default class FocusManager {
-    private focusedTarget: Target = 'other'
+    private focusedTarget: Target = null
 
     constructor() {}
 

@@ -12,7 +12,7 @@ import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
 import FocusManager from './modules/state/FocusManager'
-import shortcutRegistry from './modules/input/shortcutRegistry'
+import ShortcutRegistry from './modules/input/ShortcutRegistry'
 import TabEditorManager from './modules/manager/TabEditorManager'
 import TreeLayoutManager from './modules/manager/TreeLayoutManager'
 import diContainer from './diContainer'
@@ -50,16 +50,17 @@ window.addEventListener('DOMContentLoaded', () => {
     const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
     const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
+    const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
 
     registerWindowHandlers(windowLayoutManager)
-    registerFileHandlers(commandDispatcher, tabEditorManager)
+    registerFileHandlers(commandDispatcher, tabEditorManager, shortcutRegistry)
     registerLoadHandlers(tabEditorManager, treeLayoutManager)
     registerExitHandlers(tabEditorManager, treeLayoutManager)
-    registerEditHandlers(commandDispatcher, tabEditorManager)
-    registerViewHandlers(zoomManager)
+    registerEditHandlers(commandDispatcher, shortcutRegistry)
+    registerViewHandlers(shortcutRegistry, zoomManager)
     registerSideHandlers(treeLayoutManager)
-    registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu)
-    registerTreeHandlers(commandDispatcher, focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu)
+    registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
+    registerTreeHandlers(commandDispatcher, focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
@@ -85,7 +86,7 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
         if (!isInMenuItem) menuItems.forEach(i => i.classList.remove(CLASS_SELECTED))
         if (!isInTab) tabContextMenu.classList.remove(CLASS_SELECTED)
         if (!isInTree) treeContextMenu.classList.remove(CLASS_SELECTED)
-        trackFocus(e.target as HTMLElement, focusManager)
+        trackRelevantFocus(e.target as HTMLElement, focusManager)
 
         if (!isInTab) {
             tabEditorManager.removeContextTabId()
@@ -104,14 +105,10 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
     })
 }
 
-function trackFocus(target: HTMLElement, focusManager: FocusManager) {
+function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {
     if (target.closest('#editor_container')) {
         focusManager.setFocus('editor')
-    } else if (target.closest('#tab_container')) {
-        focusManager.setFocus('tab')
     } else if (target.closest('#tree')) {
         focusManager.setFocus('tree')
-    } else {
-        focusManager.setFocus('other')
     }
 }

@@ -35,6 +35,8 @@ declare global {
             
             exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => Promise<void>
 
+            cut: (text: string) => Promise<void>
+            copy: (text: string) => Promise<void>
             paste: () => Promise<string>
         }
     }

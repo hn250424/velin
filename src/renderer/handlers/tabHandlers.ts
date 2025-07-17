@@ -5,8 +5,7 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
-import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
-import shortcutRegistry from "../modules/input/shortcutRegistry"
+import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorManager from "../modules/manager/TabEditorManager"
 
 export default function registerTabHandlers(
@@ -14,6 +13,7 @@ export default function registerTabHandlers(
     tabContainer: HTMLElement,
     tabEditorManager: TabEditorManager,
     tabContextMenu: HTMLElement,
+    shortcutRegistry: ShortcutRegistry
 ) {
     bindTabClickEvents(tabContainer, tabEditorManager)
     bindTabContextmenuEvents(tabContainer, tabEditorManager, tabContextMenu)
@@ -81,7 +81,7 @@ function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEd
     })
 }
 
-function bindCommandsWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: IShortcutRegistry, tabEditorManager: TabEditorManager) {
+function bindCommandsWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry, tabEditorManager: TabEditorManager) {
     shortcutRegistry.register('Ctrl+W', 
         async (e: KeyboardEvent) => await commandDispatcher.performCloseTab('shortcut', tabEditorManager.activeTabId)
     )

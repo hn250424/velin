@@ -5,11 +5,13 @@ import FocusManager from './modules/state/FocusManager'
 import CommandDispatcher from './modules/command/CommandDispatcher'
 import TabEditorManager from './modules/manager/TabEditorManager'
 import TreeLayoutManager from './modules/manager/TreeLayoutManager'
+import ShortcutRegistry from './modules/input/ShortcutRegistry'
 
 const diContainer = new Container()
 
 diContainer.bind<FocusManager>(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope()
 
+diContainer.bind<ShortcutRegistry>(DI_KEYS.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope()
 diContainer.bind<TabEditorManager>(DI_KEYS.TabEditorManager).to(TabEditorManager).inSingletonScope()
 diContainer.bind<TreeLayoutManager>(DI_KEYS.TreeLayoutManager).to(TreeLayoutManager).inSingletonScope()
 

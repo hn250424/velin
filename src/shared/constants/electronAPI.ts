@@ -29,6 +29,8 @@ export const electronAPI = {
         
         exit: 'exit',
 
+        cut: 'cut',
+        copy: 'copy',
         paste: 'paste'
     }
 } as const

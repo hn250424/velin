@@ -4,13 +4,13 @@ import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
-import IShortcutRegistry from "../modules/contracts/IShortcutRegistry"
-import shortcutRegistry from "../modules/input/shortcutRegistry"
+import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorManager from "../modules/manager/TabEditorManager"
 
 export default function registerFileHandlers(
     commandDispatcher: CommandDispatcher, 
     tabEditorManager: TabEditorManager, 
+    shortcutRegistry: ShortcutRegistry
 ) {
     bindCommandWithmenu(commandDispatcher, tabEditorManager)
     bindCommandWithShortcut(commandDispatcher, shortcutRegistry)
@@ -44,7 +44,7 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorMana
     })
 }
 
-function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: IShortcutRegistry) {
+function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
     shortcutRegistry.register('Ctrl+T', async (e: KeyboardEvent) => await commandDispatcher.performNewTab('shortcut'))
     shortcutRegistry.register('Ctrl+O', async (e: KeyboardEvent) => await commandDispatcher.performOpenFile('shortcut'))
     shortcutRegistry.register('Ctrl+Shift+O', async (e: KeyboardEvent) => await commandDispatcher.performOpenDirectory('shortcut'))

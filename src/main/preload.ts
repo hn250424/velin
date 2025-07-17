@@ -33,5 +33,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => { ipcRenderer.invoke(electronAPI.events.exit, tabSessionData, treeSessionData) },
 
-    paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) }
+    cut: (text: string) => { return ipcRenderer.invoke(electronAPI.events.cut, text) },
+    copy: (text: string) => { return ipcRenderer.invoke(electronAPI.events.copy, text) },
+    paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) },
 })

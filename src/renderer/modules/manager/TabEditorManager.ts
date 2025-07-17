@@ -16,8 +16,6 @@ import {
 } from '../../constants/dom'
 
 export default class TabEditorManager {
-    // private static instance: TabEditorManager | null = null
-    
     private tabEditorViews: TabEditorView[] = []
     private idToTabViewModelMap: Map<number, TabViewModel> = new Map()
     private pathToTabEditorViewMap: Map<string, TabEditorView> = new Map()
@@ -332,5 +330,14 @@ export default class TabEditorManager {
 
     set contextTabId(id: number) {
         this._contextTabId = id
+    }
+
+    paste(text: string) {
+                    this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
+                const view = ctx.get(editorViewCtx)
+                const { state, dispatch } = view
+                view.focus()
+                dispatch(state.tr.insertText(text))
+            })
     }
 }
