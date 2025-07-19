@@ -1,14 +1,10 @@
 import IFileService from '@services/contracts/IFileService'
 import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
-import { BrowserWindow, ipcMain } from 'electron'
-import DI_KEYS from '../constants/di_keys'
-import diContainer from '../diContainer'
 import TreeDto from '@shared/dto/TreeDto'
+import { BrowserWindow, ipcMain } from 'electron'
 
-export default function registerFileHandlers(mainWindow: BrowserWindow) {
-    const fileService: IFileService = diContainer.get(DI_KEYS.FileService)
-
+export default function registerFileHandlers(mainWindow: BrowserWindow, fileService: IFileService) {
     ipcMain.handle(electronAPI.events.newTab, async () => {
         const id = await fileService.newTab()
         return {

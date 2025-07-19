@@ -8,6 +8,9 @@ export { }
 declare global {
     interface Window {
         [electronAPI.channel]: {
+            // Expose Renderer.
+            getBaseName: (fullPath: string) => string
+
             // Main -> Renderer.
             session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => void
             onMaximizeWindow: (callback: () => void) => void
@@ -38,6 +41,9 @@ declare global {
             cut: (text: string) => Promise<void>
             copy: (text: string) => Promise<void>
             paste: () => Promise<string>
+
+            renameTree: (prePath: string, newName: string) => Promise<Response<string | null>>
+            renameTab: (dto: TabEditorDto, newPath: string) => Promise<Response<TabEditorDto>>
         }
     }
 }

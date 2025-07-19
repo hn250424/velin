@@ -7,6 +7,7 @@ const DI_KEYS = {
 
     FileService: Symbol('FileService'),
     TabService: Symbol('TabService'),
+    TreeService: Symbol('TreeService'),
 }
 
 export default DI_KEYS

@@ -24,8 +24,8 @@ export default function registerTreeHandlers(
 ) {
     bindTreeClickEvents(commandDispatcher, treeContentContainer, treeLayoutManager, tabEditorManager)
     bindTreeContextmenuEvents(treeContentContainer, treeContextMenu, treeLayoutManager)
-    bindCommandsWithContextmenu(treeLayoutManager)
-    bindCommandsWithShortcut(shortcutRegistry, focusManager, treeLayoutManager)
+    bindCommandsWithContextmenu(commandDispatcher)
+    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
 }
 
 function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutManager, tabEditorManager: TabEditorManager) {
@@ -40,11 +40,12 @@ function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentCo
             treeNode.classList.remove(CLASS_FOCUSED)
         }
         treeNode.classList.add(CLASS_FOCUSED)
+        const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
 
         if (e.shiftKey && treeLayoutManager.isTreeSelected()) {
             const startIndex = treeLayoutManager.lastSelectedIndex
-            const endIndex = treeLayoutManager.getIndexByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
-            treeLayoutManager.setLastSelectedIndexByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
+            const endIndex = treeLayoutManager.getIndexByPath(path)
+            treeLayoutManager.setLastSelectedIndexByPath(path)  
             const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
             for (let i = start; i <= end; i++) {
@@ -55,7 +56,6 @@ function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentCo
 
         } else if (e.ctrlKey) {
             treeNode.classList.add(CLASS_SELECTED)
-            const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
             const index = treeLayoutManager.getIndexByPath(path)
             treeLayoutManager.setLastSelectedIndexByPath(path)
             treeLayoutManager.addMultiSelectedIndex(index)
@@ -69,7 +69,6 @@ function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentCo
 
             treeLayoutManager.clearMultiSelectedIndex()
             treeNode.classList.add(CLASS_SELECTED)
-            const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
             treeLayoutManager.setLastSelectedIndexByPath(path)
             treeLayoutManager.addMultiSelectedIndex(treeLayoutManager.getIndexByPath(path))
             const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
@@ -97,33 +96,44 @@ function bindTreeContextmenuEvents(
 
         const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
         treeLayoutManager.setLastSelectedIndexByPath(path)
+        treeLayoutManager.addMultiSelectedIndex(treeLayoutManager.getIndexByPath(path))
         treeNode.classList.add(CLASS_FOCUSED)
     })
 }
 
-function bindCommandsWithContextmenu(treeLayoutManager: TreeLayoutManager) {
+function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher) {
     document.getElementById('tree_context_cut').addEventListener('click', async () => {
-        await performTreeNodeCut()
+        await commandDispatcher.performTreeNodeCut('context_menu')
     })
 
     document.getElementById('tree_context_copy').addEventListener('click', async () => {
-        await performTreeNodeCopy()
+        await commandDispatcher.performTreeNodeCopy('context_menu')
     })
 
     document.getElementById('tree_context_rename').addEventListener('click', async () => {
-        await performTreeNodeRename()
+        await commandDispatcher.performTreeNodeRename('context_menu')
     })
 
     document.getElementById('tree_context_delete').addEventListener('click', async () => {
-        await performTreeNodeDelete()
+        await commandDispatcher.performTreeNodeDelete('context_menu')
     })
 }
 
-function bindCommandsWithShortcut(shortcutRegistry: ShortcutRegistry, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
+function bindCommandsWithShortcut(
+    commandDispatcher: CommandDispatcher,
+    shortcutRegistry: ShortcutRegistry, 
+    focusManager: FocusManager, 
+    treeLayoutManager: TreeLayoutManager
+) {
     shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
     shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
     shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
     shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
+
+    shortcutRegistry.register('Ctrl+X', async (e: KeyboardEvent) => await commandDispatcher.performTreeNodeCut('shortcut'))
+    shortcutRegistry.register('Ctrl+C', async (e: KeyboardEvent) => await commandDispatcher.performTreeNodeCopy('shortcut'))
+    shortcutRegistry.register('F2', async (e: KeyboardEvent) => await commandDispatcher.performTreeNodeRename('shortcut'))
+    shortcutRegistry.register('DELETE', async (e: KeyboardEvent) => await commandDispatcher.performTreeNodeDelete('shortcut'))
 }
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
@@ -165,31 +175,4 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutM
         newTreeNode.classList.add(CLASS_SELECTED)
         treeLayoutManager.addMultiSelectedIndex(lastIdx)
     }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-async function performTreeNodeCut() {
-    // const response: Response<void> = await window[electronAPI.channel].closeTab(data)
-}
-
-async function performTreeNodeCopy() {
-
-}
-
-async function performTreeNodeRename() {
-
-}
-
-async function performTreeNodeDelete() {
-
 }

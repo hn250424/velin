@@ -7,13 +7,15 @@ import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { redo, undo } from 'prosemirror-history'
 import TabViewModel from '../../viewmodels/TabViewModel'
 import TabEditorView from '../../views/TabEditorView'
-import { 
-    CLASS_TAB, 
-    DATASET_ATTR_TAB_ID, 
+import {
+    CLASS_TAB,
+    DATASET_ATTR_TAB_ID,
     MODIFIED_TEXT,
     CLASS_EDITOR_BOX,
     NOT_MODIFIED_TEXT
 } from '../../constants/dom'
+import { electronAPI } from "@shared/constants/electronAPI"
+import Response from "@shared/types/Response"
 
 export default class TabEditorManager {
     private tabEditorViews: TabEditorView[] = []
@@ -31,18 +33,18 @@ export default class TabEditorManager {
         this.tabContainer = document.getElementById('tab_container')
         this.editorContainer = document.getElementById('editor_container')
     }
-    // private constructor() {
-    //     this.tabContainer = document.getElementById('tab_container')
-    //     this.editorContainer = document.getElementById('editor_container')
+
+    // toTabEditorDto(viewModel: TabViewModel): TabEditorDto {
     // }
 
-    // static getInstance(): TabEditorManager {
-    //     if (this.instance === null) {
-    //         this.instance = new TabEditorManager()
-    //     }
-
-    //     return this.instance
-    // }
+    toTabViewModel(dto: TabEditorDto): TabViewModel {
+        return {
+            id: dto.id,
+            isModified: dto.isModified,
+            filePath: dto.filePath,
+            fileName: dto.fileName,
+        }
+    }
 
     async restoreTabs(dto: TabEditorsDto) {
         this._activeTabId = dto.activatedId
@@ -184,7 +186,7 @@ export default class TabEditorManager {
         const tabEditorView = this.tabEditorViews[index]
         const id = tabEditorView.getId()
         const viewModel = this.getTabViewModelById(id)
-        
+
         this.pathToTabEditorViewMap.delete(viewModel.filePath)
         this.idToTabViewModelMap.delete(id)
 
@@ -333,11 +335,31 @@ export default class TabEditorManager {
     }
 
     paste(text: string) {
-                    this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
-                const view = ctx.get(editorViewCtx)
-                const { state, dispatch } = view
-                view.focus()
-                dispatch(state.tr.insertText(text))
-            })
+        this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
+            const view = ctx.get(editorViewCtx)
+            const { state, dispatch } = view
+            view.focus()
+            dispatch(state.tr.insertText(text))
+        })
+    }
+
+    async rename(prePath: string, newPath: string) {
+        const view = this.getTabEditorViewByPath(prePath)
+        if (!view) return
+
+        const preData: TabEditorDto = this.getTabEditorData(view)
+        const response: Response<TabEditorDto> = await window[electronAPI.channel].renameTab(preData, newPath)
+
+        if (response.result) {
+            const newData: TabEditorDto = response.data
+            const viewModel = this.toTabViewModel(newData)
+
+            this.idToTabViewModelMap.set(viewModel.id, viewModel)
+            this.pathToTabEditorViewMap.delete(preData.filePath)
+            this.pathToTabEditorViewMap.set(viewModel.filePath, view)
+
+            view.tabSpan.title = viewModel.filePath
+            view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : 'Untitled'
+        }
     }
 }

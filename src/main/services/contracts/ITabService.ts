@@ -6,4 +6,5 @@ export default interface ITabService {
     closeTabsExcept(exceptData: TabEditorDto, allData: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]>
     closeTabsToRight(referenceData: TabEditorDto, allData: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]>
     closeAllTabs(data: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]>
+    rename(dto: TabEditorDto, newPath: string): Promise<TabEditorDto>
 }

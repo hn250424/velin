@@ -30,4 +30,19 @@ export default class FakeFileManager implements IFileManager {
         this.savedFiles[path] = data
         this.pathExists[path] = true
     }
+
+    async rename(oldPath: string, newPath: string): Promise<void> {
+        if (!(oldPath in this.savedFiles)) {
+            throw new Error(`Cannot rename: Source file not found: ${oldPath}`)
+        }
+        if (newPath in this.savedFiles) {
+            throw new Error(`Cannot rename: Destination file already exists: ${newPath}`)
+        }
+
+        this.savedFiles[newPath] = this.savedFiles[oldPath]
+        this.pathExists[newPath] = true
+
+        delete this.savedFiles[oldPath]
+        delete this.pathExists[oldPath]
+    }
 }

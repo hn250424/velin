@@ -5,22 +5,27 @@ import path from 'path'
 import TreeSessionModel from 'src/main/models/TreeSessionModel'
 
 export default class TreeReposotory implements ITreeReposotory {
+    private session: TreeSessionModel | null = null
 
     constructor(private treeSessionPath: string, private fileManager: IFileManager) {
  
     }
 
     async readTreeSession(): Promise<TreeSessionModel> {
+        if (this.session) return this.session
+
         try {
             const json = await this.fileManager.read(this.treeSessionPath)
-            return JSON.parse(json)
+            this.session = JSON.parse(json)
+            return this.session
         } catch (e) {
             return null
         }
     }
 
-    async writeTreeSession(treeSessionArr: TreeSessionModel) {
-        this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSessionArr, null, 4))
+    async writeTreeSession(treeSessionModel: TreeSessionModel) {
+        this.session = treeSessionModel
+        this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSessionModel, null, 4))
     }
 
     async updateSessionWithFsData(

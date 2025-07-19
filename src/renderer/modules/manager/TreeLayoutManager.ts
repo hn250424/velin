@@ -6,6 +6,7 @@ import {
     CLASS_SELECTED,
     CLASS_EXPANDED,
     CLASS_TREE_NODE,
+    CLASS_TREE_NODE_TEXT,
     CLASS_TREE_NODE_ICON,
     CLASS_TREE_NODE_OPEN,
     CLASS_TREE_NODE_WRAPPER,
@@ -14,6 +15,7 @@ import {
 } from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
+import { electronAPI } from "@shared/constants/electronAPI"
 
 export default class TreeLayoutManager {
     private _sideOpenStatus = false
@@ -23,7 +25,7 @@ export default class TreeLayoutManager {
     private _tree_top_name: HTMLElement
     private _tree_top_add_file: HTMLElement
     private _tree_top_add_directory: HTMLElement
-    private _tree_content: HTMLElement
+    private _tree_node_container: HTMLElement
     private _tree_resizer: HTMLElement
 
     private pathToFlattenArrayIndexMap: Map<string, number> = new Map()
@@ -34,7 +36,7 @@ export default class TreeLayoutManager {
     private _multiSelectedIndex = new Set<number>
 
     constructor() {
-        this._tree_content = document.getElementById('tree_content')
+        this._tree_node_container = document.getElementById('tree_node_container')
         this._tree_top_name = document.getElementById('tree_top_name')
     }
 
@@ -82,7 +84,7 @@ export default class TreeLayoutManager {
     renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
         if (!container) {
             this._tree_top_name.textContent = viewModel.name
-            container = this._tree_content
+            container = this._tree_node_container
         }
 
         this.clean(container)
@@ -112,7 +114,7 @@ export default class TreeLayoutManager {
             : new URL('../../assets/icons/file.png', import.meta.url).toString()
 
         const text = document.createElement('span')
-        text.classList.add('tree_node_text', 'ellipsis')
+        text.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
         text.textContent = viewModel.name
 
         const childrenContainer = document.createElement('div')
@@ -249,12 +251,12 @@ export default class TreeLayoutManager {
     }
 
     getTreeNodeByIndex(index: number) {
-        const wrapper = this.pathToTreeWrapperMap.get( this.getTreeViewModelByIndex(index).path )
+        const wrapper = this.pathToTreeWrapperMap.get(this.getTreeViewModelByIndex(index).path)
         return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
     }
 
     getTreeWrapperByIndex(index: number) {
-        return this.pathToTreeWrapperMap.get( this.getTreeViewModelByIndex(index).path )
+        return this.pathToTreeWrapperMap.get(this.getTreeViewModelByIndex(index).path)
     }
 
     setTreeWrapperByIndex(index: number, wrapper: HTMLElement) {
@@ -270,7 +272,7 @@ export default class TreeLayoutManager {
     }
 
     getTreeViewModelByPath(path: string) {
-        return this.flattenTreeArray[ this.pathToFlattenArrayIndexMap.get(path) ]
+        return this.flattenTreeArray[this.pathToFlattenArrayIndexMap.get(path)]
     }
 
     get lastSelectedIndex() {
@@ -303,5 +305,31 @@ export default class TreeLayoutManager {
 
     getFlattenTreeArrayLength(): number {
         return this.flattenTreeArray.length
+    }
+
+    applyRenameResultByPath(preBase: string, newBase: string) {
+        const start = this.getFlattenTreeIndexByPath(preBase)
+
+        for (let i = start; i < this.flattenTreeArray.length; i++) {
+            const node = this.flattenTreeArray[i]
+            if (node.path.startsWith(preBase)) {
+                const treeWrapper = this.pathToTreeWrapperMap.get(node.path)
+                const idx = this.pathToFlattenArrayIndexMap.get(node.path)
+                const treeNode = this.getTreeNodeByIndex(idx)
+                this.pathToFlattenArrayIndexMap.delete(node.path)
+                this.pathToTreeWrapperMap.delete(node.path)
+            
+                const newPath = newBase + node.path.slice(preBase.length)
+                node.path = newPath
+                node.name = window[electronAPI.channel].getBaseName(node.path)
+                treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
+                treeNode.title = newPath
+
+                this.pathToFlattenArrayIndexMap.set(newPath, idx)
+                this.pathToTreeWrapperMap.set(newPath, treeWrapper)
+            } else {
+                break
+            }
+        }
     }
 }

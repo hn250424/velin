@@ -31,6 +31,9 @@ export const electronAPI = {
 
         cut: 'cut',
         copy: 'copy',
-        paste: 'paste'
+        paste: 'paste',
+
+        renameTree: 'renameTree',
+        renameTab: 'renameTab',
     }
 } as const

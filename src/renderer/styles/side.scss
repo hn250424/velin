@@ -67,8 +67,6 @@ $tree_horizontal_margin: 5px;
     background-color: white;
 }
 
-#tree_content {}
-
 #tree_resizer {
     width: 3px;
     height: 100%;
@@ -111,7 +109,12 @@ $tree_horizontal_margin: 5px;
     min-height: gv.$icon_size;
 
     text-align: center;
-    flex-shrink: 0; /* prevent icon from shrinking on resize */
+    flex-shrink: 0;
+    /* prevent icon from shrinking on resize */
+}
+
+.tree_node_input {
+    width: 100%;
 }
 
 .tree_node_children {

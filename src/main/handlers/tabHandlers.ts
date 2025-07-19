@@ -3,12 +3,8 @@ import { BrowserWindow, ipcMain } from 'electron'
 import ITabService from '@services/contracts/ITabService'
 import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
-import DI_KEYS from '../constants/di_keys'
-import diContainer from '../diContainer'
 
-export default function registerTabHandlers(mainWindow: BrowserWindow) {
-    const tabService: ITabService = diContainer.get(DI_KEYS.TabService)
-
+export default function registerTabHandlers(mainWindow: BrowserWindow, tabService: ITabService) {
     ipcMain.handle(electronAPI.events.closeTab, async (e, data: TabEditorDto) => {
         const result = await tabService.closeTab(data, mainWindow)
         return {
@@ -38,6 +34,14 @@ export default function registerTabHandlers(mainWindow: BrowserWindow) {
         return {
             result: true,
             data: resultArr
+        }
+    })
+
+    ipcMain.handle(electronAPI.events.renameTab, async (e, dto: TabEditorDto, newPath: string) => {
+        const newDto = await tabService.rename(dto, newPath)
+        return {
+            result: newDto ? true : false,
+            data: newDto
         }
     })
 }

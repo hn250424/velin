@@ -32,7 +32,7 @@ let menuContainer: HTMLElement
 let tabContainer: HTMLElement
 let menuItems: NodeListOf<HTMLElement>
 let title: HTMLElement
-let treeContentContainer: HTMLElement
+let treeNodeContainer: HTMLElement
 let treeContextMenu: HTMLElement
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', () => {
     treeContextMenu = document.getElementById('tree_context_menu')
     menuContainer = document.getElementById('menu_container')
     menuItems = document.querySelectorAll('#menu_container .menu_item')
-    treeContentContainer = document.getElementById('tree_content')
+    treeNodeContainer = document.getElementById('tree_node_container')
 
     const windowLayoutManager = WindowLayoutManager.getInstance()
     const zoomManager = ZoomManager.getInstance()
@@ -60,7 +60,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerViewHandlers(shortcutRegistry, zoomManager)
     registerSideHandlers(treeLayoutManager)
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
-    registerTreeHandlers(commandDispatcher, focusManager, treeContentContainer, treeLayoutManager, tabEditorManager, treeContextMenu, shortcutRegistry)
+    registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeLayoutManager, tabEditorManager, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
@@ -79,26 +79,26 @@ function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HT
 function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
     document.addEventListener('mousedown', (e) => {
         const target = e.target as HTMLElement
-        const isInTree = !!target.closest('#tree_context_menu')
-        const isInTab = !!target.closest('#tab_context_menu')
+        const isInTreeContextMenu = !!target.closest('#tree_context_menu')
+        const isInTabContextMenu = !!target.closest('#tab_context_menu')
+        const isInTreeNodecontainer = !!target.closest('#tree_node_container')
+        const isInTabContainer = !!target.closest('#tab_container')
         const isInMenuItem = !!target.closest('.menu_item')
 
         if (!isInMenuItem) menuItems.forEach(i => i.classList.remove(CLASS_SELECTED))
-        if (!isInTab) tabContextMenu.classList.remove(CLASS_SELECTED)
-        if (!isInTree) treeContextMenu.classList.remove(CLASS_SELECTED)
+        if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED)
+        if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED)
         trackRelevantFocus(e.target as HTMLElement, focusManager)
 
-        if (!isInTab) {
+        if (!isInTabContextMenu) {
             tabEditorManager.removeContextTabId()
         }
 
-        if (!isInTree) {
+        if (!isInTreeContextMenu && !isInTreeNodecontainer) {
             const idx = treeLayoutManager.lastSelectedIndex
             if (idx < 0) return
 
-            const viewModel = treeLayoutManager.getTreeViewModelByIndex(idx)
-            const treeWrapper = treeLayoutManager.getTreeWrapperByPath(viewModel.path)
-            const treeNode = treeWrapper.querySelector(SELECTOR_TREE_NODE)
+            const treeNode = treeLayoutManager.getTreeNodeByIndex(idx)
             treeNode.classList.remove(CLASS_FOCUSED)
             treeLayoutManager.removeLastSelectedIndex()
         }

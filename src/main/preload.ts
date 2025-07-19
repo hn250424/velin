@@ -1,9 +1,13 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import * as path from 'path'
 import { electronAPI } from '../shared/constants/electronAPI'
 import { TabEditorsDto, TabEditorDto } from '../shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
+    // Expose Renderer.
+    getBaseName: (fullPath: string): string => path.basename(fullPath),
+
     // Main -> Renderer.
     session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => { 
         ipcRenderer.on(electronAPI.events.session, (e, tabs, tree) => { callback(tabs, tree) }) 
@@ -36,4 +40,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     cut: (text: string) => { return ipcRenderer.invoke(electronAPI.events.cut, text) },
     copy: (text: string) => { return ipcRenderer.invoke(electronAPI.events.copy, text) },
     paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) },
+
+    renameTree: (prePath: string, newName: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newName) },
+    renameTab: (dto: TabEditorDto, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTab, dto, newPath) }
 })

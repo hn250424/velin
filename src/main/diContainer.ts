@@ -18,6 +18,8 @@ import TreeReposotory from './modules/persistence/TreeReposotory'
 import ITabService from '@services/contracts/ITabService'
 import ITreeManager from 'src/main/modules/contracts/ITreeManager'
 import TreeManager from './modules/fs/TreeManager'
+import ITreeService from '@services/contracts/ITreeService'
+import TreeService from '@services/TreeService'
 
 const diContainer = new Container()
 
@@ -47,5 +49,6 @@ diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonS
 //     .inSingletonScope()
 
 diContainer.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()
+diContainer.bind<ITreeService>(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
 
 export default diContainer

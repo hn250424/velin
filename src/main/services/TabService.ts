@@ -1,5 +1,5 @@
 import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
-import { TabEditorDto, TabEditorsDto} from "@shared/dto/TabEditorDto"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
@@ -8,6 +8,7 @@ import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import ITabService from "./contracts/ITabService"
+import path from 'path'
 
 export default class TabService implements ITabService {
     constructor(
@@ -18,7 +19,6 @@ export default class TabService implements ITabService {
     ) {
 
     }
-    
     async closeTab(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
         if (data.isModified) {
             const confirm = await this.dialogService.showConfirmDialog(`Do you want to save ${data.fileName} file?`)
@@ -133,5 +133,27 @@ export default class TabService implements ITabService {
             data: sessionArr
         })
         return responseArr
+    }
+
+    async rename(dto: TabEditorDto, newPath: string): Promise<TabEditorDto> {
+        const session: TabSessionModel = await this.tabRepository.readTabSession()
+        const sessionData = session.data
+
+        for (const data of sessionData) {
+            if (dto.id === data.id) {
+                data.filePath = newPath
+                await this.tabRepository.writeTabSession(session)
+
+                return {
+                    id: dto.id,
+                    isModified: dto.isModified,
+                    filePath: newPath,
+                    fileName: path.basename(newPath),
+                    content: dto.content
+                }
+            }
+        }
+
+        return null
     }
 }

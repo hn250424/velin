@@ -18,6 +18,7 @@ export default class ShortcutRegistry {
 
     handleKeyEvent(e: KeyboardEvent) {
         const key = this.getKeyString(e)
+        // console.log(key)
         const handler = this.shortcutMap.get(key)
         if (handler) {
             if (this.focusManager.getFocus() !== 'editor') e.preventDefault()

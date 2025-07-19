@@ -14,6 +14,12 @@ export const SELECTOR_EDITOR_BOX = `.${CLASS_EDITOR_BOX}`
 export const CLASS_TREE_NODE = 'tree_node'
 export const SELECTOR_TREE_NODE = `.${CLASS_TREE_NODE}`
 
+export const CLASS_TREE_NODE_TEXT = 'tree_node_text'
+export const SELECTOR_TREE_NODE_TEXT = `.${CLASS_TREE_NODE_TEXT}`
+
+export const CLASS_TREE_NODE_INPUT = 'tree_node_input'
+export const SELECTOR_TREE_NODE_INPUT = `.${CLASS_TREE_NODE_INPUT}`
+
 export const CLASS_TREE_NODE_OPEN = 'tree_node_open'
 export const SELECTOR_TREE_NODE_OPEN = `.${CLASS_TREE_NODE_OPEN}`
 

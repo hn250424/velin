@@ -6,11 +6,14 @@ import Response from "@shared/types/Response"
 import {
     CLASS_EXPANDED,
     CLASS_TREE_NODE_CHILDREN,
+    CLASS_TREE_NODE_TEXT,
+    SELECTOR_TREE_NODE_TEXT,
     DATASET_ATTR_TAB_ID,
     DATASET_ATTR_TREE_PATH,
     EXPANDED_TEXT,
     NOT_EXPANDED_TEXT,
-    SELECTOR_TREE_NODE_OPEN
+    SELECTOR_TREE_NODE_OPEN,
+    CLASS_TREE_NODE_INPUT
 } from "../../constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -21,6 +24,7 @@ import TreeLayoutManager from "../manager/TreeLayoutManager"
 
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
+import path from "path"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
 
@@ -108,7 +112,7 @@ export default class CommandDispatcher {
             else treeDivChildren.classList.remove(CLASS_EXPANDED)
         }
 
-        function syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
+        const syncFlattenTreeArray = (viewModel: TreeViewModel, expanded: boolean) => {
             if (expanded) this.treeLayoutManager.expandNode(viewModel)
             else this.treeLayoutManager.collapseNode(viewModel)
         }
@@ -165,14 +169,14 @@ export default class CommandDispatcher {
 
     async performUndo(source: CommandSource) {
         const focus = this.focusManager.getFocus()
-        
+
         if (focus === 'editor' && source === 'shortcut') return
 
         if (focus === 'editor') {
             this.tabEditorManager.undo()
             return
-        } 
-        
+        }
+
         if (focus === 'tree') {
 
             return
@@ -187,8 +191,8 @@ export default class CommandDispatcher {
         if (focus === 'editor') {
             this.tabEditorManager.redo()
             return
-        } 
-        
+        }
+
         if (focus === 'tree') {
 
             return
@@ -208,8 +212,8 @@ export default class CommandDispatcher {
             sel.deleteFromDocument()
 
             return
-        } 
-        
+        }
+
         if (focus === 'tree') {
 
             return
@@ -228,8 +232,8 @@ export default class CommandDispatcher {
             await window[electronAPI.channel].copy(selectedText)
 
             return
-        } 
-        
+        }
+
         if (focus === 'tree') {
 
             return
@@ -263,6 +267,123 @@ export default class CommandDispatcher {
 
         if (focus === 'tree') {
 
+            return
+        }
+    }
+
+    async performTreeNodeCut(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        if (focus !== 'tree') return
+
+        if (source === 'context_menu') {
+            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+
+            for (let i = 0; i < selectedIndices.length; i++) {
+                //
+            }
+
+            return
+        }
+
+        // === context_menu ?
+        if (source === 'shortcut') {
+            return
+        }
+    }
+
+    async performTreeNodeCopy(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        if (focus !== 'tree') return
+
+        if (source === 'context_menu') {
+            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+
+            for (let i = 0; i < selectedIndices.length; i++) {
+                //
+            }
+
+            return
+        }
+
+        // === context_menu ?
+        if (source === 'shortcut') {
+            return
+        }
+    }
+    
+    async performTreeNodeRename(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        if (focus !== 'tree') return
+
+        const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+        if (selectedIndices.length !== 1) return
+
+        const treeNode = this.treeLayoutManager.getTreeNodeByIndex(selectedIndices[0])
+        const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
+        if (!treeSpan) return
+
+        const treeInput = document.createElement('input')
+        treeInput.type = 'text'
+        treeInput.value = treeSpan.textContent ?? ''
+        treeInput.classList.add(CLASS_TREE_NODE_INPUT)
+
+        treeNode.replaceChild(treeInput, treeSpan)
+
+        treeInput.focus()
+        treeInput.select()
+
+        let alreadyFinished = false
+
+        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Enter') finishRename() }
+        const onBlur = () => finishRename()
+        treeInput.addEventListener('keydown', onKeyDown)
+        treeInput.addEventListener('blur', onBlur)
+
+        const finishRename = async () => {
+            if (alreadyFinished) return
+            alreadyFinished = true
+
+            treeInput.removeEventListener('keydown', onKeyDown)
+            treeInput.removeEventListener('blur', onBlur)
+
+            const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]
+            const newName = treeInput.value.trim()
+            const ret: Response<string | null> = await window[electronAPI.channel].renameTree(prePath, newName)
+
+            if (ret.result) {
+                const newSpan = document.createElement('span')
+                newSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
+
+                const newPath = ret.data
+                const newBaseName = window[electronAPI.channel].getBaseName(newPath)
+
+                newSpan.textContent = newBaseName
+                treeNode.replaceChild(newSpan, treeInput)
+
+                this.treeLayoutManager.applyRenameResultByPath(prePath, newPath)
+                await this.tabEditorManager.rename(prePath, newPath)
+            } else {
+                treeNode.replaceChild(treeSpan, treeInput)
+            }
+        }
+    }
+
+    async performTreeNodeDelete(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        if (focus !== 'tree') return
+
+        if (source === 'context_menu') {
+            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+
+            for (let i = 0; i < selectedIndices.length; i++) {
+                //
+            }
+
+            return
+        }
+
+        // === context_menu ?
+        if (source === 'shortcut') {
             return
         }
     }
