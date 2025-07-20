@@ -16,35 +16,35 @@ export default class TreeService implements ITreeService {
 
     }
 
-    async rename(prePath: string, newName: string): Promise<string | null> {
-        function _rename(prePath: string, node: TreeSessionModel): string | null {
+    async rename(prePath: string, newPath: string): Promise<boolean> {
+        function _rename(prePath: string, node: TreeSessionModel): boolean {
             if (prePath === node.path) {
-                const newBase = path.join(path.dirname(node.path), newName)
-                const oldBase = node.path
+                const oldPath = node.path
                 const updatePathsRecursively = (n: TreeSessionModel) => {
-                    n.path = n.path.replace(oldBase, newBase)
+                    const relative = path.relative(oldPath, n.path)
+                    n.path = path.join(newPath, relative)
                     n.name = path.basename(n.path)
                     for (const child of n.children ?? []) {
                         updatePathsRecursively(child)
                     }
                 }
                 updatePathsRecursively(node)
-                return newBase
+                return true
             } else {
                 for (const child of node.children ?? []) {
                     const found = _rename(prePath, child)
                     if (found) return found
                 }
-                return null
+                return false
             }
         }
 
         const session: TreeSessionModel = await this.treeRepository.readTreeSession()
-        const newPath = _rename(prePath, session)
-        if (newPath) {
+        const result = _rename(prePath, session)
+        if (result) {
             await this.fileManager.rename(prePath, newPath)
             await this.treeRepository.writeTreeSession(session)
         }
-        return newPath
+        return result
     }
 }

@@ -307,7 +307,10 @@ export default class TreeLayoutManager {
         return this.flattenTreeArray.length
     }
 
-    applyRenameResultByPath(preBase: string, newBase: string) {
+    async rename(preBase: string, newBase: string) {
+        const result = await window[electronAPI.channel].renameTree(preBase, newBase)
+        if (!result) return false
+
         const start = this.getFlattenTreeIndexByPath(preBase)
 
         for (let i = start; i < this.flattenTreeArray.length; i++) {
@@ -318,8 +321,9 @@ export default class TreeLayoutManager {
                 const treeNode = this.getTreeNodeByIndex(idx)
                 this.pathToFlattenArrayIndexMap.delete(node.path)
                 this.pathToTreeWrapperMap.delete(node.path)
-            
-                const newPath = newBase + node.path.slice(preBase.length)
+
+                const relative = window[electronAPI.channel].getRelativePath(preBase, node.path)
+                const newPath = window[electronAPI.channel].getJoinedPath(newBase, relative)
                 node.path = newPath
                 node.name = window[electronAPI.channel].getBaseName(node.path)
                 treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
@@ -331,5 +335,7 @@ export default class TreeLayoutManager {
                 break
             }
         }
+
+        return true
     }
 }

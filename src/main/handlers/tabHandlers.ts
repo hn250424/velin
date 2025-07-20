@@ -37,11 +37,7 @@ export default function registerTabHandlers(mainWindow: BrowserWindow, tabServic
         }
     })
 
-    ipcMain.handle(electronAPI.events.renameTab, async (e, dto: TabEditorDto, newPath: string) => {
-        const newDto = await tabService.rename(dto, newPath)
-        return {
-            result: newDto ? true : false,
-            data: newDto
-        }
+    ipcMain.handle(electronAPI.events.syncTabSession, async (e, data: TabEditorsDto) => {
+        return await tabService.syncTabSession(data)
     })
 }

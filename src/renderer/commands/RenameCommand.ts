@@ -1,0 +1,39 @@
+import { electronAPI } from "@shared/constants/electronAPI"
+import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
+import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
+import TabEditorManager from "../modules/manager/TabEditorManager"
+import ICommand from "./ICommand"
+
+export default class RenameCommand implements ICommand {
+    constructor(
+        private treeManager: TreeLayoutManager,
+        private tabManager: TabEditorManager,
+        private treeNode: HTMLElement,
+        private isDir: boolean,
+        private prePath: string,
+        private newPath: string,
+    ) { }
+
+    async execute() {
+        const result = await this.treeManager.rename(this.prePath, this.newPath)
+        if (!result) throw new Error('Rename failed')
+        const newBaseName = window[electronAPI.channel].getBaseName(this.newPath)
+        const newSpan = document.createElement('span')
+        newSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
+        newSpan.textContent = newBaseName
+        this.treeNode.replaceChild(newSpan, this.treeNode.querySelector('input')!)
+
+        await this.tabManager.rename(this.prePath, this.newPath, this.isDir)
+    }
+
+    async undo() {
+        await this.treeManager.rename(this.newPath, this.prePath)
+        const oldSpan = document.createElement('span')
+        oldSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
+        oldSpan.textContent = window[electronAPI.channel].getBaseName(this.prePath)
+        const currentText = this.treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
+        if (currentText) this.treeNode.replaceChild(oldSpan, currentText)
+
+        await this.tabManager.rename(this.newPath, this.prePath, this.isDir)
+    }
+}

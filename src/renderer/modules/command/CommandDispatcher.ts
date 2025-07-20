@@ -24,7 +24,8 @@ import TreeLayoutManager from "../manager/TreeLayoutManager"
 
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
-import path from "path"
+import RenameCommand from "../../commands/RenameCommand"
+import ICommand from "../../commands/ICommand"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
 
@@ -40,6 +41,9 @@ type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'program
  */
 @injectable()
 export default class CommandDispatcher {
+    private undoStack: ICommand[] = []
+    private redoStack: ICommand[] = []
+
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
         @inject(DI_KEYS.TabEditorManager) private readonly tabEditorManager: TabEditorManager,
@@ -178,7 +182,10 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-
+            const cmd = this.undoStack.pop()
+            if (!cmd) return
+            await cmd.undo()
+            this.redoStack.push(cmd)
             return
         }
     }
@@ -194,7 +201,10 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-
+            const cmd = this.redoStack.pop()
+            if (!cmd) return
+            await cmd.execute()
+            this.undoStack.push(cmd)
             return
         }
     }
@@ -310,7 +320,7 @@ export default class CommandDispatcher {
             return
         }
     }
-    
+
     async performTreeNodeRename(source: CommandSource) {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
@@ -348,21 +358,17 @@ export default class CommandDispatcher {
 
             const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]
             const newName = treeInput.value.trim()
-            const ret: Response<string | null> = await window[electronAPI.channel].renameTree(prePath, newName)
+            const dir = window[electronAPI.channel].getDirName(prePath)
+            const newPath = window[electronAPI.channel].getJoinedPath(dir, newName)
 
-            if (ret.result) {
-                const newSpan = document.createElement('span')
-                newSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
+            const viewModel = this.treeLayoutManager.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
+            const cmd = new RenameCommand(this.treeLayoutManager, this.tabEditorManager, treeNode, viewModel.directory, prePath, newPath)
 
-                const newPath = ret.data
-                const newBaseName = window[electronAPI.channel].getBaseName(newPath)
-
-                newSpan.textContent = newBaseName
-                treeNode.replaceChild(newSpan, treeInput)
-
-                this.treeLayoutManager.applyRenameResultByPath(prePath, newPath)
-                await this.tabEditorManager.rename(prePath, newPath)
-            } else {
+            try {
+                await cmd.execute()
+                this.undoStack.push(cmd)
+                this.redoStack.length = 0
+            } catch {
                 treeNode.replaceChild(treeSpan, treeInput)
             }
         }

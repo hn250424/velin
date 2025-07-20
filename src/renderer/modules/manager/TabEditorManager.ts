@@ -248,6 +248,52 @@ export default class TabEditorManager {
         else this.activeTabIndex = idx
     }
 
+    paste(text: string) {
+        this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
+            const view = ctx.get(editorViewCtx)
+            const { state, dispatch } = view
+            view.focus()
+            dispatch(state.tr.insertText(text))
+        })
+    }
+
+    async rename(prePath: string, newPath: string, isDir: boolean) {
+        if (isDir) {
+            for (const [filePath, view] of this.pathToTabEditorViewMap.entries()) {
+                const relative = window[electronAPI.channel].getRelativePath(prePath, filePath)
+                if (relative === '' || (!relative.startsWith('..') && !window[electronAPI.channel].isAbsolute(relative))) {
+                    const newFilePath = window[electronAPI.channel].getJoinedPath(newPath, relative)
+                    const preData = this.getTabEditorData(view)
+                    const newData = { ...preData, filePath: newFilePath }
+                    const viewModel = this.toTabViewModel(newData)
+
+                    this.idToTabViewModelMap.set(viewModel.id, viewModel)
+                    this.pathToTabEditorViewMap.delete(filePath)
+                    this.pathToTabEditorViewMap.set(newFilePath, view)
+
+                    view.tabSpan.title = viewModel.filePath
+                }
+            }
+
+            const dto = this.getAllTabEditorData()
+            await window[electronAPI.channel].syncTabSession(dto)
+        } else {
+            const view = this.getTabEditorViewByPath(prePath)
+            const viewModel = this.getTabViewModelById(view.getId())
+            viewModel.filePath = newPath
+            viewModel.fileName = window[electronAPI.channel].getBaseName(newPath)
+
+            this.pathToTabEditorViewMap.delete(prePath)
+            this.pathToTabEditorViewMap.set(viewModel.filePath, view)
+
+            view.tabSpan.title = viewModel.filePath
+            view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : 'Untitled'
+
+            const dto = this.getAllTabEditorData()
+            await window[electronAPI.channel].syncTabSession(dto)
+        }
+    }
+
     undo() {
         this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
             const view = ctx.get(editorViewCtx)
@@ -332,34 +378,5 @@ export default class TabEditorManager {
 
     set contextTabId(id: number) {
         this._contextTabId = id
-    }
-
-    paste(text: string) {
-        this.tabEditorViews[this.activeTabIndex].editor.action((ctx) => {
-            const view = ctx.get(editorViewCtx)
-            const { state, dispatch } = view
-            view.focus()
-            dispatch(state.tr.insertText(text))
-        })
-    }
-
-    async rename(prePath: string, newPath: string) {
-        const view = this.getTabEditorViewByPath(prePath)
-        if (!view) return
-
-        const preData: TabEditorDto = this.getTabEditorData(view)
-        const response: Response<TabEditorDto> = await window[electronAPI.channel].renameTab(preData, newPath)
-
-        if (response.result) {
-            const newData: TabEditorDto = response.data
-            const viewModel = this.toTabViewModel(newData)
-
-            this.idToTabViewModelMap.set(viewModel.id, viewModel)
-            this.pathToTabEditorViewMap.delete(preData.filePath)
-            this.pathToTabEditorViewMap.set(viewModel.filePath, view)
-
-            view.tabSpan.title = viewModel.filePath
-            view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : 'Untitled'
-        }
     }
 }

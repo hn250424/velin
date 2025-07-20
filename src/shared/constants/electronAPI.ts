@@ -34,6 +34,8 @@ export const electronAPI = {
         paste: 'paste',
 
         renameTree: 'renameTree',
-        renameTab: 'renameTab',
+        // renameTab: 'renameTab',
+
+        syncTabSession: 'syncTabSession',
     }
 } as const

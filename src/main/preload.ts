@@ -6,7 +6,12 @@ import TreeDto from '@shared/dto/TreeDto'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Expose Renderer.
+    getDirName: (fullPath: string): string => path.dirname(fullPath),
     getBaseName: (fullPath: string): string => path.basename(fullPath),
+    getJoinedPath: (dir: string, base: string): string => path.join(dir, base),
+    getRelativePath: (from: string, to: string): string => path.relative(from, to),
+    isAbsolute: (p: string): boolean => path.isAbsolute(p),
+    pathSep: path.sep,
 
     // Main -> Renderer.
     session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => { 
@@ -41,6 +46,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     copy: (text: string) => { return ipcRenderer.invoke(electronAPI.events.copy, text) },
     paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) },
 
-    renameTree: (prePath: string, newName: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newName) },
-    renameTab: (dto: TabEditorDto, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTab, dto, newPath) }
+    renameTree: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newPath) },
+
+    syncTabSession: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSession, tabEditorsDto) }
 })

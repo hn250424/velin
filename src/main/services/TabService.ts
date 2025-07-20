@@ -135,25 +135,16 @@ export default class TabService implements ITabService {
         return responseArr
     }
 
-    async rename(dto: TabEditorDto, newPath: string): Promise<TabEditorDto> {
-        const session: TabSessionModel = await this.tabRepository.readTabSession()
-        const sessionData = session.data
-
-        for (const data of sessionData) {
-            if (dto.id === data.id) {
-                data.filePath = newPath
-                await this.tabRepository.writeTabSession(session)
-
-                return {
-                    id: dto.id,
-                    isModified: dto.isModified,
-                    filePath: newPath,
-                    fileName: path.basename(newPath),
-                    content: dto.content
-                }
-            }
+    async syncTabSession(dto: TabEditorsDto): Promise<boolean> {
+        const newSession: TabSessionModel = {
+            activatedId: dto.activatedId,
+            data: dto.data.map(d => ({
+                id: d.id,
+                filePath: d.filePath
+            }))
         }
 
-        return null
+        await this.tabRepository.writeTabSession(newSession)
+        return true
     }
 }

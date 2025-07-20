@@ -9,7 +9,12 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Expose Renderer.
+            getDirName: (fullPath: string) => string
             getBaseName: (fullPath: string) => string
+            getJoinedPath: (dir: string, base: string) => string
+            getRelativePath: (from: string, to: string) => string
+            isAbsolute: (path: string) => boolean,
+            pathSep: string
 
             // Main -> Renderer.
             session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => void
@@ -42,8 +47,9 @@ declare global {
             copy: (text: string) => Promise<void>
             paste: () => Promise<string>
 
-            renameTree: (prePath: string, newName: string) => Promise<Response<string | null>>
-            renameTab: (dto: TabEditorDto, newPath: string) => Promise<Response<TabEditorDto>>
+            renameTree: (prePath: string, newPath: string) => Promise<boolean>
+
+            syncTabSession: (dto: TabEditorsDto) => Promise<boolean>
         }
     }
 }
