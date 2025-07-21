@@ -3,24 +3,26 @@ import TreeDto from "@shared/dto/TreeDto"
 import TreeSessionModel from "src/main/models/TreeSessionModel"
 import IFileManager from "src/main/modules/contracts/IFileManager"
 import path from 'path'
+import ITreeManager from "src/main/modules/contracts/ITreeManager"
 
 export default class FakeTreeRepository implements ITreeRepository {
     constructor(
         private treeSessionPath: string,
-        private fileManager: IFileManager
+        private fakeFileManager: IFileManager,
+        private fakeTreeManager: ITreeManager
     ) { }
 
     async readTreeSession(): Promise<TreeSessionModel | null> {
-        if (!(await this.fileManager.exists(this.treeSessionPath))) {
+        if (!(await this.fakeFileManager.exists(this.treeSessionPath))) {
             return null
         }
 
-        const json = await this.fileManager.read(this.treeSessionPath)
+        const json = await this.fakeFileManager.read(this.treeSessionPath)
         return JSON.parse(json)
     }
 
     async writeTreeSession(treeSession: TreeSessionModel): Promise<void> {
-        await this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSession, null, 4))
+        await this.fakeFileManager.write(this.treeSessionPath, JSON.stringify(treeSession, null, 4))
     }
 
     async updateSessionWithFsData(
@@ -49,7 +51,7 @@ export default class FakeTreeRepository implements ITreeRepository {
 
         const replaceNode = (root: TreeSessionModel): TreeSessionModel => {
             if (root.path === dirPath) {
-                return newNode;
+                return newNode
             }
 
             if (root.children) {
@@ -68,5 +70,45 @@ export default class FakeTreeRepository implements ITreeRepository {
 
     async setTreeSession(treeSession: TreeSessionModel): Promise<void> {
         await this.writeTreeSession(treeSession)
+    }
+
+    async syncTreeSessionWithFs(): Promise<TreeSessionModel | null> {
+        const syncTree = async (node: TreeSessionModel): Promise<TreeSessionModel | null> => {
+            if (!node.directory) return node
+
+            const realNode = await this.fakeTreeManager.getDirectoryTree(node.path, node.indent)
+            if (!realNode) return null
+
+            if (!node.expanded) {
+                return {
+                    ...node,
+                    children: null,
+                }
+            }
+
+            const sessionChildren = node.children ?? []
+            const sessionMap = new Map(sessionChildren.map(c => [c.path, c]))
+
+            const updatedChildren: TreeSessionModel[] = []
+            for (const child of realNode.children ?? []) {
+                const sessionChild = sessionMap.get(child.path) ?? child
+                const syncedChild = await syncTree(sessionChild)
+                if (syncedChild) updatedChildren.push(syncedChild)
+            }
+
+            return {
+                ...node,
+                expanded: node.expanded,
+                children: updatedChildren.length > 0 ? updatedChildren : null,
+            }
+        }
+
+        const session = await this.readTreeSession()
+        if (!session) return null
+
+        const syncedSession = await syncTree(session)
+
+        await this.writeTreeSession(syncedSession)
+        return syncedSession
     }
 }

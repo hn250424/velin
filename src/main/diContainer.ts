@@ -29,6 +29,7 @@ diContainer.bind<ITreeManager>(DI_KEYS.TreeManager).to(TreeManager).inSingletonS
 
 const _fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
 const _dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
+const _treeManager = diContainer.get<ITreeManager>(DI_KEYS.TreeManager)
 
 const userDataPath = app.getPath('userData')
 const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
@@ -40,7 +41,7 @@ const _tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
 
 const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
 diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
-    .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager))
+    .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager, _treeManager))
     .inSingletonScope()
 
 diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()

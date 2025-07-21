@@ -2,6 +2,7 @@ import TreeDto from "@shared/dto/TreeDto"
 import { electronAPI } from "./shared/constants/electronAPI"
 import Response from "./shared/interface/Response"
 import { TabEditorDto, TabEditorsDto } from "./shared/interface/TabEditorDto"
+import TrashMap from "@shared/types/TrashMap"
 
 export { }
 
@@ -48,10 +49,12 @@ declare global {
             paste: () => Promise<string>
 
             renameTree: (prePath: string, newPath: string) => Promise<boolean>
-            delete: (arr: string[]) => Promise<boolean>
+            delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>
+            undo_delete: (trashMap: TrashMap[] | null) => Promise<boolean>
 
             syncTabSession: (dto: TabEditorsDto) => Promise<boolean>
             syncTreeSession: (dto: TreeDto) => Promise<boolean>
+            requestTreeSession: () => Promise<TreeDto | null>
         }
     }
 }

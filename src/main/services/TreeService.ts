@@ -7,6 +7,7 @@ import ITreeService from "./contracts/ITreeService"
 import IFileManager from "../modules/contracts/IFileManager"
 import FileManager from "../modules/fs/FileManager"
 import TreeDto from "@shared/dto/TreeDto"
+import TrashMap from "@shared/types/TrashMap"
 
 @injectable()
 export default class TreeService implements ITreeService {
@@ -49,8 +50,12 @@ export default class TreeService implements ITreeService {
         return result
     }
 
-    async delete(arr: string[]): Promise<boolean> {
+    async delete(arr: string[]): Promise<TrashMap[] | null> {
         return await this.fileManager.delete(arr)
+    }
+
+    async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
+        return await this.fileManager.undo_delete(trashMap)
     }
 
     async syncTreeSession(dto: TreeDto): Promise<boolean> {
@@ -60,5 +65,9 @@ export default class TreeService implements ITreeService {
         } catch (e) {
             return false
         }
+    }
+
+    async requestTreeSession(): Promise<TreeDto | null> {
+        return await this.treeRepository.syncTreeSessionWithFs()
     }
 }

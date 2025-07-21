@@ -27,6 +27,7 @@ import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
 import RenameCommand from "../../commands/RenameCommand"
 import ICommand from "../../commands/ICommand"
+import DeleteCommand from "../../commands/DeleteCommand"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
 
@@ -340,29 +341,38 @@ export default class CommandDispatcher {
         if (focus !== 'tree') return
 
         const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+        const cmd = new DeleteCommand(this.treeLayoutManager, this.tabEditorManager, selectedIndices)
 
-        const pathsToDelete: string[] = []
-        const idsToDelete: number[] = []
-        for (let i = 0; i < selectedIndices.length; i++) {
-            const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(selectedIndices[i])
-            pathsToDelete.push(viewModel.path)
-            const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(viewModel.path)
-            idsToDelete.push(tabEditorView.getId())
+        try {
+            await cmd.execute()
+            this.undoStack.push(cmd)
+            this.redoStack.length = 0
+        } catch {
+
         }
 
-        const result = await window[electronAPI.channel].delete(pathsToDelete)
-        if (!result) return
+        // const pathsToDelete: string[] = []
+        // const idsToDelete: number[] = []
+        // for (let i = 0; i < selectedIndices.length; i++) {
+        //     const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(selectedIndices[i])
+        //     pathsToDelete.push(viewModel.path)
+        //     const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(viewModel.path)
+        //     idsToDelete.push(tabEditorView.getId())
+        // }
 
-        for (let i = 0; i < selectedIndices.length; i++) {
-            this.tabEditorManager.removeTab(idsToDelete[i])
-        }
-        this.treeLayoutManager.delete(selectedIndices)
-        this.treeLayoutManager.clearMultiSelectedIndex()
+        // const result = await window[electronAPI.channel].delete(pathsToDelete)
+        // if (!result) return
 
-        const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
-        await window[electronAPI.channel].syncTabSession(tabEditorDto)
+        // for (let i = 0; i < selectedIndices.length; i++) {
+        //     this.tabEditorManager.removeTab(idsToDelete[i])
+        // }
+        // this.treeLayoutManager.delete(selectedIndices)
+        // this.treeLayoutManager.clearMultiSelectedIndex()
 
-        const treeDto = this.treeLayoutManager.toTreeDto(this.treeLayoutManager.extractTreeViewModel())
-        await window[electronAPI.channel].syncTreeSession(treeDto)
+        // const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
+        // await window[electronAPI.channel].syncTabSession(tabEditorDto)
+
+        // const treeDto = this.treeLayoutManager.toTreeDto(this.treeLayoutManager.extractTreeViewModel())
+        // await window[electronAPI.channel].syncTreeSession(treeDto)
     }
 }

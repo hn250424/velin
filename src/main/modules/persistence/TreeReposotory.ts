@@ -3,12 +3,17 @@ import ITreeReposotory from 'src/main/modules/contracts/ITreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
 import path from 'path'
 import TreeSessionModel from 'src/main/models/TreeSessionModel'
+import ITreeManager from '../contracts/ITreeManager'
 
 export default class TreeReposotory implements ITreeReposotory {
     private session: TreeSessionModel | null = null
 
-    constructor(private treeSessionPath: string, private fileManager: IFileManager) {
- 
+    constructor(
+        private treeSessionPath: string,
+        private fileManager: IFileManager,
+        private treeManager: ITreeManager
+    ) {
+
     }
 
     async readTreeSession(): Promise<TreeSessionModel> {
@@ -78,5 +83,46 @@ export default class TreeReposotory implements ITreeReposotory {
         }
 
         return root
+    }
+
+    async syncTreeSessionWithFs() {
+        const syncTree = async (node: TreeDto): Promise<TreeDto | null> => {
+            const exists = await this.fileManager.exists(node.path)
+            if (!exists) return null
+
+            if (!node.directory) return node
+
+            if (!node.expanded) {
+                return {
+                    ...node,
+                    children: null
+                }
+            }
+
+            const current = await this.treeManager.getDirectoryTree(node.path, node.indent)
+            const sessionChildren = node.children ?? []
+            const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]))
+
+            const updatedChildren: TreeDto[] = []
+
+            for (const child of current.children ?? []) {
+                const sessionChild = sessionMap.get(child.path)
+                const merged = await syncTree(sessionChild ?? child)
+                if (merged) updatedChildren.push(merged)
+            }
+
+            return {
+                ...node,
+                expanded: node.expanded,
+                children: updatedChildren.length > 0 ? updatedChildren : null,
+            }
+        }
+
+        const treeSession = await this.readTreeSession()
+        if (!treeSession) return null
+
+        const newTreeSession = await syncTree(treeSession)
+        await this.writeTreeSession(newTreeSession)
+        return newTreeSession
     }
 }

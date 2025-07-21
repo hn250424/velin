@@ -4,6 +4,7 @@ import path from 'path'
 import { app } from 'electron'
 import IFileManager from "src/main/modules/contracts/IFileManager"
 import { injectable } from 'inversify'
+import TrashMap from '@shared/types/TrashMap'
 
 @injectable()
 export default class FileManager implements IFileManager {
@@ -49,10 +50,10 @@ export default class FileManager implements IFileManager {
         await fs.promises.mkdir(this.getTrashDir(), { recursive: true })
     }
 
-    async delete(paths: string[]): Promise<boolean> {
+    async delete(paths: string[]): Promise<TrashMap[] | null> {
         await this.ensureTrashDir()
         const trashDir = this.getTrashDir()
-        const movedFiles: { originalPath: string; trashPath: string }[] = []
+        const movedFiles: TrashMap[] = []
 
         try {
             for (const p of paths) {
@@ -66,7 +67,7 @@ export default class FileManager implements IFileManager {
                 movedFiles.push({ originalPath: p, trashPath })
             }
 
-            return true
+            return movedFiles
         } catch (error) {
             console.error('[delete] Failed to move file to trash:', error)
 
@@ -79,8 +80,24 @@ export default class FileManager implements IFileManager {
                 }
             }
 
+            return null
+        }
+    }
+
+    async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
+        if (!trashMap) return false
+
+        try {
+            for (const { originalPath, trashPath } of trashMap) {
+                await fsExtra.copy(trashPath, originalPath)
+                await fs.promises.unlink(trashPath)
+            }
+        } catch (error) {
+            console.error('[undo_delete] Failed to restore files from trash:', error)
             return false
         }
+
+        return true
     }
 
     async cleanTrash(): Promise<void> {

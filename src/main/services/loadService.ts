@@ -14,7 +14,8 @@ export async function loadedRenderer(
     treeManager: ITreeManager
 ) {
     const newTabSessionArr = await getUpdatedTabSession(fileManager, tabRepository)
-    const newTreeSession = await getUpdatedTreeSession(fileManager, treeRepository, treeManager)
+    const newTreeSession = await treeRepository.syncTreeSessionWithFs()
+    // const newTreeSession = await getUpdatedTreeSession(fileManager, treeRepository, treeManager)
     mainWindow.webContents.send(electronAPI.events.session, newTabSessionArr, newTreeSession as TreeDto)
     fileManager.cleanTrash()
 }
@@ -68,43 +69,43 @@ async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: IT
     }
 }
 
-async function getUpdatedTreeSession(fileManager: IFileManager, treeRepository: ITreeRepository, treeManager: ITreeManager) {
-    async function syncTree(node: TreeDto): Promise<TreeDto | null> {
-        const exists = await fileManager.exists(node.path)
-        if (!exists) return null
+// async function getUpdatedTreeSession(fileManager: IFileManager, treeRepository: ITreeRepository, treeManager: ITreeManager) {
+//     async function syncTree(node: TreeDto): Promise<TreeDto | null> {
+//         const exists = await fileManager.exists(node.path)
+//         if (!exists) return null
 
-        if (!node.directory) return node
+//         if (!node.directory) return node
 
-        if (!node.expanded) {
-            return {
-                ...node,
-                children: null
-            }
-        }
+//         if (!node.expanded) {
+//             return {
+//                 ...node,
+//                 children: null
+//             }
+//         }
 
-        const current = await treeManager.getDirectoryTree(node.path, node.indent)
-        const sessionChildren = node.children ?? []
-        const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]))
+//         const current = await treeManager.getDirectoryTree(node.path, node.indent)
+//         const sessionChildren = node.children ?? []
+//         const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]))
 
-        const updatedChildren: TreeDto[] = []
+//         const updatedChildren: TreeDto[] = []
 
-        for (const child of current.children ?? []) {
-            const sessionChild = sessionMap.get(child.path)
-            const merged = await syncTree(sessionChild ?? child)
-            if (merged) updatedChildren.push(merged)
-        }
+//         for (const child of current.children ?? []) {
+//             const sessionChild = sessionMap.get(child.path)
+//             const merged = await syncTree(sessionChild ?? child)
+//             if (merged) updatedChildren.push(merged)
+//         }
 
-        return {
-            ...node,
-            expanded: node.expanded,
-            children: updatedChildren.length > 0 ? updatedChildren : null,
-        }
-    }
+//         return {
+//             ...node,
+//             expanded: node.expanded,
+//             children: updatedChildren.length > 0 ? updatedChildren : null,
+//         }
+//     }
 
-    const treeSession = await treeRepository.readTreeSession()
-    if (!treeSession) return null
+//     const treeSession = await treeRepository.readTreeSession()
+//     if (!treeSession) return null
 
-    const newTreeSession = await syncTree(treeSession)
-    await treeRepository.writeTreeSession(newTreeSession)
-    return newTreeSession
-}
+//     const newTreeSession = await syncTree(treeSession)
+//     await treeRepository.writeTreeSession(newTreeSession)
+//     return newTreeSession
+// }

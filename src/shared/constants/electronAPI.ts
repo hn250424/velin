@@ -36,8 +36,10 @@ export const electronAPI = {
         renameTree: 'renameTree',
         // renameTab: 'renameTab',
         delete: 'delete',
+        undo_delete: 'undo_delete',
 
         syncTabSession: 'syncTabSession',
         syncTreeSession: 'syncTreeSession',
+        requestTreeSession: 'requestTreeSession'
     }
 } as const
