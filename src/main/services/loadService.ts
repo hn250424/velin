@@ -16,6 +16,7 @@ export async function loadedRenderer(
     const newTabSessionArr = await getUpdatedTabSession(fileManager, tabRepository)
     const newTreeSession = await getUpdatedTreeSession(fileManager, treeRepository, treeManager)
     mainWindow.webContents.send(electronAPI.events.session, newTabSessionArr, newTreeSession as TreeDto)
+    fileManager.cleanTrash()
 }
 
 async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: ITabRepository) {

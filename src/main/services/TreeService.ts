@@ -6,6 +6,7 @@ import ITreeRepository from '../modules/contracts/ITreeRepository'
 import ITreeService from "./contracts/ITreeService"
 import IFileManager from "../modules/contracts/IFileManager"
 import FileManager from "../modules/fs/FileManager"
+import TreeDto from "@shared/dto/TreeDto"
 
 @injectable()
 export default class TreeService implements ITreeService {
@@ -46,5 +47,18 @@ export default class TreeService implements ITreeService {
             await this.treeRepository.writeTreeSession(session)
         }
         return result
+    }
+
+    async delete(arr: string[]): Promise<boolean> {
+        return await this.fileManager.delete(arr)
+    }
+
+    async syncTreeSession(dto: TreeDto): Promise<boolean> {
+        try {
+            await this.treeRepository.writeTreeSession(dto)
+            return true
+        } catch (e) {
+            return false
+        }
     }
 }

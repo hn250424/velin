@@ -13,7 +13,8 @@ import {
     EXPANDED_TEXT,
     NOT_EXPANDED_TEXT,
     SELECTOR_TREE_NODE_OPEN,
-    CLASS_TREE_NODE_INPUT
+    CLASS_TREE_NODE_INPUT,
+    CLASS_SELECTED
 } from "../../constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -281,47 +282,7 @@ export default class CommandDispatcher {
         }
     }
 
-    async performTreeNodeCut(source: CommandSource) {
-        const focus = this.focusManager.getFocus()
-        if (focus !== 'tree') return
-
-        if (source === 'context_menu') {
-            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
-
-            for (let i = 0; i < selectedIndices.length; i++) {
-                //
-            }
-
-            return
-        }
-
-        // === context_menu ?
-        if (source === 'shortcut') {
-            return
-        }
-    }
-
-    async performTreeNodeCopy(source: CommandSource) {
-        const focus = this.focusManager.getFocus()
-        if (focus !== 'tree') return
-
-        if (source === 'context_menu') {
-            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
-
-            for (let i = 0; i < selectedIndices.length; i++) {
-                //
-            }
-
-            return
-        }
-
-        // === context_menu ?
-        if (source === 'shortcut') {
-            return
-        }
-    }
-
-    async performTreeNodeRename(source: CommandSource) {
+    async performRenameTreeNode(source: CommandSource) {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
@@ -374,23 +335,34 @@ export default class CommandDispatcher {
         }
     }
 
-    async performTreeNodeDelete(source: CommandSource) {
+    async performDeleteTreeNode(source: CommandSource) {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        if (source === 'context_menu') {
-            const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+        const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
 
-            for (let i = 0; i < selectedIndices.length; i++) {
-                //
-            }
-
-            return
+        const pathsToDelete: string[] = []
+        const idsToDelete: number[] = []
+        for (let i = 0; i < selectedIndices.length; i++) {
+            const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(selectedIndices[i])
+            pathsToDelete.push(viewModel.path)
+            const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(viewModel.path)
+            idsToDelete.push(tabEditorView.getId())
         }
 
-        // === context_menu ?
-        if (source === 'shortcut') {
-            return
+        const result = await window[electronAPI.channel].delete(pathsToDelete)
+        if (!result) return
+
+        for (let i = 0; i < selectedIndices.length; i++) {
+            this.tabEditorManager.removeTab(idsToDelete[i])
         }
+        this.treeLayoutManager.delete(selectedIndices)
+        this.treeLayoutManager.clearMultiSelectedIndex()
+
+        const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
+        await window[electronAPI.channel].syncTabSession(tabEditorDto)
+
+        const treeDto = this.treeLayoutManager.toTreeDto(this.treeLayoutManager.extractTreeViewModel())
+        await window[electronAPI.channel].syncTreeSession(treeDto)
     }
 }

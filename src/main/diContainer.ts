@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { app } from 'electron'
 import path from 'path'
-import { TAB_SESSION_PATH, Tree_SESSION_PATH } from './constants/file_info'
+import { TAB_SESSION_PATH, TREE_SESSION_PATH } from './constants/file_info'
 import { Container } from 'inversify'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from 'src/main/modules/contracts/IFileManager'
@@ -38,7 +38,7 @@ diContainer.bind<ITabRepository>(DI_KEYS.TabRepository)
 
 const _tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
 
-const treeSessionPath = path.join(userDataPath, Tree_SESSION_PATH)
+const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
 diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
     .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager))
     .inSingletonScope()

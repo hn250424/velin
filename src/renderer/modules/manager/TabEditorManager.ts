@@ -182,7 +182,7 @@ export default class TabEditorManager {
         this._contextTabId = -1
     }
 
-    removeTabAt(index: number) {
+    private removeTabAt(index: number) {
         const tabEditorView = this.tabEditorViews[index]
         const id = tabEditorView.getId()
         const viewModel = this.getTabViewModelById(id)

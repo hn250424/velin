@@ -47,6 +47,8 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) },
 
     renameTree: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newPath) },
+    delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.delete, arr) },
 
-    syncTabSession: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSession, tabEditorsDto) }
+    syncTabSession: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSession, tabEditorsDto) },
+    syncTreeSession: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.syncTreeSession, treeDto) },
 })

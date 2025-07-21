@@ -48,8 +48,10 @@ declare global {
             paste: () => Promise<string>
 
             renameTree: (prePath: string, newPath: string) => Promise<boolean>
+            delete: (arr: string[]) => Promise<boolean>
 
             syncTabSession: (dto: TabEditorsDto) => Promise<boolean>
+            syncTreeSession: (dto: TreeDto) => Promise<boolean>
         }
     }
 }

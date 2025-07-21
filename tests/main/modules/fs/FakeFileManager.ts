@@ -4,6 +4,8 @@ import path from 'path'
 export default class FakeFileManager implements IFileManager {
     private pathExists: Record<string, boolean> = {}
     private savedFiles: Record<string, string> = {}
+    private trashFiles: Record<string, string> = {}
+    private trashId = 0
 
     setPathExistence(path: string, exists: boolean) {
         this.pathExists[path] = exists
@@ -44,5 +46,28 @@ export default class FakeFileManager implements IFileManager {
 
         delete this.savedFiles[oldPath]
         delete this.pathExists[oldPath]
+    }
+
+    async delete(paths: string[]): Promise<boolean> {
+        try {
+            for (const p of paths) {
+                if (!(p in this.savedFiles)) {
+                    throw new Error(`File to delete not found: ${p}`)
+                }
+                const baseName = path.basename(p)
+                const newName = `${this.trashId++}_${baseName}`
+                this.trashFiles[newName] = this.savedFiles[p]
+
+                delete this.savedFiles[p]
+                delete this.pathExists[p]
+            }
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+
+    async cleanTrash(): Promise<void> {
+        this.trashFiles = {}
     }
 }

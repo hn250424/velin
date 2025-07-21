@@ -338,4 +338,37 @@ export default class TreeLayoutManager {
 
         return true
     }
+
+    delete(indices: number[]) {
+        indices.sort((a, b) => b - a)
+
+        for (const index of indices) {
+            const target = this.flattenTreeArray[index]
+
+            const toDelete: TreeViewModel[] = []
+            const baseIndent = target.indent
+
+            // Collects the deletion target: Self + all children
+            for (let i = index; i < this.flattenTreeArray.length; i++) {
+                const node = this.flattenTreeArray[i]
+                if (i !== index && node.indent <= baseIndent) break
+                toDelete.push(node)
+            }
+
+            for (const node of toDelete) {
+                const path = node.path
+
+                const wrapper = this.pathToTreeWrapperMap.get(path)
+                wrapper?.remove()
+
+                // this.pathToFlattenArrayIndexMap.delete(path)
+                this.pathToTreeWrapperMap.delete(path)
+            }
+
+            this.flattenTreeArray.splice(index, toDelete.length)
+            
+        }
+
+        this.rebuildIndexMap()
+    }
 }

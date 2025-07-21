@@ -1,10 +1,14 @@
 import fs from 'fs'
+import fsExtra from 'fs-extra'
 import path from 'path'
+import { app } from 'electron'
 import IFileManager from "src/main/modules/contracts/IFileManager"
 import { injectable } from 'inversify'
 
 @injectable()
 export default class FileManager implements IFileManager {
+    private trashId = 0
+
     constructor() { }
 
     async exists(path: string): Promise<boolean> {
@@ -35,5 +39,61 @@ export default class FileManager implements IFileManager {
                 else resolve()
             })
         })
+    }
+
+    private getTrashDir(): string {
+        return path.join(app.getPath('userData'), 'trash')
+    }
+
+    private async ensureTrashDir() {
+        await fs.promises.mkdir(this.getTrashDir(), { recursive: true })
+    }
+
+    async delete(paths: string[]): Promise<boolean> {
+        await this.ensureTrashDir()
+        const trashDir = this.getTrashDir()
+        const movedFiles: { originalPath: string; trashPath: string }[] = []
+
+        try {
+            for (const p of paths) {
+                const baseName = path.basename(p)
+                const newName = `${this.trashId++}_${baseName}`
+                const trashPath = path.join(trashDir, newName)
+
+                await fsExtra.copy(p, trashPath)
+                await fs.promises.unlink(p)
+
+                movedFiles.push({ originalPath: p, trashPath })
+            }
+
+            return true
+        } catch (error) {
+            console.error('[delete] Failed to move file to trash:', error)
+
+            for (const { originalPath, trashPath } of movedFiles) {
+                try {
+                    await fsExtra.copy(trashPath, originalPath)
+                    await fs.promises.unlink(trashPath)
+                } catch {
+                    console.log(error)
+                }
+            }
+
+            return false
+        }
+    }
+
+    async cleanTrash(): Promise<void> {
+        const trashDir = this.getTrashDir()
+
+        try {
+            const files = await fs.promises.readdir(trashDir)
+            for (const file of files) {
+                const filePath = path.join(trashDir, file)
+                await fs.promises.rm(filePath, { recursive: true, force: true })
+            }
+        } catch (error) {
+            console.error('[clearTrash] Failed to clear trash:', error)
+        }
     }
 }
