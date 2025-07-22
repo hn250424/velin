@@ -5,6 +5,12 @@ export const CLASS_FOCUSED = 'focused'
 export const CLASS_SELECTED = 'selected'
 export const CLASS_EXPANDED = 'expanded'
 
+export const CLASS_DEACTIVE = 'deactive'
+export const CLASS_CUT = 'cut'
+
+export const ID_TREE_CONTEXT_PASTE = 'tree_context_paste'
+export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
+
 export const CLASS_TAB = 'tab'
 export const SELECTOR_TAB = `.${CLASS_TAB}`
 

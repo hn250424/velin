@@ -1,9 +1,9 @@
-import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
+import ITreeRepository from "@modules_contracts/ITreeRepository"
 import TreeDto from "@shared/dto/TreeDto"
-import TreeSessionModel from "src/main/models/TreeSessionModel"
-import IFileManager from "src/main/modules/contracts/IFileManager"
+import TreeSessionModel from "@main/models/TreeSessionModel"
+import IFileManager from "@modules_contracts/IFileManager"
 import path from 'path'
-import ITreeManager from "src/main/modules/contracts/ITreeManager"
+import ITreeManager from "@modules_contracts/ITreeManager"
 
 export default class FakeTreeRepository implements ITreeRepository {
     constructor(

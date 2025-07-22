@@ -22,8 +22,8 @@ describe('loadService.loadedRenderer: ', () => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager()
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager, fakeTreeManager)
     })
 
     test('loadedRenderer: normal', async () => {

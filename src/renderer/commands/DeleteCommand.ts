@@ -32,7 +32,7 @@ export default class DeleteCommand implements ICommand {
             this.tabEditorManager.removeTab(this.idsToDelete[i])
         }
         this.treeLayoutManager.delete(this.selectedIndices)
-        this.treeLayoutManager.clearMultiSelectedIndex()
+        this.treeLayoutManager.clearSelectedIndices()
 
         const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
         await window[electronAPI.channel].syncTabSession(tabEditorDto)

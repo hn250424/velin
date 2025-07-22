@@ -82,6 +82,10 @@ $tree_horizontal_margin: 5px;
     min-width: 100px;
 }
 
+.tree_node_wrapper.cut {
+    color: gold;
+}
+
 .tree_node {
     font-size: 0.8rem;
     display: flex;

@@ -69,6 +69,7 @@ $shortcut_color: gv.$grey-4;
     text-overflow: ellipsis;
 }
 
+.deactive,
 .not_implemented {
     color: gv.$grey-3 !important;
     cursor: default !important;

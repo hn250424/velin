@@ -17,6 +17,8 @@ import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { electronAPI } from "@shared/constants/electronAPI"
 
+type ClipboardMode = 'cut' | 'copy' | 'none'
+
 export default class TreeLayoutManager {
     private _sideOpenStatus = false
 
@@ -33,7 +35,9 @@ export default class TreeLayoutManager {
     private flattenTreeArray: TreeViewModel[] = []
 
     private _lastSelectedIndex: number = -1
-    private _multiSelectedIndex = new Set<number>
+    private _selectedIndices = new Set<number> // Set of user-selected indices (no children included)
+    private _clipboardMode: ClipboardMode = 'none'
+    private _clipboardIndices = new Set<number> // Clipboard indices resolved at command time (includes all children)
 
     constructor() {
         this._tree_node_container = document.getElementById('tree_node_container')
@@ -291,20 +295,40 @@ export default class TreeLayoutManager {
         this._lastSelectedIndex = -1
     }
 
-    addMultiSelectedIndex(index: number) {
-        this._multiSelectedIndex.add(index)
+    addSelectedIndices(index: number) {
+        this._selectedIndices.add(index)
     }
 
-    getMultiSelectedIndex(): number[] {
-        return [...this._multiSelectedIndex]
+    getSelectedIndices(): number[] {
+        return [...this._selectedIndices]
     }
 
-    clearMultiSelectedIndex() {
-        this._multiSelectedIndex.clear()
+    clearSelectedIndices() {
+        this._selectedIndices.clear()
+    }
+
+    addClipboardIndices(index: number) {
+        this._clipboardIndices.add(index)
+    }
+
+    getClipboardIndices(): number[] {
+        return [...this._clipboardIndices]
+    }
+
+    clearClipboardIndices() {
+        this._clipboardIndices.clear()
     }
 
     getFlattenTreeArrayLength(): number {
         return this.flattenTreeArray.length
+    }
+
+    get clipboardMode() {
+        return this._clipboardMode
+    }
+
+    set clipboardMode(mode: ClipboardMode) {
+        this._clipboardMode = mode
     }
 
     async rename(preBase: string, newBase: string) {

@@ -14,7 +14,8 @@ import {
     NOT_EXPANDED_TEXT,
     SELECTOR_TREE_NODE_OPEN,
     CLASS_TREE_NODE_INPUT,
-    CLASS_SELECTED
+    CLASS_SELECTED,
+    CLASS_CUT
 } from "../../constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -227,6 +228,30 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
+            this.treeLayoutManager.clearClipboardIndices()
+            this.treeLayoutManager.clipboardMode = 'cut'
+            const selectedIndices = this.treeLayoutManager.getSelectedIndices()
+
+            for (const idx of selectedIndices) {
+                this.treeLayoutManager.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT)
+                this.treeLayoutManager.addClipboardIndices(idx)
+                const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+
+                if (viewModel.directory) {
+                    for (let i = idx + 1; i < this.treeLayoutManager.getFlattenTreeArrayLength(); i++) {
+                        const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
+
+                        if (viewModel.indent < isChildViewModel.indent) {
+                            // note: We skip adding CLASS_CUT to children, as parent visually affects them
+                            // this.treeLayoutManager.getTreeWrapperByIndex(i).classList.add(CLASS_CUT) 
+                            this.treeLayoutManager.addClipboardIndices(i)
+                            continue
+                        }
+
+                        break
+                    }
+                }
+            }
 
             return
         }
@@ -247,6 +272,27 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
+            this.treeLayoutManager.clearClipboardIndices()
+            this.treeLayoutManager.clipboardMode = 'copy'
+            const selectedIndices = this.treeLayoutManager.getSelectedIndices()
+
+            for (const idx of selectedIndices) {
+                this.treeLayoutManager.addClipboardIndices(idx)
+                const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+
+                if (viewModel.directory) {
+                    for (let i = idx + 1; i < this.treeLayoutManager.getFlattenTreeArrayLength(); i++) {
+                        const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
+
+                        if (viewModel.indent < isChildViewModel.indent) {
+                            this.treeLayoutManager.addClipboardIndices(i)
+                            continue
+                        }
+
+                        break
+                    }
+                }
+            }
 
             return
         }
@@ -287,7 +333,7 @@ export default class CommandDispatcher {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+        const selectedIndices = this.treeLayoutManager.getSelectedIndices()
         if (selectedIndices.length !== 1) return
 
         const treeNode = this.treeLayoutManager.getTreeNodeByIndex(selectedIndices[0])
@@ -340,7 +386,7 @@ export default class CommandDispatcher {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        const selectedIndices = this.treeLayoutManager.getMultiSelectedIndex()
+        const selectedIndices = this.treeLayoutManager.getSelectedIndices()
         const cmd = new DeleteCommand(this.treeLayoutManager, this.tabEditorManager, selectedIndices)
 
         try {
@@ -350,29 +396,5 @@ export default class CommandDispatcher {
         } catch {
 
         }
-
-        // const pathsToDelete: string[] = []
-        // const idsToDelete: number[] = []
-        // for (let i = 0; i < selectedIndices.length; i++) {
-        //     const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(selectedIndices[i])
-        //     pathsToDelete.push(viewModel.path)
-        //     const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(viewModel.path)
-        //     idsToDelete.push(tabEditorView.getId())
-        // }
-
-        // const result = await window[electronAPI.channel].delete(pathsToDelete)
-        // if (!result) return
-
-        // for (let i = 0; i < selectedIndices.length; i++) {
-        //     this.tabEditorManager.removeTab(idsToDelete[i])
-        // }
-        // this.treeLayoutManager.delete(selectedIndices)
-        // this.treeLayoutManager.clearMultiSelectedIndex()
-
-        // const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
-        // await window[electronAPI.channel].syncTabSession(tabEditorDto)
-
-        // const treeDto = this.treeLayoutManager.toTreeDto(this.treeLayoutManager.extractTreeViewModel())
-        // await window[electronAPI.channel].syncTreeSession(treeDto)
     }
 }
