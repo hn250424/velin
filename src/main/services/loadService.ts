@@ -14,8 +14,11 @@ export async function loadedRenderer(
     treeManager: ITreeManager
 ) {
     const newTabSessionArr = await getUpdatedTabSession(fileManager, tabRepository)
-    const newTreeSession = await treeRepository.syncTreeSessionWithFs()
-    // const newTreeSession = await getUpdatedTreeSession(fileManager, treeRepository, treeManager)
+    
+    const treeSession = await treeRepository.readTreeSession()
+    const newTreeSession = treeSession ? await treeManager.syncWithFs(treeSession) : null
+    if (newTreeSession) await treeRepository.writeTreeSession(newTreeSession)
+    
     mainWindow.webContents.send(electronAPI.events.session, newTabSessionArr, newTreeSession as TreeDto)
     fileManager.cleanTrash()
 }

@@ -44,17 +44,20 @@ declare global {
             
             exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => Promise<void>
 
-            cut: (text: string) => Promise<void>
-            copy: (text: string) => Promise<void>
-            paste: () => Promise<string>
+            cutEditor: (text: string) => Promise<void>
+            copyEditor: (text: string) => Promise<void>
+            pasteEditor: () => Promise<string>
+            copyTree: (src: string, dest: string) => Promise<void>
+            pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => Promise<boolean>
+            deletePermanently: (path) => Promise<void>
 
             renameTree: (prePath: string, newPath: string) => Promise<boolean>
             delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>
             undo_delete: (trashMap: TrashMap[] | null) => Promise<boolean>
 
-            syncTabSession: (dto: TabEditorsDto) => Promise<boolean>
-            syncTreeSession: (dto: TreeDto) => Promise<boolean>
-            requestTreeSession: () => Promise<TreeDto | null>
+            syncTabSessionFromRenderer: (dto: TabEditorsDto) => Promise<boolean>
+            syncTreeSessionFromRenderer: (dto: TreeDto) => Promise<boolean>
+            getSyncedTreeSession: () => Promise<TreeDto | null>
         }
     }
 }

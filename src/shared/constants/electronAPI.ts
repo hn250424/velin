@@ -29,17 +29,20 @@ export const electronAPI = {
         
         exit: 'exit',
 
-        cut: 'cut',
-        copy: 'copy',
-        paste: 'paste',
+        cutEditor: 'cutEditor',
+        copyEditor: 'copyEditor',
+        copyTree: 'copyTree',
+        pasteEditor: 'pasteEditor',
+        pasteTree: 'pasteTree',
+        deletePermanently: 'deletePermanently',
 
         renameTree: 'renameTree',
         // renameTab: 'renameTab',
         delete: 'delete',
         undo_delete: 'undo_delete',
 
-        syncTabSession: 'syncTabSession',
-        syncTreeSession: 'syncTreeSession',
-        requestTreeSession: 'requestTreeSession'
+        syncTabSessionFromRenderer: 'syncTabSessionFromRenderer',
+        syncTreeSessionFromRenderer: 'syncTreeSessionFromRenderer',
+        getSyncedTreeSession: 'getSyncedTreeSession'
     }
 } as const

@@ -1,4 +1,4 @@
-import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
+import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 
 export default function registerSideHandlers(treeLayoutManager: TreeLayoutManager) {
     let isDragging = false

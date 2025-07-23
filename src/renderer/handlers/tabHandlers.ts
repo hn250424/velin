@@ -6,7 +6,7 @@ import Response from "@shared/types/Response"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/manager/TabEditorManager"
+import TabEditorManager from "../modules/managers/TabEditorManager"
 
 export default function registerTabHandlers(
     commandDispatcher: CommandDispatcher,

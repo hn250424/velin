@@ -1,5 +1,5 @@
 import "@milkdown/theme-nord/style.css"
-import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
+import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 import {
     DATASET_ATTR_TREE_PATH,
     CLASS_FOCUSED,
@@ -12,7 +12,7 @@ import {
     SELECTOR_TREE_CONTEXT_PASTE
 } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/manager/TabEditorManager"
+import TabEditorManager from "../modules/managers/TabEditorManager"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
 
@@ -110,7 +110,7 @@ function bindTreeContextmenuEvents(
 
         treeContextPasteButton.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
 
-        treeLayoutManager.setLastSelectedIndexByPath(path)
+        treeLayoutManager.setContextTreeIndexByPath(path)
         treeNode.classList.add(CLASS_FOCUSED)
     })
 }

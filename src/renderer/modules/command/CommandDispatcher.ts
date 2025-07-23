@@ -21,14 +21,15 @@ import {
 import TreeDto from "@shared/dto/TreeDto"
 
 import FocusManager from "../state/FocusManager"
-import TabEditorManager from "../manager/TabEditorManager"
-import TreeLayoutManager from "../manager/TreeLayoutManager"
+import TabEditorManager from "../managers/TabEditorManager"
+import TreeLayoutManager from "../managers/TreeLayoutManager"
 
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
 import RenameCommand from "../../commands/RenameCommand"
 import ICommand from "../../commands/ICommand"
 import DeleteCommand from "../../commands/DeleteCommand"
+import PasteCommand from "../../commands/PasteCommand"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
 
@@ -221,7 +222,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             const selectedText = window.getSelection()?.toString()
             if (!sel || !selectedText) return
-            await window[electronAPI.channel].cut(selectedText)
+            await window[electronAPI.channel].cutEditor(selectedText)
             sel.deleteFromDocument()
 
             return
@@ -266,7 +267,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             const selectedText = window.getSelection()?.toString()
             if (!sel || !selectedText) return
-            await window[electronAPI.channel].copy(selectedText)
+            await window[electronAPI.channel].copyEditor(selectedText)
 
             return
         }
@@ -310,7 +311,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             if (!sel || !sel.rangeCount) return
             sel.deleteFromDocument()
-            const text = await window[electronAPI.channel].paste()
+            const text = await window[electronAPI.channel].pasteEditor()
             const textNode = document.createTextNode(text)
             const range = sel.getRangeAt(0)
             range.insertNode(textNode)
@@ -324,6 +325,27 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
+            let targetIndex
+            if (source === 'context_menu') targetIndex = this.treeLayoutManager.contextTreeIndex
+            else if (source === 'shortcut') targetIndex = this.treeLayoutManager.lastSelectedIndex
+            if (targetIndex === -1) return
+            const targetViewModel = this.treeLayoutManager.getTreeViewModelByIndex(targetIndex)
+
+            const selectedViewModels = []
+            const clipboardIndices = this.treeLayoutManager.getClipboardIndices()
+            for (const idx of clipboardIndices) {
+                selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByIndex(idx))
+            }
+
+            const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
+            
+            try {
+                await cmd.execute()
+                this.undoStack.push(cmd)
+                this.redoStack.length = 0
+            } catch {
+    
+            }
 
             return
         }

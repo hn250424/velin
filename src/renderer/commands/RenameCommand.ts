@@ -1,7 +1,7 @@
 import { electronAPI } from "@shared/constants/electronAPI"
 import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
-import TreeLayoutManager from "../modules/manager/TreeLayoutManager"
-import TabEditorManager from "../modules/manager/TabEditorManager"
+import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
+import TabEditorManager from "../modules/managers/TabEditorManager"
 import ICommand from "./ICommand"
 
 export default class RenameCommand implements ICommand {

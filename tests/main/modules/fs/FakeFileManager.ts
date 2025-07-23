@@ -6,6 +6,7 @@ export default class FakeFileManager implements IFileManager {
     private pathExists: Record<string, boolean> = {}
     private savedFiles: Record<string, string> = {}
     private trashFiles: Record<string, string> = {}
+    private osTrashFiles: Record<string, string> = {}
     private trashId = 0
 
     setPathExistence(path: string, exists: boolean) {
@@ -49,7 +50,20 @@ export default class FakeFileManager implements IFileManager {
         delete this.pathExists[oldPath]
     }
 
-    async delete(paths: string[]): Promise<TrashMap[] | null> {
+    async copy(src: string, dest: string) {
+        if (!(src in this.savedFiles)) {
+            throw new Error(`Cannot copy: Source file not found: ${src}`)
+        }
+    
+        if (dest in this.savedFiles) {
+            throw new Error(`Cannot copy: Destination already exists: ${dest}`)
+        }
+    
+        this.savedFiles[dest] = this.savedFiles[src]
+        this.pathExists[dest] = true
+    }
+
+    async moveToTrash(paths: string[]): Promise<TrashMap[] | null> {
         const movedFiles: TrashMap[] = []
 
         try {
@@ -76,7 +90,7 @@ export default class FakeFileManager implements IFileManager {
         }
     }
 
-    async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
+    async restoreFromTrash(trashMap: TrashMap[] | null): Promise<boolean> {
         if (!trashMap) return false
 
         try {
@@ -100,4 +114,19 @@ export default class FakeFileManager implements IFileManager {
     async cleanTrash(): Promise<void> {
         this.trashFiles = {}
     }
+
+    async deletePermanently(filePath: string): Promise<void> {
+        if (!(filePath in this.savedFiles)) {
+            throw new Error(`Cannot permanently delete: File not found: ${filePath}`)
+        }
+
+        this.osTrashFiles[filePath] = this.savedFiles[filePath]
+
+        delete this.savedFiles[filePath]
+        delete this.pathExists[filePath]
+    }
+
+    // getOsTrashFiles(): Record<string, string> {
+    //     return this.osTrashFiles
+    // }
 }

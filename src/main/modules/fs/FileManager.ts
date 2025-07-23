@@ -42,6 +42,10 @@ export default class FileManager implements IFileManager {
         })
     }
 
+    async copy(src: string, dest: string) {
+        await fsExtra.copy(src, dest)
+    }
+
     private getTrashDir(): string {
         return path.join(app.getPath('userData'), 'trash')
     }
@@ -50,7 +54,7 @@ export default class FileManager implements IFileManager {
         await fs.promises.mkdir(this.getTrashDir(), { recursive: true })
     }
 
-    async delete(paths: string[]): Promise<TrashMap[] | null> {
+    async moveToTrash(paths: string[]): Promise<TrashMap[] | null> {
         await this.ensureTrashDir()
         const trashDir = this.getTrashDir()
         const movedFiles: TrashMap[] = []
@@ -61,8 +65,8 @@ export default class FileManager implements IFileManager {
                 const newName = `${this.trashId++}_${baseName}`
                 const trashPath = path.join(trashDir, newName)
 
-                await fsExtra.copy(p, trashPath)
-                await fs.promises.unlink(p)
+                await this.copy(p, trashPath)
+                await this.deletePermanently(p)
 
                 movedFiles.push({ originalPath: p, trashPath })
             }
@@ -73,8 +77,8 @@ export default class FileManager implements IFileManager {
 
             for (const { originalPath, trashPath } of movedFiles) {
                 try {
-                    await fsExtra.copy(trashPath, originalPath)
-                    await fs.promises.unlink(trashPath)
+                    await this.copy(trashPath, originalPath)
+                    await this.deletePermanently(trashPath)
                 } catch {
                     console.log(error)
                 }
@@ -84,7 +88,7 @@ export default class FileManager implements IFileManager {
         }
     }
 
-    async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
+    async restoreFromTrash(trashMap: TrashMap[] | null): Promise<boolean> {
         if (!trashMap) return false
 
         try {
@@ -112,5 +116,9 @@ export default class FileManager implements IFileManager {
         } catch (error) {
             console.error('[clearTrash] Failed to clear trash:', error)
         }
+    }
+
+    async deletePermanently(path: string) {
+        await fs.promises.rm(path, { force: true })
     }
 }

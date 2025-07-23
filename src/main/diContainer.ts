@@ -17,7 +17,7 @@ import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 import TreeReposotory from './modules/persistence/TreeReposotory'
 import ITabService from '@services/contracts/ITabService'
 import ITreeManager from 'src/main/modules/contracts/ITreeManager'
-import TreeManager from './modules/fs/TreeManager'
+import TreeManager from './modules/managers/TreeManager'
 import ITreeService from '@services/contracts/ITreeService'
 import TreeService from '@services/TreeService'
 

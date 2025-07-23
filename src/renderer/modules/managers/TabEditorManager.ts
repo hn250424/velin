@@ -58,7 +58,7 @@ export default class TabEditorManager {
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const tabViewModel = { id: id, isModified: false, filePath: filePath, fileName: fileName }
-        this.setTabViewModelById(id, tabViewModel)
+        this.setTabEditorViewModelById(id, tabViewModel)
 
         const { tabDiv, tabSpan, tabButton } = this.createTabBox(fileName)
         tabDiv.dataset[DATASET_ATTR_TAB_ID] = id.toString()
@@ -113,7 +113,7 @@ export default class TabEditorManager {
 
     getTabEditorData(view: TabEditorView): TabEditorDto {
         const id = view.getId()
-        const data = this.getTabViewModelById(id)
+        const data = this.getTabEditorViewModelById(id)
 
         return {
             id: data.id,
@@ -157,7 +157,7 @@ export default class TabEditorManager {
     applySaveResult(result: TabEditorDto) {
         let wasApplied = false
         for (let i = 0; i < this.tabEditorViews.length; i++) {
-            const data = this.getTabViewModelById(this.tabEditorViews[i].getId())
+            const data = this.getTabEditorViewModelById(this.tabEditorViews[i].getId())
             if ((data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
                 data.isModified = false
                 data.filePath = result.filePath
@@ -185,7 +185,7 @@ export default class TabEditorManager {
     private removeTabAt(index: number) {
         const tabEditorView = this.tabEditorViews[index]
         const id = tabEditorView.getId()
-        const viewModel = this.getTabViewModelById(id)
+        const viewModel = this.getTabEditorViewModelById(id)
 
         this.pathToTabEditorViewMap.delete(viewModel.filePath)
         this.idToTabViewModelMap.delete(id)
@@ -276,10 +276,10 @@ export default class TabEditorManager {
             }
 
             const dto = this.getAllTabEditorData()
-            await window[electronAPI.channel].syncTabSession(dto)
+            await window[electronAPI.channel].syncTabSessionFromRenderer(dto)
         } else {
             const view = this.getTabEditorViewByPath(prePath)
-            const viewModel = this.getTabViewModelById(view.getId())
+            const viewModel = this.getTabEditorViewModelById(view.getId())
             viewModel.filePath = newPath
             viewModel.fileName = window[electronAPI.channel].getBaseName(newPath)
 
@@ -290,7 +290,7 @@ export default class TabEditorManager {
             view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : 'Untitled'
 
             const dto = this.getAllTabEditorData()
-            await window[electronAPI.channel].syncTabSession(dto)
+            await window[electronAPI.channel].syncTabSessionFromRenderer(dto)
         }
     }
 
@@ -332,11 +332,11 @@ export default class TabEditorManager {
         this.tabEditorViews[this.activeTabIndex]?.setActive()
     }
 
-    private getTabViewModelById(id: number) {
+    getTabEditorViewModelById(id: number) {
         return this.idToTabViewModelMap.get(id)
     }
 
-    private setTabViewModelById(id: number, viewModel: TabViewModel) {
+    setTabEditorViewModelById(id: number, viewModel: TabViewModel) {
         this.idToTabViewModelMap.set(id, viewModel)
     }
 
@@ -344,13 +344,17 @@ export default class TabEditorManager {
         return this.pathToTabEditorViewMap.get(path)
     }
 
-    private setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
+    setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
         this.pathToTabEditorViewMap.set(path, tabEditorVeiw)
+    }
+
+    deleteTabEditorViewByPath(path: string) {
+        this.pathToTabEditorViewMap.delete(path)
     }
 
     private resolveFileName(view: TabEditorView): string {
         const id = view.getId()
-        const data = this.getTabViewModelById(id)
+        const data = this.getTabEditorViewModelById(id)
 
         if (!data.fileName) return view.getEditorFirstLine()
         else return data.fileName

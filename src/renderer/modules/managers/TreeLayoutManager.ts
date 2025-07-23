@@ -16,8 +16,7 @@ import {
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { electronAPI } from "@shared/constants/electronAPI"
-
-type ClipboardMode = 'cut' | 'copy' | 'none'
+import ClipboardMode from "@shared/types/ClipboardMode"
 
 export default class TreeLayoutManager {
     private _sideOpenStatus = false
@@ -34,6 +33,7 @@ export default class TreeLayoutManager {
     private pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
     private flattenTreeArray: TreeViewModel[] = []
 
+    private _contextTreeIndex: number = -1
     private _lastSelectedIndex: number = -1
     private _selectedIndices = new Set<number> // Set of user-selected indices (no children included)
     private _clipboardMode: ClipboardMode = 'none'
@@ -64,7 +64,7 @@ export default class TreeLayoutManager {
                 : null
         }
     }
-
+    
     toTreeViewModel(dto: TreeDto): TreeViewModel {
         return {
             path: dto.path,
@@ -293,6 +293,22 @@ export default class TreeLayoutManager {
 
     removeLastSelectedIndex() {
         this._lastSelectedIndex = -1
+    }
+
+    get contextTreeIndex() {
+        return this._contextTreeIndex
+    }
+
+    set contextTreeIndex(index: number) {
+        this._contextTreeIndex = index
+    }
+
+    setContextTreeIndexByPath(path: string) {
+        this._contextTreeIndex = this.pathToFlattenArrayIndexMap.get(path)
+    }
+
+    removeContextTreeIndex() {
+        this._contextTreeIndex = -1
     }
 
     addSelectedIndices(index: number) {

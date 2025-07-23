@@ -12,7 +12,7 @@ import fakeDialogService, {
 } from '../modules/ui/fakeDialogService'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/fs/FakeTreeManager'
+import FakeTreeManager from '../modules/domains/FakeTreeManager'
 import TreeDto from '@shared/dto/TreeDto'
 
 const tabSessionPath = '/fake/path/tabSession.json'
@@ -121,7 +121,7 @@ describe('FileService.newTab', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
@@ -149,7 +149,7 @@ describe('FileService.openFile', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
@@ -216,8 +216,8 @@ describe('FileService.openDirectory', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
-        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager, fakeTreeManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
@@ -294,7 +294,7 @@ describe('FileService.save', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
@@ -368,7 +368,7 @@ describe('FileService.saveAs', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 
@@ -420,7 +420,7 @@ describe('FileService.saveAll', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager()
+        fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 

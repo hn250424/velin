@@ -3,6 +3,7 @@ import * as path from 'path'
 import { electronAPI } from '../shared/constants/electronAPI'
 import { TabEditorsDto, TabEditorDto } from '../shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
+import ClipboardMode from '@shared/types/ClipboardMode'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Expose Renderer.
@@ -42,15 +43,18 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
 
     exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => { ipcRenderer.invoke(electronAPI.events.exit, tabSessionData, treeSessionData) },
 
-    cut: (text: string) => { return ipcRenderer.invoke(electronAPI.events.cut, text) },
-    copy: (text: string) => { return ipcRenderer.invoke(electronAPI.events.copy, text) },
-    paste: () => { return ipcRenderer.invoke(electronAPI.events.paste) },
+    cutEditor: (text: string) => { return ipcRenderer.invoke(electronAPI.events.cutEditor, text) },
+    copyEditor: (text: string) => { return ipcRenderer.invoke(electronAPI.events.copyEditor, text) },
+    copyTree: (src: string, dest: string) => { return ipcRenderer.invoke(electronAPI.events.copyTree, src, dest) },
+    pasteEditor: () => { return ipcRenderer.invoke(electronAPI.events.pasteEditor) },
+    pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => { return ipcRenderer.invoke(electronAPI.events.pasteTree, targetDto, selectedDtos, clipboardMode) },
+    deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.deletePermanently, path) },
 
     renameTree: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newPath) },
     delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.delete, arr) },
     undo_delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.undo_delete, arr)},
 
-    syncTabSession: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSession, tabEditorsDto) },
-    syncTreeSession: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.syncTreeSession, treeDto) },
-    requestTreeSession: () => { return ipcRenderer.invoke(electronAPI.events.requestTreeSession) }
+    syncTabSessionFromRenderer: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSessionFromRenderer, tabEditorsDto) },
+    syncTreeSessionFromRenderer: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.syncTreeSessionFromRenderer, treeDto) },
+    getSyncedTreeSession: () => { return ipcRenderer.invoke(electronAPI.events.getSyncedTreeSession) }
 })

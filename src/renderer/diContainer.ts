@@ -3,8 +3,8 @@ import DI_KEYS from './constants/di_keys'
 import { Container } from 'inversify'
 import FocusManager from './modules/state/FocusManager'
 import CommandDispatcher from './modules/command/CommandDispatcher'
-import TabEditorManager from './modules/manager/TabEditorManager'
-import TreeLayoutManager from './modules/manager/TreeLayoutManager'
+import TabEditorManager from './modules/managers/TabEditorManager'
+import TreeLayoutManager from './modules/managers/TreeLayoutManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
 
 const diContainer = new Container()

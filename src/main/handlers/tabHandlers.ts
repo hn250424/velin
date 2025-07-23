@@ -37,7 +37,7 @@ export default function registerTabHandlers(mainWindow: BrowserWindow, tabServic
         }
     })
 
-    ipcMain.handle(electronAPI.events.syncTabSession, async (e, data: TabEditorsDto) => {
+    ipcMain.handle(electronAPI.events.syncTabSessionFromRenderer, async (e, data: TabEditorsDto) => {
         return await tabService.syncTabSession(data)
     })
 }
