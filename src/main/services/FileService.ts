@@ -77,9 +77,8 @@ export default class FileService implements IFileService {
             await this.treeRepository.writeTreeSession(fsTree)
         } else {
             const session = await this.treeRepository.readTreeSession()
-            const updatedSession = await this.treeManager.updateSessionWithFsData(path, indent, fsTree.children, session)
+            const updatedSession = await this.treeManager.getSessionModelWithFs(path, indent, fsTree.children, session)
             await this.treeRepository.writeTreeSession(updatedSession)
-            // await this.treeRepository.updateSessionWithFsData(path, indent, fsTree.children)
         }
 
         return {

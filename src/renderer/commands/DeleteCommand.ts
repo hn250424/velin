@@ -51,7 +51,7 @@ export default class DeleteCommand implements ICommand {
         if (newTreeSession) {
             const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
             this.treeLayoutManager.renderTreeData(viewModel)
-            this.treeLayoutManager.restoreFlattenArrayAndMaps(viewModel)
+            this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
         }
     }
 }

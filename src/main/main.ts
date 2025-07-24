@@ -20,6 +20,7 @@ import ITabService from '@services/contracts/ITabService'
 import ITreeManager from './modules/contracts/ITreeManager'
 import IDialogService from './modules/contracts/IDialogService'
 import ITreeService from '@services/contracts/ITreeService'
+import ITabManager from './modules/contracts/ITabManager'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -57,13 +58,14 @@ const createWindow = () => {
     const dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeReposotory)
+    const tabManager = diContainer.get<ITabManager>(DI_KEYS.TabManager)
     const treeManager = diContainer.get<ITreeManager>(DI_KEYS.TreeManager)
 
     const fileService = diContainer.get<IFileService>(DI_KEYS.FileService)
     const tabService = diContainer.get<ITabService>(DI_KEYS.TabService)
     const treeService = diContainer.get<ITreeService>(DI_KEYS.TreeService)
 
-    registerLoadHandlers(mainWindow, fileManager, tabRepository, treeRepository, treeManager)
+    registerLoadHandlers(mainWindow, fileManager, tabRepository, treeRepository, tabManager, treeManager)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogService, tabRepository, treeRepository)

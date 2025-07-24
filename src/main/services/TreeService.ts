@@ -114,7 +114,7 @@ export default class TreeService implements ITreeService {
     }
 
     async deletePermanently(path: string): Promise<void> {
-        this.fileManager.deletePermanently(path)
+        await this.fileManager.deletePermanently(path)
     }
 
     async syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean> {

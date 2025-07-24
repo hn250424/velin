@@ -9,17 +9,20 @@ import {
     SELECTOR_TREE_NODE_CHILDREN,
     CLASS_DEACTIVE,
     ID_TREE_CONTEXT_PASTE,
-    SELECTOR_TREE_CONTEXT_PASTE
+    SELECTOR_TREE_CONTEXT_PASTE,
+    ID_TREE_NODE_CONTAINER,
+    SELECTOR_TREE_NODE_CONTAINER
 } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorManager from "../modules/managers/TabEditorManager"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
+import { wrap } from "node:module"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
     focusManager: FocusManager,
-    treeContentContainer: HTMLElement,
+    treeNodeContainer: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
     tabEditorManager: TabEditorManager,
     treeContextMenu: HTMLElement,
@@ -27,27 +30,51 @@ export default function registerTreeHandlers(
 ) {
     const treeContextPasteButton = treeContextMenu.querySelector(SELECTOR_TREE_CONTEXT_PASTE) as HTMLElement
 
-    bindTreeClickEvents(commandDispatcher, treeContentContainer, treeLayoutManager, tabEditorManager)
-    bindTreeContextmenuEvents(treeContentContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
+    bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeLayoutManager, tabEditorManager)
+    bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
 }
 
-function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentContainer: HTMLElement, treeLayoutManager: TreeLayoutManager, tabEditorManager: TabEditorManager) {
-    treeContentContainer.addEventListener('click', async (e) => {
+function bindTreeClickEvents(
+    commandDispatcher: CommandDispatcher,
+    treeNodeContainer: HTMLElement,
+    treeLayoutManager: TreeLayoutManager,
+    tabEditorManager: TabEditorManager
+) {
+    treeNodeContainer.addEventListener('click', async (e) => {
+        if (treeLayoutManager.isAnyTreeNodeSelected()) {
+            const _idx = treeLayoutManager.lastSelectedIndex
+            const _treeNode = treeLayoutManager.getTreeNodeByIndex(_idx)
+            _treeNode.classList.remove(CLASS_FOCUSED)
+        }
+
         const target = e.target as HTMLElement
         const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
-        if (!treeNode) return
+        if (!treeNode) {
+            const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+            if (isTreeNodeContainer) {
+                const selectedIndices = treeLayoutManager.getSelectedIndices()
+                for (const i of selectedIndices) {
+                    const div = treeLayoutManager.getTreeNodeByIndex(i)
+                    div.classList.remove(CLASS_SELECTED)
+                }
 
-        if (treeLayoutManager.isTreeSelected()) {
-            const idx = treeLayoutManager.lastSelectedIndex
-            const treeNode = treeLayoutManager.getTreeNodeByIndex(idx)
-            treeNode.classList.remove(CLASS_FOCUSED)
+                treeLayoutManager.clearSelectedIndices()
+
+                treeNodeContainer.classList.add(CLASS_FOCUSED)
+                treeLayoutManager.lastSelectedIndex = 0
+            }
+
+            return
         }
+
+        treeNodeContainer.classList.remove(CLASS_FOCUSED)
+
         treeNode.classList.add(CLASS_FOCUSED)
         const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
 
-        if (e.shiftKey && treeLayoutManager.isTreeSelected()) {
+        if (e.shiftKey && treeLayoutManager.isAnyTreeNodeSelected()) {
             const startIndex = treeLayoutManager.lastSelectedIndex
             const endIndex = treeLayoutManager.getIndexByPath(path)
             treeLayoutManager.setLastSelectedIndexByPath(path)
@@ -87,12 +114,12 @@ function bindTreeClickEvents(commandDispatcher: CommandDispatcher, treeContentCo
 }
 
 function bindTreeContextmenuEvents(
-    treeContentContainer: HTMLElement,
+    treeNodeContainer: HTMLElement,
     treeContextMenu: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
     treeContextPasteButton: HTMLElement
 ) {
-    treeContentContainer.addEventListener('contextmenu', (e) => {
+    treeNodeContainer.addEventListener('contextmenu', (e) => {
         const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
         if (!treeNode) return
 

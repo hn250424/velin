@@ -61,7 +61,7 @@ export default class TreeManager implements ITreeManager {
         }
     }
 
-    async updateSessionWithFsData(
+    async getSessionModelWithFs(
         dirPath: string,
         indent: number,
         fsChildren: TreeDto[] | null,
@@ -93,7 +93,6 @@ export default class TreeManager implements ITreeManager {
         }
 
         const newTree = this.replaceNode(preTree, dirPath, newNode) || preTree
-        // await this.writeTreeSession(newTree)
         return newTree
     }
 

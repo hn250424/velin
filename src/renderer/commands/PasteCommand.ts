@@ -61,7 +61,7 @@ export default class PasteCommand implements ICommand {
             if (newTreeSession) {
                 const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
                 this.treeLayoutManager.renderTreeData(viewModel)
-                this.treeLayoutManager.restoreFlattenArrayAndMaps(viewModel)
+                this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
             }
         }
     }
@@ -97,7 +97,7 @@ export default class PasteCommand implements ICommand {
         if (newTreeSession) {
             const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
             this.treeLayoutManager.renderTreeData(viewModel)
-            this.treeLayoutManager.restoreFlattenArrayAndMaps(viewModel)
+            this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
         }
     }
 }

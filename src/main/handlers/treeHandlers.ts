@@ -26,12 +26,12 @@ export default function registerTreeHandlers(mainWindow: BrowserWindow, treeServ
         }
     })
 
-    ipcMain.handle(electronAPI.events.deletePermanently, async (e, path: string) => {
-        return await treeService.deletePermanently(path)
-    })
-
     ipcMain.handle(electronAPI.events.undo_delete, async (e, trashMap: TrashMap[] | null) => {
         return await treeService.undo_delete(trashMap)
+    })
+
+    ipcMain.handle(electronAPI.events.deletePermanently, async (e, path: string) => {
+        return await treeService.deletePermanently(path)
     })
 
     ipcMain.handle(electronAPI.events.syncTreeSessionFromRenderer, async (e, dto: TreeDto) => {

@@ -9,7 +9,6 @@ export default class FakeTreeRepository implements ITreeRepository {
     constructor(
         private treeSessionPath: string,
         private fakeFileManager: IFileManager,
-        private fakeTreeManager: ITreeManager
     ) { }
 
     async readTreeSession(): Promise<TreeSessionModel | null> {

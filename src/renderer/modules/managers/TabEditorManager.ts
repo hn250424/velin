@@ -46,7 +46,7 @@ export default class TabEditorManager {
         }
     }
 
-    async restoreTabs(dto: TabEditorsDto) {
+    async loadTabs(dto: TabEditorsDto) {
         this._activeTabId = dto.activatedId
         const tabs = dto.data
 

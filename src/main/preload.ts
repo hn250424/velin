@@ -48,11 +48,11 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     copyTree: (src: string, dest: string) => { return ipcRenderer.invoke(electronAPI.events.copyTree, src, dest) },
     pasteEditor: () => { return ipcRenderer.invoke(electronAPI.events.pasteEditor) },
     pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => { return ipcRenderer.invoke(electronAPI.events.pasteTree, targetDto, selectedDtos, clipboardMode) },
-    deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.deletePermanently, path) },
-
+    
     renameTree: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newPath) },
     delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.delete, arr) },
     undo_delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.undo_delete, arr)},
+    deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.deletePermanently, path) },
 
     syncTabSessionFromRenderer: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.syncTabSessionFromRenderer, tabEditorsDto) },
     syncTreeSessionFromRenderer: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.syncTreeSessionFromRenderer, treeDto) },

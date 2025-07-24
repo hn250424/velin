@@ -12,7 +12,7 @@ import fakeDialogService, {
 } from '../modules/ui/fakeDialogService'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/domains/FakeTreeManager'
+import FakeTreeManager from '../modules/managers/FakeTreeManager'
 import TreeDto from '@shared/dto/TreeDto'
 
 const tabSessionPath = '/fake/path/tabSession.json'
@@ -217,7 +217,7 @@ describe('FileService.openDirectory', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager, fakeTreeManager)
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
     })
 

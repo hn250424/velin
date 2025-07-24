@@ -14,7 +14,7 @@ declare global {
             getBaseName: (fullPath: string) => string
             getJoinedPath: (dir: string, base: string) => string
             getRelativePath: (from: string, to: string) => string
-            isAbsolute: (path: string) => boolean,
+            isAbsolute: (path: string) => boolean
             pathSep: string
 
             // Main -> Renderer.
@@ -49,11 +49,11 @@ declare global {
             pasteEditor: () => Promise<string>
             copyTree: (src: string, dest: string) => Promise<void>
             pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => Promise<boolean>
-            deletePermanently: (path) => Promise<void>
 
             renameTree: (prePath: string, newPath: string) => Promise<boolean>
             delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>
             undo_delete: (trashMap: TrashMap[] | null) => Promise<boolean>
+            deletePermanently: (path) => Promise<void>
 
             syncTabSessionFromRenderer: (dto: TabEditorsDto) => Promise<boolean>
             syncTreeSessionFromRenderer: (dto: TreeDto) => Promise<boolean>

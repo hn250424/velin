@@ -7,13 +7,13 @@ import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 export default function registerLoadHandlers(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
     window[electronAPI.channel].session(async (tabs: TabEditorsDto, tree: TreeDto) => {
         if (tabs) {
-            await tabEditorManager.restoreTabs(tabs)
+            await tabEditorManager.loadTabs(tabs)
         }
 
         if (tree) {
             const viewModel = treeLayoutManager.toTreeViewModel(tree)
             treeLayoutManager.renderTreeData(viewModel)
-            treeLayoutManager.restoreFlattenArrayAndMaps(viewModel)
+            treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
         }
 
         window[electronAPI.channel].showMainWindow()

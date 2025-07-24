@@ -37,7 +37,7 @@ export default class FakeTreeManager implements ITreeManager {
     }
 
 
-    async updateSessionWithFsData(
+    async getSessionModelWithFs(
         dirPath: string,
         indent: number,
         fsChildren: TreeDto[] | null,
@@ -59,21 +59,21 @@ export default class FakeTreeManager implements ITreeManager {
             return newNode
         }
 
-        const replaceNode = (root: TreeSessionModel): TreeSessionModel => {
-            if (root.path === dirPath) {
-                return newNode
-            }
+        const updatedTree = this.replaceNode(preTree, dirPath, newNode)
+        return updatedTree
+    }
 
-            if (root.children) {
-                const newChildren = root.children.map(child => replaceNode(child))
-                return { ...root, children: newChildren }
-            }
-
-            return root
+    private replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel {
+        if (root.path === targetPath) {
+            return newNode
         }
 
-        const updatedTree = replaceNode(preTree)
-        return updatedTree
+        if (root.children) {
+            const newChildren = root.children.map(child => this.replaceNode(child, targetPath, newNode))
+            return { ...root, children: newChildren }
+        }
+
+        return root
     }
 
     async syncWithFs(node: TreeSessionModel): Promise<TreeSessionModel | null> {

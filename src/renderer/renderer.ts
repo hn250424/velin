@@ -22,7 +22,8 @@ import {
     SELECTOR_TREE_NODE,
     CLASS_TREE_NODE,
     CLASS_FOCUSED,
-    CLASS_SELECTED
+    CLASS_SELECTED,
+    ID_TREE_NODE_CONTAINER
 } from './constants/dom'
 import WindowLayoutManager from './modules/layout/WindowLayoutManager'
 import ZoomManager from './modules/layout/ZoomManager'
@@ -42,7 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
     treeContextMenu = document.getElementById('tree_context_menu')
     menuContainer = document.getElementById('menu_container')
     menuItems = document.querySelectorAll('#menu_container .menu_item')
-    treeNodeContainer = document.getElementById('tree_node_container')
+    treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER)
 
     const windowLayoutManager = WindowLayoutManager.getInstance()
     const zoomManager = ZoomManager.getInstance()

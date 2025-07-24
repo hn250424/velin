@@ -145,7 +145,7 @@ export default class TreeLayoutManager {
         }
     }
 
-    restoreFlattenArrayAndMaps(tree: TreeViewModel) {
+    loadFlattenArrayAndMaps(tree: TreeViewModel) {
         this.flattenTreeArray = this.flattenTree(tree)
         this.rebuildIndexMap()
     }
@@ -229,8 +229,8 @@ export default class TreeLayoutManager {
         this.rebuildIndexMap()
     }
 
-    isTreeSelected(): boolean {
-        return this._lastSelectedIndex !== -1
+    isAnyTreeNodeSelected(): boolean {
+        return this._lastSelectedIndex > 0
     }
 
     getFlattenTreeIndexByPath(path: string) {
@@ -278,6 +278,11 @@ export default class TreeLayoutManager {
     getTreeViewModelByPath(path: string) {
         return this.flattenTreeArray[this.pathToFlattenArrayIndexMap.get(path)]
     }
+
+    // Is needed ?
+    // getPathByTreeNode(treeNode: HTMLElement) {
+    //     return treeNode.dataset[DATASET_ATTR_TREE_PATH]
+    // }
 
     get lastSelectedIndex() {
         return this._lastSelectedIndex

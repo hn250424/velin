@@ -38,6 +38,9 @@ $tree_horizontal_margin: 5px;
     height: 100%;
     cursor: default;
 
+    display: flex;
+    flex-direction: column;
+
     background-color: white;
 }
 
@@ -65,6 +68,15 @@ $tree_horizontal_margin: 5px;
     height: gv.$icon_size;
     margin-right: $tree_horizontal_margin;
     background-color: white;
+}
+
+#tree_node_container {
+    flex: 1;
+    border: 1px solid transparent;
+}
+
+#tree_node_container.focused {
+    border: 1px solid aqua;
 }
 
 #tree_resizer {

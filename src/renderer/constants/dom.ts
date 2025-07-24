@@ -17,6 +17,9 @@ export const SELECTOR_TAB = `.${CLASS_TAB}`
 export const CLASS_EDITOR_BOX = 'editorBox'
 export const SELECTOR_EDITOR_BOX = `.${CLASS_EDITOR_BOX}`
 
+export const ID_TREE_NODE_CONTAINER = 'tree_node_container'
+export const SELECTOR_TREE_NODE_CONTAINER = `#${ID_TREE_NODE_CONTAINER}`
+
 export const CLASS_TREE_NODE = 'tree_node'
 export const SELECTOR_TREE_NODE = `.${CLASS_TREE_NODE}`
 

@@ -100,7 +100,7 @@ export default class CommandDispatcher {
             const responseViewModel = this.treeLayoutManager.toTreeViewModel(response.data)
 
             this.treeLayoutManager.renderTreeData(responseViewModel)
-            this.treeLayoutManager.restoreFlattenArrayAndMaps(responseViewModel)
+            this.treeLayoutManager.loadFlattenArrayAndMaps(responseViewModel)
             return
         }
 

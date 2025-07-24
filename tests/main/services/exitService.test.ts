@@ -11,7 +11,7 @@ import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
-import FakeTreeManager from '../modules/domains/FakeTreeManager'
+import FakeTreeManager from '../modules/managers/FakeTreeManager'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
@@ -103,7 +103,7 @@ describe('exitService.exit', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager, fakeTreeManager)
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
     })
 
     test('test when user cancels confirm dialog', async () => {

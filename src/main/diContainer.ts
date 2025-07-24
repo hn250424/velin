@@ -20,16 +20,17 @@ import ITreeManager from 'src/main/modules/contracts/ITreeManager'
 import TreeManager from './modules/managers/TreeManager'
 import ITreeService from '@services/contracts/ITreeService'
 import TreeService from '@services/TreeService'
+import ITabManager from './modules/contracts/ITabManager'
+import TabManager from './modules/managers/TabManager'
 
 const diContainer = new Container()
 
 diContainer.bind<IFileManager>(DI_KEYS.FileManager).to(FileManager).inSingletonScope()
 diContainer.bind<IDialogService>(DI_KEYS.dialogService).toConstantValue(dialogService)
 diContainer.bind<ITreeManager>(DI_KEYS.TreeManager).to(TreeManager).inSingletonScope()
+diContainer.bind<ITabManager>(DI_KEYS.TabManager).to(TabManager).inSingletonScope()
 
 const _fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-const _dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
-const _treeManager = diContainer.get<ITreeManager>(DI_KEYS.TreeManager)
 
 const userDataPath = app.getPath('userData')
 const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
@@ -37,18 +38,12 @@ diContainer.bind<ITabRepository>(DI_KEYS.TabRepository)
     .toDynamicValue(() => new TabRepository(tabSessionPath, _fileManager))
     .inSingletonScope()
 
-const _tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
-
 const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
 diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
-    .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager, _treeManager))
+    .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager))
     .inSingletonScope()
 
 diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
-// diContainer.bind<IFileService>(DI_KEYS.FileService)
-//     .toDynamicValue(() => new FileService(_fileManager, _tabRepository, _dialogService))
-//     .inSingletonScope()
-
 diContainer.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()
 diContainer.bind<ITreeService>(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
 
