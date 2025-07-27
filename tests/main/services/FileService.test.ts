@@ -223,8 +223,8 @@ describe('FileService.openDirectory', () => {
 
     test('should return correctly updated root tree without dto', async () => {
         // Given.
-        const copyedDto = {...treeDto}
-        fakeTreeManager.setTree(copyedDto)
+        const copiedDto = {...treeDto}
+        fakeTreeManager.setTree(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
             filePaths: ['/project']
@@ -234,16 +234,16 @@ describe('FileService.openDirectory', () => {
         const response = await fileService.openDirectory()
         
         // Then.
-        expect(response).toEqual(copyedDto)
+        expect(response).toEqual(copiedDto)
         const session = await fakeTreeRepository.readTreeSession()
         expect(response.path).toEqual(session.path)
     })
 
     test('should return correctly updated children tree without dto', async () => {
         // Given.
-        const copyedDto = {...treeDto}
-        fakeTreeManager.setTree(copyedDto)
-        fakeTreeRepository.setTreeSession(copyedDto)
+        const copiedDto = {...treeDto}
+        fakeTreeManager.setTree(copiedDto)
+        fakeTreeRepository.setTreeSession(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
             filePaths: ['/project/src']
@@ -260,26 +260,26 @@ describe('FileService.openDirectory', () => {
 
     test('should return the correctly updated root tree when opening the root dto', async () => {
         // Given.
-        const copyedDto = {...treeDto}
-        fakeTreeManager.setTree(copyedDto)
+        const copiedDto = {...treeDto}
+        fakeTreeManager.setTree(copiedDto)
 
         // When.
-        const response = await fileService.openDirectory(copyedDto)
+        const response = await fileService.openDirectory(copiedDto)
         
         // Then.
-        expect(response).toEqual(copyedDto)
+        expect(response).toEqual(copiedDto)
         const session = await fakeTreeRepository.readTreeSession()
         expect(response.path).toEqual(session.path)
     })
 
     test('should return the correctly updated child tree and mark it as expanded when opening a child dto', async () => {
         // Given.
-        const copyedDto = {...treeDto}
-        fakeTreeManager.setTree(copyedDto)
-        fakeTreeRepository.setTreeSession(copyedDto)
+        const copiedDto = {...treeDto}
+        fakeTreeManager.setTree(copiedDto)
+        fakeTreeRepository.setTreeSession(copiedDto)
 
         // When.
-        const response = await fileService.openDirectory(copyedDto.children[1])
+        const response = await fileService.openDirectory(copiedDto.children[1])
 
         // Then.
         expect(response.path).toBe('/project/src')
@@ -426,30 +426,30 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with confirmed dialog', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: false,
             filePath: newFilePath
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await fileService.saveAll(copyedDto, fakeMainWindow as any)
+        const response = await fileService.saveAll(copiedDto, fakeMainWindow as any)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
         expect(session.data[0].filePath).toBe('')
-        expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
-        expect(file_2).toBe(copyedDto.data[2].content)
+        expect(session.data[1].filePath).toBe(copiedDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copiedDto.data[2].filePath)
+        expect(file_2).toBe(copiedDto.data[2].content)
         expect(response.data[2].isModified).toBe(false)
         const file_3 = await fakeFileManager.read(newFilePath)
-        expect(file_3).toBe(copyedDto.data[3].content)
+        expect(file_3).toBe(copiedDto.data[3].content)
         expect(response.data[3].isModified).toBe(false)
         expect(session.data[3].filePath).toBe(newFilePath)
         expect(spy).toHaveBeenCalledTimes(3)
@@ -457,27 +457,27 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with cancel dialog', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: true,
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await fileService.saveAll(copyedDto, fakeMainWindow as any)
+        const response = await fileService.saveAll(copiedDto, fakeMainWindow as any)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
         expect(session.data[0].filePath).toBe('')
-        expect(session.data[1].filePath).toBe(copyedDto.data[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedDto.data[2].filePath)
-        expect(file_2).toBe(copyedDto.data[2].content)
+        expect(session.data[1].filePath).toBe(copiedDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copiedDto.data[2].filePath)
+        expect(file_2).toBe(copiedDto.data[2].content)
         expect(response.data[2].isModified).toBe(false)
         expect(response.data[3].isModified).toBe(true)
         expect(session.data[3].filePath).toBe('')

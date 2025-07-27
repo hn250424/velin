@@ -108,8 +108,8 @@ describe('exitService.exit', () => {
 
     test('test when user cancels confirm dialog', async () => {
         // Given.
-        const copyedTabEditorDto = {...tabEidtorDto}
-        const copyedTreeDto = { ...treeDto }
+        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
         setFakeConfirmResult(false)
@@ -117,12 +117,12 @@ describe('exitService.exit', () => {
             canceled: false,
             filePath: newFilePath
         })
-        copyedTabEditorDto.data.forEach((data, i) => {
+        copiedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
         const model: TabSessionModel = {
             activatedId: 99,
-            data: copyedTabEditorDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            data: copiedTabEditorDto.data.map(({ id, filePath }) => ({ id, filePath }))
         }
         await fakeTabRepository.setTabSession(model)
         await fakeTreeRepository.setTreeSession({
@@ -136,28 +136,28 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
-        expect(session.activatedId).toBe(copyedTabEditorDto.activatedId)
+        expect(session.activatedId).toBe(copiedTabEditorDto.activatedId)
         const sessionData = session.data
         expect(sessionData[0].filePath).toBe('')
-        expect(sessionData[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
-        expect(file_2).not.toBe(copyedTabEditorDto.data[2].content)
-        const file_3 = await fakeFileManager.read(copyedTabEditorDto.data[3].filePath)
-        expect(file_3).not.toBe(copyedTabEditorDto.data[3].content)
+        expect(sessionData[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
+        expect(file_2).not.toBe(copiedTabEditorDto.data[2].content)
+        const file_3 = await fakeFileManager.read(copiedTabEditorDto.data[3].filePath)
+        expect(file_3).not.toBe(copiedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(2)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()
-        expect(treeSession).toEqual(copyedTreeDto)
+        expect(treeSession).toEqual(copiedTreeDto)
     })
 
     test('test when user confirm dialog and cancels open dialog', async () => {
         // Given.
-        const copyedTabEditorDto = {...tabEidtorDto}
-        const copyedTreeDto = { ...treeDto }
+        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
         setFakeConfirmResult(true)
@@ -165,7 +165,7 @@ describe('exitService.exit', () => {
             canceled: true,
             filePath: ''
         })
-        copyedTabEditorDto.data.forEach((data, i) => {
+        copiedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
         await fakeTreeRepository.setTreeSession({
@@ -179,26 +179,26 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
         expect(session.data[0].filePath).toBe('')
-        expect(session.data[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
-        expect(file_2).toBe(copyedTabEditorDto.data[2].content)
-        const file_3 = await fakeFileManager.read(copyedTabEditorDto.data[3].filePath)
-        expect(file_3).not.toBe(copyedTabEditorDto.data[3].content)
+        expect(session.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
+        expect(file_2).toBe(copiedTabEditorDto.data[2].content)
+        const file_3 = await fakeFileManager.read(copiedTabEditorDto.data[3].filePath)
+        expect(file_3).not.toBe(copiedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(3)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()
-        expect(treeSession).toEqual(copyedTreeDto)
+        expect(treeSession).toEqual(copiedTreeDto)
     })
 
     test('test when user confirm dialog and select file path', async () => {
         // Given.
-        const copyedTabEditorDto = {...tabEidtorDto}
-        const copyedTreeDto = { ...treeDto }
+        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
         setFakeConfirmResult(true)
@@ -206,7 +206,7 @@ describe('exitService.exit', () => {
             canceled: false,
             filePath: newFilePath
         })
-        copyedTabEditorDto.data.forEach((data, i) => {
+        copiedTabEditorDto.data.forEach((data, i) => {
             fakeFileManager.setFilecontent(data.filePath, 'dummy')
         })
         await fakeTreeRepository.setTreeSession({
@@ -220,20 +220,20 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copyedTabEditorDto, copyedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
         expect(session.data[0].filePath).toBe('')
-        expect(session.data[1].filePath).toBe(copyedTabEditorDto.data[1].filePath)
-        const file_2 = await fakeFileManager.read(copyedTabEditorDto.data[2].filePath)
-        expect(file_2).toBe(copyedTabEditorDto.data[2].content)
+        expect(session.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
+        const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
+        expect(file_2).toBe(copiedTabEditorDto.data[2].content)
         expect(session.data[3].filePath).toBe(newFilePath)
         const file_3 = await fakeFileManager.read(newFilePath)
-        expect(file_3).toBe(copyedTabEditorDto.data[3].content)
+        expect(file_3).toBe(copiedTabEditorDto.data[3].content)
         expect(spy).toHaveBeenCalledTimes(4)
         expect(fakeMainWindow.close).toHaveBeenCalled()
         const treeSession = await fakeTreeRepository.readTreeSession()
-        expect(treeSession).toEqual(copyedTreeDto)
+        expect(treeSession).toEqual(copiedTreeDto)
     })
 })

@@ -36,7 +36,6 @@ export default class FakeTreeManager implements ITreeManager {
         return node ? { ...node, indent } : null
     }
 
-
     async getSessionModelWithFs(
         dirPath: string,
         indent: number,

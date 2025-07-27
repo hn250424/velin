@@ -203,7 +203,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should retain only selected tab and save others modified file', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -211,18 +211,18 @@ describe('tabService.closeTabsExcept', () => {
             filePath: newFilePath
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const exceptData: TabEditorDto = copyedDto.data[1]
+        const exceptData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        const response = await tabService.closeTabsExcept(exceptData, copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
-        expect(await fakeFileManager.read(newFilePath)).toBe(copyedDto.data[3].content)
+        expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
         const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.data.length).toBe(1)
         expect(tabSession.data[0].id).toBe(exceptData.id)
@@ -231,7 +231,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should retain only the selected tab when user declines to save', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -239,14 +239,14 @@ describe('tabService.closeTabsExcept', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const exceptData: TabEditorDto = copyedDto.data[1]
+        const exceptData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        const response = await tabService.closeTabsExcept(exceptData, copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
@@ -258,7 +258,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should keep selected tab and tabs with canceled save dialog after confirm', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -266,17 +266,17 @@ describe('tabService.closeTabsExcept', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
-        for (const { filePath } of copyedDto.data) {
+        for (const { filePath } of copiedDto.data) {
             fakeFileManager.setFilecontent(filePath, 'dummy')
         }
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const exceptData: TabEditorDto = copyedDto.data[1]
+        const exceptData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        const response = await tabService.closeTabsExcept(exceptData, copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
@@ -284,7 +284,7 @@ describe('tabService.closeTabsExcept', () => {
         expect(tabSession.data.length).toBe(2)
         expect(tabSession.data[0].id).toBe(exceptData.id)
         expect(tabSession.data[0].filePath).toBe(exceptData.filePath)
-        expect(await fakeFileManager.read(copyedDto.data[2].filePath)).toBe(copyedDto.data[2].content)
+        expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
     })
 })
 
@@ -298,7 +298,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain only the tabs to the left of the reference tab and save modified files', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -306,18 +306,18 @@ describe('tabService.closeTabsToRight', () => {
             filePath: newFilePath
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const refData: TabEditorDto = copyedDto.data[1]
+        const refData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        const response = await tabService.closeTabsToRight(refData, copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeTabsToRight(refData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
-        expect(await fakeFileManager.read(newFilePath)).toBe(copyedDto.data[3].content)
+        expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
         const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.data.length).toBe(2)
         expect(tabSession.data[tabSession.data.length - 1].id).toBe(refData.id)
@@ -326,7 +326,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain only the tabs to the left of the reference tab when user decline to save', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -334,14 +334,14 @@ describe('tabService.closeTabsToRight', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const refData: TabEditorDto = copyedDto.data[1]
+        const refData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        const response = await tabService.closeTabsToRight(refData, copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeTabsToRight(refData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
@@ -353,7 +353,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain left tabs and right tabs if user cancels save dialog after confirming to save', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -361,25 +361,25 @@ describe('tabService.closeTabsToRight', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
-        for (const { filePath } of copyedDto.data) {
+        for (const { filePath } of copiedDto.data) {
             fakeFileManager.setFilecontent(filePath, 'dummy')
         }
         const spy = vi.spyOn(fakeFileManager, 'write')
-        const refData: TabEditorDto = copyedDto.data[1]
+        const refData: TabEditorDto = copiedDto.data[1]
 
         // When.
-        await tabService.closeTabsToRight(refData, copyedDto, fakeMainWindow as any)
+        await tabService.closeTabsToRight(refData, copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
         const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.data.length).toBe(3)
-        expect(tabSession.data[tabSession.data.length - 1].id).toBe(copyedDto.data[3].id)
-        expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(copyedDto.data[3].filePath)
-        expect(await fakeFileManager.read(copyedDto.data[2].filePath)).toBe(copyedDto.data[2].content)
+        expect(tabSession.data[tabSession.data.length - 1].id).toBe(copiedDto.data[3].id)
+        expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(copiedDto.data[3].filePath)
+        expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
     })
 })
 
@@ -393,7 +393,7 @@ describe('tabService.closeAllTabs', () => {
 
     test('should close all tabs and save modified files', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -401,24 +401,24 @@ describe('tabService.closeAllTabs', () => {
             filePath: newFilePath
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await tabService.closeAllTabs(copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeAllTabs(copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(3)
-        expect(await fakeFileManager.read(newFilePath)).toBe(copyedDto.data[3].content)
+        expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
         const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.data.length).toBe(0)
     })
 
     test('should close all tabs when user declines to save', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -426,13 +426,13 @@ describe('tabService.closeAllTabs', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        const response = await tabService.closeAllTabs(copyedDto, fakeMainWindow as any)
+        const response = await tabService.closeAllTabs(copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(1)
@@ -442,7 +442,7 @@ describe('tabService.closeAllTabs', () => {
 
     test('should retain tab if user confirms save but cancels save dialog', async () => {
         // Given.
-        const copyedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -450,21 +450,49 @@ describe('tabService.closeAllTabs', () => {
             filePath: ''
         })
         await fakeTabRepository.setTabSession({
-            activatedId: copyedDto.activatedId,
-            data: copyedDto.data.map(({ id, filePath }) => ({ id, filePath }))
+            activatedId: copiedDto.activatedId,
+            data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath }))
         })
-        for (const { filePath } of copyedDto.data) {
+        for (const { filePath } of copiedDto.data) {
             fakeFileManager.setFilecontent(filePath, 'dummy')
         }
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await tabService.closeAllTabs(copyedDto, fakeMainWindow as any)
+        await tabService.closeAllTabs(copiedDto, fakeMainWindow as any)
 
         // Then.
         expect(spy).toHaveBeenCalledTimes(2)
         const tabSession = await fakeTabRepository.readTabSession()
         expect(tabSession.data.length).toBe(1)
-        expect(await fakeFileManager.read(copyedDto.data[2].filePath)).toBe(copyedDto.data[2].content)
+        expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
+    })
+})
+
+describe('tabService.syncTabSession', () => {
+    beforeEach(() => {
+        fakeFileManager = new FakeFileManager()
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+    })
+
+    test('a write session was received from the renderer for synchronization', async () => {
+        // Given.
+        const copiedDto = { ...tabEidtorDto }
+
+        // When.
+        await tabService.syncTabSession(copiedDto)
+
+        // Then.
+        const session = await fakeTabRepository.readTabSession()
+        const dtoToSessionData = copiedDto.data.map(d => {
+            return {
+                id: d.id,
+                filePath: d.filePath
+            }
+        })
+        expect(dtoToSessionData).toEqual(session.data)
+        expect(copiedDto.activatedId).toBe(session.activatedId)
     })
 })

@@ -3,8 +3,8 @@ import path from 'path'
 import TrashMap from "@shared/types/TrashMap"
 
 export default class FakeFileManager implements IFileManager {
-    private pathExists: Record<string, boolean> = {}
-    private savedFiles: Record<string, string> = {}
+     pathExists: Record<string, boolean> = {}
+     savedFiles: Record<string, string> = {}
     private trashFiles: Record<string, string> = {}
     private osTrashFiles: Record<string, string> = {}
     private trashId = 0
