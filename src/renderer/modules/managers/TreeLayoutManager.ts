@@ -353,7 +353,7 @@ export default class TreeLayoutManager {
     }
 
     async rename(preBase: string, newBase: string) {
-        const result = await window[electronAPI.channel].renameTree(preBase, newBase)
+        const result = await window[electronAPI.channel].rename(preBase, newBase)
         if (!result) return false
 
         const start = this.getFlattenTreeIndexByPath(preBase)

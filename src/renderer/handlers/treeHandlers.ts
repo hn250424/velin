@@ -156,11 +156,11 @@ function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher) {
     })
 
     document.getElementById('tree_context_rename').addEventListener('click', async () => {
-        await commandDispatcher.performRenameTreeNode('context_menu')
+        await commandDispatcher.performRename('context_menu')
     })
 
     document.getElementById('tree_context_delete').addEventListener('click', async () => {
-        await commandDispatcher.performDeleteTreeNode('context_menu')
+        await commandDispatcher.performDelete('context_menu')
     })
 }
 
@@ -178,8 +178,8 @@ function bindCommandsWithShortcut(
     shortcutRegistry.register('Ctrl+X', async (e: KeyboardEvent) => await commandDispatcher.performCut('shortcut'))
     shortcutRegistry.register('Ctrl+C', async (e: KeyboardEvent) => await commandDispatcher.performCopy('shortcut'))
     shortcutRegistry.register('Ctrl+V', async (e: KeyboardEvent) => await commandDispatcher.performPaste('shortcut'))
-    shortcutRegistry.register('F2', async (e: KeyboardEvent) => await commandDispatcher.performRenameTreeNode('shortcut'))
-    shortcutRegistry.register('DELETE', async (e: KeyboardEvent) => await commandDispatcher.performDeleteTreeNode('shortcut'))
+    shortcutRegistry.register('F2', async (e: KeyboardEvent) => await commandDispatcher.performRename('shortcut'))
+    shortcutRegistry.register('DELETE', async (e: KeyboardEvent) => await commandDispatcher.performDelete('shortcut'))
 }
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {

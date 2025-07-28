@@ -10,6 +10,7 @@ declare global {
     interface Window {
         [electronAPI.channel]: {
             // Expose Renderer.
+            setZoomFactor: (factor: number) => void
             getDirName: (fullPath: string) => string
             getBaseName: (fullPath: string) => string
             getJoinedPath: (dir: string, base: string) => string
@@ -50,7 +51,7 @@ declare global {
             copyTree: (src: string, dest: string) => Promise<void>
             pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => Promise<boolean>
 
-            renameTree: (prePath: string, newPath: string) => Promise<boolean>
+            rename: (prePath: string, newPath: string) => Promise<boolean>
             delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>
             undo_delete: (trashMap: TrashMap[] | null) => Promise<boolean>
             deletePermanently: (path) => Promise<void>

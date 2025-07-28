@@ -8,6 +8,27 @@
 </head>
 
 <body>
+    <div id="find_replace_container">
+        <div id="find">
+            <input id="find_input" type="text" />
+            <span id="find_info"></span>
+            <button id="find_up">
+                <img src="src/renderer//assets/icons/find_up.png">
+            </button>
+            <button id="find_down">
+                <img src="src/renderer//assets/icons/find_down.png">
+            </button>
+            <button id="find_close">
+                <img src="src/renderer//assets/icons/find_close.png">
+            </button>
+        </div>
+
+        <div id="replace">
+            <input id="replace_input" type="text" />
+            <span id="replace_info"></span>
+        </div>
+    </div>
+
     <div id="tab_context_menu" class="dropdown">
         <div id="tab_context_close" class="dropdown_item">
             Close<span class="shortcut">Ctrl+W</span>
@@ -89,11 +110,11 @@
                         </div>
                         <div id="edit_menu_replace" class="dropdown_item">Replace<span class="shortcut">Ctrl+R</span>
                         </div>
-                        <div class="dropdown_divider"></div>
-                        <div id="edit_menu_find" class="dropdown_item">Find in Files<span class="shortcut">Ctrl+Shift+F</span>
+                        <!-- <div class="dropdown_divider"></div>
+                        <div id="edit_menu_find_in_files" class="dropdown_item">Find in Files<span class="shortcut">Ctrl+Shift+F</span>
                         </div>
-                        <div id="edit_menu_replace" class="dropdown_item">Replace in Files<span class="shortcut">Ctrl+Shift+R</span>
-                        </div>
+                        <div id="edit_menu_replace_in_files" class="dropdown_item">Replace in Files<span class="shortcut">Ctrl+Shift+R</span> -->
+                        <!-- </div> -->
                     </div>
                 </div>
 

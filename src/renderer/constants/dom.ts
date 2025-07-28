@@ -8,6 +8,21 @@ export const CLASS_EXPANDED = 'expanded'
 export const CLASS_DEACTIVE = 'deactive'
 export const CLASS_CUT = 'cut'
 
+export const ID_FIND_REPLACE_CONTAINER = 'find_replace_container'
+export const SELECTOR_FIND_REPLACE_CONTAINER = `#${ID_FIND_REPLACE_CONTAINER}`
+
+export const ID_FIND = 'find'
+export const SELECTOR_FIND = `#${ID_FIND}`
+
+export const ID_REPLACE = 'replace'
+export const SELECTOR_REPLACE = `#${ID_REPLACE}`
+
+export const ID_FIND_INPUT = 'find_input'
+export const SELECTOR_FIND_INPUT = `#${ID_FIND_INPUT}`
+
+export const ID_REPLACE_INPUT = 'replace_input'
+export const SELECTOR_REPLACE_INPUT = `#${ID_REPLACE_INPUT}`
+
 export const ID_TREE_CONTEXT_PASTE = 'tree_context_paste'
 export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
 

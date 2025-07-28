@@ -6,7 +6,7 @@ import TrashMap from '@shared/types/TrashMap'
 import ClipboardMode from '@shared/types/ClipboardMode'
 
 export default function registerTreeHandlers(mainWindow: BrowserWindow, treeService: ITreeService) {
-    ipcMain.handle(electronAPI.events.renameTree, async (e, prePath: string, newPath: string) => {
+    ipcMain.handle(electronAPI.events.rename, async (e, prePath: string, newPath: string) => {
         return await treeService.rename(prePath, newPath)
     })
 

@@ -29,6 +29,26 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
     document.getElementById('edit_menu_paste').addEventListener('click', async () => {
         await commandDispatcher.performPaste('menu')
     })
+
+    document.getElementById('edit_menu_find').addEventListener('click', async () => {
+        commandDispatcher.toggleFindReplaceBox('menu', false)
+    })
+
+    document.getElementById('edit_menu_replace').addEventListener('click', async () => {
+        commandDispatcher.toggleFindReplaceBox('menu', true)
+    })
+
+    document.getElementById('find_up').addEventListener('click', async () => {
+        commandDispatcher.performFindUp('menu')
+    })
+
+    document.getElementById('find_down').addEventListener('click', async () => {
+        commandDispatcher.performFindDown('menu')
+    })
+
+    document.getElementById('find_close').addEventListener('click', async () => {
+        commandDispatcher.performCloseFindReplaceBox('menu')
+    })
 }
 
 function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
@@ -37,4 +57,6 @@ function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutR
     shortcutRegistry.register('Ctrl+X', async (e: KeyboardEvent) => await commandDispatcher.performCut('shortcut'))
     shortcutRegistry.register('Ctrl+C', async (e: KeyboardEvent) => await commandDispatcher.performCopy('shortcut'))
     shortcutRegistry.register('Ctrl+V', async (e: KeyboardEvent) => await commandDispatcher.performPaste('shortcut'))
+    shortcutRegistry.register('Ctrl+F', (e: KeyboardEvent) => commandDispatcher.toggleFindReplaceBox('shortcut', false))
+    shortcutRegistry.register('Ctrl+R', (e: KeyboardEvent) => commandDispatcher.toggleFindReplaceBox('shortcut', true))
 }

@@ -66,6 +66,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
     bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
+    bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window[electronAPI.channel].loadedRenderer()
 })
@@ -106,10 +107,17 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
     })
 }
 
+function bindShortcutEvent(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
+    shortcutRegistry.register('ESC', async (e: KeyboardEvent) => await commandDispatcher.performESC('shortcut'))
+    shortcutRegistry.register('ENTER', async (e: KeyboardEvent) => await commandDispatcher.performENTER('shortcut'))
+}
+
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {
     if (target.closest('#editor_container')) {
         focusManager.setFocus('editor')
     } else if (target.closest('#tree')) {
         focusManager.setFocus('tree')
+    } else if (target.closest('#find_replace_container')) {
+        focusManager.setFocus('find_replace')
     }
 }

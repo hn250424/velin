@@ -1,6 +1,6 @@
 import { injectable } from "inversify"
 
-type Target = 'editor' | 'tree' | null
+type Target = 'editor' | 'tree' | 'find_replace' | null
 
 @injectable()
 export default class FocusManager {

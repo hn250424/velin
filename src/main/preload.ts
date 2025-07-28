@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webFrame } from 'electron'
 import * as path from 'path'
 import { electronAPI } from '../shared/constants/electronAPI'
 import { TabEditorsDto, TabEditorDto } from '../shared/dto/TabEditorDto'
@@ -7,6 +7,7 @@ import ClipboardMode from '@shared/types/ClipboardMode'
 
 contextBridge.exposeInMainWorld(electronAPI.channel, {
     // Expose Renderer.
+    setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
     getDirName: (fullPath: string): string => path.dirname(fullPath),
     getBaseName: (fullPath: string): string => path.basename(fullPath),
     getJoinedPath: (dir: string, base: string): string => path.join(dir, base),
@@ -49,7 +50,7 @@ contextBridge.exposeInMainWorld(electronAPI.channel, {
     pasteEditor: () => { return ipcRenderer.invoke(electronAPI.events.pasteEditor) },
     pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => { return ipcRenderer.invoke(electronAPI.events.pasteTree, targetDto, selectedDtos, clipboardMode) },
     
-    renameTree: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.renameTree, prePath, newPath) },
+    rename: (prePath: string, newPath: string) => { return ipcRenderer.invoke(electronAPI.events.rename, prePath, newPath) },
     delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.delete, arr) },
     undo_delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.undo_delete, arr)},
     deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.deletePermanently, path) },

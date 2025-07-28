@@ -1,11 +1,10 @@
+import { electronAPI } from "@shared/constants/electronAPI"
+
 export default class ZoomManager {
     private static instance: ZoomManager | null = null
     private zoomLevel = 1
-    private contentContainer: HTMLElement
     
-    private constructor() {
-        this.contentContainer = document.getElementById('content')
-    }
+    private constructor() {}
 
     static getInstance(): ZoomManager {
         if (this.instance === null) {
@@ -29,8 +28,6 @@ export default class ZoomManager {
 
     private setZoom(level: number) {
         this.zoomLevel = Math.max(0.1, Math.min(level, 3))
-        this.contentContainer.style.transform = `scale(${this.zoomLevel})`
-        this.contentContainer.style.width = `${100 / this.zoomLevel}%`
-        this.contentContainer.style.height = `${100 / this.zoomLevel}%`
+        window[electronAPI.channel].setZoomFactor(this.zoomLevel)
     }
 }

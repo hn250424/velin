@@ -6,10 +6,12 @@ import CommandDispatcher from './modules/command/CommandDispatcher'
 import TabEditorManager from './modules/managers/TabEditorManager'
 import TreeLayoutManager from './modules/managers/TreeLayoutManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
+import FindReplaceState from './modules/state/FindReplaceState'
 
 const diContainer = new Container()
 
 diContainer.bind<FocusManager>(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope()
+diContainer.bind<FindReplaceState>(DI_KEYS.FindReplaceState).to(FindReplaceState).inRequestScope()
 
 diContainer.bind<ShortcutRegistry>(DI_KEYS.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope()
 diContainer.bind<TabEditorManager>(DI_KEYS.TabEditorManager).to(TabEditorManager).inSingletonScope()

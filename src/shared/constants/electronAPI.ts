@@ -36,8 +36,7 @@ export const electronAPI = {
         pasteTree: 'pasteTree',
         deletePermanently: 'deletePermanently',
 
-        renameTree: 'renameTree',
-        // renameTab: 'renameTab',
+        rename: 'rename',
         delete: 'delete',
         undo_delete: 'undo_delete',
 

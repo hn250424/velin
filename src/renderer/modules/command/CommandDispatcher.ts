@@ -15,7 +15,12 @@ import {
     SELECTOR_TREE_NODE_OPEN,
     CLASS_TREE_NODE_INPUT,
     CLASS_SELECTED,
-    CLASS_CUT
+    CLASS_CUT,
+    ID_FIND_REPLACE_CONTAINER,
+    ID_FIND,
+    ID_REPLACE,
+    ID_FIND_INPUT,
+    ID_REPLACE_INPUT
 } from "../../constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -30,6 +35,7 @@ import RenameCommand from "../../commands/RenameCommand"
 import ICommand from "../../commands/ICommand"
 import DeleteCommand from "../../commands/DeleteCommand"
 import PasteCommand from "../../commands/PasteCommand"
+import FindReplaceState from "../state/FindReplaceState"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
 
@@ -48,12 +54,23 @@ export default class CommandDispatcher {
     private undoStack: ICommand[] = []
     private redoStack: ICommand[] = []
 
+    private findAndReplaceContainer: HTMLElement
+    private findBox: HTMLElement
+    private replaceBox: HTMLElement
+    private findInput: HTMLElement
+    private replaceInput: HTMLElement
+
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
+        @inject(DI_KEYS.FindReplaceState) private readonly findReplaceState: FindReplaceState,
         @inject(DI_KEYS.TabEditorManager) private readonly tabEditorManager: TabEditorManager,
         @inject(DI_KEYS.TreeLayoutManager) private readonly treeLayoutManager: TreeLayoutManager
     ) {
-
+        this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER)
+        this.findBox = document.getElementById(ID_FIND)
+        this.replaceBox = document.getElementById(ID_REPLACE)
+        this.findInput = document.getElementById(ID_FIND_INPUT)
+        this.replaceInput = document.getElementById(ID_REPLACE_INPUT)
     }
 
     async performNewTab(source: CommandSource) {
@@ -338,20 +355,20 @@ export default class CommandDispatcher {
             }
 
             const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
-            
+
             try {
                 await cmd.execute()
                 this.undoStack.push(cmd)
                 this.redoStack.length = 0
             } catch {
-    
+
             }
 
             return
         }
     }
 
-    async performRenameTreeNode(source: CommandSource) {
+    async performRename(source: CommandSource) {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
@@ -404,7 +421,7 @@ export default class CommandDispatcher {
         }
     }
 
-    async performDeleteTreeNode(source: CommandSource) {
+    async performDelete(source: CommandSource) {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
@@ -417,6 +434,53 @@ export default class CommandDispatcher {
             this.redoStack.length = 0
         } catch {
 
+        }
+    }
+
+    toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
+        this.findAndReplaceContainer.style.display = 'block'
+        this.replaceBox.style.display = showReplace ? 'flex' : 'none'
+    }
+
+    performFindUp(source: CommandSource) {
+        console.log('perform-findup')
+
+        this.findReplaceState.setDirectionUp(true)
+    }
+
+    performFindDown(source: CommandSource) {
+        console.log('perform-finddown')
+
+        this.findReplaceState.setDirectionUp(false)
+    }
+
+    performCloseFindReplaceBox(source: CommandSource) {
+        this.findAndReplaceContainer.style.display = 'none'
+    }
+
+    async performESC(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'find_replace') {
+            this.performCloseFindReplaceBox(source)
+        }
+    }
+
+    async performENTER(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+
+        if (focus === 'find_replace') {
+            const activateElement = document.activeElement
+            
+            if (activateElement === this.findInput) {
+                if (this.findReplaceState.getDirectionUp()) {
+                    this.performFindUp(source)
+                } else {
+                    this.performFindDown(source)
+                }
+            } else if (activateElement === this.replaceInput) {
+                console.log('replaceinput')
+            }
         }
     }
 }

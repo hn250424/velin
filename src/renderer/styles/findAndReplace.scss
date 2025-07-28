@@ -1,0 +1,54 @@
+@use './global_variables.scss' as gv;
+
+$row_height: 24px;
+$button_size: $row_height;
+$input_width: 150px;
+$info_width: 100px;
+
+#find_replace_container {
+    display: none;
+    position: fixed;
+    top: 10%;
+    right: 10%;
+
+    background-color: red;
+}
+
+#find,
+#replace {
+    width: 100%;
+    height: $row_height;
+    
+    
+}
+
+#find > input,
+#replace > input {
+    width: $input_width;
+
+    background-color: floralwhite;
+}
+
+#find > span,
+#replace > span {
+    width: $info_width;
+
+    background-color: burlywood;
+}
+
+#find {
+    display: flex;
+    
+    background-color: aqua;
+}
+
+#find > button {
+    width: $button_size;
+    height: $button_size;
+}
+
+#replace {
+    display: none;
+    
+    background-color: aquamarine;
+}
