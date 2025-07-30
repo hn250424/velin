@@ -1,5 +1,5 @@
 import exit from '@services/exitService'
-import { electronAPI } from '@shared/constants/electronAPI'
+import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 import { BrowserWindow, ipcMain } from 'electron'
@@ -15,7 +15,7 @@ export default function registerExitHandlers(
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
 ) {
-    ipcMain.handle(electronAPI.events.exit, async (e, tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => {
+    ipcMain.handle(electronAPI.events.rendererToMain.exit, async (e, tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => {
         await exit(mainWindow, fileManager, dialogService, tabRepository, treeRepository, tabSessionData, treeSessionData)
     })
 }

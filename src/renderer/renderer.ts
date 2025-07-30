@@ -1,6 +1,5 @@
 import './index.scss'
 import "@milkdown/theme-nord/style.css"
-import { electronAPI } from '../shared/constants/electronAPI'
 import registerEditHandlers from './handlers/editHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
@@ -68,7 +67,7 @@ window.addEventListener('DOMContentLoaded', () => {
     bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
-    window[electronAPI.channel].loadedRenderer()
+    window.rendererToMain.loadedRenderer()
 })
 
 function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {

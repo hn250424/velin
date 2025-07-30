@@ -14,7 +14,6 @@ import {
     CLASS_EDITOR_BOX,
     NOT_MODIFIED_TEXT
 } from '../../constants/dom'
-import { electronAPI } from "@shared/constants/electronAPI"
 import Response from "@shared/types/Response"
 
 export default class TabEditorManager {
@@ -260,9 +259,9 @@ export default class TabEditorManager {
     async rename(prePath: string, newPath: string, isDir: boolean) {
         if (isDir) {
             for (const [filePath, view] of this.pathToTabEditorViewMap.entries()) {
-                const relative = window[electronAPI.channel].getRelativePath(prePath, filePath)
-                if (relative === '' || (!relative.startsWith('..') && !window[electronAPI.channel].isAbsolute(relative))) {
-                    const newFilePath = window[electronAPI.channel].getJoinedPath(newPath, relative)
+                const relative = window.utils.getRelativePath(prePath, filePath)
+                if (relative === '' || (!relative.startsWith('..') && !window.utils.isAbsolute(relative))) {
+                    const newFilePath = window.utils.getJoinedPath(newPath, relative)
                     const preData = this.getTabEditorData(view)
                     const newData = { ...preData, filePath: newFilePath }
                     const viewModel = this.toTabViewModel(newData)
@@ -276,12 +275,12 @@ export default class TabEditorManager {
             }
 
             const dto = this.getAllTabEditorData()
-            await window[electronAPI.channel].syncTabSessionFromRenderer(dto)
+            await window.rendererToMain.syncTabSessionFromRenderer(dto)
         } else {
             const view = this.getTabEditorViewByPath(prePath)
             const viewModel = this.getTabEditorViewModelById(view.getId())
             viewModel.filePath = newPath
-            viewModel.fileName = window[electronAPI.channel].getBaseName(newPath)
+            viewModel.fileName = window.utils.getBaseName(newPath)
 
             this.pathToTabEditorViewMap.delete(prePath)
             this.pathToTabEditorViewMap.set(viewModel.filePath, view)
@@ -290,7 +289,7 @@ export default class TabEditorManager {
             view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : 'Untitled'
 
             const dto = this.getAllTabEditorData()
-            await window[electronAPI.channel].syncTabSessionFromRenderer(dto)
+            await window.rendererToMain.syncTabSessionFromRenderer(dto)
         }
     }
 

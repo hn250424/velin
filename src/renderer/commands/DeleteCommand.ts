@@ -1,4 +1,3 @@
-import { electronAPI } from "@shared/constants/electronAPI"
 import ICommand from "./ICommand"
 import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 import TabEditorManager from "../modules/managers/TabEditorManager"
@@ -26,7 +25,7 @@ export default class DeleteCommand implements ICommand {
             if (tabEditorView) idsToDelete.push(tabEditorView.getId())
         }
 
-        const response: Response<TrashMap[] | null> = await window[electronAPI.channel].delete(pathsToDelete)
+        const response: Response<TrashMap[] | null> = await window.rendererToMain.delete(pathsToDelete)
         if (!response.result) return
         this.trashMap = response.data
 
@@ -37,17 +36,17 @@ export default class DeleteCommand implements ICommand {
         this.treeLayoutManager.clearSelectedIndices()
 
         const tabEditorDto = this.tabEditorManager.getAllTabEditorData()
-        await window[electronAPI.channel].syncTabSessionFromRenderer(tabEditorDto)
+        await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto)
 
         const treeDto = this.treeLayoutManager.toTreeDto(this.treeLayoutManager.extractTreeViewModel())
-        await window[electronAPI.channel].syncTreeSessionFromRenderer(treeDto)
+        await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
     }
 
     async undo(): Promise<void> {
-        const result = await window[electronAPI.channel].undo_delete(this.trashMap)
+        const result = await window.rendererToMain.undo_delete(this.trashMap)
         if (!result) return
 
-        const newTreeSession = await window[electronAPI.channel].getSyncedTreeSession()
+        const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
             const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
             this.treeLayoutManager.renderTreeData(viewModel)

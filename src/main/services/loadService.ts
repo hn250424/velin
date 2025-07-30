@@ -1,6 +1,6 @@
 import ITreeManager from "src/main/modules/contracts/ITreeManager"
 import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
-import { electronAPI } from "@shared/constants/electronAPI"
+import { electronAPI } from "@shared/constants/electronAPI/electronAPI"
 import TreeDto from "@shared/dto/TreeDto"
 import { BrowserWindow } from "electron"
 import IFileManager from "../modules/contracts/IFileManager"
@@ -23,55 +23,6 @@ export async function loadedRenderer(
     const newTreeSession = treeSession ? await treeManager.syncWithFs(treeSession) : null
     if (newTreeSession) await treeRepository.writeTreeSession(newTreeSession)
     
-    mainWindow.webContents.send(electronAPI.events.session, newTabSession, newTreeSession as TreeDto)
+    mainWindow.webContents.send(electronAPI.events.mainToRenderer.session, newTabSession, newTreeSession as TreeDto)
     fileManager.cleanTrash()
 }
-
-// async function getUpdatedTabSession(fileManager: IFileManager, tabRepository: ITabRepository) {
-//     const session = await tabRepository.readTabSession()
-//     if (!session) return null
-//     const sessionData = session.data
-
-//     let isChanged = false
-//     const newTabSessionArr = await Promise.all(
-//         sessionData.map(async (data) => {
-//             const filePath = data.filePath ?? ''
-//             try {
-//                 if (!filePath) throw new Error('No file path')
-
-//                 await fileManager.exists(filePath)
-//                 const fileName = fileManager.getBasename(filePath)
-//                 const content = await fileManager.read(data.filePath)
-//                 return {
-//                     id: data.id,
-//                     isModified: false,
-//                     filePath: filePath,
-//                     fileName: fileName,
-//                     content: content,
-//                 }
-//             } catch (e) {
-//                 if (!isChanged) isChanged = true
-//                 return {
-//                     id: data.id,
-//                     isModified: false,
-//                     filePath: '',
-//                     fileName: '',
-//                     content: '',
-//                 }
-//             }
-//         })
-//     )
-
-//     if (isChanged) {
-//         const sessionArr = newTabSessionArr.map(({ id, filePath }) => ({ id, filePath }))
-//         await tabRepository.writeTabSession({
-//             activatedId: session.activatedId,
-//             data: sessionArr
-//         })
-//     }
-
-//     return {
-//         activatedId: session.activatedId,
-//         data: newTabSessionArr
-//     }
-// }

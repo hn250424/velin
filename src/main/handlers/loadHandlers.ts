@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { electronAPI } from '@shared/constants/electronAPI'
+import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import IFileManager from 'src/main/modules/contracts/IFileManager'
 import ITabRepository from 'src/main/modules/contracts/ITabRepository'
 import ITreeManager from 'src/main/modules/contracts/ITreeManager'
@@ -16,11 +16,11 @@ export default function registerLoadHandlers(
     tabManager: ITabManager,
     treeManager: ITreeManager
 ) {
-    ipcMain.on(electronAPI.events.loadedRenderer, async (e) => {
+    ipcMain.on(electronAPI.events.rendererToMain.loadedRenderer, async (e) => {
         loadedRenderer(mainWindow, fileManager, tabRepository, treeRepository, tabManager, treeManager)
     })
 
-    ipcMain.on(electronAPI.events.showMainWindow, () => {
+    ipcMain.on(electronAPI.events.rendererToMain.showMainWindow, () => {
         mainWindow.show()
     })
 }

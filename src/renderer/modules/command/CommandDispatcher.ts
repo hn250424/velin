@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
-import { electronAPI } from "@shared/constants/electronAPI"
 import Response from "@shared/types/Response"
 
 import {
@@ -74,7 +73,7 @@ export default class CommandDispatcher {
     }
 
     async performNewTab(source: CommandSource) {
-        const response: Response<number> = await window[electronAPI.channel].newTab()
+        const response: Response<number> = await window.rendererToMain.newTab()
         if (response.result) await this.tabEditorManager.addTab(response.data)
     }
 
@@ -88,7 +87,7 @@ export default class CommandDispatcher {
             }
         }
 
-        const response: Response<TabEditorDto> = await window[electronAPI.channel].openFile(filePath)
+        const response: Response<TabEditorDto> = await window.rendererToMain.openFile(filePath)
         if (response.result && response.data) {
             const data = response.data
             await this.tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
@@ -111,7 +110,7 @@ export default class CommandDispatcher {
     async performOpenDirectory(source: CommandSource, treeDiv?: HTMLElement) {
         // New open when shortcut or file menu.
         if (!treeDiv) {
-            const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory()
+            const response: Response<TreeDto> = await window.rendererToMain.openDirectory()
             if (!response.data) return
 
             const responseViewModel = this.treeLayoutManager.toTreeViewModel(response.data)
@@ -157,7 +156,7 @@ export default class CommandDispatcher {
             return
         }
 
-        const response: Response<TreeDto> = await window[electronAPI.channel].openDirectory(viewModel)
+        const response: Response<TreeDto> = await window.rendererToMain.openDirectory(viewModel)
         if (!response.data) return
 
         const responseTreeData = this.treeLayoutManager.toTreeViewModel(response.data)
@@ -171,13 +170,13 @@ export default class CommandDispatcher {
     async performSave(source: CommandSource) {
         const data = this.tabEditorManager.getActiveTabEditorData()
         if (!data.isModified) return
-        const response: Response<TabEditorDto> = await window[electronAPI.channel].save(data)
+        const response: Response<TabEditorDto> = await window.rendererToMain.save(data)
         if (response.result && !response.data.isModified) this.tabEditorManager.applySaveResult(response.data)
     }
 
     async performSaveAs(source: CommandSource) {
         const data: TabEditorDto = this.tabEditorManager.getActiveTabEditorData()
-        const response: Response<TabEditorDto> = await window[electronAPI.channel].saveAs(data)
+        const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
         if (response.result && response.data) {
             const wasApplied = this.tabEditorManager.applySaveResult(response.data)
             if (!wasApplied) await this.tabEditorManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
@@ -188,7 +187,7 @@ export default class CommandDispatcher {
         const data = this.tabEditorManager.getTabEditorDataById(id)
         if (!data) return
 
-        const response: Response<void> = await window[electronAPI.channel].closeTab(data)
+        const response: Response<void> = await window.rendererToMain.closeTab(data)
         if (response.result) this.tabEditorManager.removeTab(data.id)
     }
 
@@ -239,7 +238,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             const selectedText = window.getSelection()?.toString()
             if (!sel || !selectedText) return
-            await window[electronAPI.channel].cutEditor(selectedText)
+            await window.rendererToMain.cutEditor(selectedText)
             sel.deleteFromDocument()
 
             return
@@ -284,7 +283,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             const selectedText = window.getSelection()?.toString()
             if (!sel || !selectedText) return
-            await window[electronAPI.channel].copyEditor(selectedText)
+            await window.rendererToMain.copyEditor(selectedText)
 
             return
         }
@@ -328,7 +327,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             if (!sel || !sel.rangeCount) return
             sel.deleteFromDocument()
-            const text = await window[electronAPI.channel].pasteEditor()
+            const text = await window.rendererToMain.pasteEditor()
             const textNode = document.createTextNode(text)
             const range = sel.getRangeAt(0)
             range.insertNode(textNode)
@@ -405,8 +404,8 @@ export default class CommandDispatcher {
 
             const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]
             const newName = treeInput.value.trim()
-            const dir = window[electronAPI.channel].getDirName(prePath)
-            const newPath = window[electronAPI.channel].getJoinedPath(dir, newName)
+            const dir = window.utils.getDirName(prePath)
+            const newPath = window.utils.getJoinedPath(dir, newName)
 
             const viewModel = this.treeLayoutManager.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
             const cmd = new RenameCommand(this.treeLayoutManager, this.tabEditorManager, treeNode, viewModel.directory, prePath, newPath)

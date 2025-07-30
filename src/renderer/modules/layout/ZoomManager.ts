@@ -1,5 +1,3 @@
-import { electronAPI } from "@shared/constants/electronAPI"
-
 export default class ZoomManager {
     private static instance: ZoomManager | null = null
     private zoomLevel = 1
@@ -28,6 +26,6 @@ export default class ZoomManager {
 
     private setZoom(level: number) {
         this.zoomLevel = Math.max(0.1, Math.min(level, 3))
-        window[electronAPI.channel].setZoomFactor(this.zoomLevel)
+        window.utils.setZoomFactor(this.zoomLevel)
     }
 }

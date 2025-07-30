@@ -1,6 +1,5 @@
 import "@milkdown/theme-nord/style.css"
 
-import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
@@ -29,7 +28,7 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEdit
             if (target.tagName === 'BUTTON') {
                 const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
                 const data = tabEditorManager.getTabEditorDataById(id)
-                const response: Response<void> = await window[electronAPI.channel].closeTab(data)
+                const response: Response<void> = await window.rendererToMain.closeTab(data)
                 if (response.result) tabEditorManager.removeTab(data.id)
             } else if (target.tagName === 'SPAN') {
                 const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
@@ -63,20 +62,20 @@ function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEd
     document.getElementById('tab_context_close_others').addEventListener('click', async () => {
         const exceptData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
         const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
-        const response: Response<boolean[]> = await window[electronAPI.channel].closeTabsExcept(exceptData, allData)
+        const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
         if (response.result) tabEditorManager.removeTabsExcept(response.data)
     })
 
     document.getElementById('tab_context_close_right').addEventListener('click', async () => {
         const referenceData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
         const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
-        const response: Response<boolean[]> = await window[electronAPI.channel].closeTabsToRight(referenceData, allData)
+        const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
         if (response.result) tabEditorManager.removeTabsToRight(response.data)
     })
 
     document.getElementById('tab_context_close_all').addEventListener('click', async () => {
         const data: TabEditorsDto = tabEditorManager.getAllTabEditorData()
-        const response: Response<boolean[]> = await window[electronAPI.channel].closeAllTabs(data)
+        const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
         if (response.result) tabEditorManager.removeAllTabs(response.data)
     })
 }

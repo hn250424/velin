@@ -1,4 +1,3 @@
-import { electronAPI } from "@shared/constants/electronAPI"
 import ICommand from "./ICommand"
 import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 import TabEditorManager from "../modules/managers/TabEditorManager"
@@ -29,12 +28,12 @@ export default class PasteCommand implements ICommand {
             return this.treeLayoutManager.toTreeDto(viewModel)
         })
 
-        const result = await window[electronAPI.channel].pasteTree(targetDto, selectedDtos, this.clipboardMode)
+        const result = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
 
         if (result) {
             for (const preDto of selectedDtos) {
                 const oldPath = preDto.path
-                const newPath = window[electronAPI.channel].getJoinedPath(targetDto.path, preDto.name) // Target must be directory.
+                const newPath = window.utils.getJoinedPath(targetDto.path, preDto.name) // Target must be directory.
 
                 this.undoInfos.push({
                     src: oldPath,
@@ -57,7 +56,7 @@ export default class PasteCommand implements ICommand {
                 this.tabEditorManager.setTabEditorViewByPath(newPath, view)
             }
 
-            const newTreeSession = await window[electronAPI.channel].getSyncedTreeSession()
+            const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
             if (newTreeSession) {
                 const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
                 this.treeLayoutManager.renderTreeData(viewModel)
@@ -72,10 +71,10 @@ export default class PasteCommand implements ICommand {
 
             try {
                 if (mode === 'cut') {
-                    await window[electronAPI.channel].copyTree(dest, src)
+                    await window.rendererToMain.copyTree(dest, src)
                 }
 
-                await window[electronAPI.channel].deletePermanently(dest)
+                await window.rendererToMain.deletePermanently(dest)
 
                 const view = this.tabEditorManager.getTabEditorViewByPath(dest)
                 if (view) {
@@ -93,7 +92,7 @@ export default class PasteCommand implements ICommand {
             }
         }
 
-        const newTreeSession = await window[electronAPI.channel].getSyncedTreeSession()
+        const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
             const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
             this.treeLayoutManager.renderTreeData(viewModel)

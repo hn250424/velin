@@ -15,7 +15,6 @@ import {
 } from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
-import { electronAPI } from "@shared/constants/electronAPI"
 import ClipboardMode from "@shared/types/ClipboardMode"
 
 export default class TreeLayoutManager {
@@ -353,7 +352,7 @@ export default class TreeLayoutManager {
     }
 
     async rename(preBase: string, newBase: string) {
-        const result = await window[electronAPI.channel].rename(preBase, newBase)
+        const result = await window.rendererToMain.rename(preBase, newBase)
         if (!result) return false
 
         const start = this.getFlattenTreeIndexByPath(preBase)
@@ -367,10 +366,10 @@ export default class TreeLayoutManager {
                 this.pathToFlattenArrayIndexMap.delete(node.path)
                 this.pathToTreeWrapperMap.delete(node.path)
 
-                const relative = window[electronAPI.channel].getRelativePath(preBase, node.path)
-                const newPath = window[electronAPI.channel].getJoinedPath(newBase, relative)
+                const relative = window.utils.getRelativePath(preBase, node.path)
+                const newPath = window.utils.getJoinedPath(newBase, relative)
                 node.path = newPath
-                node.name = window[electronAPI.channel].getBaseName(node.path)
+                node.name = window.utils.getBaseName(node.path)
                 treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
                 treeNode.title = newPath
 

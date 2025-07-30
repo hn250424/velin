@@ -1,6 +1,5 @@
 import "@milkdown/theme-nord/style.css"
 
-import { electronAPI } from '@shared/constants/electronAPI'
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
@@ -39,7 +38,7 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorMana
 
     document.getElementById('file_menu_save_all').addEventListener('click', async () => {
         const tabsData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
-        const response: Response<TabEditorsDto> = await window[electronAPI.channel].saveAll(tabsData)
+        const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabsData)
         if (response.result) tabEditorManager.applySaveAllResults(response.data)
     })
 }
