@@ -1,17 +1,13 @@
+import TreeSessionModel from '@main/models/TreeSessionModel'
+import TreeService from '@services/TreeService'
+import TreeDto from '@shared/dto/TreeDto'
 import path from 'path'
 import { beforeEach, describe, expect, test } from 'vitest'
-import TreeService from '@services/TreeService'
-import { TREE_SESSION_PATH, TEMP_TRASH } from 'src/main/constants/file_info'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
+import FakeTreeManager from '../modules/managers/FakeTreeManager'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/managers/FakeTreeManager'
-import FakeTabManager from '../modules/managers/FakeTabManager'
-import { TabSessionModel } from 'src/main/models/TabSessionModel'
-import TreeSessionModel from '@main/models/TreeSessionModel'
-import IFileManager from '@main/modules/contracts/IFileManager'
-import TreeDto from '@shared/dto/TreeDto'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
@@ -52,52 +48,28 @@ const treeSessionModel: TreeSessionModel = {
                             "expanded": false,
                             "children": null
                         },
-                        {
-                            "path": "D:\\node-workspace\\velin\\test_file\\dir333\\deep\\15.md",
-                            "name": "15.md",
-                            "indent": 3,
-                            "directory": false,
-                            "expanded": false,
-                            "children": null
-                        }
                     ]
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1354.md",
-                    "name": "1354.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
+                    "name": "test139.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1355.md",
-                    "name": "1355.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
+                    "name": "test139-1.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1356.md",
-                    "name": "1356.md",
-                    "indent": 2,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1357.md",
-                    "name": "1357.md",
-                    "indent": 2,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\16.md",
-                    "name": "16.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
+                    "name": "test139-3.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
@@ -105,24 +77,24 @@ const treeSessionModel: TreeSessionModel = {
             ]
         },
         {
-            "path": "D:\\node-workspace\\velin\\test_file\\direc.md",
-            "name": "direc.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\test138.md",
-            "name": "test138.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
             "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
             "name": "test139.md",
+            "indent": 1,
+            "directory": false,
+            "expanded": false,
+            "children": null
+        },
+        {
+            "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
+            "name": "test139-1.md",
+            "indent": 1,
+            "directory": false,
+            "expanded": false,
+            "children": null
+        },
+        {
+            "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
+            "name": "test139-3.md",
             "indent": 1,
             "directory": false,
             "expanded": false,
@@ -160,52 +132,28 @@ const treeDto: TreeDto = {
                             "expanded": false,
                             "children": null
                         },
-                        {
-                            "path": "D:\\node-workspace\\velin\\test_file\\dir333\\deep\\15.md",
-                            "name": "15.md",
-                            "indent": 3,
-                            "directory": false,
-                            "expanded": false,
-                            "children": null
-                        }
                     ]
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1354.md",
-                    "name": "1354.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
+                    "name": "test139.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1355.md",
-                    "name": "1355.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
+                    "name": "test139-1.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
                 },
                 {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1356.md",
-                    "name": "1356.md",
-                    "indent": 2,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\1357.md",
-                    "name": "1357.md",
-                    "indent": 2,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\16.md",
-                    "name": "16.md",
-                    "indent": 2,
+                    "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
+                    "name": "test139-3.md",
+                    "indent": 1,
                     "directory": false,
                     "expanded": false,
                     "children": null
@@ -213,24 +161,24 @@ const treeDto: TreeDto = {
             ]
         },
         {
-            "path": "D:\\node-workspace\\velin\\test_file\\direc.md",
-            "name": "direc.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\test138.md",
-            "name": "test138.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
             "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
             "name": "test139.md",
+            "indent": 1,
+            "directory": false,
+            "expanded": false,
+            "children": null
+        },
+        {
+            "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
+            "name": "test139-1.md",
+            "indent": 1,
+            "directory": false,
+            "expanded": false,
+            "children": null
+        },
+        {
+            "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
+            "name": "test139-3.md",
             "indent": 1,
             "directory": false,
             "expanded": false,
@@ -243,6 +191,13 @@ function traverse(node: TreeSessionModel | TreeDto, cb: (node: TreeSessionModel 
     cb(node)
     for (const child of node.children ?? []) {
         traverse(child, cb)
+    }
+}
+
+function deepCopyTreeSessionModel(model: TreeSessionModel): TreeSessionModel {
+    return {
+        ...model,
+        children: model.children ? model.children.map(child => deepCopyTreeDto(child)) : []
     }
 }
 
@@ -264,7 +219,7 @@ describe('treeService.rename', () => {
 
     test('should sync renamed session including children nodes', async () => {
         // Given.
-        const copiedTreeSessionModel = { ...treeSessionModel }
+        const copiedTreeSessionModel = deepCopyTreeSessionModel(treeSessionModel)
         traverse(copiedTreeSessionModel, (model) => {
             fakeFileManager.setPathExistence(model.path, true)
             fakeFileManager.setFilecontent(model.path, model.name)
@@ -286,6 +241,27 @@ describe('treeService.rename', () => {
             }
         }
         checkPaths(session)
+    })
+
+    test('should append suffix with dash and number to avoid duplicate file names', async () => {
+        // Given.
+        const copiedTreeDto = deepCopyTreeDto(treeDto)
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        await fakeTreeRepository.setTreeSession(copiedTreeDto)
+        const prePath = copiedTreeDto.children[0].children[2].path
+
+        // When.
+        const response = await treeService.rename(prePath, prePath)
+
+        // Then.
+        expect(response.result).toBe(true)
+        const dirName = path.dirname(prePath)
+        const expectedBaseName = `test139-2.md`
+        const expectedPath = path.join(dirName, expectedBaseName)
+        expect(response.data).toBe(expectedPath)
     })
 })
 
@@ -310,10 +286,10 @@ describe('treeService.paste', () => {
         const originalPaths = childrenToPaste.map(c => c.path) // For checking delete with cut mode.
 
         // When.
-        const result = await treeService.paste(target, childrenToPaste, 'cut')
+        const response = await treeService.paste(target, childrenToPaste, 'cut')
 
         // Then.
-        expect(result).toBe(true)
+        expect(response.result).toBe(true)
 
         for (const oldPath of originalPaths) {
             const exists = await fakeFileManager.exists(oldPath)
@@ -353,10 +329,10 @@ describe('treeService.paste', () => {
         const originalPaths = childrenToPaste.map(c => c.path) // For checking delete with cut mode.
 
         // When
-        const result = await treeService.paste(target, childrenToPaste, 'cut')
+        const response = await treeService.paste(target, childrenToPaste, 'cut')
 
         // Then
-        expect(result).toBe(false)
+        expect(response.result).toBe(false)
         for (const oldPath of originalPaths) {
             const exists = await fakeFileManager.exists(oldPath)
             expect(exists).toBe(true)
@@ -380,10 +356,10 @@ describe('treeService.paste', () => {
         const originalPaths = childrenToPaste.map(c => c.path) // For checking original still exists.
 
         // When.
-        const result = await treeService.paste(target, childrenToPaste, 'copy')
+        const response = await treeService.paste(target, childrenToPaste, 'copy')
 
         // Then.
-        expect(result).toBe(true)
+        expect(response.result).toBe(true)
 
         for (const oldPath of originalPaths) {
             const exists = await fakeFileManager.exists(oldPath)
@@ -423,10 +399,10 @@ describe('treeService.paste', () => {
         const originalPaths = childrenToPaste.map(c => c.path)
 
         // When
-        const result = await treeService.paste(target, childrenToPaste, 'copy')
+        const response = await treeService.paste(target, childrenToPaste, 'copy')
 
         // Then
-        expect(result).toBe(false)
+        expect(response.result).toBe(false)
         for (const oldPath of originalPaths) {
             const exists = await fakeFileManager.exists(oldPath)
             expect(exists).toBe(true)
@@ -437,8 +413,68 @@ describe('treeService.paste', () => {
             expect(exists).toBe(false)
         }
     })
-})
 
+    test('When "139", "139-1", "139-3" exist, pasting "139" or "139-1" creates "139-2"', async () => {
+        // Given
+        const copiedTreeDto = deepCopyTreeDto(treeDto)
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const selectedDtos = []
+        selectedDtos.push(copiedTreeDto.children[0].children[2]) // 139
+        // selectedDtos.push(copiedTreeDto.children[0].children[3]) // 139-1
+        // selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+
+        // When.
+        const response = await treeService.paste(copiedTreeDto, selectedDtos, 'copy')
+        
+        // Then.
+        expect(response.result).toBe(true)
+        expect(response.data[0]).toBe(selectedDtos[0].path)
+    })
+
+    test('When "139", "139-1", "139-3" exist, pasting "139" or "139-1" creates "139-2"', async () => {
+        // Given
+        const copiedTreeDto = deepCopyTreeDto(treeDto)
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const selectedDtos = []
+        // selectedDtos.push(copiedTreeDto.children[0].children[2]) // 139
+        selectedDtos.push(copiedTreeDto.children[0].children[3]) // 139-1
+        // selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+
+        // When.
+        const response = await treeService.paste(copiedTreeDto, selectedDtos, 'cut')
+        
+        // Then.
+        expect(response.result).toBe(true)
+        expect(response.data[0]).toBe(selectedDtos[0].path)
+    })
+
+    test('When "139", "139-1", "139-3" exist, pasting "139" then "139-1" creates "139-2" then "139-4"', async () => {
+        // Given
+        const copiedTreeDto = deepCopyTreeDto(treeDto)
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const selectedDtos = []
+        selectedDtos.push(copiedTreeDto.children[0].children[2]) // 139
+        selectedDtos.push(copiedTreeDto.children[0].children[3]) // 139-1
+        // selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+
+        // When.
+        const response = await treeService.paste(copiedTreeDto, selectedDtos, 'cut')
+        
+        // Then.
+        expect(response.result).toBe(true)
+        expect(path.basename(response.data[0])).toBe('test139-2.md')
+        expect(path.basename(response.data[1])).toBe('test139-4.md')
+    })
+})
 
 describe('treeService.syncTreeSessionFromRenderer', () => {
     beforeEach(() => {

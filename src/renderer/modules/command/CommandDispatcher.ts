@@ -248,13 +248,13 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            this.treeLayoutManager.clearClipboardIndices()
+            this.treeLayoutManager.clearClipboardPaths()
             this.treeLayoutManager.clipboardMode = 'cut'
             const selectedIndices = this.treeLayoutManager.getSelectedIndices()
 
             for (const idx of selectedIndices) {
                 this.treeLayoutManager.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT)
-                this.treeLayoutManager.addClipboardIndices(idx)
+                this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
                 const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
@@ -264,7 +264,7 @@ export default class CommandDispatcher {
                         if (viewModel.indent < isChildViewModel.indent) {
                             // note: We skip adding CLASS_CUT to children, as parent visually affects them
                             // this.treeLayoutManager.getTreeWrapperByIndex(i).classList.add(CLASS_CUT) 
-                            this.treeLayoutManager.addClipboardIndices(i)
+                            this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
                             continue
                         }
 
@@ -292,12 +292,12 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            this.treeLayoutManager.clearClipboardIndices()
+            this.treeLayoutManager.clearClipboardPaths()
             this.treeLayoutManager.clipboardMode = 'copy'
             const selectedIndices = this.treeLayoutManager.getSelectedIndices()
 
             for (const idx of selectedIndices) {
-                this.treeLayoutManager.addClipboardIndices(idx)
+                this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
                 const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
@@ -305,7 +305,7 @@ export default class CommandDispatcher {
                         const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
 
                         if (viewModel.indent < isChildViewModel.indent) {
-                            this.treeLayoutManager.addClipboardIndices(i)
+                            this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
                             continue
                         }
 
@@ -351,11 +351,10 @@ export default class CommandDispatcher {
             const targetViewModel = this.treeLayoutManager.getTreeViewModelByIndex(targetIndex)
 
             const selectedViewModels = []
-            const clipboardIndices = this.treeLayoutManager.getClipboardIndices()
-            for (const idx of clipboardIndices) {
-                selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByIndex(idx))
+            const clipboardPaths = this.treeLayoutManager.getClipboardPaths()
+            for (const path of clipboardPaths) {
+                selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByPath(path))
             }
-
             const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
 
             try {
@@ -458,28 +457,6 @@ export default class CommandDispatcher {
         const bDirect = direction === 'up'
         this.findReplaceState.setDirectionUp(bDirect)
     }
-
-    // performFindUp(source: CommandSource) {
-    //     const input = this.findInput.value
-    //     const view = this.tabEditorManager.getActiveTabEditorView()
-
-    //     const result = view.findAndSelect(input, 'up')
-    //     if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
-    //     else this.findInfo.textContent = 'No results'
-
-    //     this.findReplaceState.setDirectionUp(true)
-    // }
-
-    // performFindDown(source: CommandSource) {
-    //     const input = this.findInput.value
-    //     const view = this.tabEditorManager.getActiveTabEditorView()
-
-    //     const result = view.findAndSelect(input, 'down')
-    //     if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
-    //     else this.findInfo.textContent = 'No results'
-
-    //     this.findReplaceState.setDirectionUp(false)
-    // }
 
     performCloseFindReplaceBox(source: CommandSource) {
         this.findAndReplaceContainer.style.display = 'none'

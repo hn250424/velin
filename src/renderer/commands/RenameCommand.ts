@@ -2,6 +2,7 @@ import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
 import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 import TabEditorManager from "../modules/managers/TabEditorManager"
 import ICommand from "./ICommand"
+import Response from "@shared/types/Response"
 
 export default class RenameCommand implements ICommand {
     constructor(
@@ -14,8 +15,10 @@ export default class RenameCommand implements ICommand {
     ) { }
 
     async execute() {
-        const result = await this.treeLayoutManager.rename(this.prePath, this.newPath)
-        if (!result) throw new Error('Rename failed')
+        const response: Response<string> = await this.treeLayoutManager.rename(this.prePath, this.newPath)
+        if (!response.result) throw new Error('Rename failed')
+        this.newPath = response.data
+
         const newBaseName = window.utils.getBaseName(this.newPath)
         const newSpan = document.createElement('span')
         newSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')

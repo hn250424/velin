@@ -3,8 +3,8 @@ import path from 'path'
 import TrashMap from "@shared/types/TrashMap"
 
 export default class FakeFileManager implements IFileManager {
-     pathExists: Record<string, boolean> = {}
-     savedFiles: Record<string, string> = {}
+    pathExists: Record<string, boolean> = {}
+    savedFiles: Record<string, string> = {}
     private trashFiles: Record<string, string> = {}
     private osTrashFiles: Record<string, string> = {}
     private trashId = 0
@@ -28,6 +28,21 @@ export default class FakeFileManager implements IFileManager {
     async read(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
         if (!(path in this.savedFiles)) throw new Error(`File not found: ${path}`)
         return this.savedFiles[path]
+    }
+
+    async readDir(dirPath: string): Promise<string[]> {
+        const prefix = dirPath.endsWith(path.sep) ? dirPath : dirPath + path.sep;
+        const fileNames = Object.keys(this.savedFiles)
+            .filter(filePath => filePath.startsWith(prefix))
+            .map(filePath => filePath.substring(prefix.length));
+
+        const immediateEntries = new Set<string>();
+        for (const name of fileNames) {
+            const firstPart = name.split(path.sep)[0];
+            immediateEntries.add(firstPart);
+        }
+
+        return Array.from(immediateEntries);
     }
 
     async write(path: string, data: string, encoding: BufferEncoding = 'utf8'): Promise<void> {
@@ -54,11 +69,11 @@ export default class FakeFileManager implements IFileManager {
         if (!(src in this.savedFiles)) {
             throw new Error(`Cannot copy: Source file not found: ${src}`)
         }
-    
+
         if (dest in this.savedFiles) {
             throw new Error(`Cannot copy: Destination already exists: ${dest}`)
         }
-    
+
         this.savedFiles[dest] = this.savedFiles[src]
         this.pathExists[dest] = true
     }

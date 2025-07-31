@@ -16,6 +16,7 @@ import {
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import ClipboardMode from "@shared/types/ClipboardMode"
+import Response from "@shared/types/Response"
 
 export default class TreeLayoutManager {
     private _sideOpenStatus = false
@@ -34,9 +35,16 @@ export default class TreeLayoutManager {
 
     private _contextTreeIndex: number = -1
     private _lastSelectedIndex: number = -1
-    private _selectedIndices = new Set<number> // Set of user-selected indices (no children included)
+
+    // Set of user-selected indices (no children included). For just ui.
+    private _selectedIndices = new Set<number> 
+
+    // Set of full paths that have been copied (including all nested children).
+    // Unlike selectedIndices, this persists even if folders are collapsed.
+    // Used during copy/cut commands to track exactly what to paste later.
+    // Always resolved at the time of the command (not tied to UI state).
+    private _clipboardPaths = new Set<string>
     private _clipboardMode: ClipboardMode = 'none'
-    private _clipboardIndices = new Set<number> // Clipboard indices resolved at command time (includes all children)
 
     constructor() {
         this._tree_node_container = document.getElementById('tree_node_container')
@@ -327,16 +335,16 @@ export default class TreeLayoutManager {
         this._selectedIndices.clear()
     }
 
-    addClipboardIndices(index: number) {
-        this._clipboardIndices.add(index)
+    addClipboardPaths(path: string) {
+        this._clipboardPaths.add(path)
     }
 
-    getClipboardIndices(): number[] {
-        return [...this._clipboardIndices]
+    getClipboardPaths(): string[] {
+        return [...this._clipboardPaths]
     }
 
-    clearClipboardIndices() {
-        this._clipboardIndices.clear()
+    clearClipboardPaths() {
+        this._clipboardPaths.clear()
     }
 
     getFlattenTreeArrayLength(): number {
@@ -352,8 +360,9 @@ export default class TreeLayoutManager {
     }
 
     async rename(preBase: string, newBase: string) {
-        const result = await window.rendererToMain.rename(preBase, newBase)
-        if (!result) return false
+        const response: Response<string> = await window.rendererToMain.rename(preBase, newBase)
+        if (!response.result) return response
+        newBase = response.data
 
         const start = this.getFlattenTreeIndexByPath(preBase)
 
@@ -380,7 +389,7 @@ export default class TreeLayoutManager {
             }
         }
 
-        return true
+        return response
     }
 
     delete(indices: number[]) {

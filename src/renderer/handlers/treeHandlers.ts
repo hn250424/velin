@@ -14,23 +14,20 @@ import {
     SELECTOR_TREE_NODE_CONTAINER
 } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/managers/TabEditorManager"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
-import { wrap } from "node:module"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
     focusManager: FocusManager,
     treeNodeContainer: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
-    tabEditorManager: TabEditorManager,
     treeContextMenu: HTMLElement,
     shortcutRegistry: ShortcutRegistry
 ) {
     const treeContextPasteButton = treeContextMenu.querySelector(SELECTOR_TREE_CONTEXT_PASTE) as HTMLElement
 
-    bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeLayoutManager, tabEditorManager)
+    bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeLayoutManager)
     bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
@@ -40,7 +37,6 @@ function bindTreeClickEvents(
     commandDispatcher: CommandDispatcher,
     treeNodeContainer: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
-    tabEditorManager: TabEditorManager
 ) {
     treeNodeContainer.addEventListener('click', async (e) => {
         if (treeLayoutManager.isAnyTreeNodeSelected()) {

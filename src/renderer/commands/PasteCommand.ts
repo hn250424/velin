@@ -3,6 +3,7 @@ import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
 import TabEditorManager from "../modules/managers/TabEditorManager"
 import TreeViewModel from "../viewmodels/TreeViewModel"
 import ClipboardMode from "@shared/types/ClipboardMode"
+import Response from "@shared/types/Response"
 
 type UndoInfo = {
     src: string
@@ -28,18 +29,20 @@ export default class PasteCommand implements ICommand {
             return this.treeLayoutManager.toTreeDto(viewModel)
         })
 
-        const result = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
+        const response: Response<string[]> = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
+        
+        if (response.result) {
+            const newPaths = response.data
 
-        if (result) {
-            for (const preDto of selectedDtos) {
-                const oldPath = preDto.path
-                const newPath = window.utils.getJoinedPath(targetDto.path, preDto.name) // Target must be directory.
+            for (let i = 0; i < selectedDtos.length; i++) {
+                const oldPath = selectedDtos[i].path
+                const newPath = newPaths[i]
 
                 this.undoInfos.push({
                     src: oldPath,
                     dest: newPath,
                     mode: this.clipboardMode,
-                    isDir: preDto.directory
+                    isDir: selectedDtos[i].directory
                 })
 
                 const view = this.tabEditorManager.getTabEditorViewByPath(oldPath)

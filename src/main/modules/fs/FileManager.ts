@@ -29,6 +29,10 @@ export default class FileManager implements IFileManager {
         return await fs.promises.readFile(path, { encoding: encoding })
     }
 
+    async readDir(dirPath: string) {
+        return fs.promises.readdir(dirPath)
+    }
+
     async write(path: string, data: string, encoding: BufferEncoding = 'utf8'): Promise<void> {
         return await fs.promises.writeFile(path, data, encoding)
     }

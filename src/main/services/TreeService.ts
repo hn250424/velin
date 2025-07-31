@@ -10,6 +10,8 @@ import TreeDto from "@shared/dto/TreeDto"
 import TrashMap from "@shared/types/TrashMap"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import ITreeManager from "@main/modules/contracts/ITreeManager"
+import Response from "@shared/types/Response"
+import { getUniqueFileNames } from "../utils/file"
 
 @injectable()
 export default class TreeService implements ITreeService {
@@ -21,23 +23,24 @@ export default class TreeService implements ITreeService {
 
     }
 
-    async rename(prePath: string, newPath: string): Promise<boolean> {
-        function _rename(prePath: string, node: TreeSessionModel): boolean {
+    async rename(prePath: string, newPath: string): Promise<Response<string>> {
+        function updateTreeSession(prePath: string, finalNewPath: string, node: TreeSessionModel): boolean {
             if (prePath === node.path) {
                 const oldPath = node.path
-                const updatePathsRecursively = (n: TreeSessionModel) => {
+
+                const recursivelyUpdatePaths = (n: TreeSessionModel) => {
                     const relative = path.relative(oldPath, n.path)
-                    n.path = path.join(newPath, relative)
+                    n.path = path.join(finalNewPath, relative)
                     n.name = path.basename(n.path)
                     for (const child of n.children ?? []) {
-                        updatePathsRecursively(child)
+                        recursivelyUpdatePaths(child)
                     }
                 }
-                updatePathsRecursively(node)
+                recursivelyUpdatePaths(node)
                 return true
             } else {
                 for (const child of node.children ?? []) {
-                    const found = _rename(prePath, child)
+                    const found = updateTreeSession(prePath, finalNewPath, child)
                     if (found) return found
                 }
                 return false
@@ -45,28 +48,44 @@ export default class TreeService implements ITreeService {
         }
 
         const session: TreeSessionModel = await this.treeRepository.readTreeSession()
-        const result = _rename(prePath, session)
-        if (result) {
-            await this.fileManager.rename(prePath, newPath)
+
+        const targetDir = path.dirname(newPath)
+        const existingNames = new Set(await this.fileManager.readDir(targetDir))
+        const requestedFileName = path.basename(newPath)
+        
+        const uniqueFileName = getUniqueFileNames(existingNames, [requestedFileName])
+        const finalNewPath = path.join(targetDir, uniqueFileName[0])
+
+        const updated = updateTreeSession(prePath, finalNewPath, session)
+        if (updated) {
+            await this.fileManager.rename(prePath, finalNewPath)
             await this.treeRepository.writeTreeSession(session)
         }
-        return result
+
+        return {
+            result: updated,
+            data: finalNewPath
+        }
     }
 
     async copy(src: string, dest: string) {
         await this.fileManager.copy(src, dest)
     }
 
-    async paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<boolean> {
+    async paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<Response<string[]>> {
         const copiedPaths: string[] = []
         const cutPaths: string[] = []
+        const originalNames = selectedDtos.map(dto => dto.name)
+        const targetDir = targetDto.path
+        const existingNames = new Set(await this.fileManager.readDir(targetDir))
+        const uniqueNames = getUniqueFileNames(existingNames, originalNames)
 
         const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
             if (!Array.isArray(child.children)) {
                 child.children = []
             }
 
-            // Childern first,
+            // Children first,
             for (const grandChild of child.children) {
                 await sortData(child, grandChild)
             }
@@ -82,7 +101,9 @@ export default class TreeService implements ITreeService {
         }
 
         try {
-            for (const child of selectedDtos) {
+            for (const [index, child] of selectedDtos.entries()) {
+                const fileName = uniqueNames[index]
+                child.name = fileName
                 await sortData(targetDto, child)
             }
 
@@ -92,7 +113,10 @@ export default class TreeService implements ITreeService {
                 }
             }
 
-            return true
+            return {
+                result: true,
+                data: copiedPaths
+            }
         } catch (err) {
             for (const p of copiedPaths) {
                 try {
@@ -101,7 +125,10 @@ export default class TreeService implements ITreeService {
                     console.error('Rollback failed to delete:', p, deleteErr)
                 }
             }
-            return false
+            return {
+                result: false,
+                data: []
+            }
         }
     }
 
