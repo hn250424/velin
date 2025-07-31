@@ -14,7 +14,6 @@ import {
     CLASS_EDITOR_BOX,
     NOT_MODIFIED_TEXT
 } from '../../constants/dom'
-import Response from "@shared/types/Response"
 
 export default class TabEditorManager {
     private tabEditorViews: TabEditorView[] = []
@@ -151,6 +150,10 @@ export default class TabEditorManager {
             activatedId: this._activeTabId,
             data: this.tabEditorViews.map(view => this.getTabEditorData(view))
         }
+    }
+
+    getActiveTabEditorView(): TabEditorView {
+        return this.tabEditorViews[this.activeTabIndex]
     }
 
     applySaveResult(result: TabEditorDto) {

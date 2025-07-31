@@ -39,11 +39,11 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
     })
 
     document.getElementById('find_up').addEventListener('click', async () => {
-        commandDispatcher.performFindUp('menu')
+        commandDispatcher.performFind('menu', 'up')
     })
 
     document.getElementById('find_down').addEventListener('click', async () => {
-        commandDispatcher.performFindDown('menu')
+        commandDispatcher.performFind('menu', 'down')
     })
 
     document.getElementById('find_close').addEventListener('click', async () => {

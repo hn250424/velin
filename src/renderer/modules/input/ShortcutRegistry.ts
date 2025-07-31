@@ -21,7 +21,11 @@ export default class ShortcutRegistry {
         // console.log(key)
         const handler = this.shortcutMap.get(key)
         if (handler) {
+            // Prevent the default browser behavior only when the focus is NOT inside the editor.
+            // This avoids interfering with native editor shortcuts (like copy/paste),
+            // while ensuring custom shortcuts work properly in other UI areas (e.g., sidebar, tree view).
             if (this.focusManager.getFocus() !== 'editor') e.preventDefault()
+                
             handler(e)
         }
     }

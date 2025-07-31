@@ -2,6 +2,9 @@ import { serializerCtx } from '@milkdown/core'
 import { Editor, editorViewCtx, parserCtx } from "@milkdown/kit/core"
 import "@milkdown/theme-nord/style.css"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from '../constants/dom'
+import { TextSelection } from 'prosemirror-state'
+import { Decoration, DecorationSet } from "prosemirror-view"
+import { Plugin, PluginKey } from "prosemirror-state"
 
 export default class TabEditorView {
     private _editor: Editor
@@ -9,6 +12,10 @@ export default class TabEditorView {
     private _tabSpan: HTMLElement
     private _tabButton: HTMLElement
     private _editorBoxDiv: HTMLElement
+
+    private searchHighlightKey = new PluginKey("searchHighlight")
+    private searchResults: { from: number; to: number }[] = []
+    private currentSearchIndex: number = -1
 
     constructor(
         tabDiv: HTMLElement,
@@ -101,6 +108,118 @@ export default class TabEditorView {
 
     setTabButtonTextContent(text: string) {
         this._tabButton.textContent = text
+    }
+
+    findMatches(searchText: string): { from: number, to: number }[] {
+        const view = this.editor.ctx.get(editorViewCtx)
+        const { doc } = view.state
+
+        const matches: { from: number, to: number }[] = []
+
+        if (!searchText || !searchText.trim()) {
+            return matches
+        }
+
+        doc.descendants((node, pos) => {
+            if (node.isText) {
+                const text = node.text ?? ''
+                let index = text.indexOf(searchText)
+                while (index !== -1) {
+                    matches.push({ from: pos + index, to: pos + index + searchText.length })
+                    index = text.indexOf(searchText, index + searchText.length)
+                }
+            }
+            return true
+        })
+
+        return matches
+    }
+
+    findAndSelect(
+        searchText: string,
+        direction: 'up' | 'down'
+    ): { total: number; current: number } | null {
+        const view = this.editor.ctx.get(editorViewCtx)
+        const state = view.state
+        const currentPos = state.selection.from
+
+        this.searchResults = this.findMatches(searchText)
+
+        if (this.searchResults.length === 0) return null
+
+        let targetIndex = -1
+
+        // Find next/previous match based on current cursor position
+        // and wrap to first or last match with direction if none found after cursor.
+        if (direction === 'down') {
+            targetIndex = this.searchResults.findIndex(match => match.from > currentPos)
+            if (targetIndex === -1) {
+                targetIndex = 0
+            }
+        } else {
+            for (let i = this.searchResults.length - 1; i >= 0; i--) {
+                if (this.searchResults[i].to <= currentPos) {
+                    targetIndex = i
+                    break
+                }
+            }
+            if (targetIndex === -1) {
+                targetIndex = this.searchResults.length - 1
+            }
+        }
+
+        this.currentSearchIndex = targetIndex
+        const match = this.searchResults[targetIndex]
+
+        const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to))
+
+        const searchHighlightPlugin = new Plugin({
+            key: this.searchHighlightKey,
+            state: {
+                init: () => DecorationSet.empty,
+                apply: (tr, old, _oldState, newState) => old.map(tr.mapping, newState.doc)
+            },
+            props: {
+                decorations: (state) => {
+                    if (!this.searchResults.length) return null
+                    const decorations = this.searchResults.map((match, idx) =>
+                        Decoration.inline(
+                            match.from,
+                            match.to,
+                            { class: idx === this.currentSearchIndex ? "search-highlight-current" : "search-highlight" }
+                        )
+                    )
+                    return DecorationSet.create(state.doc, decorations)
+                }
+            }
+        })
+
+        const plugins = state.plugins.filter(p => p.spec.key !== this.searchHighlightKey)
+        const newState = state.reconfigure({ plugins: [...plugins, searchHighlightPlugin] })
+        view.updateState(newState)
+
+        view.dispatch(tr)
+        // view.focus() // Retain focus in input.
+
+        // console.log('Current cursor position:', currentPos)
+        // console.log('Search results:', this.searchResults)
+        // console.log('Direction:', direction)
+        // console.log('Target index:', targetIndex)
+
+        return {
+            total: this.searchResults.length,
+            current: this.currentSearchIndex + 1,
+        }
+    }
+
+    clearSearch() {
+        const view = this.editor.ctx.get(editorViewCtx)
+        const plugins = view.state.plugins.filter(p => p.spec.key !== this.searchHighlightKey)
+        const newState = view.state.reconfigure({ plugins })
+        view.updateState(newState)
+
+        this.searchResults = []
+        this.currentSearchIndex = -1
     }
 
     get editor(): Editor {

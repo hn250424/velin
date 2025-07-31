@@ -23,6 +23,9 @@ export const SELECTOR_FIND_INPUT = `#${ID_FIND_INPUT}`
 export const ID_REPLACE_INPUT = 'replace_input'
 export const SELECTOR_REPLACE_INPUT = `#${ID_REPLACE_INPUT}`
 
+export const ID_FIND_INFO = 'find_info'
+export const SELECTOR_FIND_INFO = `#${ID_FIND_INFO}`
+
 export const ID_TREE_CONTEXT_PASTE = 'tree_context_paste'
 export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
 

@@ -19,7 +19,8 @@ import {
     ID_FIND,
     ID_REPLACE,
     ID_FIND_INPUT,
-    ID_REPLACE_INPUT
+    ID_REPLACE_INPUT,
+    ID_FIND_INFO
 } from "../../constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -56,8 +57,9 @@ export default class CommandDispatcher {
     private findAndReplaceContainer: HTMLElement
     private findBox: HTMLElement
     private replaceBox: HTMLElement
-    private findInput: HTMLElement
-    private replaceInput: HTMLElement
+    private findInput: HTMLInputElement
+    private replaceInput: HTMLInputElement
+    private findInfo: HTMLElement
 
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
@@ -68,8 +70,9 @@ export default class CommandDispatcher {
         this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER)
         this.findBox = document.getElementById(ID_FIND)
         this.replaceBox = document.getElementById(ID_REPLACE)
-        this.findInput = document.getElementById(ID_FIND_INPUT)
-        this.replaceInput = document.getElementById(ID_REPLACE_INPUT)
+        this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement
+        this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement
+        this.findInfo = document.getElementById(ID_FIND_INFO)
     }
 
     async performNewTab(source: CommandSource) {
@@ -439,22 +442,50 @@ export default class CommandDispatcher {
     toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
         this.findAndReplaceContainer.style.display = 'block'
         this.replaceBox.style.display = showReplace ? 'flex' : 'none'
+
+        if (this.findReplaceState.getDirectionUp()) this.performFind('programmatic', 'up')
+        else this.performFind('programmatic', 'down')
     }
 
-    performFindUp(source: CommandSource) {
-        console.log('perform-findup')
+    performFind(source: CommandSource, direction: 'up' | 'down') {
+        const input = this.findInput.value
+        const view = this.tabEditorManager.getActiveTabEditorView()
 
-        this.findReplaceState.setDirectionUp(true)
+        const result = view.findAndSelect(input, direction)
+        if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
+        else this.findInfo.textContent = 'No results'
+
+        const bDirect = direction === 'up'
+        this.findReplaceState.setDirectionUp(bDirect)
     }
 
-    performFindDown(source: CommandSource) {
-        console.log('perform-finddown')
+    // performFindUp(source: CommandSource) {
+    //     const input = this.findInput.value
+    //     const view = this.tabEditorManager.getActiveTabEditorView()
 
-        this.findReplaceState.setDirectionUp(false)
-    }
+    //     const result = view.findAndSelect(input, 'up')
+    //     if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
+    //     else this.findInfo.textContent = 'No results'
+
+    //     this.findReplaceState.setDirectionUp(true)
+    // }
+
+    // performFindDown(source: CommandSource) {
+    //     const input = this.findInput.value
+    //     const view = this.tabEditorManager.getActiveTabEditorView()
+
+    //     const result = view.findAndSelect(input, 'down')
+    //     if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
+    //     else this.findInfo.textContent = 'No results'
+
+    //     this.findReplaceState.setDirectionUp(false)
+    // }
 
     performCloseFindReplaceBox(source: CommandSource) {
         this.findAndReplaceContainer.style.display = 'none'
+
+        const activeView = this.tabEditorManager.getActiveTabEditorView()
+        if (activeView) activeView.clearSearch()
     }
 
     async performESC(source: CommandSource) {
@@ -465,17 +496,17 @@ export default class CommandDispatcher {
         }
     }
 
-    async performENTER(source: CommandSource) {
+    async performENTER(e: KeyboardEvent, source: CommandSource) {
         const focus = this.focusManager.getFocus()
 
         if (focus === 'find_replace') {
             const activateElement = document.activeElement
-            
+
             if (activateElement === this.findInput) {
                 if (this.findReplaceState.getDirectionUp()) {
-                    this.performFindUp(source)
+                    this.performFind(source, 'up')
                 } else {
-                    this.performFindDown(source)
+                    this.performFind(source, 'down')
                 }
             } else if (activateElement === this.replaceInput) {
                 console.log('replaceinput')
