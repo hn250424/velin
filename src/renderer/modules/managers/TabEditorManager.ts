@@ -27,6 +27,9 @@ export default class TabEditorManager {
     private tabContainer: HTMLElement
     private editorContainer: HTMLElement
 
+    private ghostTab: HTMLElement | null
+    private indicator: HTMLElement | null
+
     constructor() {
         this.tabContainer = document.getElementById('tab_container')
         this.editorContainer = document.getElementById('editor_container')
@@ -328,6 +331,45 @@ export default class TabEditorManager {
         return { tabDiv: div, tabSpan: span, tabButton: button }
     }
 
+    createGhostTabBox(fileName: string) {
+        if (this.ghostTab) return this.ghostTab
+
+        const { tabDiv: div, tabSpan: span, tabButton: button } = this.createTabBox(fileName)
+        div.style.position = 'fixed'
+        div.style.height = '3px'
+        div.style.pointerEvents = 'none'
+        div.style.opacity = '0.7'
+        div.style.zIndex = '1000'
+        this.ghostTab = div
+        document.body.appendChild(this.ghostTab)
+
+        return div
+    }
+
+    removeGhostTab() {
+        if (this.ghostTab) {
+            this.ghostTab.remove()
+            this.ghostTab = null
+        }
+    }
+
+    createIndicator() {
+        if (this.indicator) return this.indicator
+
+        const _indicator = document.createElement('div')
+        _indicator.className = 'tab-indicator'
+
+        this.indicator = _indicator
+        return this.indicator
+    }
+
+    removeIndicator() {
+        if (this.indicator) {
+            this.indicator.remove()
+            this.indicator = null
+        }
+    }
+
     private setLastTabAsActive() {
         this.activeTabIndex = this.tabEditorViews.length - 1
         this.activeTabId = this.activeTabIndex >= 0 ? this.tabEditorViews[this.activeTabIndex].getId() : -1
@@ -348,6 +390,33 @@ export default class TabEditorManager {
 
     setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
         this.pathToTabEditorViewMap.set(path, tabEditorVeiw)
+    }
+
+    getTabEditorViewByIndex(index: number) {
+        return this.tabEditorViews[index]
+    }
+
+    getTabEditorViewIndexById(id: number) {
+        return this.tabEditorViews.findIndex(v => v.getId() === id)
+    }
+
+    moveTabEditorView(fromIndex: number, toIndex: number): void {
+        if (fromIndex === toIndex) return
+
+        const view = this.tabEditorViews.splice(fromIndex, 1)[0]
+        this.tabEditorViews.splice(toIndex, 0, view)
+
+        this.tabContainer.removeChild(view.tabDiv)
+        const refNode = this.tabContainer.children[toIndex] ?? null
+        this.tabContainer.insertBefore(view.tabDiv, refNode)
+
+        if (this._activeTabIndex === fromIndex) {
+            this._activeTabIndex = toIndex
+        } else if (fromIndex < this._activeTabIndex && toIndex >= this._activeTabIndex) {
+            this._activeTabIndex--
+        } else if (fromIndex > this._activeTabIndex && toIndex <= this._activeTabIndex) {
+            this._activeTabIndex++
+        }
     }
 
     deleteTabEditorViewByPath(path: string) {

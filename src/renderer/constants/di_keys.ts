@@ -4,7 +4,9 @@ const DI_KEYS = {
     ShortcutRegistry: Symbol('ShortcutRegistry'),
     TabEditorManager: Symbol('TabEditorManager'),
     TreeLayoutManager: Symbol('TreeLayoutManager'),
-    CommandDispatcher: Symbol('CommandDispatcher')
+    CommandDispatcher: Symbol('CommandDispatcher'),
+    TabDragManager: Symbol('TabDragManager'),
+    TreeDragManager: Symbol('TreeDragManager'),
 }
 
 export default DI_KEYS

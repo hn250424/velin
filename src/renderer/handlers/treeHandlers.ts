@@ -16,10 +16,12 @@ import {
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
+import TreeDragManager from "../modules/state/TreeDragManager"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
     focusManager: FocusManager,
+    dragManager: TreeDragManager,
     treeNodeContainer: HTMLElement,
     treeLayoutManager: TreeLayoutManager,
     treeContextMenu: HTMLElement,

@@ -26,6 +26,9 @@ import {
 } from './constants/dom'
 import WindowLayoutManager from './modules/layout/WindowLayoutManager'
 import ZoomManager from './modules/layout/ZoomManager'
+import TabDragManager from './modules/state/TabDragManager'
+import TreeDragManager from './modules/state/TreeDragManager'
+import FindReplaceState from './modules/state/FindReplaceState'
 
 let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -47,6 +50,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const windowLayoutManager = WindowLayoutManager.getInstance()
     const zoomManager = ZoomManager.getInstance()
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
+    const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState)
+    const tabDragManager = diContainer.get<TabDragManager>(DI_KEYS.TabDragManager)
+    const treeDragManager = diContainer.get<TreeDragManager>(DI_KEYS.TreeDragManager)
     const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
     const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
@@ -59,8 +65,8 @@ window.addEventListener('DOMContentLoaded', () => {
     registerEditHandlers(commandDispatcher, shortcutRegistry)
     registerViewHandlers(shortcutRegistry, zoomManager)
     registerSideHandlers(treeLayoutManager)
-    registerTabHandlers(commandDispatcher, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
-    registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeLayoutManager, treeContextMenu, shortcutRegistry)
+    registerTabHandlers(commandDispatcher, tabDragManager, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
+    registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeLayoutManager, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)

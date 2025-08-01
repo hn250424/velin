@@ -7,11 +7,15 @@ import TabEditorManager from './modules/managers/TabEditorManager'
 import TreeLayoutManager from './modules/managers/TreeLayoutManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
 import FindReplaceState from './modules/state/FindReplaceState'
+import TabDragManager from './modules/state/TabDragManager'
+import TreeDragManager from './modules/state/TreeDragManager'
 
 const diContainer = new Container()
 
 diContainer.bind<FocusManager>(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope()
-diContainer.bind<FindReplaceState>(DI_KEYS.FindReplaceState).to(FindReplaceState).inRequestScope()
+diContainer.bind<FindReplaceState>(DI_KEYS.FindReplaceState).to(FindReplaceState).inSingletonScope()
+diContainer.bind<TabDragManager>(DI_KEYS.TabDragManager).to(TabDragManager).inSingletonScope()
+diContainer.bind<TreeDragManager>(DI_KEYS.TreeDragManager).to(TreeDragManager).inSingletonScope()
 
 diContainer.bind<ShortcutRegistry>(DI_KEYS.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope()
 diContainer.bind<TabEditorManager>(DI_KEYS.TabEditorManager).to(TabEditorManager).inSingletonScope()

@@ -47,6 +47,8 @@ $tab_button_radius: 5px;
 
     padding: $tab_elem_padding;
 
+    user-select: none;
+
     background-color: grey;
 }
 
@@ -115,4 +117,10 @@ $tab_button_radius: 5px;
 
 .editorBox.selected {
     display: block;
+}
+
+.tab-indicator {
+    width: 3px;
+    height: 100%;
+    background-color: blue;
 }
