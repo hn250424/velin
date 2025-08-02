@@ -12,7 +12,8 @@ import {
     DATASET_ATTR_TAB_ID,
     MODIFIED_TEXT,
     CLASS_EDITOR_BOX,
-    NOT_MODIFIED_TEXT
+    NOT_MODIFIED_TEXT,
+    CLASS_TAB_GHOST
 } from '../../constants/dom'
 
 export default class TabEditorManager {
@@ -331,22 +332,19 @@ export default class TabEditorManager {
         return { tabDiv: div, tabSpan: span, tabButton: button }
     }
 
-    createGhostTabBox(fileName: string) {
+    createGhostBox(fileName: string) {
         if (this.ghostTab) return this.ghostTab
 
         const { tabDiv: div, tabSpan: span, tabButton: button } = this.createTabBox(fileName)
-        div.style.position = 'fixed'
-        div.style.height = '3px'
-        div.style.pointerEvents = 'none'
-        div.style.opacity = '0.7'
-        div.style.zIndex = '1000'
+        div.classList.add(CLASS_TAB_GHOST)
+
         this.ghostTab = div
         document.body.appendChild(this.ghostTab)
 
         return div
     }
 
-    removeGhostTab() {
+    removeGhostBox() {
         if (this.ghostTab) {
             this.ghostTab.remove()
             this.ghostTab = null

@@ -11,7 +11,8 @@ import {
     CLASS_TREE_NODE_OPEN,
     CLASS_TREE_NODE_WRAPPER,
     CLASS_TREE_NODE_CHILDREN,
-    SELECTOR_TREE_NODE
+    SELECTOR_TREE_NODE,
+    CLASS_TREE_GHOST
 } from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
@@ -35,6 +36,7 @@ export default class TreeLayoutManager {
 
     private _contextTreeIndex: number = -1
     private _lastSelectedIndex: number = -1
+    private _selectedDragIndex: number = -1
 
     // Set of user-selected indices (no children included). For just ui.
     private _selectedIndices = new Set<number> 
@@ -45,6 +47,8 @@ export default class TreeLayoutManager {
     // Always resolved at the time of the command (not tied to UI state).
     private _clipboardPaths = new Set<string>
     private _clipboardMode: ClipboardMode = 'none'
+
+    private ghostBox: HTMLElement | null = null
 
     constructor() {
         this._tree_node_container = document.getElementById('tree_node_container')
@@ -149,6 +153,26 @@ export default class TreeLayoutManager {
             for (const child of viewModel.children) {
                 this._renderNode(childrenContainer, child)
             }
+        }
+    }
+
+    createGhostBox(count: number) {
+        if (this.ghostBox) return this.ghostBox
+
+        const div = document.createElement('div')
+        div.classList.add(CLASS_TREE_GHOST)
+        div.textContent = `${count} items`
+ 
+        this.ghostBox = div
+        document.body.appendChild(div)
+
+        return this.ghostBox
+    }
+
+    removeGhostBox() {
+        if (this.ghostBox) {
+            this.ghostBox.remove()
+            this.ghostBox = null
         }
     }
 
@@ -305,6 +329,14 @@ export default class TreeLayoutManager {
 
     removeLastSelectedIndex() {
         this._lastSelectedIndex = -1
+    }
+
+    get selectedDragIndex() {
+        return this._selectedDragIndex
+    }
+
+    setSelectedDragIndexByPath(path: string) {
+        this._selectedDragIndex = this.getIndexByPath(path)
     }
 
     get contextTreeIndex() {

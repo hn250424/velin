@@ -1,6 +1,6 @@
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
-import TabEditorManager from "../modules/managers/TabEditorManager"
-import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
+import TabEditorManager from "../modules/domains/TabEditorManager"
+import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
 
 // TODO: Alt+F4
 export default function registerExitHandlers(

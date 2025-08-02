@@ -1,6 +1,6 @@
 import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
-import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
-import TabEditorManager from "../modules/managers/TabEditorManager"
+import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
+import TabEditorManager from "../modules/domains/TabEditorManager"
 import ICommand from "./ICommand"
 import Response from "@shared/types/Response"
 

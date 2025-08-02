@@ -17,11 +17,11 @@ import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 import TreeReposotory from './modules/persistence/TreeReposotory'
 import ITabService from '@services/contracts/ITabService'
 import ITreeManager from 'src/main/modules/contracts/ITreeManager'
-import TreeManager from './modules/managers/TreeManager'
+import TreeManager from './modules/domains/TreeManager'
 import ITreeService from '@services/contracts/ITreeService'
 import TreeService from '@services/TreeService'
 import ITabManager from './modules/contracts/ITabManager'
-import TabManager from './modules/managers/TabManager'
+import TabManager from './modules/domains/TabManager'
 
 const diContainer = new Container()
 

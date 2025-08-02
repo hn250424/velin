@@ -26,8 +26,8 @@ import {
 import TreeDto from "@shared/dto/TreeDto"
 
 import FocusManager from "../state/FocusManager"
-import TabEditorManager from "../managers/TabEditorManager"
-import TreeLayoutManager from "../managers/TreeLayoutManager"
+import TabEditorManager from "../domains/TabEditorManager"
+import TreeLayoutManager from "../domains/TreeLayoutManager"
 
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
@@ -37,7 +37,7 @@ import DeleteCommand from "../../commands/DeleteCommand"
 import PasteCommand from "../../commands/PasteCommand"
 import FindReplaceState from "../state/FindReplaceState"
 
-type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'programmatic'
+type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic'
 
 /**
  * CommandDispatcher centrally handles commands
@@ -320,7 +320,7 @@ export default class CommandDispatcher {
 
     async performPaste(source: CommandSource) {
         const focus = this.focusManager.getFocus()
-
+        
         if (focus === 'editor' && source === 'shortcut') return
 
         if (focus === 'editor') {
@@ -347,11 +347,13 @@ export default class CommandDispatcher {
             let targetIndex
             if (source === 'context_menu') targetIndex = this.treeLayoutManager.contextTreeIndex
             else if (source === 'shortcut') targetIndex = this.treeLayoutManager.lastSelectedIndex
+            else if (source === 'drag') targetIndex = this.treeLayoutManager.selectedDragIndex
+            
             if (targetIndex === -1) return
             const targetViewModel = this.treeLayoutManager.getTreeViewModelByIndex(targetIndex)
 
             const selectedViewModels = []
-            const clipboardPaths = this.treeLayoutManager.getClipboardPaths()
+            const clipboardPaths = this.treeLayoutManager.getClipboardPaths() ?? []
             for (const path of clipboardPaths) {
                 selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByPath(path))
             }

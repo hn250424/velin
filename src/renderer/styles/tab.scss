@@ -124,3 +124,11 @@ $tab_button_radius: 5px;
     height: 100%;
     background-color: blue;
 }
+
+.tab_ghost {
+    position: fixed;
+    height: 3px;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 1000;
+}

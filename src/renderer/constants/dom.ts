@@ -59,6 +59,12 @@ export const SELECTOR_TREE_NODE_WRAPPER = `.${CLASS_TREE_NODE_WRAPPER}`
 export const CLASS_TREE_NODE_CHILDREN = 'tree_node_children'
 export const SELECTOR_TREE_NODE_CHILDREN = `.${CLASS_TREE_NODE_CHILDREN}`
 
+export const CLASS_TAB_GHOST = 'tab_ghost'
+export const SELECTOR_TAB_GHOST = `.${CLASS_TAB_GHOST}`
+
+export const CLASS_TREE_GHOST = 'tree_ghost'
+export const SELECTOR_TREE_GHOST = `.${CLASS_TREE_GHOST}`
+
 export const MODIFIED_TEXT = '•'
 export const NOT_MODIFIED_TEXT = '×'
 

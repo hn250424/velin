@@ -1,7 +1,7 @@
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import TreeDto from "@shared/dto/TreeDto"
-import TabEditorManager from "../modules/managers/TabEditorManager"
-import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
+import TabEditorManager from "../modules/domains/TabEditorManager"
+import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
 
 export default function registerLoadHandlers(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
     window.mainToRenderer.session(async (tabs: TabEditorsDto, tree: TreeDto) => {

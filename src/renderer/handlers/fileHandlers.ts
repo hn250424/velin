@@ -4,7 +4,7 @@ import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/managers/TabEditorManager"
+import TabEditorManager from "../modules/domains/TabEditorManager"
 
 export default function registerFileHandlers(
     commandDispatcher: CommandDispatcher, 

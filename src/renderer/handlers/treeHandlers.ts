@@ -1,5 +1,5 @@
 import "@milkdown/theme-nord/style.css"
-import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
+import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
 import {
     DATASET_ATTR_TREE_PATH,
     CLASS_FOCUSED,
@@ -11,12 +11,14 @@ import {
     ID_TREE_CONTEXT_PASTE,
     SELECTOR_TREE_CONTEXT_PASTE,
     ID_TREE_NODE_CONTAINER,
-    SELECTOR_TREE_NODE_CONTAINER
+    SELECTOR_TREE_NODE_CONTAINER,
+    CLASS_TREE_NODE_WRAPPER,
+    CLASS_TREE_NODE
 } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
-import TreeDragManager from "../modules/state/TreeDragManager"
+import TreeDragManager from "../modules/drag/TreeDragManager"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
@@ -33,6 +35,71 @@ export default function registerTreeHandlers(
     bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
+
+    // Drag.
+    bindMouseDownEvents(dragManager, treeLayoutManager, treeNodeContainer)
+    bindMouseMoveEvents(dragManager, treeLayoutManager)
+    bindMouseUpEvents(dragManager, treeLayoutManager, treeNodeContainer, commandDispatcher)
+}
+
+function bindMouseDownEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager, treeContainer: HTMLElement) {
+    treeContainer.addEventListener('mousedown', (e) => {
+        const count = treeManager.getSelectedIndices().length
+        dragManager.setDragTreeCount(count)
+        dragManager.setMouseDown(true)
+        dragManager.setStartPosition(e.clientX, e.clientY)
+    })
+}
+
+function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager) {
+    document.addEventListener('mousemove', (e: MouseEvent) => {
+        if (!dragManager.isMouseDown()) return
+
+        if (!dragManager.isDrag()) {
+            const dx = Math.abs(e.clientX - dragManager.getStartPosition_x())
+            const dy = Math.abs(e.clientY - dragManager.getStartPosition_y())
+            if (dx > 5 || dy > 5) {
+                dragManager.startDrag()
+            } else {
+                return
+            }
+        }
+        
+        const div = treeManager.createGhostBox(dragManager.getDragTreeCount())
+        div.style.left = `${e.clientX + 5}px`
+        div.style.top = `${e.clientY + 5}px`
+
+        const target = e.target as HTMLElement
+        const wrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
+        if (!wrapper) return
+        const preWrapper = dragManager.getInsertWrapper()
+        if (preWrapper === wrapper) return
+        if (preWrapper) preWrapper.style.background = ''
+
+        const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+        const viewModel = treeManager.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
+        if (!viewModel.directory) return
+        dragManager.setInsertPath(viewModel.path)
+        
+        wrapper.style.background = 'green'
+        dragManager.setInsertWrapper(wrapper)
+    })
+}
+
+function bindMouseUpEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager, treeContainer: HTMLElement, commandDispatcher: CommandDispatcher) {
+    treeContainer.addEventListener('mouseup', async (e: MouseEvent) => {
+        if (!dragManager.isDrag()) {
+            dragManager.setMouseDown(false)
+            return
+        }
+        
+        const path = dragManager.getInsertPath()
+        dragManager.endDrag()
+        treeManager.removeGhostBox()
+        treeManager.setSelectedDragIndexByPath(path)
+        await commandDispatcher.performCut('drag')
+        commandDispatcher.performPaste('drag')
+    })
 }
 
 function bindTreeClickEvents(

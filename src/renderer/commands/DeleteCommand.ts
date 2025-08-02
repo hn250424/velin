@@ -1,6 +1,6 @@
 import ICommand from "./ICommand"
-import TreeLayoutManager from "../modules/managers/TreeLayoutManager"
-import TabEditorManager from "../modules/managers/TabEditorManager"
+import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
+import TabEditorManager from "../modules/domains/TabEditorManager"
 import TrashMap from "@shared/types/TrashMap"
 import Response from "@shared/types/Response"
 
