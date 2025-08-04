@@ -5,7 +5,7 @@ import path from 'path'
 import { beforeEach, describe, expect, test } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
-import FakeTreeManager from '../modules/managers/FakeTreeManager'
+import FakeTreeManager from '../modules/domains/FakeTreeManager'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
 

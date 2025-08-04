@@ -10,7 +10,6 @@ import registerExitHandlers from './handlers/exitHandlers'
 import registerEditHandlers from './handlers/editHandlers'
 import registerTabHandlers from './handlers/tabHandlers'
 import registerTreeHandlers from './handlers/treeHandlers'
-import diContainer from './diContainer'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from './modules/contracts/IFileManager'
 import ITreeRepository from './modules/contracts/ITreeRepository'
@@ -21,6 +20,9 @@ import ITreeManager from './modules/contracts/ITreeManager'
 import IDialogService from './modules/contracts/IDialogService'
 import ITreeService from '@services/contracts/ITreeService'
 import ITabManager from './modules/contracts/ITabManager'
+import DIContainer from './DiContainer_'
+import IFileWatcher from './modules/contracts/IFileWatcher'
+import registerWatchHandlers from './handlers/watchHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -55,7 +57,11 @@ const createWindow = () => {
     const mainWindow = createMainWindow()
     Menu.setApplicationMenu(null)
 
+    DIContainer.init(mainWindow)
+    const diContainer = DIContainer.getInstance()
+
     const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
+    const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
     const dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeReposotory)
@@ -66,13 +72,14 @@ const createWindow = () => {
     const tabService = diContainer.get<ITabService>(DI_KEYS.TabService)
     const treeService = diContainer.get<ITreeService>(DI_KEYS.TreeService)
 
-    registerLoadHandlers(mainWindow, fileManager, tabRepository, treeRepository, tabManager, treeManager)
+    registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogService, tabRepository, treeRepository)
     registerTabHandlers(mainWindow, tabService)
     registerTreeHandlers(mainWindow, treeService)
     registerEditHandlers()
+    registerWatchHandlers(mainWindow, fileWatcher)
 
     loadUrl(mainWindow)
 }

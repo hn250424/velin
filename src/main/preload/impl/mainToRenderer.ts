@@ -5,8 +5,11 @@ import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import TreeDto from "@shared/dto/TreeDto"
 
 const mainToRenderer: MainToRendererAPI = {
-    session: (callback: (tabs: TabEditorsDto, tree: TreeDto) => void) => {
-        ipcRenderer.on(electronAPI.events.mainToRenderer.session, (e, tabs, tree) => { callback(tabs, tree) })
+    session: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
+        ipcRenderer.on(electronAPI.events.mainToRenderer.session, (e, tabEditorsDto, treeDto) => { callback(tabEditorsDto, treeDto) })
+    },
+    syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
+        ipcRenderer.on(electronAPI.events.mainToRenderer.syncFromWatch, (e, tabEditorsDto, treeDto) => { callback(tabEditorsDto, treeDto) })
     },
     onMaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.mainToRenderer.onMaximizeWindow, () => { callback() }) },
     onUnmaximizeWindow: (callback: () => void) => { ipcRenderer.on(electronAPI.events.mainToRenderer.onUnmaximizeWindow, () => { callback() }) },

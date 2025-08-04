@@ -33,5 +33,7 @@ export const rendererToMainEvents = {
 
     syncTabSessionFromRenderer: 'syncTabSessionFromRenderer',
     syncTreeSessionFromRenderer: 'syncTreeSessionFromRenderer',
-    getSyncedTreeSession: 'getSyncedTreeSession'
+    getSyncedTreeSession: 'getSyncedTreeSession',
+
+    setWatchSkipState: 'setWatchSkipState'
 } as const

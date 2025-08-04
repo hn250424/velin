@@ -7,17 +7,19 @@ import ITreeManager from 'src/main/modules/contracts/ITreeManager'
 import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 import { loadedRenderer } from '../services/loadService'
 import ITabManager from '@main/modules/contracts/ITabManager'
+import IFileWatcher from '@main/modules/contracts/IFileWatcher'
 
 export default function registerLoadHandlers(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
+    fileWatcher: IFileWatcher,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
     tabManager: ITabManager,
     treeManager: ITreeManager
 ) {
     ipcMain.on(electronAPI.events.rendererToMain.loadedRenderer, async (e) => {
-        loadedRenderer(mainWindow, fileManager, tabRepository, treeRepository, tabManager, treeManager)
+        loadedRenderer(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
     })
 
     ipcMain.on(electronAPI.events.rendererToMain.showMainWindow, () => {

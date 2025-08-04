@@ -58,6 +58,36 @@ export default class TabEditorManager {
         }
     }
 
+    async syncTabs(dto: TabEditorsDto) {
+        this._activeTabId = dto.activatedId
+        const tabs = dto.data
+
+        const map: Map<number, TabEditorDto> = new Map()
+
+        for (const tab of tabs) {
+            map.set(tab.id, tab)
+        }
+
+        for (const view of this.tabEditorViews) {
+            const id = view.getId()
+            const dto = map.get(id)
+            
+            if (dto) {
+                const viewModel = this.idToTabViewModelMap.get(id)
+                if (dto.filePath !== viewModel.filePath) {
+                    viewModel.filePath = dto.filePath
+                    viewModel.fileName = dto.fileName
+
+                    view.tabSpan.title = dto.filePath
+                    view.tabSpan.textContent = this.resolveFileName(view)
+                }
+            } else {
+                this.removeTab(id)
+                this.idToTabViewModelMap.delete(id)
+            }
+        }
+    }
+
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
         const tabViewModel = { id: id, isModified: false, filePath: filePath, fileName: fileName }
         this.setTabEditorViewModelById(id, tabViewModel)
@@ -144,7 +174,9 @@ export default class TabEditorManager {
     }
 
     getTabEditorDataById(id: number): TabEditorDto {
-        const view = this.tabEditorViews.find(_view => _view.getId() === id)
+        const viewModel = this.idToTabViewModelMap.get(id)
+        const view = this.pathToTabEditorViewMap.get(viewModel.filePath)
+        // const view = this.tabEditorViews.find(_view => _view.getId() === id)
         if (!view) return null
         return this.getTabEditorData(view)
     }

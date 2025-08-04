@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
 import Response from "@shared/types/Response"
+import { sleep } from "../../utils/sleep"
 
 import {
     CLASS_EXPANDED,
@@ -205,10 +206,19 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            const cmd = this.undoStack.pop()
-            if (!cmd) return
-            await cmd.undo()
-            this.redoStack.push(cmd)
+            try {
+                window.rendererToMain.setWatchSkipState(true)
+                const cmd = this.undoStack.pop()
+                if (!cmd) return
+                await cmd.undo()
+                this.redoStack.push(cmd)
+            } catch (err) {
+
+            } finally {
+                await sleep(300)
+                window.rendererToMain.setWatchSkipState(false)
+            }
+
             return
         }
     }
@@ -224,10 +234,19 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            const cmd = this.redoStack.pop()
-            if (!cmd) return
-            await cmd.execute()
-            this.undoStack.push(cmd)
+            try {
+                window.rendererToMain.setWatchSkipState(true)
+                const cmd = this.redoStack.pop()
+                if (!cmd) return
+                await cmd.execute()
+                this.undoStack.push(cmd)
+            } catch (err) {
+
+            } finally {
+                await sleep(300)
+                window.rendererToMain.setWatchSkipState(false)
+            }
+
             return
         }
     }
@@ -254,7 +273,7 @@ export default class CommandDispatcher {
 
             for (const idx of selectedIndices) {
                 this.treeLayoutManager.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT)
-                this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
+                this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
                 const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
@@ -264,7 +283,7 @@ export default class CommandDispatcher {
                         if (viewModel.indent < isChildViewModel.indent) {
                             // note: We skip adding CLASS_CUT to children, as parent visually affects them
                             // this.treeLayoutManager.getTreeWrapperByIndex(i).classList.add(CLASS_CUT) 
-                            this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
+                            this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
                             continue
                         }
 
@@ -297,7 +316,7 @@ export default class CommandDispatcher {
             const selectedIndices = this.treeLayoutManager.getSelectedIndices()
 
             for (const idx of selectedIndices) {
-                this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
+                this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
                 const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
@@ -305,7 +324,7 @@ export default class CommandDispatcher {
                         const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
 
                         if (viewModel.indent < isChildViewModel.indent) {
-                            this.treeLayoutManager.addClipboardPaths( this.treeLayoutManager.getTreeViewModelByIndex(idx).path )
+                            this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
                             continue
                         }
 
@@ -320,7 +339,7 @@ export default class CommandDispatcher {
 
     async performPaste(source: CommandSource) {
         const focus = this.focusManager.getFocus()
-        
+
         if (focus === 'editor' && source === 'shortcut') return
 
         if (focus === 'editor') {
@@ -348,7 +367,7 @@ export default class CommandDispatcher {
             if (source === 'context_menu') targetIndex = this.treeLayoutManager.contextTreeIndex
             else if (source === 'shortcut') targetIndex = this.treeLayoutManager.lastSelectedIndex
             else if (source === 'drag') targetIndex = this.treeLayoutManager.selectedDragIndex
-            
+
             if (targetIndex === -1) return
             const targetViewModel = this.treeLayoutManager.getTreeViewModelByIndex(targetIndex)
 
@@ -360,11 +379,15 @@ export default class CommandDispatcher {
             const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
 
             try {
+                window.rendererToMain.setWatchSkipState(true)
                 await cmd.execute()
                 this.undoStack.push(cmd)
                 this.redoStack.length = 0
             } catch {
 
+            } finally {
+                await sleep(300)
+                window.rendererToMain.setWatchSkipState(false)
             }
 
             return
@@ -412,14 +435,19 @@ export default class CommandDispatcher {
             const newPath = window.utils.getJoinedPath(dir, newName)
 
             const viewModel = this.treeLayoutManager.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
+
             const cmd = new RenameCommand(this.treeLayoutManager, this.tabEditorManager, treeNode, viewModel.directory, prePath, newPath)
 
             try {
+                window.rendererToMain.setWatchSkipState(true)
                 await cmd.execute()
                 this.undoStack.push(cmd)
                 this.redoStack.length = 0
             } catch {
                 treeNode.replaceChild(treeSpan, treeInput)
+            } finally {
+                await sleep(300)
+                window.rendererToMain.setWatchSkipState(false)
             }
         }
     }
@@ -432,11 +460,15 @@ export default class CommandDispatcher {
         const cmd = new DeleteCommand(this.treeLayoutManager, this.tabEditorManager, selectedIndices)
 
         try {
+            await window.rendererToMain.setWatchSkipState(true)
             await cmd.execute()
             this.undoStack.push(cmd)
             this.redoStack.length = 0
         } catch {
 
+        } finally {
+            await sleep(300)
+            window.rendererToMain.setWatchSkipState(false)
         }
     }
 

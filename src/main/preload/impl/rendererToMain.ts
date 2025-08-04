@@ -41,7 +41,9 @@ const rendererToMain: RendererToMainAPI = {
 
     syncTabSessionFromRenderer: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTabSessionFromRenderer, tabEditorsDto) },
     syncTreeSessionFromRenderer: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTreeSessionFromRenderer, treeDto) },
-    getSyncedTreeSession: () => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.getSyncedTreeSession) }
+    getSyncedTreeSession: () => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.getSyncedTreeSession) },
+
+    setWatchSkipState: (state: boolean) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.setWatchSkipState, state) }
 }
 
 export default rendererToMain

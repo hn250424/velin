@@ -1,5 +1,6 @@
 import './index.scss'
 import "@milkdown/theme-nord/style.css"
+
 import registerEditHandlers from './handlers/editHandlers'
 import registerExitHandlers from './handlers/exitHandlers'
 import registerFileHandlers from './handlers/fileHandlers'
@@ -29,6 +30,8 @@ import ZoomManager from './modules/layout/ZoomManager'
 import TabDragManager from './modules/drag/TabDragManager'
 import TreeDragManager from './modules/drag/TreeDragManager'
 import FindReplaceState from './modules/state/FindReplaceState'
+import { TabEditorsDto } from '@shared/dto/TabEditorDto'
+import TreeDto from '@shared/dto/TreeDto'
 
 let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -69,12 +72,27 @@ window.addEventListener('DOMContentLoaded', () => {
     registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeLayoutManager, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
+    bindSyncEventFromWatch(tabEditorManager, treeLayoutManager)
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
     bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window.rendererToMain.loadedRenderer()
 })
+
+function bindSyncEventFromWatch(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
+    window.mainToRenderer.syncFromWatch(async (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => {
+        if (tabEditorsDto) {
+            await tabEditorManager.syncTabs(tabEditorsDto)
+        }
+
+        if (treeDto) {
+            const viewModel = treeLayoutManager.toTreeViewModel(treeDto)
+            treeLayoutManager.renderTreeData(viewModel)
+            treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+        }
+    })
+}
 
 function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
     document.addEventListener('click', () => {

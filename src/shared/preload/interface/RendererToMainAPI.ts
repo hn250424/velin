@@ -40,4 +40,6 @@ export default interface RendererToMainAPI {
     syncTabSessionFromRenderer: (dto: TabEditorsDto) => Promise<boolean>
     syncTreeSessionFromRenderer: (dto: TreeDto) => Promise<boolean>
     getSyncedTreeSession: () => Promise<TreeDto | null>
+
+    setWatchSkipState: (state: boolean) => Promise<void>
 }

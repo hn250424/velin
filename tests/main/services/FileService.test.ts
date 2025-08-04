@@ -12,8 +12,9 @@ import fakeDialogService, {
 } from '../modules/ui/fakeDialogService'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/managers/FakeTreeManager'
+import FakeTreeManager from '../modules/domains/FakeTreeManager'
 import TreeDto from '@shared/dto/TreeDto'
+import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
@@ -21,6 +22,7 @@ let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeManager: FakeTreeManager
 let fakeTreeRepository: FakeTreeRepository
+let fakeFileWatcher: FakeFileWatcher
 let fileService: FileService
 const fakeMainWindow = new FakeMainWindow()
 
@@ -122,7 +124,8 @@ describe('FileService.newTab', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('should create a new tab with an incremented ID based on the existing session', async () => {
@@ -150,7 +153,8 @@ describe('FileService.openFile', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('should return false when the open dialog is canceled', async () => {
@@ -218,7 +222,8 @@ describe('FileService.openDirectory', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('should return correctly updated root tree without dto', async () => {
@@ -295,7 +300,8 @@ describe('FileService.save', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('Save with empty filePath and cancel dialog', async () => {
@@ -369,7 +375,8 @@ describe('FileService.saveAs', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('should return false when SaveDialog is canceled', async () => {
@@ -421,7 +428,8 @@ describe('FileService.saveAll', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager)
+        fakeFileWatcher = new FakeFileWatcher()
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
     })
 
     test('test all cases with confirmed dialog', async () => {

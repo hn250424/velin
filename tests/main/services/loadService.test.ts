@@ -5,9 +5,10 @@ import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/managers/FakeTreeManager'
-import FakeTabManager from '../modules/managers/FakeTabManager'
+import FakeTreeManager from '../modules/domains/FakeTreeManager'
+import FakeTabManager from '../modules/domains/FakeTabManager'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
+import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 
 describe('loadService.loadedRenderer: ', () => {
     const tabSessionPath = '/fake/path/tabSession.json'
@@ -19,6 +20,7 @@ describe('loadService.loadedRenderer: ', () => {
     let fakeTabManager: FakeTabManager
     let fakeTreeRepository: FakeTreeRepository
     let fakeTreeManager: FakeTreeManager
+    let fakeFileWatcher: FakeFileWatcher
 
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
@@ -27,6 +29,7 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeManager = new FakeTreeManager(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
+        fakeFileWatcher = new FakeFileWatcher()
     })
 
     test('loadedRenderer: normal', async () => {
@@ -90,7 +93,7 @@ describe('loadService.loadedRenderer: ', () => {
         await fakeTreeRepository.setTreeSession(initialTreeSession)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -121,7 +124,7 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTabRepository.setTabSession(null)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
