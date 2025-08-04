@@ -36,6 +36,7 @@ export default interface RendererToMainAPI {
     delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>
     undo_delete: (trashMap: TrashMap[] | null) => Promise<boolean>
     deletePermanently: (path: string) => Promise<void>
+    create: (path: string, directory: boolean) => Promise<void>
 
     syncTabSessionFromRenderer: (dto: TabEditorsDto) => Promise<boolean>
     syncTreeSessionFromRenderer: (dto: TreeDto) => Promise<boolean>

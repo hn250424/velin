@@ -144,6 +144,18 @@ export default class TreeService implements ITreeService {
         await this.fileManager.deletePermanently(path)
     }
 
+    async create(targetPath: string, directory: boolean) {
+        const dir = path.dirname(targetPath)
+        const base = path.basename(targetPath)
+        const existingNames = new Set(await this.fileManager.readDir(dir))
+
+        const res = getUniqueFileNames(existingNames, [base])
+        const uniqueName = res[0]
+
+        const uniquePath = path.join(dir, uniqueName)
+        await this.fileManager.create(uniquePath, directory)
+    }
+
     async syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean> {
         try {
             await this.treeRepository.writeTreeSession(dto)

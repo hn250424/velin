@@ -37,18 +37,21 @@ import ICommand from "../../commands/ICommand"
 import DeleteCommand from "../../commands/DeleteCommand"
 import PasteCommand from "../../commands/PasteCommand"
 import FindReplaceState from "../state/FindReplaceState"
+import CreateCommand from "../../commands/CreateCommand"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic'
 
 /**
- * CommandDispatcher centrally handles commands
- * triggered from multiple input sources (keyboard shortcuts, menus, context menus, etc.).
+ * CommandDispatcher centrally manages and executes commands that involve side effects,
+ * state changes, or require Undo/Redo support.
  * 
- * - Commands invoked via multiple UI paths should go through this dispatcher
- *   to ensure consistent handling and side effect management.
+ * - Commands triggered via multiple UI input sources (keyboard shortcuts, menus, etc.)
+ *   should go through this dispatcher for consistent handling.
  * 
- * - Commands triggered from a single, localized UI event without duplication
- *   can be handled directly in their respective event handlers without dispatching.
+ * - Even commands from a single source (e.g., click only) may be dispatched here if they
+ *   require Undo/Redo support or are part of a centralized command flow.
+ * 
+ * - Local UI-only operations without side effects can remain in their event handlers.
  */
 @injectable()
 export default class CommandDispatcher {
@@ -469,6 +472,80 @@ export default class CommandDispatcher {
         } finally {
             await sleep(300)
             window.rendererToMain.setWatchSkipState(false)
+        }
+    }
+
+    async performCreate(source: CommandSource, treeNodeContainer: HTMLElement, directory: boolean) {
+        let idx = Math.max(this.treeLayoutManager.lastSelectedIndex, 0)
+        let viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+
+        if (!viewModel.directory) {
+            idx = this.treeLayoutManager.findParentDirectory(idx)
+            viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+        }
+
+        let parentContainer: HTMLElement
+        if (idx === 0) {
+            parentContainer = treeNodeContainer
+        } else {
+            const parentWrapper = this.treeLayoutManager.getTreeWrapperByIndex(idx)
+            parentContainer = parentWrapper.querySelector('.tree_node_children') as HTMLElement
+        }
+
+        const { wrapper, input } = this.treeLayoutManager.createInputbox(viewModel.directory, viewModel.indent)
+        parentContainer.appendChild(wrapper)
+        input.focus()
+
+        let alreadyFinished = false
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') finalize()
+            else if (e.key === 'Escape') cancel()
+        }
+        const onBlur = () => finalize()
+
+        input.addEventListener('keydown', onKeyDown)
+        input.addEventListener('blur', onBlur)
+        
+        const finalize = async () => {
+            if (alreadyFinished) return
+            alreadyFinished = true
+
+            input.removeEventListener('keydown', onKeyDown)
+            input.removeEventListener('blur', onBlur)
+
+            wrapper.remove()
+
+            const name = input.value.trim()
+            if (name) {
+                const cmd = new CreateCommand(
+                    this.treeLayoutManager,
+                    viewModel.path,
+                    name,
+                    directory,
+                )
+
+                try {
+                    window.rendererToMain.setWatchSkipState(true)
+                    await cmd.execute()
+                    this.undoStack.push(cmd)
+                    this.redoStack.length = 0
+                } catch (error) {
+                    console.error('Create failed:', error)
+                } finally {
+                    await sleep(300)
+                    window.rendererToMain.setWatchSkipState(false)
+                }
+            }
+        }
+
+        const cancel = () => {
+            if (alreadyFinished) return
+            alreadyFinished = true
+
+            input.removeEventListener('keydown', onKeyDown)
+            input.removeEventListener('blur', onBlur)
+            wrapper.remove()
         }
     }
 

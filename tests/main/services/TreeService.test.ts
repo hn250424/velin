@@ -476,6 +476,92 @@ describe('treeService.paste', () => {
     })
 })
 
+describe('treeService.create', () => {
+    beforeEach(() => {
+        fakeFileManager = new FakeFileManager()
+        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
+        fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
+        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+    })
+
+    test('should create new file', async () => {
+        // Given
+        const copiedTreeDto = { ...treeDto }
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const dir = copiedTreeDto.path
+        const base = 'test.md'
+        const targetPath = path.join(dir, base)
+
+        // When.
+        await treeService.create(targetPath, false)
+
+        // Then.
+        const ret = await fakeFileManager.exists(targetPath)
+        expect(ret).toBe(true)
+    })
+
+    test('should create duplicated new file', async () => {
+        // Given
+        const copiedTreeDto = { ...treeDto }
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const dir = copiedTreeDto.path
+        const base = 'test139.md'
+        const targetPath = path.join(dir, base)
+
+        // When.
+        await treeService.create(targetPath, false)
+
+        // Then.
+        const ret = await fakeFileManager.exists(path.join(dir, 'test139-2.md'))
+        expect(ret).toBe(true)
+    })
+
+    test('should create new directory', async () => {
+        // Given
+        const copiedTreeDto = { ...treeDto }
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const dir = copiedTreeDto.path
+        const base = 'test139'
+        const targetPath = path.join(dir, base)
+
+        // When.
+        await treeService.create(targetPath, true)
+
+        // Then.
+        const ret = await fakeFileManager.exists(targetPath)
+        expect(ret).toBe(true)
+    })
+
+    test('should create duplicated new directory', async () => {
+        // Given
+        const copiedTreeDto = { ...treeDto }
+        traverse(copiedTreeDto, (dto) => {
+            fakeFileManager.setPathExistence(dto.path, true)
+            fakeFileManager.setFilecontent(dto.path, dto.name)
+        })
+        const dir = copiedTreeDto.path
+        const base = 'dir333'
+        const targetPath = path.join(dir, base)
+
+        // When.
+        await treeService.create(targetPath, true)
+
+        // Then.
+        const ret = await fakeFileManager.exists(path.join(dir, 'dir333-1'))
+        expect(ret).toBe(true)
+    })
+})
+
 describe('treeService.syncTreeSessionFromRenderer', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()

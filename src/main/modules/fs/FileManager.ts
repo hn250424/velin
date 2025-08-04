@@ -1,6 +1,6 @@
 import fs from 'fs'
 import fsExtra from 'fs-extra'
-import path from 'path'
+import path, { dirname } from 'path'
 import { app } from 'electron'
 import IFileManager from "src/main/modules/contracts/IFileManager"
 import { injectable } from 'inversify'
@@ -123,6 +123,21 @@ export default class FileManager implements IFileManager {
     }
 
     async deletePermanently(path: string) {
-        await fs.promises.rm(path, { force: true })
+        await fs.promises.rm(path, { force: true, recursive: true })
+    }
+
+    async create(targetPath: string, directory: boolean): Promise<void> {
+        try {
+            if (directory) {
+                await fs.promises.mkdir(targetPath, { recursive: true })
+            } else {
+                const dirName = path.dirname(targetPath)
+                await fs.promises.mkdir(dirName, { recursive: true })
+                const baseName = path.basename(targetPath)
+                await fs.promises.writeFile(targetPath, baseName)
+            }
+        } catch (error) {
+            console.error('[create] Failed to create:', error)
+        }
     }
 }

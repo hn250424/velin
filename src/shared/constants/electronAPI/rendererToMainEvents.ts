@@ -30,6 +30,7 @@ export const rendererToMainEvents = {
     delete: 'delete',
     undo_delete: 'undo_delete',
     deletePermanently: 'deletePermanently',
+    create: 'create',
 
     syncTabSessionFromRenderer: 'syncTabSessionFromRenderer',
     syncTreeSessionFromRenderer: 'syncTreeSessionFromRenderer',

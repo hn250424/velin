@@ -49,13 +49,6 @@ $tree_horizontal_margin: 5px;
     border: 1px solid aqua;
 }
 
-#tree_resizer {
-    width: 3px;
-    height: 100%;
-    cursor: ew-resize;
-    background-color: blue;
-}
-
 .tree_node_wrapper {
     // width: 100%;
     white-space: nowrap;
@@ -68,6 +61,7 @@ $tree_horizontal_margin: 5px;
     color: gold;
 }
 
+.tree_node_temp,
 .tree_node {
     font-size: 0.8rem;
     display: flex;

@@ -19,6 +19,7 @@ import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../modules/command/CommandDispatcher"
 import TreeDragManager from "../modules/drag/TreeDragManager"
+import { aL } from "vitest/dist/chunks/reporters.d.BFLkQcL6"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
@@ -35,6 +36,7 @@ export default function registerTreeHandlers(
     bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
+    bindTreeMenuEvents(commandDispatcher, treeNodeContainer)
 
     // Drag.
     bindMouseDownEvents(dragManager, treeLayoutManager, treeNodeContainer)
@@ -64,7 +66,7 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
                 return
             }
         }
-        
+
         const div = treeManager.createGhostBox(dragManager.getDragTreeCount())
         div.style.left = `${e.clientX + 5}px`
         div.style.top = `${e.clientY + 5}px`
@@ -80,7 +82,7 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
         const viewModel = treeManager.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
         if (!viewModel.directory) return
         dragManager.setInsertPath(viewModel.path)
-        
+
         wrapper.style.background = 'green'
         dragManager.setInsertWrapper(wrapper)
     })
@@ -92,13 +94,26 @@ function bindMouseUpEvents(dragManager: TreeDragManager, treeManager: TreeLayout
             dragManager.setMouseDown(false)
             return
         }
-        
+
         const path = dragManager.getInsertPath()
         dragManager.endDrag()
         treeManager.removeGhostBox()
         treeManager.setSelectedDragIndexByPath(path)
         await commandDispatcher.performCut('drag')
         commandDispatcher.performPaste('drag')
+    })
+}
+
+function bindTreeMenuEvents(commandDispatcher: CommandDispatcher, treeNodeContainer: HTMLElement) {
+    const addFile = document.getElementById('tree_top_add_file')
+    const addDirectory = document.getElementById('tree_top_add_directory')
+
+    addFile.addEventListener('click', () => {
+        commandDispatcher.performCreate('element', treeNodeContainer, false)
+    })
+
+    addDirectory.addEventListener('click', () => {
+        commandDispatcher.performCreate('element', treeNodeContainer, true)
     })
 }
 

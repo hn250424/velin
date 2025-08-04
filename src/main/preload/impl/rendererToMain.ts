@@ -38,6 +38,7 @@ const rendererToMain: RendererToMainAPI = {
     delete: (arr: string[]) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.delete, arr) },
     undo_delete: (trashMap: TrashMap[] | null) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.undo_delete, trashMap)},
     deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.deletePermanently, path) },
+    create: (path: string, directory: boolean) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.create, path, directory) },
 
     syncTabSessionFromRenderer: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTabSessionFromRenderer, tabEditorsDto) },
     syncTreeSessionFromRenderer: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTreeSessionFromRenderer, treeDto) },

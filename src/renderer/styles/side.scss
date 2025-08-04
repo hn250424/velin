@@ -31,3 +31,10 @@
 #side_menu_container img:hover {
     cursor: pointer;
 }
+
+#side_resizer {
+    width: 3px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color: blue;
+}

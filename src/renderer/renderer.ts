@@ -114,7 +114,8 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
         const target = e.target as HTMLElement
         const isInTreeContextMenu = !!target.closest('#tree_context_menu')
         const isInTabContextMenu = !!target.closest('#tab_context_menu')
-        const isInTreeNodecontainer = !!target.closest('#tree_node_container')
+        // const isInTreeNodecontainer = !!target.closest('#tree_node_container')
+        const isInTree = !!target.closest('#tree')
         const isInTabContainer = !!target.closest('#tab_container')
         const isInMenuItem = !!target.closest('.menu_item')
 
@@ -127,7 +128,8 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
             tabEditorManager.removeContextTabId()
         }
 
-        if (!isInTreeContextMenu && !isInTreeNodecontainer) {
+        // if (!isInTreeContextMenu && !isInTreeNodecontainer) {
+        if (!isInTreeContextMenu && !isInTree) {
             const idx = treeLayoutManager.lastSelectedIndex
             if (idx < 0) return
 

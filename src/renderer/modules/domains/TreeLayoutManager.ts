@@ -9,6 +9,7 @@ import {
     CLASS_TREE_NODE_TEXT,
     CLASS_TREE_NODE_ICON,
     CLASS_TREE_NODE_OPEN,
+    CLASS_TREE_NODE_INPUT,
     CLASS_TREE_NODE_WRAPPER,
     CLASS_TREE_NODE_CHILDREN,
     SELECTOR_TREE_NODE,
@@ -389,6 +390,49 @@ export default class TreeLayoutManager {
 
     set clipboardMode(mode: ClipboardMode) {
         this._clipboardMode = mode
+    }
+
+    findParentDirectory(index: number) {
+        const indent = this.flattenTreeArray[index].indent
+        let i = index - 1
+        while (i >= 0) {
+            if (this.flattenTreeArray[i].indent < indent) {
+                return i
+            }
+            i--
+        }
+        return 0
+    }
+
+    createInputbox(directory: boolean, indent: number) {
+        const box = document.createElement('div')
+        box.classList.add('tree_node_temp')
+        box.style.paddingLeft = `${indent * 16}px`
+
+        const openStatus = document.createElement('span')
+        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
+        if (directory) openStatus.textContent = NOT_EXPANDED_TEXT
+
+        const icon = document.createElement('img')
+        icon.classList.add(CLASS_TREE_NODE_ICON)
+        icon.src = directory
+            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
+            : new URL('../../assets/icons/file.png', import.meta.url).toString()
+
+        const input = document.createElement('input')
+        input.type = 'text'
+        input.value = ''
+        input.classList.add(CLASS_TREE_NODE_INPUT)
+
+        box.appendChild(openStatus)
+        box.appendChild(icon)
+        box.appendChild(input)
+
+        const wrapper = document.createElement('div')
+        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
+        wrapper.appendChild(box)
+
+        return { wrapper, input }
     }
 
     async rename(preBase: string, newBase: string) {

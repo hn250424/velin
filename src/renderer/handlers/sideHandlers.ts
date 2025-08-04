@@ -11,7 +11,7 @@ export default function registerSideHandlers(treeLayoutManager: TreeLayoutManage
     const side = document.getElementById('side')
     const treeToggle = document.getElementById('treeToggle')
     const tree = document.getElementById('tree')
-    const resizer = document.getElementById('tree_resizer')
+    const resizer = document.getElementById('side_resizer')
 
     treeToggle.addEventListener('click', () => {
         const isSideOpen = treeLayoutManager.isSideOpen()

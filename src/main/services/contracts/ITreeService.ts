@@ -9,6 +9,7 @@ export default interface ITreeService {
     paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<Response<string[]>>
     delete(arr: string[]): Promise<TrashMap[] | null>
     deletePermanently(path: string): Promise<void>
+    create(path: string, directory: boolean): Promise<void>
     undo_delete(trashMap: TrashMap[] | null): Promise<boolean>
     syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean>
     getSyncedTreeSession(): Promise<TreeDto | null>

@@ -141,6 +141,19 @@ export default class FakeFileManager implements IFileManager {
         delete this.pathExists[filePath]
     }
 
+    async create(targetPath: string, directory: boolean): Promise<void> {
+        if (directory) {
+            this.pathExists[targetPath] = true
+        } else {
+            const dirName = path.dirname(targetPath)
+            if (!this.pathExists[dirName]) {
+                this.pathExists[dirName] = true
+            }
+            this.savedFiles[targetPath] = path.basename(targetPath)
+            this.pathExists[targetPath] = true
+        }
+    }
+
     // getOsTrashFiles(): Record<string, string> {
     //     return this.osTrashFiles
     // }

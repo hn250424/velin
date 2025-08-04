@@ -34,6 +34,10 @@ export default function registerTreeHandlers(mainWindow: BrowserWindow, treeServ
         return await treeService.deletePermanently(path)
     })
 
+    ipcMain.handle(electronAPI.events.rendererToMain.create, async (e, path: string, directory: boolean) => {
+        return await treeService.create(path, directory)
+    })
+
     ipcMain.handle(electronAPI.events.rendererToMain.syncTreeSessionFromRenderer, async (e, dto: TreeDto) => {
         return await treeService.syncTreeSessionFromRenderer(dto)
     })
