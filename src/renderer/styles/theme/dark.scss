@@ -1,0 +1,5 @@
+@use '../global_variables.scss' as gv;
+
+$theme-dark: (
+    --title-color: gv.$black
+);

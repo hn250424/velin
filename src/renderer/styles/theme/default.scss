@@ -1,0 +1,5 @@
+@use '../global_variables.scss' as gv;
+
+$theme-default: (
+    --title-color: gv.$green-3
+);

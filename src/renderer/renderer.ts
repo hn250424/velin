@@ -78,6 +78,14 @@ window.addEventListener('DOMContentLoaded', () => {
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window.rendererToMain.loadedRenderer()
+
+    document.getElementById('settings').addEventListener('click', () => {
+        document.documentElement.classList.add('dark')
+    })
+
+    document.getElementById('logo').addEventListener('click', () => {
+        document.documentElement.classList.remove('dark')
+    })
 })
 
 function bindSyncEventFromWatch(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {

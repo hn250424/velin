@@ -1,4 +1,5 @@
 @use './global_variables.scss' as gv;
+@use './theme/theme.scss';
 
 $title_height: 40px;
 $window_width: 100px;
@@ -17,7 +18,8 @@ $menu_container_horizontal_margin: 10px;
     height: $title_height;
     flex-shrink: 0;
 
-    background-color: gv.$blue-1;
+    background-color: var(--title-color);
+    // background-color: gv.$title-color;
 }
 
 #logo {
