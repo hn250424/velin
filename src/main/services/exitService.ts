@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron"
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import IFileManager from "src/main/modules/contracts/IFileManager"
 import ITabRepository from "src/main/modules/contracts/ITabRepository"
-import IDialogService from "src/main/modules/contracts/IDialogService"
+import IDialogManager from "src/main/modules/contracts/IDialogManager"
 import { TabSessionModel, TabSessionData } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
 import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
@@ -11,13 +11,13 @@ import TreeSessionModel from "../models/TreeSessionModel"
 export default async function exit(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
-    dialogService: IDialogService,
+    dialogManager: IDialogManager,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
     tabSessionData: TabEditorsDto,
     treeSessionData: TreeDto,
 ) {
-    await syncTab(mainWindow, fileManager, dialogService, tabRepository, tabSessionData)
+    await syncTab(mainWindow, fileManager, dialogManager, tabRepository, tabSessionData)
     await syncTree(treeRepository, treeSessionData as TreeSessionModel)
     mainWindow.close()
 }
@@ -25,7 +25,7 @@ export default async function exit(
 async function syncTab(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
-    dialogService: IDialogService,
+    dialogManager: IDialogManager,
     tabRepository: ITabRepository,
     tabSessionData: TabEditorsDto,
 ) {
@@ -39,14 +39,14 @@ async function syncTab(
             continue
         }
 
-        const confirm = await dialogService.showConfirmDialog(`Do you want to save ${fileName} file?`)
+        const confirm = await dialogManager.showConfirmDialog(`Do you want to save ${fileName} file?`)
         if (!confirm) {
             data.push({ id: id, filePath: filePath })
             continue
         }
 
         if (!filePath) {
-            const result = await dialogService.showSaveDialog(mainWindow, fileName)
+            const result = await dialogManager.showSaveDialog(mainWindow, fileName)
 
             if (result.canceled || !result.filePath) {
                 data.push({ id: id, filePath: filePath })

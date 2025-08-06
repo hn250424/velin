@@ -8,8 +8,8 @@ import IFileManager from 'src/main/modules/contracts/IFileManager'
 import FileManager from './modules/fs/FileManager'
 import ITabRepository from 'src/main/modules/contracts/ITabRepository'
 import TabRepository from './modules/persistence/TabRepository'
-import IDialogService from 'src/main/modules/contracts/IDialogService'
-import dialogService from './modules/ui/dialogService'
+import IDialogManager from 'src/main/modules/contracts/IDialogManager'
+import dialogManager from './modules/ui/dialogManager'
 import FileService from '@services/FileService'
 import TabService from '@services/TabService'
 import IFileService from '@services/contracts/IFileService'
@@ -24,33 +24,6 @@ import ITabManager from './modules/contracts/ITabManager'
 import TabManager from './modules/domains/TabManager'
 import IFileWatcher from './modules/contracts/IFileWatcher'
 import FileWatcher from './modules/fs/FileWatcher'
-
-// const diContainer = new Container()
-
-// diContainer.bind<IFileManager>(DI_KEYS.FileManager).to(FileManager).inSingletonScope()
-// diContainer.bind<IFileWatcher>(DI_KEYS.FileWatcher).to(FileWatcher).inSingletonScope()
-// diContainer.bind<IDialogService>(DI_KEYS.dialogService).toConstantValue(dialogService)
-// diContainer.bind<ITreeManager>(DI_KEYS.TreeManager).to(TreeManager).inSingletonScope()
-// diContainer.bind<ITabManager>(DI_KEYS.TabManager).to(TabManager).inSingletonScope()
-
-// const _fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
-
-// const userDataPath = app.getPath('userData')
-// const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
-// diContainer.bind<ITabRepository>(DI_KEYS.TabRepository)
-//     .toDynamicValue(() => new TabRepository(tabSessionPath, _fileManager))
-//     .inSingletonScope()
-
-// const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
-// diContainer.bind<ITreeRepository>(DI_KEYS.TreeReposotory)
-//     .toDynamicValue(() => new TreeReposotory(treeSessionPath, _fileManager))
-//     .inSingletonScope()
-
-// diContainer.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
-// diContainer.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()
-// diContainer.bind<ITreeService>(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
-
-// export default diContainer
 
 export default class DIContainer {
     private static _instance: Container | null = null
@@ -70,7 +43,7 @@ export default class DIContainer {
             const container = new Container()
 
             container.bind<IFileManager>(DI_KEYS.FileManager).to(FileManager).inSingletonScope()
-            container.bind<IDialogService>(DI_KEYS.dialogService).toConstantValue(dialogService)
+            container.bind<IDialogManager>(DI_KEYS.dialogManager).toConstantValue(dialogManager)
             container.bind<ITreeManager>(DI_KEYS.TreeManager).to(TreeManager).inSingletonScope()
             container.bind<ITabManager>(DI_KEYS.TabManager).to(TabManager).inSingletonScope()
 

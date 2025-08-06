@@ -3,7 +3,7 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
-import IDialogService from "../modules/contracts/IDialogService"
+import IDialogManager from "../modules/contracts/IDialogManager"
 import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
@@ -16,7 +16,7 @@ export default class FileService implements IFileService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
-        @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
+        @inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
         @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository,
         @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,
         @inject(DI_KEYS.FileWatcher) private readonly fileWatcher: IFileWatcher,
@@ -36,7 +36,7 @@ export default class FileService implements IFileService {
 
     async openFile(filePath?: string) {
         if (!filePath) {
-            const result = await this.dialogService.showOpenFileDialog()
+            const result = await this.dialogManager.showOpenFileDialog()
             if (result.canceled || result.filePaths.length === 0) {
                 return null
             }
@@ -61,7 +61,7 @@ export default class FileService implements IFileService {
         let path
         let indent
         if (!dto || !dto.path) {
-            const result = await this.dialogService.showOpenDirectoryDialog()
+            const result = await this.dialogManager.showOpenDirectoryDialog()
 
             if (result.canceled || result.filePaths.length === 0) {
                 return null
@@ -96,7 +96,7 @@ export default class FileService implements IFileService {
 
     async save(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
         if (!data.filePath) {
-            const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
+            const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
             if (result.canceled || !result.filePath) {
                 return data
@@ -127,7 +127,7 @@ export default class FileService implements IFileService {
     }
 
     async saveAs(data: TabEditorDto, mainWindow: BrowserWindow) {
-        const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
+        const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
         if (result.canceled || !result.filePath) {
             return null

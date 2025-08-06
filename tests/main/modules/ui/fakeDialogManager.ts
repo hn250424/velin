@@ -1,4 +1,4 @@
-import IDialogService from "src/main/modules/contracts/IDialogService"
+import IDialogManager from "@main/modules/contracts/IDialogManager"
 import { dialog, BrowserWindow } from "electron"
 
 let fakeConfirmResult: boolean = false
@@ -21,7 +21,7 @@ export function setFakeOpenDirectoryDialogResult(result: Electron.OpenDialogRetu
     fakeOpenDirectoryDialogResult = result
 }
 
-const fakeDialogService: IDialogService = {
+const fakeDialogManager: IDialogManager = {
     async showConfirmDialog(message: string): Promise<boolean> {
         return fakeConfirmResult
     },
@@ -39,4 +39,4 @@ const fakeDialogService: IDialogService = {
     },
 }
 
-export default fakeDialogService
+export default fakeDialogManager

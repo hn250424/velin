@@ -1,4 +1,4 @@
-import CommandDispatcher from "../modules/command/CommandDispatcher"
+import CommandDispatcher from "../CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 
 export default function registerEditHandlers(

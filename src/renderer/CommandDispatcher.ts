@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify"
-import DI_KEYS from "../../constants/di_keys"
+import DI_KEYS from "./constants/di_keys"
 import Response from "@shared/types/Response"
-import { sleep } from "../../utils/sleep"
+import { sleep } from "./utils/sleep"
 
 import {
     CLASS_EXPANDED,
@@ -22,24 +22,24 @@ import {
     ID_FIND_INPUT,
     ID_REPLACE_INPUT,
     ID_FIND_INFO
-} from "../../constants/dom"
+} from "./constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
 
-import FocusManager from "../state/FocusManager"
-import TabEditorManager from "../domains/TabEditorManager"
-import TreeLayoutManager from "../domains/TreeLayoutManager"
+import FocusManager from "./modules/state/FocusManager"
+import TabEditorManager from "./modules/domains/TabEditorManager"
+import TreeLayoutManager from "./modules/domains/TreeLayoutManager"
 
-import TreeViewModel from "../../viewmodels/TreeViewModel"
+import TreeViewModel from "./viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
-import RenameCommand from "../../commands/RenameCommand"
-import ICommand from "../../commands/ICommand"
-import DeleteCommand from "../../commands/DeleteCommand"
-import PasteCommand from "../../commands/PasteCommand"
-import FindReplaceState from "../state/FindReplaceState"
-import CreateCommand from "../../commands/CreateCommand"
+import RenameCommand from "./commands/RenameCommand"
+import ICommand from "./commands/ICommand"
+import DeleteCommand from "./commands/DeleteCommand"
+import PasteCommand from "./commands/PasteCommand"
+import FindReplaceState from "./modules/state/FindReplaceState"
+import CreateCommand from "./commands/CreateCommand"
 
-import { debounce } from "../../utils/debounce"
+import { debounce } from "./utils/debounce"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic'
 

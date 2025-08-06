@@ -1,4 +1,4 @@
-import WindowLayoutManager from "../modules/layout/WindowLayoutManager"
+import WindowLayoutManager from "../modules/state/WindowLayoutManager"
 
 export default function registerWindowHandlers(windowLayoutManager: WindowLayoutManager) {
     const maximize = document.getElementById('maximizeWindow') as HTMLImageElement | null

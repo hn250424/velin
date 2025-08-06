@@ -3,10 +3,10 @@ import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
-import fakeDialogService, {
+import fakeDialogManager, {
     setFakeConfirmResult,
     setFakeSaveDialogResult
-} from '../modules/ui/fakeDialogService'
+} from '../modules/ui/fakeDialogManager'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
@@ -136,7 +136,7 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogManager, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
@@ -179,7 +179,7 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogManager, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()
@@ -220,7 +220,7 @@ describe('exitService.exit', () => {
         const spy = vi.spyOn(fakeFileManager, 'write')
 
         // When.
-        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogService, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
+        await exit(fakeMainWindow as any, fakeFileManager, fakeDialogManager, fakeTabRepository, fakeTreeRepository, copiedTabEditorDto, copiedTreeDto)
 
         // Then.
         const session = await fakeTabRepository.readTabSession()

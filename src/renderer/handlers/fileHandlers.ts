@@ -2,7 +2,7 @@ import "@milkdown/theme-nord/style.css"
 
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
+import CommandDispatcher from "../CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorManager from "../modules/domains/TabEditorManager"
 

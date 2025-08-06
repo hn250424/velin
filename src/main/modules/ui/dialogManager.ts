@@ -1,7 +1,7 @@
-import IDialogService from "src/main/modules/contracts/IDialogService"
+import IDialogManager from "@main/modules/contracts/IDialogManager"
 import { dialog, BrowserWindow } from "electron"
 
-const dialogService: IDialogService = {
+const dialogManager: IDialogManager = {
     async showConfirmDialog(message: string): Promise<boolean> {
         const result = await dialog.showMessageBox({
             type: 'question',
@@ -39,4 +39,4 @@ const dialogService: IDialogService = {
     }
 }
 
-export default dialogService
+export default dialogManager

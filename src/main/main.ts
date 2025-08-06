@@ -17,7 +17,7 @@ import ITabRepository from './modules/contracts/ITabRepository'
 import IFileService from '@services/contracts/IFileService'
 import ITabService from '@services/contracts/ITabService'
 import ITreeManager from './modules/contracts/ITreeManager'
-import IDialogService from './modules/contracts/IDialogService'
+import IDialogManager from './modules/contracts/IDialogManager'
 import ITreeService from '@services/contracts/ITreeService'
 import ITabManager from './modules/contracts/ITabManager'
 import DIContainer from './DiContainer'
@@ -62,7 +62,7 @@ const createWindow = () => {
 
     const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
     const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
-    const dialogService = diContainer.get<IDialogService>(DI_KEYS.dialogService)
+    const dialogManager = diContainer.get<IDialogManager>(DI_KEYS.dialogManager)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeReposotory)
     const tabManager = diContainer.get<ITabManager>(DI_KEYS.TabManager)
@@ -75,7 +75,7 @@ const createWindow = () => {
     registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow, fileService)
-    registerExitHandlers(mainWindow, fileManager, dialogService, tabRepository, treeRepository)
+    registerExitHandlers(mainWindow, fileManager, dialogManager, tabRepository, treeRepository)
     registerTabHandlers(mainWindow, tabService)
     registerTreeHandlers(mainWindow, treeService)
     registerEditHandlers()

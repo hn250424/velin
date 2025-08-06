@@ -21,8 +21,6 @@ import ClipboardMode from "@shared/types/ClipboardMode"
 import Response from "@shared/types/Response"
 
 export default class TreeLayoutManager {
-    private _sideOpenStatus = false
-
     private _tree: HTMLElement
     private _tree_top: HTMLElement
     private _tree_top_name: HTMLElement
@@ -54,14 +52,6 @@ export default class TreeLayoutManager {
     constructor() {
         this._tree_node_container = document.getElementById('tree_node_container')
         this._tree_top_name = document.getElementById('tree_top_name')
-    }
-
-    isSideOpen(): boolean {
-        return this._sideOpenStatus
-    }
-
-    setSideOpen(status: boolean) {
-        this._sideOpenStatus = status
     }
 
     toTreeDto(viewModel: TreeViewModel): TreeDto {

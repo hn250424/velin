@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron"
 
-export default interface IDialogService {
+export default interface IDialogManager {
     showConfirmDialog(message: string): Promise<boolean>
     showOpenFileDialog(): Promise<Electron.OpenDialogReturnValue>
     showOpenDirectoryDialog(): Promise<Electron.OpenDialogReturnValue>

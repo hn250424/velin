@@ -2,7 +2,7 @@ const DI_KEYS = {
     FileManager: Symbol('FileManager'),
     FileWatcher: Symbol('FileWatcher'),
     TabRepository: Symbol('TabRepository'),
-    dialogService: Symbol('dialogService'),
+    dialogManager: Symbol('dialogManager'),
     TreeReposotory: Symbol('TreeReposotory'),
     TabManager: Symbol('TabManager'),
     TreeManager: Symbol('TreeManager'),

@@ -17,7 +17,7 @@ import {
 } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
-import CommandDispatcher from "../modules/command/CommandDispatcher"
+import CommandDispatcher from "../CommandDispatcher"
 import TreeDragManager from "../modules/drag/TreeDragManager"
 import { aL } from "vitest/dist/chunks/reporters.d.BFLkQcL6"
 

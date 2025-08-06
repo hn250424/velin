@@ -17,7 +17,7 @@ import TabEditorManager from './modules/domains/TabEditorManager'
 import TreeLayoutManager from './modules/domains/TreeLayoutManager'
 import diContainer from './diContainer'
 import DI_KEYS from './constants/di_keys'
-import CommandDispatcher from './modules/command/CommandDispatcher'
+import CommandDispatcher from './CommandDispatcher'
 import {
     SELECTOR_TREE_NODE,
     CLASS_TREE_NODE,
@@ -25,13 +25,14 @@ import {
     CLASS_SELECTED,
     ID_TREE_NODE_CONTAINER
 } from './constants/dom'
-import WindowLayoutManager from './modules/layout/WindowLayoutManager'
+import WindowLayoutManager from './modules/state/WindowLayoutManager'
 import ZoomManager from './modules/layout/ZoomManager'
 import TabDragManager from './modules/drag/TabDragManager'
 import TreeDragManager from './modules/drag/TreeDragManager'
 import FindReplaceState from './modules/state/FindReplaceState'
 import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
+import SideState from './modules/state/SideState'
 
 let tabContextMenu: HTMLElement
 let menuContainer: HTMLElement
@@ -50,6 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
     menuItems = document.querySelectorAll('#menu_container .menu_item')
     treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER)
 
+    const sideState = SideState.getInstance()
     const windowLayoutManager = WindowLayoutManager.getInstance()
     const zoomManager = ZoomManager.getInstance()
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
@@ -67,7 +69,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerExitHandlers(tabEditorManager, treeLayoutManager)
     registerEditHandlers(commandDispatcher, shortcutRegistry)
     registerViewHandlers(shortcutRegistry, zoomManager)
-    registerSideHandlers(treeLayoutManager)
+    registerSideHandlers(sideState)
     registerTabHandlers(commandDispatcher, tabDragManager, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
     registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeLayoutManager, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)

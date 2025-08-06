@@ -3,7 +3,7 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
-import IDialogService from "../modules/contracts/IDialogService"
+import IDialogManager from "../modules/contracts/IDialogManager"
 import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
@@ -14,18 +14,18 @@ export default class TabService implements ITabService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
-        @inject(DI_KEYS.dialogService) private readonly dialogService: IDialogService,
+        @inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
         @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
     ) {
 
     }
     async closeTab(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
         if (data.isModified) {
-            const confirm = await this.dialogService.showConfirmDialog(`Do you want to save ${data.fileName} file?`)
+            const confirm = await this.dialogManager.showConfirmDialog(`Do you want to save ${data.fileName} file?`)
 
             if (confirm) {
                 if (!data.filePath) {
-                    const result = await this.dialogService.showSaveDialog(mainWindow, data.fileName)
+                    const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
                     if (result.canceled || !result.filePath) {
                         return false

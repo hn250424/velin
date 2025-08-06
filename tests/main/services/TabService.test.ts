@@ -3,12 +3,12 @@ import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
-import fakeDialogService, {
+import fakeDialogManager, {
     setFakeConfirmResult,
     setFakeOpenFileDialogResult,
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
-} from '../modules/ui/fakeDialogService'
+} from '../modules/ui/fakeDialogManager'
 import FakeTabRepository from '../modules/persistence/FakeTabRepository'
 import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
 import TabService from '@services/TabService'
@@ -83,7 +83,7 @@ describe('tabService.closeTab', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository)
     })
 
     test('should write when closeTab if data is modified', async () => {
@@ -198,7 +198,7 @@ describe('tabService.closeTabsExcept', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository)
     })
 
     test('should retain only selected tab and save others modified file', async () => {
@@ -293,7 +293,7 @@ describe('tabService.closeTabsToRight', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository)
     })
 
     test('should retain only the tabs to the left of the reference tab and save modified files', async () => {
@@ -388,7 +388,7 @@ describe('tabService.closeAllTabs', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository)
     })
 
     test('should close all tabs and save modified files', async () => {
@@ -474,7 +474,7 @@ describe('tabService.syncTabSession', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogService, fakeTreeRepository)
+        tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository)
     })
 
     test('a write session was received from the renderer for synchronization', async () => {
