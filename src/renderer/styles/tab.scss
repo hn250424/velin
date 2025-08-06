@@ -104,7 +104,7 @@ $tab_button_radius: 5px;
     display: none;
     position: fixed;
     flex-direction: column;
-    z-index: 1000;
+    z-index: 90;
 }
 
 #tab_context_menu.selected {
@@ -130,5 +130,5 @@ $tab_button_radius: 5px;
     height: 3px;
     pointer-events: none;
     opacity: 0.7;
-    z-index: 1000;
+    z-index: 90;
 }

@@ -20,7 +20,7 @@ import ITreeManager from './modules/contracts/ITreeManager'
 import IDialogService from './modules/contracts/IDialogService'
 import ITreeService from '@services/contracts/ITreeService'
 import ITabManager from './modules/contracts/ITabManager'
-import DIContainer from './DiContainer_'
+import DIContainer from './DiContainer'
 import IFileWatcher from './modules/contracts/IFileWatcher'
 import registerWatchHandlers from './handlers/watchHandlers'
 

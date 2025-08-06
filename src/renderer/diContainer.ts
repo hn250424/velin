@@ -23,5 +23,4 @@ diContainer.bind<TreeLayoutManager>(DI_KEYS.TreeLayoutManager).to(TreeLayoutMana
 
 diContainer.bind<CommandDispatcher>(DI_KEYS.CommandDispatcher).to(CommandDispatcher).inSingletonScope()
 
-
 export default diContainer

@@ -11,20 +11,32 @@
     <div id="find_replace_container">
         <div id="find">
             <input id="find_input" type="text" />
-            <span id="find_info"></span>
+            
             <button id="find_up">
                 <img src="src/renderer//assets/icons/find_up.png">
             </button>
             <button id="find_down">
-                <img src="src/renderer//assets/icons/find_down.png">
+                <img src="src/renderer/assets/icons/find_down.png">
             </button>
             <button id="find_close">
-                <img src="src/renderer//assets/icons/find_close.png">
+                <img src="src/renderer/assets/icons/find_close.png">
             </button>
+
+            <span id="find_info"></span>
         </div>
 
         <div id="replace">
             <input id="replace_input" type="text" />
+            
+            <button id="replace_current" class="tooltip-btn">
+                <img src="src/renderer/assets/icons/find_up.png">
+                <span class="tooltip">Replace (Enter)</span>
+            </button>
+            <button id="replace_all" class="tooltip-btn">
+                <img src="src/renderer/assets/icons/find_down.png">
+                <span class="tooltip">Replace All (Ctrl+Alt+Enter)</span>
+            </button>
+
             <span id="replace_info"></span>
         </div>
     </div>

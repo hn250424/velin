@@ -39,6 +39,8 @@ import PasteCommand from "../../commands/PasteCommand"
 import FindReplaceState from "../state/FindReplaceState"
 import CreateCommand from "../../commands/CreateCommand"
 
+import { debounce } from "../../utils/debounce"
+
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic'
 
 /**
@@ -77,6 +79,10 @@ export default class CommandDispatcher {
         this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement
         this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement
         this.findInfo = document.getElementById(ID_FIND_INFO)
+
+        this.findInput.addEventListener('input', debounce(() => {
+            this.performFind('programmatic', this.findReplaceState.getDirectionUp() ? 'up' : 'down')
+        }, 300))
     }
 
     async performNewTab(source: CommandSource) {
@@ -506,7 +512,7 @@ export default class CommandDispatcher {
 
         input.addEventListener('keydown', onKeyDown)
         input.addEventListener('blur', onBlur)
-        
+
         const finalize = async () => {
             if (alreadyFinished) return
             alreadyFinished = true
@@ -553,6 +559,9 @@ export default class CommandDispatcher {
         this.findAndReplaceContainer.style.display = 'block'
         this.replaceBox.style.display = showReplace ? 'flex' : 'none'
 
+        if (showReplace) this.replaceInput.focus()
+        else this.findInput.focus()
+
         if (this.findReplaceState.getDirectionUp()) this.performFind('programmatic', 'up')
         else this.performFind('programmatic', 'down')
     }
@@ -569,6 +578,30 @@ export default class CommandDispatcher {
         this.findReplaceState.setDirectionUp(bDirect)
     }
 
+    performReplace(source: CommandSource) {
+        const findInput = this.findInput.value
+        const replaceInput = this.replaceInput.value
+
+        const view = this.tabEditorManager.getActiveTabEditorView()
+        const ret = view.replaceCurrent(findInput, replaceInput)
+
+        if (ret) {
+            const direction = this.findReplaceState.getDirectionUp() ? 'up' : 'down'
+            view.findAndSelect(findInput, direction)
+        }
+    }
+
+    performReplaceAll(source: CommandSource) {
+        const focus = this.focusManager.getFocus()
+        if (focus !== 'find_replace') return
+
+        const findInput = this.findInput.value
+        const replaceInput = this.replaceInput.value
+
+        const view = this.tabEditorManager.getActiveTabEditorView()
+        view.replaceAll(findInput, replaceInput)
+    }
+
     performCloseFindReplaceBox(source: CommandSource) {
         this.findAndReplaceContainer.style.display = 'none'
 
@@ -579,7 +612,7 @@ export default class CommandDispatcher {
     async performESC(source: CommandSource) {
         const focus = this.focusManager.getFocus()
 
-        if (focus === 'find_replace') {
+        if (focus === 'editor' || focus === 'find_replace') {
             this.performCloseFindReplaceBox(source)
         }
     }
@@ -597,7 +630,7 @@ export default class CommandDispatcher {
                     this.performFind(source, 'down')
                 }
             } else if (activateElement === this.replaceInput) {
-                console.log('replaceinput')
+                this.performReplace(source)
             }
         }
     }

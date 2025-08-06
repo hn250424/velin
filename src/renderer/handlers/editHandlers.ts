@@ -49,6 +49,14 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
     document.getElementById('find_close').addEventListener('click', async () => {
         commandDispatcher.performCloseFindReplaceBox('menu')
     })
+
+    document.getElementById('replace_current').addEventListener('click', async () => {
+        commandDispatcher.performReplace('menu')
+    })
+
+    document.getElementById('replace_all').addEventListener('click', async () => {
+        commandDispatcher.performReplaceAll('menu')
+    })
 }
 
 function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
@@ -59,4 +67,5 @@ function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutR
     shortcutRegistry.register('Ctrl+V', async (e: KeyboardEvent) => await commandDispatcher.performPaste('shortcut'))
     shortcutRegistry.register('Ctrl+F', (e: KeyboardEvent) => commandDispatcher.toggleFindReplaceBox('shortcut', false))
     shortcutRegistry.register('Ctrl+R', (e: KeyboardEvent) => commandDispatcher.toggleFindReplaceBox('shortcut', true))
+    shortcutRegistry.register('Ctrl+Alt+ENTER', (e: KeyboardEvent) => commandDispatcher.performReplaceAll('shortcut'))
 }

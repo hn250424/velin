@@ -109,7 +109,7 @@ $tree_horizontal_margin: 5px;
     display: none;
     position: fixed;
     flex-direction: column;
-    z-index: 1000;
+    z-index: 90;
 }
 
 #tree_context_menu.selected {
@@ -123,5 +123,5 @@ $tree_horizontal_margin: 5px;
     color: white;
     font-size: 1rem;
     padding: 4px;
-    z-index: 1000;
+    z-index: 90;
 }

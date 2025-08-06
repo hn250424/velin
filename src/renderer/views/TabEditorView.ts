@@ -17,6 +17,8 @@ export default class TabEditorView {
     private searchResults: { from: number; to: number }[] = []
     private currentSearchIndex: number = -1
 
+    private onEditorInputCallback?: () => void
+
     constructor(
         tabDiv: HTMLElement,
         tabSpan: HTMLElement,
@@ -36,6 +38,9 @@ export default class TabEditorView {
     }
 
     observeEditor(onInput: () => void, onBlur: () => void) {
+        // Store the input callback globally to be triggered when content is replaced
+        this.onEditorInputCallback = onInput
+
         this.editor.action(ctx => {
             const view = ctx.get(editorViewCtx)
             view.setProps({
@@ -201,11 +206,6 @@ export default class TabEditorView {
         view.dispatch(tr)
         // view.focus() // Retain focus in input.
 
-        // console.log('Current cursor position:', currentPos)
-        // console.log('Search results:', this.searchResults)
-        // console.log('Direction:', direction)
-        // console.log('Target index:', targetIndex)
-
         return {
             total: this.searchResults.length,
             current: this.currentSearchIndex + 1,
@@ -220,6 +220,66 @@ export default class TabEditorView {
 
         this.searchResults = []
         this.currentSearchIndex = -1
+    }
+
+    replaceCurrent(searchText: string, replaceText: string): boolean {
+        if (!searchText) return false
+        if (
+            this.currentSearchIndex < 0 ||
+            this.currentSearchIndex >= this.searchResults.length
+        ) return false
+
+        let replaced = false
+
+        this.editor.action(ctx => {
+            const view = ctx.get(editorViewCtx)
+            const state = view.state
+            const match = this.searchResults[this.currentSearchIndex]
+            const { from, to } = match
+            const tr = state.tr.replaceWith(from, to, state.schema.text(replaceText))
+            view.dispatch(tr)
+            replaced = true
+        })
+
+        if (replaced) {
+            if (this.onEditorInputCallback) {
+                this.onEditorInputCallback()
+            }
+        }
+        return replaced
+    }
+
+    replaceAll(searchText: string, replaceText: string): number {
+        if (!searchText) return 0
+
+        let replacedCount = 0
+        this.editor.action(ctx => {
+            const view = ctx.get(editorViewCtx)
+            const state = view.state
+            const parser = ctx.get(parserCtx)
+            const serializer = ctx.get(serializerCtx)
+
+            let content = serializer(state.doc)
+            const regex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+            const newContent = content.replace(regex, () => {
+                replacedCount++
+                return replaceText
+            })
+
+            if (newContent !== content) {
+                const newDoc = parser(newContent)
+                if (newDoc) {
+                    const tr = state.tr.replaceWith(0, state.doc.content.size, newDoc.content)
+                    view.dispatch(tr)
+                }
+
+                if (this.onEditorInputCallback) {
+                    this.onEditorInputCallback()
+                }
+            }
+        })
+
+        return replacedCount
     }
 
     get editor(): Editor {
