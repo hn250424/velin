@@ -3,7 +3,6 @@ import path from 'path'
 import DI_KEYS from '../constants/di_keys'
 import TreeSessionModel from '../models/TreeSessionModel'
 import ITreeRepository from '../modules/contracts/ITreeRepository'
-import ITreeService from "./contracts/ITreeService"
 import IFileManager from "../modules/contracts/IFileManager"
 import FileManager from "../modules/fs/FileManager"
 import TreeDto from "@shared/dto/TreeDto"
@@ -13,8 +12,7 @@ import ITreeManager from "@main/modules/contracts/ITreeManager"
 import Response from "@shared/types/Response"
 import { getUniqueFileNames } from "../utils/file"
 
-@injectable()
-export default class TreeService implements ITreeService {
+export default class TreeService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,

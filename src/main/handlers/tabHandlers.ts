@@ -1,10 +1,10 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import ITabService from '@services/contracts/ITabService'
 import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
+import TabService from '@main/services/TabService'
 
-export default function registerTabHandlers(mainWindow: BrowserWindow, tabService: ITabService) {
+export default function registerTabHandlers(mainWindow: BrowserWindow, tabService: TabService) {
     ipcMain.handle(electronAPI.events.rendererToMain.closeTab, async (e, data: TabEditorDto) => {
         const result = await tabService.closeTab(data, mainWindow)
         return {

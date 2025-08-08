@@ -9,6 +9,8 @@ export default class TabDragManager {
     private _start_y: number = 0
     private _insertIndex: number = -1
 
+    constructor() {}
+
     isMouseDown(): boolean {
         return this._isMouseDown
     }

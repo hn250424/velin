@@ -12,13 +12,10 @@ import IDialogManager from 'src/main/modules/contracts/IDialogManager'
 import dialogManager from './modules/ui/dialogManager'
 import FileService from '@services/FileService'
 import TabService from '@services/TabService'
-import IFileService from '@services/contracts/IFileService'
 import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 import TreeReposotory from './modules/persistence/TreeReposotory'
-import ITabService from '@services/contracts/ITabService'
 import ITreeManager from 'src/main/modules/contracts/ITreeManager'
 import TreeManager from './modules/domains/TreeManager'
-import ITreeService from '@services/contracts/ITreeService'
 import TreeService from '@services/TreeService'
 import ITabManager from './modules/contracts/ITabManager'
 import TabManager from './modules/domains/TabManager'
@@ -70,9 +67,9 @@ export default class DIContainer {
                 .toDynamicValue(() => new FileWatcher(this._mainWindow, fileManager, tabManager, treeManager, tabRepository, treeRepository))
                 .inSingletonScope()
 
-            container.bind<IFileService>(DI_KEYS.FileService).to(FileService).inSingletonScope()
-            container.bind<ITabService>(DI_KEYS.TabService).to(TabService).inSingletonScope()
-            container.bind<ITreeService>(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
+            container.bind(DI_KEYS.FileService).to(FileService).inSingletonScope()
+            container.bind(DI_KEYS.TabService).to(TabService).inSingletonScope()
+            container.bind(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
 
             this._instance = container
         }

@@ -1,10 +1,10 @@
-import IFileService from '@services/contracts/IFileService'
+import FileService from '@main/services/FileService'
 import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 import { BrowserWindow, ipcMain } from 'electron'
 
-export default function registerFileHandlers(mainWindow: BrowserWindow, fileService: IFileService) {
+export default function registerFileHandlers(mainWindow: BrowserWindow, fileService: FileService) {
     ipcMain.handle(electronAPI.events.rendererToMain.newTab, async () => {
         const id = await fileService.newTab()
         return {

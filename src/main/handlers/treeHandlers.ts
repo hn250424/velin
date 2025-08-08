@@ -1,11 +1,11 @@
-import ITreeService from '@services/contracts/ITreeService'
 import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import { BrowserWindow, ipcMain } from 'electron'
 import TreeDto from '@shared/dto/TreeDto'
 import TrashMap from '@shared/types/TrashMap'
 import ClipboardMode from '@shared/types/ClipboardMode'
+import TreeService from '@main/services/TreeService'
 
-export default function registerTreeHandlers(mainWindow: BrowserWindow, treeService: ITreeService) {
+export default function registerTreeHandlers(mainWindow: BrowserWindow, treeService: TreeService) {
     ipcMain.handle(electronAPI.events.rendererToMain.rename, async (e, prePath: string, newPath: string) => {
         return await treeService.rename(prePath, newPath)
     })

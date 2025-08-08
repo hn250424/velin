@@ -382,11 +382,13 @@ export default class CommandDispatcher {
 
             const selectedViewModels = []
             const clipboardPaths = this.treeLayoutManager.getClipboardPaths() ?? []
+            
             for (const path of clipboardPaths) {
                 selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByPath(path))
             }
+            
             const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
-
+            
             try {
                 window.rendererToMain.setWatchSkipState(true)
                 await cmd.execute()

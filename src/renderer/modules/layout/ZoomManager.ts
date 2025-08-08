@@ -1,16 +1,7 @@
 export default class ZoomManager {
-    private static instance: ZoomManager | null = null
     private zoomLevel = 1
     
-    private constructor() {}
-
-    static getInstance(): ZoomManager {
-        if (this.instance === null) {
-            this.instance = new ZoomManager()
-        }
-
-        return this.instance
-    }
+    constructor() {}
 
     zoomIn() {
         this.setZoom(this.zoomLevel + 0.1)

@@ -87,10 +87,15 @@ export default class TreeLayoutManager {
         }
     }
 
+    // Each DOM element with class `tree_node` has a dataset attribute for its path.
+    // The root node uses the container `tree_node_container` to hold its path in the dataset.
     renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
         if (!container) {
             this._tree_top_name.textContent = viewModel.name
             container = this._tree_node_container
+
+            this.pathToTreeWrapperMap.set(viewModel.path, container)
+            container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
         }
 
         this.clean(container)

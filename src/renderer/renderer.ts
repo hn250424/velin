@@ -51,17 +51,17 @@ window.addEventListener('DOMContentLoaded', () => {
     menuItems = document.querySelectorAll('#menu_container .menu_item')
     treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER)
 
-    const sideState = SideState.getInstance()
-    const windowLayoutManager = WindowLayoutManager.getInstance()
-    const zoomManager = ZoomManager.getInstance()
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
     const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState)
+    const sideState = diContainer.get<SideState>(DI_KEYS.SideState)
+    const windowLayoutManager = diContainer.get<WindowLayoutManager>(DI_KEYS.WindowLayoutManager)
+    const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
+    const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
     const tabDragManager = diContainer.get<TabDragManager>(DI_KEYS.TabDragManager)
     const treeDragManager = diContainer.get<TreeDragManager>(DI_KEYS.TreeDragManager)
     const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
     const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
-    const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
 
     registerWindowHandlers(windowLayoutManager)
     registerFileHandlers(commandDispatcher, tabEditorManager, shortcutRegistry)
@@ -116,9 +116,7 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
         const target = e.target as HTMLElement
         const isInTreeContextMenu = !!target.closest('#tree_context_menu')
         const isInTabContextMenu = !!target.closest('#tab_context_menu')
-        // const isInTreeNodecontainer = !!target.closest('#tree_node_container')
         const isInTree = !!target.closest('#tree')
-        const isInTabContainer = !!target.closest('#tab_container')
         const isInMenuItem = !!target.closest('.menu_item')
 
         if (!isInMenuItem) menuItems.forEach(i => i.classList.remove(CLASS_SELECTED))
@@ -130,7 +128,6 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
             tabEditorManager.removeContextTabId()
         }
 
-        // if (!isInTreeContextMenu && !isInTreeNodecontainer) {
         if (!isInTreeContextMenu && !isInTree) {
             const idx = treeLayoutManager.lastSelectedIndex
             if (idx < 0) return

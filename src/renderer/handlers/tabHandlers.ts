@@ -57,7 +57,7 @@ function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorManager: TabE
                 return
             }
         }
-        
+
         const div = tabEditorManager.createGhostBox(dragManager.getDragTargetTabName())
         div.style.left = `${e.clientX + 5}px`
         div.style.top = `${e.clientY + 5}px`
@@ -82,14 +82,14 @@ function bindMouseUpEvents(dragManager: TabDragManager, tabEditorManager: TabEdi
             return
         }
 
-        dragManager.endDrag()
-        tabEditorManager.removeIndicator()
-        tabEditorManager.removeGhostBox()
-
         const to = dragManager.getInsertIndex()
         const id = dragManager.getDragTargetTabId()
         const from = tabEditorManager.getTabEditorViewIndexById(id)
         tabEditorManager.moveTabEditorView(from, to)
+
+        dragManager.endDrag()
+        tabEditorManager.removeIndicator()
+        tabEditorManager.removeGhostBox()
 
         const dtos = tabEditorManager.getAllTabEditorData()
         const response = await window.rendererToMain.syncTabSessionFromRenderer(dtos)

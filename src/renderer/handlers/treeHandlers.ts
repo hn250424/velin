@@ -72,15 +72,29 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
         div.style.top = `${e.clientY + 5}px`
 
         const target = e.target as HTMLElement
-        const wrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
-        if (!wrapper) return
-        const preWrapper = dragManager.getInsertWrapper()
-        if (preWrapper === wrapper) return
-        if (preWrapper) preWrapper.style.background = ''
+        let wrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
+        let isContainer = false
+        if (!wrapper) {
+            const _container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+            if (!_container) return
+            
+            wrapper = _container
+            isContainer = true
+        }
 
-        const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-        const viewModel = treeManager.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
-        if (!viewModel.directory) return
+        const inserWrapper = dragManager.getInsertWrapper()
+        if (inserWrapper === wrapper) return
+        if (inserWrapper) inserWrapper.style.background = ''
+
+        let viewModel
+        if (!isContainer) {
+            const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+            viewModel = treeManager.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
+        } else {
+            viewModel = treeManager.getTreeViewModelByPath(wrapper.dataset[DATASET_ATTR_TREE_PATH])
+        }
+        
+        if (!viewModel || !viewModel.directory) return
         dragManager.setInsertPath(viewModel.path)
 
         wrapper.style.background = 'green'
@@ -183,6 +197,7 @@ function bindTreeClickEvents(
             treeNode.classList.add(CLASS_SELECTED)
             treeLayoutManager.setLastSelectedIndexByPath(path)
             treeLayoutManager.addSelectedIndices(treeLayoutManager.getIndexByPath(path))
+
             const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
             if (viewModel.directory) {
                 await commandDispatcher.performOpenDirectory('element', treeNode)

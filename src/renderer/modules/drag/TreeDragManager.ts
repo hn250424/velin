@@ -7,6 +7,8 @@ export default class TreeDragManager {
     private _insertWrapper: HTMLElement | null = null
     private _insertPath: string = ''
 
+    constructor() {}
+
     isMouseDown(): boolean {
         return this._isMouseDown
     }

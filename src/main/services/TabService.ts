@@ -7,10 +7,8 @@ import IDialogManager from "../modules/contracts/IDialogManager"
 import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
-import ITabService from "./contracts/ITabService"
-import path from 'path'
 
-export default class TabService implements ITabService {
+export default class TabService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,

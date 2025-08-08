@@ -8,11 +8,10 @@ import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
-import IFileService from "./contracts/IFileService"
 import ITreeManager from "src/main/modules/contracts/ITreeManager"
 import IFileWatcher from "@main/modules/contracts/IFileWatcher"
 
-export default class FileService implements IFileService {
+export default class FileService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,

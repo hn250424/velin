@@ -14,15 +14,15 @@ import DI_KEYS from './constants/di_keys'
 import IFileManager from './modules/contracts/IFileManager'
 import ITreeRepository from './modules/contracts/ITreeRepository'
 import ITabRepository from './modules/contracts/ITabRepository'
-import IFileService from '@services/contracts/IFileService'
-import ITabService from '@services/contracts/ITabService'
 import ITreeManager from './modules/contracts/ITreeManager'
 import IDialogManager from './modules/contracts/IDialogManager'
-import ITreeService from '@services/contracts/ITreeService'
 import ITabManager from './modules/contracts/ITabManager'
 import DIContainer from './DiContainer'
 import IFileWatcher from './modules/contracts/IFileWatcher'
 import registerWatchHandlers from './handlers/watchHandlers'
+import FileService from './services/FileService'
+import TabService from './services/TabService'
+import TreeService from './services/TreeService'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -68,9 +68,9 @@ const createWindow = () => {
     const tabManager = diContainer.get<ITabManager>(DI_KEYS.TabManager)
     const treeManager = diContainer.get<ITreeManager>(DI_KEYS.TreeManager)
 
-    const fileService = diContainer.get<IFileService>(DI_KEYS.FileService)
-    const tabService = diContainer.get<ITabService>(DI_KEYS.TabService)
-    const treeService = diContainer.get<ITreeService>(DI_KEYS.TreeService)
+    const fileService = diContainer.get(DI_KEYS.FileService)
+    const tabService = diContainer.get(DI_KEYS.TabService)
+    const treeService = diContainer.get(DI_KEYS.TreeService)
 
     registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
     registerWindowHandlers(mainWindow)
