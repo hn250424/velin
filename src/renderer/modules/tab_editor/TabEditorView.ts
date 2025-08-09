@@ -1,7 +1,7 @@
 import { serializerCtx } from '@milkdown/core'
 import { Editor, editorViewCtx, parserCtx } from "@milkdown/kit/core"
 import "@milkdown/theme-nord/style.css"
-import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from '../constants/dom'
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from '../../constants/dom'
 import { TextSelection } from 'prosemirror-state'
 import { Decoration, DecorationSet } from "prosemirror-view"
 import { Plugin, PluginKey } from "prosemirror-state"

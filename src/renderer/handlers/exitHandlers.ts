@@ -1,16 +1,16 @@
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
-import TabEditorManager from "../modules/domains/TabEditorManager"
-import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
+import TreeFacade from "../modules/tree/TreeFacade"
 
 // TODO: Alt+F4
 export default function registerExitHandlers(
-    tabEditorManager: TabEditorManager,
-    treeLayoutManager: TreeLayoutManager
+    tabEditorFacade: TabEditorFacade,
+    treeLayoutFacade: TreeFacade
 ) {
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
-            const tabSessionData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
-            const treeSessionData = treeLayoutManager.toTreeDto(treeLayoutManager.extractTreeViewModel())
+            const tabSessionData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
+            const treeSessionData = treeLayoutFacade.toTreeDto(treeLayoutFacade.extractTreeViewModel())
             window.rendererToMain.exit(tabSessionData, treeSessionData)
         })
     })

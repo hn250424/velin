@@ -1,13 +1,13 @@
 import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
-import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
-import TabEditorManager from "../modules/domains/TabEditorManager"
+import TreeFacade from "../modules/tree/TreeFacade"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import ICommand from "./ICommand"
 import Response from "@shared/types/Response"
 
 export default class RenameCommand implements ICommand {
     constructor(
-        private treeLayoutManager: TreeLayoutManager,
-        private tabEditorManager: TabEditorManager,
+        private treeLayoutFacade: TreeFacade,
+        private tabEditorFacade: TabEditorFacade,
         private treeNode: HTMLElement,
         private isDir: boolean,
         private prePath: string,
@@ -15,7 +15,7 @@ export default class RenameCommand implements ICommand {
     ) { }
 
     async execute() {
-        const response: Response<string> = await this.treeLayoutManager.rename(this.prePath, this.newPath)
+        const response: Response<string> = await this.treeLayoutFacade.rename(this.prePath, this.newPath)
         if (!response.result) throw new Error('Rename failed')
         this.newPath = response.data
 
@@ -25,17 +25,17 @@ export default class RenameCommand implements ICommand {
         newSpan.textContent = newBaseName
         this.treeNode.replaceChild(newSpan, this.treeNode.querySelector('input')!)
 
-        await this.tabEditorManager.rename(this.prePath, this.newPath, this.isDir)
+        await this.tabEditorFacade.rename(this.prePath, this.newPath, this.isDir)
     }
 
     async undo() {
-        await this.treeLayoutManager.rename(this.newPath, this.prePath)
+        await this.treeLayoutFacade.rename(this.newPath, this.prePath)
         const oldSpan = document.createElement('span')
         oldSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
         oldSpan.textContent = window.utils.getBaseName(this.prePath)
         const currentText = this.treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
         if (currentText) this.treeNode.replaceChild(oldSpan, currentText)
 
-        await this.tabEditorManager.rename(this.newPath, this.prePath, this.isDir)
+        await this.tabEditorFacade.rename(this.newPath, this.prePath, this.isDir)
     }
 }

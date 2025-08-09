@@ -19,8 +19,12 @@ import TreeDto from "@shared/dto/TreeDto"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import Response from "@shared/types/Response"
+import { inject } from "inversify"
+import DI_KEYS from "../../constants/di_keys"
+import TreeRenderer from "./TreeRenderer"
+import TreeStore from "./TreeStore"
 
-export default class TreeLayoutManager {
+export default class TreeFacade {
     private _tree: HTMLElement
     private _tree_top: HTMLElement
     private _tree_top_name: HTMLElement
@@ -49,7 +53,10 @@ export default class TreeLayoutManager {
 
     private ghostBox: HTMLElement | null = null
 
-    constructor() {
+    constructor(
+        @inject(DI_KEYS.TreeRenderer) private readonly treeRenderer: TreeRenderer,
+        @inject(DI_KEYS.TreeStore) private readonly treeStore: TreeStore
+    ) {
         this._tree_node_container = document.getElementById('tree_node_container')
         this._tree_top_name = document.getElementById('tree_top_name')
     }

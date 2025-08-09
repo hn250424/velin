@@ -7,11 +7,11 @@ import fakeDialogManager, {
     setFakeConfirmResult,
     setFakeSaveDialogResult
 } from '../modules/ui/fakeDialogManager'
-import FakeTabRepository from '../modules/persistence/FakeTabRepository'
-import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
+import FakeTabRepository from '../modules/tab/FakeTabRepository'
+import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
-import FakeTreeManager from '../modules/domains/FakeTreeManager'
+import FakeTreeManager from '../modules/tree/FakeTreeManager'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'

@@ -9,8 +9,8 @@ import fakeDialogManager, {
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../modules/ui/fakeDialogManager'
-import FakeTabRepository from '../modules/persistence/FakeTabRepository'
-import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
+import FakeTabRepository from '../modules/tab/FakeTabRepository'
+import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 import TabService from '@services/TabService'
 
 const tabSessionPath = '/fake/path/tabSession.json'

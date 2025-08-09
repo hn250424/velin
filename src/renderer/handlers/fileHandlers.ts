@@ -4,18 +4,18 @@ import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import Response from "@shared/types/Response"
 import CommandDispatcher from "../CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/domains/TabEditorManager"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 
 export default function registerFileHandlers(
     commandDispatcher: CommandDispatcher, 
-    tabEditorManager: TabEditorManager, 
+    tabEditorFacade: TabEditorFacade, 
     shortcutRegistry: ShortcutRegistry
 ) {
-    bindCommandWithmenu(commandDispatcher, tabEditorManager)
+    bindCommandWithmenu(commandDispatcher, tabEditorFacade)
     bindCommandWithShortcut(commandDispatcher, shortcutRegistry)
 }
 
-function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorManager: TabEditorManager) {
+function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorFacade: TabEditorFacade) {
     document.getElementById('file_menu_new_tab').addEventListener('click', async () => {
         await commandDispatcher.performNewTab('menu')
     })
@@ -37,9 +37,9 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorMana
     })
 
     document.getElementById('file_menu_save_all').addEventListener('click', async () => {
-        const tabsData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
+        const tabsData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
         const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabsData)
-        if (response.result) tabEditorManager.applySaveAllResults(response.data)
+        if (response.result) tabEditorFacade.applySaveAllResults(response.data)
     })
 }
 

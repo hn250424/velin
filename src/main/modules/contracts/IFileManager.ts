@@ -13,4 +13,5 @@ export default interface IFileManager {
     cleanTrash(): Promise<void>
     deletePermanently(path: string): Promise<void>
     create(targetPath: string, directory: boolean): Promise<void>
+    getUniqueFileNames(existingNames: Set<string>, fileNames: string[]): string[]
 }

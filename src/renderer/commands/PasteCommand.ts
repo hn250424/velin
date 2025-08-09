@@ -1,6 +1,6 @@
 import ICommand from "./ICommand"
-import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
-import TabEditorManager from "../modules/domains/TabEditorManager"
+import TreeFacade from "../modules/tree/TreeFacade"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import TreeViewModel from "../viewmodels/TreeViewModel"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import Response from "@shared/types/Response"
@@ -16,17 +16,17 @@ export default class PasteCommand implements ICommand {
     private undoInfos: UndoInfo[] = []
 
     constructor(
-        private treeLayoutManager: TreeLayoutManager,
-        private tabEditorManager: TabEditorManager,
+        private treeLayoutFacade: TreeFacade,
+        private tabEditorFacade: TabEditorFacade,
         private targetViewModel: TreeViewModel,
         private selectedViewModels: TreeViewModel[],
         private clipboardMode: ClipboardMode
     ) { }
 
     async execute(): Promise<void> {
-        const targetDto = this.treeLayoutManager.toTreeDto(this.targetViewModel)
+        const targetDto = this.treeLayoutFacade.toTreeDto(this.targetViewModel)
         const selectedDtos = this.selectedViewModels.map(viewModel => {
-            return this.treeLayoutManager.toTreeDto(viewModel)
+            return this.treeLayoutFacade.toTreeDto(viewModel)
         })
 
         const response: Response<string[]> = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
@@ -45,25 +45,25 @@ export default class PasteCommand implements ICommand {
                     isDir: selectedDtos[i].directory
                 })
 
-                const view = this.tabEditorManager.getTabEditorViewByPath(oldPath)
+                const view = this.tabEditorFacade.getTabEditorViewByPath(oldPath)
 
                 if (view) {
                     view.tabDiv.title = newPath
-                    const viewModel = this.tabEditorManager.getTabEditorViewModelById(view.getId())
+                    const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId())
                     if (viewModel) {
                         viewModel.filePath = newPath
                     }
                 }
 
-                this.tabEditorManager.deleteTabEditorViewByPath(oldPath)
-                this.tabEditorManager.setTabEditorViewByPath(newPath, view)
+                this.tabEditorFacade.deleteTabEditorViewByPath(oldPath)
+                this.tabEditorFacade.setTabEditorViewByPath(newPath, view)
             }
 
             const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
             if (newTreeSession) {
-                const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
-                this.treeLayoutManager.renderTreeData(viewModel)
-                this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+                const viewModel = this.treeLayoutFacade.toTreeViewModel(newTreeSession)
+                this.treeLayoutFacade.renderTreeData(viewModel)
+                this.treeLayoutFacade.loadFlattenArrayAndMaps(viewModel)
             }
         }
     }
@@ -79,16 +79,16 @@ export default class PasteCommand implements ICommand {
 
                 await window.rendererToMain.deletePermanently(dest)
 
-                const view = this.tabEditorManager.getTabEditorViewByPath(dest)
+                const view = this.tabEditorFacade.getTabEditorViewByPath(dest)
                 if (view) {
                     view.tabDiv.title = src
-                    const viewModel = this.tabEditorManager.getTabEditorViewModelById(view.getId())
+                    const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId())
                     if (viewModel) {
                         viewModel.filePath = src
                     }
 
-                    this.tabEditorManager.deleteTabEditorViewByPath(dest)
-                    this.tabEditorManager.setTabEditorViewByPath(src, view)
+                    this.tabEditorFacade.deleteTabEditorViewByPath(dest)
+                    this.tabEditorFacade.setTabEditorViewByPath(src, view)
                 }
             } catch (err) {
                 console.error('Undo failed:', err)
@@ -97,9 +97,9 @@ export default class PasteCommand implements ICommand {
 
         const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
-            const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
-            this.treeLayoutManager.renderTreeData(viewModel)
-            this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+            const viewModel = this.treeLayoutFacade.toTreeViewModel(newTreeSession)
+            this.treeLayoutFacade.renderTreeData(viewModel)
+            this.treeLayoutFacade.loadFlattenArrayAndMaps(viewModel)
         }
     }
 }

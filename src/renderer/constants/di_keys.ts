@@ -7,12 +7,16 @@ const DI_KEYS = {
     ZoomManager: Symbol('ZoomManager'),
 
     ShortcutRegistry: Symbol('ShortcutRegistry'),
-
+    
+    TabEditorFacade: Symbol('TabEditorFacade'),
+    TabEditorRenderer: Symbol('TabEditorRenderer'),
+    TabEditorStore: Symbol('TabEditorStore'),
     TabDragManager: Symbol('TabDragManager'),
-    TreeDragManager: Symbol('TreeDragManager'),
 
-    TabEditorManager: Symbol('TabEditorManager'),
-    TreeLayoutManager: Symbol('TreeLayoutManager'),
+    TreeFacade: Symbol('TreeFacade'),
+    TreeRenderer: Symbol('TreeRenderer'),
+    TreeStore: Symbol('TreeStore'),
+    TreeDragManager: Symbol('TreeDragManager'),
     
     CommandDispatcher: Symbol('CommandDispatcher'),
 }

@@ -1,16 +1,14 @@
-import { inject, injectable } from "inversify"
+import { inject } from "inversify"
 import path from 'path'
 import DI_KEYS from '../constants/di_keys'
 import TreeSessionModel from '../models/TreeSessionModel'
 import ITreeRepository from '../modules/contracts/ITreeRepository'
 import IFileManager from "../modules/contracts/IFileManager"
-import FileManager from "../modules/fs/FileManager"
 import TreeDto from "@shared/dto/TreeDto"
 import TrashMap from "@shared/types/TrashMap"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import ITreeManager from "@main/modules/contracts/ITreeManager"
 import Response from "@shared/types/Response"
-import { getUniqueFileNames } from "../utils/file"
 
 export default class TreeService {
     constructor(
@@ -51,7 +49,7 @@ export default class TreeService {
         const existingNames = new Set(await this.fileManager.readDir(targetDir))
         const requestedFileName = path.basename(newPath)
         
-        const uniqueFileName = getUniqueFileNames(existingNames, [requestedFileName])
+        const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName])
         const finalNewPath = path.join(targetDir, uniqueFileName[0])
 
         const updated = updateTreeSession(prePath, finalNewPath, session)
@@ -76,7 +74,7 @@ export default class TreeService {
         const originalNames = selectedDtos.map(dto => dto.name)
         const targetDir = targetDto.path
         const existingNames = new Set(await this.fileManager.readDir(targetDir))
-        const uniqueNames = getUniqueFileNames(existingNames, originalNames)
+        const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames)
 
         const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
             if (!Array.isArray(child.children)) {
@@ -147,7 +145,7 @@ export default class TreeService {
         const base = path.basename(targetPath)
         const existingNames = new Set(await this.fileManager.readDir(dir))
 
-        const res = getUniqueFileNames(existingNames, [base])
+        const res = this.fileManager.getUniqueFileNames(existingNames, [base])
         const uniqueName = res[0]
 
         const uniquePath = path.join(dir, uniqueName)

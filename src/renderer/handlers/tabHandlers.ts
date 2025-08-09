@@ -5,7 +5,7 @@ import Response from "@shared/types/Response"
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, DATASET_ATTR_TREE_PATH, SELECTOR_TAB } from "../constants/dom"
 import CommandDispatcher from "../CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import TabEditorManager from "../modules/domains/TabEditorManager"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import TabDragManager from "../modules/drag/TabDragManager"
 import { throttle } from "../utils/throttle"
 
@@ -13,28 +13,28 @@ export default function registerTabHandlers(
     commandDispatcher: CommandDispatcher,
     dragManager: TabDragManager,
     tabContainer: HTMLElement,
-    tabEditorManager: TabEditorManager,
+    tabEditorFacade: TabEditorFacade,
     tabContextMenu: HTMLElement,
     shortcutRegistry: ShortcutRegistry
 ) {
-    bindTabClickEvents(tabContainer, tabEditorManager)
-    bindTabContextmenuEvents(tabContainer, tabEditorManager, tabContextMenu)
-    bindCommandsWithContextmenu(commandDispatcher, tabEditorManager)
-    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorManager)
+    bindTabClickEvents(tabContainer, tabEditorFacade)
+    bindTabContextmenuEvents(tabContainer, tabEditorFacade, tabContextMenu)
+    bindCommandsWithContextmenu(commandDispatcher, tabEditorFacade)
+    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorFacade)
 
     // Drag.
-    bindMouseDownEvents(dragManager, tabEditorManager, tabContainer)
-    bindMouseMoveEvents(dragManager, tabEditorManager, tabContainer)
-    bindMouseUpEvents(dragManager, tabEditorManager)
+    bindMouseDownEvents(dragManager, tabEditorFacade, tabContainer)
+    bindMouseMoveEvents(dragManager, tabEditorFacade, tabContainer)
+    bindMouseUpEvents(dragManager, tabEditorFacade)
 }
 
-function bindMouseDownEvents(dragManager: TabDragManager, tabEditorManager: TabEditorManager, tabContainer: HTMLElement) {
+function bindMouseDownEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
     tabContainer.addEventListener('mousedown', (e) => {
         const target = e.target as HTMLElement
         const tab = target.closest(SELECTOR_TAB) as HTMLElement
         if (!tab) return
         const id = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
-        const viewModel = tabEditorManager.getTabEditorViewModelById(id)
+        const viewModel = tabEditorFacade.getTabEditorViewModelById(id)
         dragManager.setDragTargetTabName(viewModel.fileName)
         dragManager.setDragTargetTabId(id)
         dragManager.setTargetElement(tab)
@@ -44,7 +44,7 @@ function bindMouseDownEvents(dragManager: TabDragManager, tabEditorManager: TabE
     })
 }
 
-function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorManager: TabEditorManager, tabContainer: HTMLElement) {
+function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
     document.addEventListener('mousemove', (e: MouseEvent) => {
         if (!dragManager.isMouseDown()) return
 
@@ -58,7 +58,7 @@ function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorManager: TabE
             }
         }
 
-        const div = tabEditorManager.createGhostBox(dragManager.getDragTargetTabName())
+        const div = tabEditorFacade.createGhostBox(dragManager.getDragTargetTabName())
         div.style.left = `${e.clientX + 5}px`
         div.style.top = `${e.clientY + 5}px`
     })
@@ -69,13 +69,13 @@ function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorManager: TabE
         const insertIndex = getInsertIndexFromMouseX(dragManager.getTabs(), e.clientX)
         if (dragManager.getInsertIndex() === insertIndex) return
         dragManager.setInsertIndex(insertIndex)
-        const indicator = tabEditorManager.createIndicator()
-        const refNode = tabEditorManager.getTabEditorViewByIndex(insertIndex)?.tabDiv ?? null
+        const indicator = tabEditorFacade.createIndicator()
+        const refNode = tabEditorFacade.getTabEditorViewByIndex(insertIndex)?.tabDiv ?? null
         tabContainer.insertBefore(indicator, refNode)
     }, 1000))
 }
 
-function bindMouseUpEvents(dragManager: TabDragManager, tabEditorManager: TabEditorManager) {
+function bindMouseUpEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade) {
     document.addEventListener('mouseup', async (e: MouseEvent) => {
         if (!dragManager.isDrag()) {
             dragManager.setMouseDown(false)
@@ -84,17 +84,17 @@ function bindMouseUpEvents(dragManager: TabDragManager, tabEditorManager: TabEdi
 
         const to = dragManager.getInsertIndex()
         const id = dragManager.getDragTargetTabId()
-        const from = tabEditorManager.getTabEditorViewIndexById(id)
-        tabEditorManager.moveTabEditorView(from, to)
+        const from = tabEditorFacade.getTabEditorViewIndexById(id)
+        tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(from, to)
 
         dragManager.endDrag()
-        tabEditorManager.removeIndicator()
-        tabEditorManager.removeGhostBox()
+        tabEditorFacade.removeIndicator()
+        tabEditorFacade.removeGhostBox()
 
-        const dtos = tabEditorManager.getAllTabEditorData()
+        const dtos = tabEditorFacade.getAllTabEditorData()
         const response = await window.rendererToMain.syncTabSessionFromRenderer(dtos)
 
-        if (!response) tabEditorManager.moveTabEditorView(to, from)
+        if (!response) tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(to, from)
     })
 }
 
@@ -111,19 +111,19 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
     return tabs.length
 }
 
-function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEditorManager) {
+function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
     tabContainer.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement
         const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement
         if (tabDiv) {
             if (target.tagName === 'BUTTON') {
                 const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10)
-                const data = tabEditorManager.getTabEditorDataById(id)
+                const data = tabEditorFacade.getTabEditorDataById(id)
                 const response: Response<void> = await window.rendererToMain.closeTab(data)
-                if (response.result) tabEditorManager.removeTab(data.id)
+                if (response.result) tabEditorFacade.removeTab(data.id)
             } else if (target.tagName === 'SPAN') {
                 const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]
-                tabEditorManager.activateTabEditorById(parseInt(id, 10))
+                tabEditorFacade.activateTabEditorById(parseInt(id, 10))
             }
         }
     })
@@ -131,7 +131,7 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorManager: TabEdit
 
 function bindTabContextmenuEvents(
     tabContainer: HTMLElement,
-    tabEditorManager: TabEditorManager,
+    tabEditorFacade: TabEditorFacade,
     tabContextMenu: HTMLElement,
 ) {
     tabContainer.addEventListener('contextmenu', (e) => {
@@ -141,38 +141,38 @@ function bindTabContextmenuEvents(
         tabContextMenu.classList.add(CLASS_SELECTED)
         tabContextMenu.style.left = `${e.clientX}px`
         tabContextMenu.style.top = `${e.clientY}px`
-        tabEditorManager.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
+        tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
     })
 }
 
-function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorManager: TabEditorManager) {
+function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorFacade: TabEditorFacade) {
     document.getElementById('tab_context_close').addEventListener('click', async () => {
-        await commandDispatcher.performCloseTab('context_menu', tabEditorManager.contextTabId)
+        await commandDispatcher.performCloseTab('context_menu', tabEditorFacade.contextTabId)
     })
 
     document.getElementById('tab_context_close_others').addEventListener('click', async () => {
-        const exceptData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
-        const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
+        const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
+        const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
         const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
-        if (response.result) tabEditorManager.removeTabsExcept(response.data)
+        if (response.result) tabEditorFacade.removeTabsExcept(response.data)
     })
 
     document.getElementById('tab_context_close_right').addEventListener('click', async () => {
-        const referenceData: TabEditorDto = tabEditorManager.getTabEditorDataById(tabEditorManager.contextTabId)
-        const allData: TabEditorsDto = tabEditorManager.getAllTabEditorData()
+        const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
+        const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
         const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
-        if (response.result) tabEditorManager.removeTabsToRight(response.data)
+        if (response.result) tabEditorFacade.removeTabsToRight(response.data)
     })
 
     document.getElementById('tab_context_close_all').addEventListener('click', async () => {
-        const data: TabEditorsDto = tabEditorManager.getAllTabEditorData()
+        const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
         const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
-        if (response.result) tabEditorManager.removeAllTabs(response.data)
+        if (response.result) tabEditorFacade.removeAllTabs(response.data)
     })
 }
 
-function bindCommandsWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry, tabEditorManager: TabEditorManager) {
+function bindCommandsWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry, tabEditorFacade: TabEditorFacade) {
     shortcutRegistry.register('Ctrl+W',
-        async (e: KeyboardEvent) => await commandDispatcher.performCloseTab('shortcut', tabEditorManager.activeTabId)
+        async (e: KeyboardEvent) => await commandDispatcher.performCloseTab('shortcut', tabEditorFacade.activeTabId)
     )
 }

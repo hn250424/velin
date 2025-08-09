@@ -10,9 +10,9 @@ import fakeDialogManager, {
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../modules/ui/fakeDialogManager'
-import FakeTabRepository from '../modules/persistence/FakeTabRepository'
-import FakeTreeRepository from '../modules/persistence/FakeTreeRepository'
-import FakeTreeManager from '../modules/domains/FakeTreeManager'
+import FakeTabRepository from '../modules/tab/FakeTabRepository'
+import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
+import FakeTreeManager from '../modules/tree/FakeTreeManager'
 import TreeDto from '@shared/dto/TreeDto'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 

@@ -27,8 +27,8 @@ import {
 import TreeDto from "@shared/dto/TreeDto"
 
 import FocusManager from "./modules/state/FocusManager"
-import TabEditorManager from "./modules/domains/TabEditorManager"
-import TreeLayoutManager from "./modules/domains/TreeLayoutManager"
+import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
+import TreeFacade from "./modules/tree/TreeFacade"
 
 import TreeViewModel from "./viewmodels/TreeViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
@@ -70,8 +70,8 @@ export default class CommandDispatcher {
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
         @inject(DI_KEYS.FindReplaceState) private readonly findReplaceState: FindReplaceState,
-        @inject(DI_KEYS.TabEditorManager) private readonly tabEditorManager: TabEditorManager,
-        @inject(DI_KEYS.TreeLayoutManager) private readonly treeLayoutManager: TreeLayoutManager
+        @inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
+        @inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
     ) {
         this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER)
         this.findBox = document.getElementById(ID_FIND)
@@ -87,15 +87,15 @@ export default class CommandDispatcher {
 
     async performNewTab(source: CommandSource) {
         const response: Response<number> = await window.rendererToMain.newTab()
-        if (response.result) await this.tabEditorManager.addTab(response.data)
+        if (response.result) await this.tabEditorFacade.addTab(response.data)
     }
 
     async performOpenFile(source: CommandSource, filePath?: string) {
         if (filePath) {
-            const tabEditorView = this.tabEditorManager.getTabEditorViewByPath(filePath)
+            const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(filePath)
 
             if (tabEditorView) {
-                this.tabEditorManager.activateTabEditorById(tabEditorView.getId())
+                this.tabEditorFacade.activateTabEditorById(tabEditorView.getId())
                 return
             }
         }
@@ -103,7 +103,7 @@ export default class CommandDispatcher {
         const response: Response<TabEditorDto> = await window.rendererToMain.openFile(filePath)
         if (response.result && response.data) {
             const data = response.data
-            await this.tabEditorManager.addTab(data.id, data.filePath, data.fileName, data.content)
+            await this.tabEditorFacade.addTab(data.id, data.filePath, data.fileName, data.content)
         }
     }
 
@@ -116,7 +116,7 @@ export default class CommandDispatcher {
      * - If `treeDiv` is provided, it represents a clicked directory node,
      *   and this function dynamically loads and expands its child nodes.
      * 
-     * @param treeLayoutManager
+     * @param treeFacade
      * @param treeDiv The DOM element of the clicked directory node if omitted, a new root directory is opened
      * @returns Promise<void>
      */
@@ -126,16 +126,16 @@ export default class CommandDispatcher {
             const response: Response<TreeDto> = await window.rendererToMain.openDirectory()
             if (!response.data) return
 
-            const responseViewModel = this.treeLayoutManager.toTreeViewModel(response.data)
+            const responseViewModel = this.treeFacade.toTreeViewModel(response.data)
 
-            this.treeLayoutManager.renderTreeData(responseViewModel)
-            this.treeLayoutManager.loadFlattenArrayAndMaps(responseViewModel)
+            this.treeFacade.renderTreeData(responseViewModel)
+            this.treeFacade.loadFlattenArrayAndMaps(responseViewModel)
             return
         }
 
         // When click directory in tree area.
         const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]
-        const viewModel = this.treeLayoutManager.getTreeViewModelByPath(dirPath)
+        const viewModel = this.treeFacade.getTreeViewModelByPath(dirPath)
         const maybeChildren = treeDiv.nextElementSibling
         if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
 
@@ -150,8 +150,8 @@ export default class CommandDispatcher {
         }
 
         const syncFlattenTreeArray = (viewModel: TreeViewModel, expanded: boolean) => {
-            if (expanded) this.treeLayoutManager.expandNode(viewModel)
-            else this.treeLayoutManager.collapseNode(viewModel)
+            if (expanded) this.treeFacade.expandNode(viewModel)
+            else this.treeFacade.collapseNode(viewModel)
         }
 
         if (viewModel.expanded) {
@@ -162,7 +162,7 @@ export default class CommandDispatcher {
 
         if (viewModel.children && viewModel.children.length > 0) {
             if (treeDivChildren.children.length === 0) {
-                this.treeLayoutManager.renderTreeData(viewModel, treeDivChildren)
+                this.treeFacade.renderTreeData(viewModel, treeDivChildren)
             }
             updateUI(viewModel, true)
             syncFlattenTreeArray(viewModel, true)
@@ -172,36 +172,36 @@ export default class CommandDispatcher {
         const response: Response<TreeDto> = await window.rendererToMain.openDirectory(viewModel)
         if (!response.data) return
 
-        const responseTreeData = this.treeLayoutManager.toTreeViewModel(response.data)
+        const responseTreeData = this.treeFacade.toTreeViewModel(response.data)
 
         viewModel.children = responseTreeData.children
-        this.treeLayoutManager.renderTreeData(responseTreeData, treeDivChildren)
+        this.treeFacade.renderTreeData(responseTreeData, treeDivChildren)
         updateUI(viewModel, true)
         syncFlattenTreeArray(viewModel, true)
     }
 
     async performSave(source: CommandSource) {
-        const data = this.tabEditorManager.getActiveTabEditorData()
+        const data = this.tabEditorFacade.getActiveTabEditorData()
         if (!data.isModified) return
         const response: Response<TabEditorDto> = await window.rendererToMain.save(data)
-        if (response.result && !response.data.isModified) this.tabEditorManager.applySaveResult(response.data)
+        if (response.result && !response.data.isModified) this.tabEditorFacade.applySaveResult(response.data)
     }
 
     async performSaveAs(source: CommandSource) {
-        const data: TabEditorDto = this.tabEditorManager.getActiveTabEditorData()
+        const data: TabEditorDto = this.tabEditorFacade.getActiveTabEditorData()
         const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
         if (response.result && response.data) {
-            const wasApplied = this.tabEditorManager.applySaveResult(response.data)
-            if (!wasApplied) await this.tabEditorManager.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
+            const wasApplied = this.tabEditorFacade.applySaveResult(response.data)
+            if (!wasApplied) await this.tabEditorFacade.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
         }
     }
 
     async performCloseTab(source: CommandSource, id: number) {
-        const data = this.tabEditorManager.getTabEditorDataById(id)
+        const data = this.tabEditorFacade.getTabEditorDataById(id)
         if (!data) return
 
         const response: Response<void> = await window.rendererToMain.closeTab(data)
-        if (response.result) this.tabEditorManager.removeTab(data.id)
+        if (response.result) this.tabEditorFacade.removeTab(data.id)
     }
 
     async performUndo(source: CommandSource) {
@@ -210,7 +210,7 @@ export default class CommandDispatcher {
         if (focus === 'editor' && source === 'shortcut') return
 
         if (focus === 'editor') {
-            this.tabEditorManager.undo()
+            this.tabEditorFacade.undo()
             return
         }
 
@@ -238,7 +238,7 @@ export default class CommandDispatcher {
         if (focus === 'editor' && source === 'shortcut') return
 
         if (focus === 'editor') {
-            this.tabEditorManager.redo()
+            this.tabEditorFacade.redo()
             return
         }
 
@@ -276,23 +276,23 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            this.treeLayoutManager.clearClipboardPaths()
-            this.treeLayoutManager.clipboardMode = 'cut'
-            const selectedIndices = this.treeLayoutManager.getSelectedIndices()
+            this.treeFacade.clearClipboardPaths()
+            this.treeFacade.clipboardMode = 'cut'
+            const selectedIndices = this.treeFacade.getSelectedIndices()
 
             for (const idx of selectedIndices) {
-                this.treeLayoutManager.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT)
-                this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
-                const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+                this.treeFacade.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT)
+                this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
+                const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
-                    for (let i = idx + 1; i < this.treeLayoutManager.getFlattenTreeArrayLength(); i++) {
-                        const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
+                    for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
+                        const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
                         if (viewModel.indent < isChildViewModel.indent) {
                             // note: We skip adding CLASS_CUT to children, as parent visually affects them
-                            // this.treeLayoutManager.getTreeWrapperByIndex(i).classList.add(CLASS_CUT) 
-                            this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
+                            // this.treeFacade.getTreeWrapperByIndex(i).classList.add(CLASS_CUT) 
+                            this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
                             continue
                         }
 
@@ -320,20 +320,20 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            this.treeLayoutManager.clearClipboardPaths()
-            this.treeLayoutManager.clipboardMode = 'copy'
-            const selectedIndices = this.treeLayoutManager.getSelectedIndices()
+            this.treeFacade.clearClipboardPaths()
+            this.treeFacade.clipboardMode = 'copy'
+            const selectedIndices = this.treeFacade.getSelectedIndices()
 
             for (const idx of selectedIndices) {
-                this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
-                const viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+                this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
+                const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
                 if (viewModel.directory) {
-                    for (let i = idx + 1; i < this.treeLayoutManager.getFlattenTreeArrayLength(); i++) {
-                        const isChildViewModel = this.treeLayoutManager.getTreeViewModelByIndex(i)
+                    for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
+                        const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
                         if (viewModel.indent < isChildViewModel.indent) {
-                            this.treeLayoutManager.addClipboardPaths(this.treeLayoutManager.getTreeViewModelByIndex(idx).path)
+                            this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
                             continue
                         }
 
@@ -373,21 +373,21 @@ export default class CommandDispatcher {
 
         if (focus === 'tree') {
             let targetIndex
-            if (source === 'context_menu') targetIndex = this.treeLayoutManager.contextTreeIndex
-            else if (source === 'shortcut') targetIndex = this.treeLayoutManager.lastSelectedIndex
-            else if (source === 'drag') targetIndex = this.treeLayoutManager.selectedDragIndex
+            if (source === 'context_menu') targetIndex = this.treeFacade.contextTreeIndex
+            else if (source === 'shortcut') targetIndex = this.treeFacade.lastSelectedIndex
+            else if (source === 'drag') targetIndex = this.treeFacade.selectedDragIndex
 
             if (targetIndex === -1) return
-            const targetViewModel = this.treeLayoutManager.getTreeViewModelByIndex(targetIndex)
+            const targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
 
             const selectedViewModels = []
-            const clipboardPaths = this.treeLayoutManager.getClipboardPaths() ?? []
+            const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
             
             for (const path of clipboardPaths) {
-                selectedViewModels.push(this.treeLayoutManager.getTreeViewModelByPath(path))
+                selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
             }
             
-            const cmd = new PasteCommand(this.treeLayoutManager, this.tabEditorManager, targetViewModel, selectedViewModels, this.treeLayoutManager.clipboardMode)
+            const cmd = new PasteCommand(this.treeFacade, this.tabEditorFacade, targetViewModel, selectedViewModels, this.treeFacade.clipboardMode)
             
             try {
                 window.rendererToMain.setWatchSkipState(true)
@@ -409,10 +409,10 @@ export default class CommandDispatcher {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        const selectedIndices = this.treeLayoutManager.getSelectedIndices()
+        const selectedIndices = this.treeFacade.getSelectedIndices()
         if (selectedIndices.length !== 1) return
 
-        const treeNode = this.treeLayoutManager.getTreeNodeByIndex(selectedIndices[0])
+        const treeNode = this.treeFacade.getTreeNodeByIndex(selectedIndices[0])
         const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
         if (!treeSpan) return
 
@@ -445,9 +445,9 @@ export default class CommandDispatcher {
             const dir = window.utils.getDirName(prePath)
             const newPath = window.utils.getJoinedPath(dir, newName)
 
-            const viewModel = this.treeLayoutManager.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
+            const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH])
 
-            const cmd = new RenameCommand(this.treeLayoutManager, this.tabEditorManager, treeNode, viewModel.directory, prePath, newPath)
+            const cmd = new RenameCommand(this.treeFacade, this.tabEditorFacade, treeNode, viewModel.directory, prePath, newPath)
 
             try {
                 window.rendererToMain.setWatchSkipState(true)
@@ -467,8 +467,8 @@ export default class CommandDispatcher {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        const selectedIndices = this.treeLayoutManager.getSelectedIndices()
-        const cmd = new DeleteCommand(this.treeLayoutManager, this.tabEditorManager, selectedIndices)
+        const selectedIndices = this.treeFacade.getSelectedIndices()
+        const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices)
 
         try {
             await window.rendererToMain.setWatchSkipState(true)
@@ -484,23 +484,23 @@ export default class CommandDispatcher {
     }
 
     async performCreate(source: CommandSource, treeNodeContainer: HTMLElement, directory: boolean) {
-        let idx = Math.max(this.treeLayoutManager.lastSelectedIndex, 0)
-        let viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+        let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
+        let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
         if (!viewModel.directory) {
-            idx = this.treeLayoutManager.findParentDirectory(idx)
-            viewModel = this.treeLayoutManager.getTreeViewModelByIndex(idx)
+            idx = this.treeFacade.findParentDirectory(idx)
+            viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
         }
 
         let parentContainer: HTMLElement
         if (idx === 0) {
             parentContainer = treeNodeContainer
         } else {
-            const parentWrapper = this.treeLayoutManager.getTreeWrapperByIndex(idx)
+            const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)
             parentContainer = parentWrapper.querySelector('.tree_node_children') as HTMLElement
         }
 
-        const { wrapper, input } = this.treeLayoutManager.createInputbox(viewModel.directory, viewModel.indent)
+        const { wrapper, input } = this.treeFacade.createInputbox(viewModel.directory, viewModel.indent)
         parentContainer.appendChild(wrapper)
         input.focus()
 
@@ -527,7 +527,7 @@ export default class CommandDispatcher {
             const name = input.value.trim()
             if (name) {
                 const cmd = new CreateCommand(
-                    this.treeLayoutManager,
+                    this.treeFacade,
                     viewModel.path,
                     name,
                     directory,
@@ -570,7 +570,7 @@ export default class CommandDispatcher {
 
     performFind(source: CommandSource, direction: 'up' | 'down') {
         const input = this.findInput.value
-        const view = this.tabEditorManager.getActiveTabEditorView()
+        const view = this.tabEditorFacade.getActiveTabEditorView()
 
         const result = view.findAndSelect(input, direction)
         if (result) this.findInfo.textContent = `${result.current} of ${result.total}`
@@ -584,7 +584,7 @@ export default class CommandDispatcher {
         const findInput = this.findInput.value
         const replaceInput = this.replaceInput.value
 
-        const view = this.tabEditorManager.getActiveTabEditorView()
+        const view = this.tabEditorFacade.getActiveTabEditorView()
         const ret = view.replaceCurrent(findInput, replaceInput)
 
         if (ret) {
@@ -600,14 +600,14 @@ export default class CommandDispatcher {
         const findInput = this.findInput.value
         const replaceInput = this.replaceInput.value
 
-        const view = this.tabEditorManager.getActiveTabEditorView()
+        const view = this.tabEditorFacade.getActiveTabEditorView()
         view.replaceAll(findInput, replaceInput)
     }
 
     performCloseFindReplaceBox(source: CommandSource) {
         this.findAndReplaceContainer.style.display = 'none'
 
-        const activeView = this.tabEditorManager.getActiveTabEditorView()
+        const activeView = this.tabEditorFacade.getActiveTabEditorView()
         if (activeView) activeView.clearSearch()
     }
 

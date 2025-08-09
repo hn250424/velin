@@ -13,8 +13,8 @@ import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
 import FocusManager from './modules/state/FocusManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
-import TabEditorManager from './modules/domains/TabEditorManager'
-import TreeLayoutManager from './modules/domains/TreeLayoutManager'
+import TabEditorFacade from './modules/tab_editor/TabEditorFacade'
+import TreeFacade from './modules/tree/TreeFacade'
 import diContainer from './diContainer'
 import DI_KEYS from './constants/di_keys'
 import CommandDispatcher from './CommandDispatcher'
@@ -57,26 +57,29 @@ window.addEventListener('DOMContentLoaded', () => {
     const windowLayoutManager = diContainer.get<WindowLayoutManager>(DI_KEYS.WindowLayoutManager)
     const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
     const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
+
+    const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
     const tabDragManager = diContainer.get<TabDragManager>(DI_KEYS.TabDragManager)
+    
+    const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
     const treeDragManager = diContainer.get<TreeDragManager>(DI_KEYS.TreeDragManager)
-    const tabEditorManager = diContainer.get<TabEditorManager>(DI_KEYS.TabEditorManager)
-    const treeLayoutManager = diContainer.get<TreeLayoutManager>(DI_KEYS.TreeLayoutManager)
+    
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
     registerWindowHandlers(windowLayoutManager)
-    registerFileHandlers(commandDispatcher, tabEditorManager, shortcutRegistry)
-    registerLoadHandlers(tabEditorManager, treeLayoutManager)
-    registerExitHandlers(tabEditorManager, treeLayoutManager)
+    registerFileHandlers(commandDispatcher, tabEditorFacade, shortcutRegistry)
+    registerLoadHandlers(tabEditorFacade, treeFacade)
+    registerExitHandlers(tabEditorFacade, treeFacade)
     registerEditHandlers(commandDispatcher, shortcutRegistry)
     registerViewHandlers(shortcutRegistry, zoomManager)
     registerSideHandlers(sideState)
-    registerTabHandlers(commandDispatcher, tabDragManager, tabContainer, tabEditorManager, tabContextMenu, shortcutRegistry)
-    registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeLayoutManager, treeContextMenu, shortcutRegistry)
+    registerTabHandlers(commandDispatcher, tabDragManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
+    registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
-    bindSyncEventFromWatch(tabEditorManager, treeLayoutManager)
+    bindSyncEventFromWatch(tabEditorFacade, treeFacade)
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
-    bindDocumentMousedownEvnet(focusManager, tabEditorManager, treeLayoutManager)
+    bindDocumentMousedownEvnet(focusManager, tabEditorFacade, treeFacade)
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window.rendererToMain.loadedRenderer()
@@ -90,16 +93,16 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 })
 
-function bindSyncEventFromWatch(tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
+function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
     window.mainToRenderer.syncFromWatch(async (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => {
         if (tabEditorsDto) {
-            await tabEditorManager.syncTabs(tabEditorsDto)
+            await tabEditorFacade.syncTabs(tabEditorsDto)
         }
 
         if (treeDto) {
-            const viewModel = treeLayoutManager.toTreeViewModel(treeDto)
-            treeLayoutManager.renderTreeData(viewModel)
-            treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+            const viewModel = treeFacade.toTreeViewModel(treeDto)
+            treeFacade.renderTreeData(viewModel)
+            treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
     })
 }
@@ -111,7 +114,7 @@ function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HT
     })
 }
 
-function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager: TabEditorManager, treeLayoutManager: TreeLayoutManager) {
+function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
     document.addEventListener('mousedown', (e) => {
         const target = e.target as HTMLElement
         const isInTreeContextMenu = !!target.closest('#tree_context_menu')
@@ -125,16 +128,16 @@ function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorManager
         trackRelevantFocus(e.target as HTMLElement, focusManager)
 
         if (!isInTabContextMenu) {
-            tabEditorManager.removeContextTabId()
+            tabEditorFacade.removeContextTabId()
         }
 
         if (!isInTreeContextMenu && !isInTree) {
-            const idx = treeLayoutManager.lastSelectedIndex
+            const idx = treeFacade.lastSelectedIndex
             if (idx < 0) return
 
-            const treeNode = treeLayoutManager.getTreeNodeByIndex(idx)
+            const treeNode = treeFacade.getTreeNodeByIndex(idx)
             treeNode.classList.remove(CLASS_FOCUSED)
-            treeLayoutManager.removeLastSelectedIndex()
+            treeFacade.removeLastSelectedIndex()
         }
     })
 }

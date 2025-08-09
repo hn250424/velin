@@ -1,5 +1,5 @@
 import "@milkdown/theme-nord/style.css"
-import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
+import TreeFacade from "../modules/tree/TreeFacade"
 import {
     DATASET_ATTR_TREE_PATH,
     CLASS_FOCUSED,
@@ -19,41 +19,40 @@ import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
 import CommandDispatcher from "../CommandDispatcher"
 import TreeDragManager from "../modules/drag/TreeDragManager"
-import { aL } from "vitest/dist/chunks/reporters.d.BFLkQcL6"
 
 export default function registerTreeHandlers(
     commandDispatcher: CommandDispatcher,
     focusManager: FocusManager,
     dragManager: TreeDragManager,
     treeNodeContainer: HTMLElement,
-    treeLayoutManager: TreeLayoutManager,
+    treeFacade: TreeFacade,
     treeContextMenu: HTMLElement,
     shortcutRegistry: ShortcutRegistry
 ) {
     const treeContextPasteButton = treeContextMenu.querySelector(SELECTOR_TREE_CONTEXT_PASTE) as HTMLElement
 
-    bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeLayoutManager)
-    bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeLayoutManager, treeContextPasteButton)
+    bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeFacade)
+    bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeFacade, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
-    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeLayoutManager)
+    bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeFacade)
     bindTreeMenuEvents(commandDispatcher, treeNodeContainer)
 
     // Drag.
-    bindMouseDownEvents(dragManager, treeLayoutManager, treeNodeContainer)
-    bindMouseMoveEvents(dragManager, treeLayoutManager)
-    bindMouseUpEvents(dragManager, treeLayoutManager, treeNodeContainer, commandDispatcher)
+    bindMouseDownEvents(dragManager, treeFacade, treeNodeContainer)
+    bindMouseMoveEvents(dragManager, treeFacade)
+    bindMouseUpEvents(dragManager, treeFacade, treeNodeContainer, commandDispatcher)
 }
 
-function bindMouseDownEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager, treeContainer: HTMLElement) {
+function bindMouseDownEvents(dragManager: TreeDragManager, treeFacade: TreeFacade, treeContainer: HTMLElement) {
     treeContainer.addEventListener('mousedown', (e) => {
-        const count = treeManager.getSelectedIndices().length
+        const count = treeFacade.getSelectedIndices().length
         dragManager.setDragTreeCount(count)
         dragManager.setMouseDown(true)
         dragManager.setStartPosition(e.clientX, e.clientY)
     })
 }
 
-function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager) {
+function bindMouseMoveEvents(dragManager: TreeDragManager, treeFacade: TreeFacade) {
     document.addEventListener('mousemove', (e: MouseEvent) => {
         if (!dragManager.isMouseDown()) return
 
@@ -67,7 +66,7 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
             }
         }
 
-        const div = treeManager.createGhostBox(dragManager.getDragTreeCount())
+        const div = treeFacade.createGhostBox(dragManager.getDragTreeCount())
         div.style.left = `${e.clientX + 5}px`
         div.style.top = `${e.clientY + 5}px`
 
@@ -89,9 +88,9 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
         let viewModel
         if (!isContainer) {
             const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-            viewModel = treeManager.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
+            viewModel = treeFacade.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH])
         } else {
-            viewModel = treeManager.getTreeViewModelByPath(wrapper.dataset[DATASET_ATTR_TREE_PATH])
+            viewModel = treeFacade.getTreeViewModelByPath(wrapper.dataset[DATASET_ATTR_TREE_PATH])
         }
         
         if (!viewModel || !viewModel.directory) return
@@ -102,7 +101,7 @@ function bindMouseMoveEvents(dragManager: TreeDragManager, treeManager: TreeLayo
     })
 }
 
-function bindMouseUpEvents(dragManager: TreeDragManager, treeManager: TreeLayoutManager, treeContainer: HTMLElement, commandDispatcher: CommandDispatcher) {
+function bindMouseUpEvents(dragManager: TreeDragManager, treeFacade: TreeFacade, treeContainer: HTMLElement, commandDispatcher: CommandDispatcher) {
     treeContainer.addEventListener('mouseup', async (e: MouseEvent) => {
         if (!dragManager.isDrag()) {
             dragManager.setMouseDown(false)
@@ -111,8 +110,8 @@ function bindMouseUpEvents(dragManager: TreeDragManager, treeManager: TreeLayout
 
         const path = dragManager.getInsertPath()
         dragManager.endDrag()
-        treeManager.removeGhostBox()
-        treeManager.setSelectedDragIndexByPath(path)
+        treeFacade.removeGhostBox()
+        treeFacade.setSelectedDragIndexByPath(path)
         await commandDispatcher.performCut('drag')
         commandDispatcher.performPaste('drag')
     })
@@ -134,12 +133,12 @@ function bindTreeMenuEvents(commandDispatcher: CommandDispatcher, treeNodeContai
 function bindTreeClickEvents(
     commandDispatcher: CommandDispatcher,
     treeNodeContainer: HTMLElement,
-    treeLayoutManager: TreeLayoutManager,
+    treeFacade: TreeFacade,
 ) {
     treeNodeContainer.addEventListener('click', async (e) => {
-        if (treeLayoutManager.isAnyTreeNodeSelected()) {
-            const _idx = treeLayoutManager.lastSelectedIndex
-            const _treeNode = treeLayoutManager.getTreeNodeByIndex(_idx)
+        if (treeFacade.isAnyTreeNodeSelected()) {
+            const _idx = treeFacade.lastSelectedIndex
+            const _treeNode = treeFacade.getTreeNodeByIndex(_idx)
             _treeNode.classList.remove(CLASS_FOCUSED)
         }
 
@@ -148,16 +147,16 @@ function bindTreeClickEvents(
         if (!treeNode) {
             const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
             if (isTreeNodeContainer) {
-                const selectedIndices = treeLayoutManager.getSelectedIndices()
+                const selectedIndices = treeFacade.getSelectedIndices()
                 for (const i of selectedIndices) {
-                    const div = treeLayoutManager.getTreeNodeByIndex(i)
+                    const div = treeFacade.getTreeNodeByIndex(i)
                     div.classList.remove(CLASS_SELECTED)
                 }
 
-                treeLayoutManager.clearSelectedIndices()
+                treeFacade.clearSelectedIndices()
 
                 treeNodeContainer.classList.add(CLASS_FOCUSED)
-                treeLayoutManager.lastSelectedIndex = 0
+                treeFacade.lastSelectedIndex = 0
             }
 
             return
@@ -168,37 +167,37 @@ function bindTreeClickEvents(
         treeNode.classList.add(CLASS_FOCUSED)
         const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
 
-        if (e.shiftKey && treeLayoutManager.isAnyTreeNodeSelected()) {
-            const startIndex = treeLayoutManager.lastSelectedIndex
-            const endIndex = treeLayoutManager.getIndexByPath(path)
-            treeLayoutManager.setLastSelectedIndexByPath(path)
+        if (e.shiftKey && treeFacade.isAnyTreeNodeSelected()) {
+            const startIndex = treeFacade.lastSelectedIndex
+            const endIndex = treeFacade.getIndexByPath(path)
+            treeFacade.setLastSelectedIndexByPath(path)
             const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
             for (let i = start; i <= end; i++) {
-                treeLayoutManager.addSelectedIndices(i)
-                const div = treeLayoutManager.getTreeNodeByIndex(i)
+                treeFacade.addSelectedIndices(i)
+                const div = treeFacade.getTreeNodeByIndex(i)
                 div.classList.add(CLASS_SELECTED)
             }
 
         } else if (e.ctrlKey) {
             treeNode.classList.add(CLASS_SELECTED)
-            const index = treeLayoutManager.getIndexByPath(path)
-            treeLayoutManager.setLastSelectedIndexByPath(path)
-            treeLayoutManager.addSelectedIndices(index)
+            const index = treeFacade.getIndexByPath(path)
+            treeFacade.setLastSelectedIndexByPath(path)
+            treeFacade.addSelectedIndices(index)
 
         } else {
-            const selectedIndices = treeLayoutManager.getSelectedIndices()
+            const selectedIndices = treeFacade.getSelectedIndices()
             for (const i of selectedIndices) {
-                const div = treeLayoutManager.getTreeNodeByIndex(i)
+                const div = treeFacade.getTreeNodeByIndex(i)
                 div.classList.remove(CLASS_SELECTED)
             }
 
-            treeLayoutManager.clearSelectedIndices()
+            treeFacade.clearSelectedIndices()
             treeNode.classList.add(CLASS_SELECTED)
-            treeLayoutManager.setLastSelectedIndexByPath(path)
-            treeLayoutManager.addSelectedIndices(treeLayoutManager.getIndexByPath(path))
+            treeFacade.setLastSelectedIndexByPath(path)
+            treeFacade.addSelectedIndices(treeFacade.getIndexByPath(path))
 
-            const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
+            const viewModel = treeFacade.getTreeViewModelByPath(path)
             if (viewModel.directory) {
                 await commandDispatcher.performOpenDirectory('element', treeNode)
             } else {
@@ -211,7 +210,7 @@ function bindTreeClickEvents(
 function bindTreeContextmenuEvents(
     treeNodeContainer: HTMLElement,
     treeContextMenu: HTMLElement,
-    treeLayoutManager: TreeLayoutManager,
+    treeFacade: TreeFacade,
     treeContextPasteButton: HTMLElement
 ) {
     treeNodeContainer.addEventListener('contextmenu', (e) => {
@@ -223,16 +222,16 @@ function bindTreeContextmenuEvents(
         treeContextMenu.style.top = `${e.clientY}px`
 
         const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]
-        const viewModel = treeLayoutManager.getTreeViewModelByPath(path)
+        const viewModel = treeFacade.getTreeViewModelByPath(path)
 
         const isPasteDisabled =
-            treeLayoutManager.clipboardMode === 'none' ||
+            treeFacade.clipboardMode === 'none' ||
             !viewModel.directory ||
-            treeLayoutManager.getSelectedIndices().length === 0
+            treeFacade.getSelectedIndices().length === 0
 
         treeContextPasteButton.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
 
-        treeLayoutManager.setContextTreeIndexByPath(path)
+        treeFacade.setContextTreeIndexByPath(path)
         treeNode.classList.add(CLASS_FOCUSED)
     })
 }
@@ -263,12 +262,12 @@ function bindCommandsWithShortcut(
     commandDispatcher: CommandDispatcher,
     shortcutRegistry: ShortcutRegistry,
     focusManager: FocusManager,
-    treeLayoutManager: TreeLayoutManager
+    treeFacade: TreeFacade
 ) {
-    shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeLayoutManager))
-    shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeLayoutManager))
+    shortcutRegistry.register('ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade))
+    shortcutRegistry.register('ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade))
+    shortcutRegistry.register('Shift+ARROWUP', (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade))
+    shortcutRegistry.register('Shift+ARROWDOWN', (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade))
 
     shortcutRegistry.register('Ctrl+X', async (e: KeyboardEvent) => await commandDispatcher.performCut('shortcut'))
     shortcutRegistry.register('Ctrl+C', async (e: KeyboardEvent) => await commandDispatcher.performCopy('shortcut'))
@@ -277,43 +276,43 @@ function bindCommandsWithShortcut(
     shortcutRegistry.register('DELETE', async (e: KeyboardEvent) => await commandDispatcher.performDelete('shortcut'))
 }
 
-function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
+function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
     if (focusManager.getFocus() !== 'tree') return
 
-    let lastIdx = treeLayoutManager.lastSelectedIndex
+    let lastIdx = treeFacade.lastSelectedIndex
     if (lastIdx <= 0) return
 
-    const preTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    const preTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
     preTreeNode.classList.remove(CLASS_FOCUSED)
 
     lastIdx--
-    treeLayoutManager.lastSelectedIndex = lastIdx
-    const newTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    treeFacade.lastSelectedIndex = lastIdx
+    const newTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
     newTreeNode.classList.add(CLASS_FOCUSED)
 
     if (e.shiftKey) {
         newTreeNode.classList.add(CLASS_SELECTED)
-        treeLayoutManager.addSelectedIndices(lastIdx)
+        treeFacade.addSelectedIndices(lastIdx)
     }
 }
 
-function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeLayoutManager: TreeLayoutManager) {
+function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
     if (focusManager.getFocus() !== 'tree') return
 
-    let lastIdx = treeLayoutManager.lastSelectedIndex
-    let totalLength = treeLayoutManager.getFlattenTreeArrayLength()
+    let lastIdx = treeFacade.lastSelectedIndex
+    let totalLength = treeFacade.getFlattenTreeArrayLength()
     if (lastIdx >= totalLength) return
 
-    const preTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    const preTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
     preTreeNode.classList.remove(CLASS_FOCUSED)
 
     lastIdx++
-    treeLayoutManager.lastSelectedIndex = lastIdx
-    const newTreeNode = treeLayoutManager.getTreeNodeByIndex(lastIdx)
+    treeFacade.lastSelectedIndex = lastIdx
+    const newTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
     newTreeNode.classList.add(CLASS_FOCUSED)
 
     if (e.shiftKey) {
         newTreeNode.classList.add(CLASS_SELECTED)
-        treeLayoutManager.addSelectedIndices(lastIdx)
+        treeFacade.addSelectedIndices(lastIdx)
     }
 }

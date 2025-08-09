@@ -1,11 +1,11 @@
-import TreeLayoutManager from "../modules/domains/TreeLayoutManager"
+import TreeFacade from "../modules/tree/TreeFacade"
 import ICommand from "./ICommand"
 
 export default class CreateCommand implements ICommand {
     private createdPath: string = ""
 
     constructor(
-        private treeLayoutManager: TreeLayoutManager,
+        private treeFacade: TreeFacade,
         private parentPath: string,
         private name: string,
         private isDirectory: boolean,
@@ -17,9 +17,9 @@ export default class CreateCommand implements ICommand {
         await window.rendererToMain.create(newPath, this.isDirectory)
         const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
-            const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
-            this.treeLayoutManager.renderTreeData(viewModel)
-            this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+            const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+            this.treeFacade.renderTreeData(viewModel)
+            this.treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
     }
 
@@ -34,9 +34,9 @@ export default class CreateCommand implements ICommand {
             
             const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
             if (newTreeSession) {
-                const viewModel = this.treeLayoutManager.toTreeViewModel(newTreeSession)
-                this.treeLayoutManager.renderTreeData(viewModel)
-                this.treeLayoutManager.loadFlattenArrayAndMaps(viewModel)
+                const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+                this.treeFacade.renderTreeData(viewModel)
+                this.treeFacade.loadFlattenArrayAndMaps(viewModel)
             }
         } catch (error) {
             console.error('Undo create failed:', error)
