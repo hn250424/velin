@@ -16,7 +16,7 @@ export default class PasteCommand implements ICommand {
     private undoInfos: UndoInfo[] = []
 
     constructor(
-        private treeLayoutFacade: TreeFacade,
+        private treeFacade: TreeFacade,
         private tabEditorFacade: TabEditorFacade,
         private targetViewModel: TreeViewModel,
         private selectedViewModels: TreeViewModel[],
@@ -24,9 +24,9 @@ export default class PasteCommand implements ICommand {
     ) { }
 
     async execute(): Promise<void> {
-        const targetDto = this.treeLayoutFacade.toTreeDto(this.targetViewModel)
+        const targetDto = this.treeFacade.toTreeDto(this.targetViewModel)
         const selectedDtos = this.selectedViewModels.map(viewModel => {
-            return this.treeLayoutFacade.toTreeDto(viewModel)
+            return this.treeFacade.toTreeDto(viewModel)
         })
 
         const response: Response<string[]> = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
@@ -61,9 +61,9 @@ export default class PasteCommand implements ICommand {
 
             const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
             if (newTreeSession) {
-                const viewModel = this.treeLayoutFacade.toTreeViewModel(newTreeSession)
-                this.treeLayoutFacade.renderTreeData(viewModel)
-                this.treeLayoutFacade.loadFlattenArrayAndMaps(viewModel)
+                const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+                this.treeFacade.renderTreeData(viewModel)
+                this.treeFacade.loadFlattenArrayAndMaps(viewModel)
             }
         }
     }
@@ -97,9 +97,9 @@ export default class PasteCommand implements ICommand {
 
         const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
-            const viewModel = this.treeLayoutFacade.toTreeViewModel(newTreeSession)
-            this.treeLayoutFacade.renderTreeData(viewModel)
-            this.treeLayoutFacade.loadFlattenArrayAndMaps(viewModel)
+            const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+            this.treeFacade.renderTreeData(viewModel)
+            this.treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
     }
 }

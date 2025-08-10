@@ -1,440 +1,201 @@
-import {
-    DATASET_ATTR_TREE_PATH,
-    EXPANDED_TEXT,
-    NOT_EXPANDED_TEXT,
-    CLASS_FOCUSED,
-    CLASS_SELECTED,
-    CLASS_EXPANDED,
-    CLASS_TREE_NODE,
-    CLASS_TREE_NODE_TEXT,
-    CLASS_TREE_NODE_ICON,
-    CLASS_TREE_NODE_OPEN,
-    CLASS_TREE_NODE_INPUT,
-    CLASS_TREE_NODE_WRAPPER,
-    CLASS_TREE_NODE_CHILDREN,
-    SELECTOR_TREE_NODE,
-    CLASS_TREE_GHOST
-} from "../../constants/dom"
 import TreeDto from "@shared/dto/TreeDto"
-import TreeViewModel from "../../viewmodels/TreeViewModel"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import Response from "@shared/types/Response"
 import { inject } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
+import {
+    DATASET_ATTR_TREE_PATH,
+    SELECTOR_TREE_NODE
+} from "../../constants/dom"
+import TreeViewModel from "../../viewmodels/TreeViewModel"
 import TreeRenderer from "./TreeRenderer"
 import TreeStore from "./TreeStore"
 
 export default class TreeFacade {
-    private _tree: HTMLElement
-    private _tree_top: HTMLElement
-    private _tree_top_name: HTMLElement
-    private _tree_top_add_file: HTMLElement
-    private _tree_top_add_directory: HTMLElement
-    private _tree_node_container: HTMLElement
-    private _tree_resizer: HTMLElement
-
-    private pathToFlattenArrayIndexMap: Map<string, number> = new Map()
-    private pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
-    private flattenTreeArray: TreeViewModel[] = []
-
-    private _contextTreeIndex: number = -1
-    private _lastSelectedIndex: number = -1
-    private _selectedDragIndex: number = -1
-
-    // Set of user-selected indices (no children included). For just ui.
-    private _selectedIndices = new Set<number> 
-
-    // Set of full paths that have been copied (including all nested children).
-    // Unlike selectedIndices, this persists even if folders are collapsed.
-    // Used during copy/cut commands to track exactly what to paste later.
-    // Always resolved at the time of the command (not tied to UI state).
-    private _clipboardPaths = new Set<string>
-    private _clipboardMode: ClipboardMode = 'none'
-
-    private ghostBox: HTMLElement | null = null
-
     constructor(
-        @inject(DI_KEYS.TreeRenderer) private readonly treeRenderer: TreeRenderer,
-        @inject(DI_KEYS.TreeStore) private readonly treeStore: TreeStore
-    ) {
-        this._tree_node_container = document.getElementById('tree_node_container')
-        this._tree_top_name = document.getElementById('tree_top_name')
-    }
+        @inject(DI_KEYS.TreeRenderer) private readonly renderer: TreeRenderer,
+        @inject(DI_KEYS.TreeStore) private readonly store: TreeStore
+    ) { }
 
     toTreeDto(viewModel: TreeViewModel): TreeDto {
-        return {
-            path: viewModel.path,
-            name: viewModel.name,
-            indent: viewModel.indent,
-            directory: viewModel.directory,
-            expanded: viewModel.expanded,
-            children: viewModel.children
-                ? viewModel.children.map(child => this.toTreeDto(child))
-                : null
-        }
+        return this.store.toTreeDto(viewModel)
     }
     
     toTreeViewModel(dto: TreeDto): TreeViewModel {
-        return {
-            path: dto.path,
-            name: dto.name,
-            indent: dto.indent,
-            directory: dto.directory,
-            expanded: dto.expanded,
-            selected: false,
-            children: dto.children
-                ? dto.children.map(child => this.toTreeViewModel(child))
-                : null
-        }
-    }
-
-    clean(container: HTMLElement) {
-        while (container.firstChild) {
-            container.removeChild(container.firstChild)
-        }
-    }
-
-    // Each DOM element with class `tree_node` has a dataset attribute for its path.
-    // The root node uses the container `tree_node_container` to hold its path in the dataset.
-    renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
-        if (!container) {
-            this._tree_top_name.textContent = viewModel.name
-            container = this._tree_node_container
-
-            this.pathToTreeWrapperMap.set(viewModel.path, container)
-            container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
-        }
-
-        this.clean(container)
-
-        if (viewModel.children) {
-            for (const child of viewModel.children) {
-                this._renderNode(container, child)
-            }
-        }
-    }
-
-    private _renderNode(container: HTMLElement, viewModel: TreeViewModel) {
-        const box = document.createElement('div')
-        box.classList.add(CLASS_TREE_NODE)
-        box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
-        box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
-        box.title = viewModel.path
-
-        const openStatus = document.createElement('span')
-        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (viewModel.directory) openStatus.textContent = viewModel.expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
-
-        const icon = document.createElement('img')
-        icon.classList.add(CLASS_TREE_NODE_ICON)
-        icon.src = viewModel.directory
-            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
-            : new URL('../../assets/icons/file.png', import.meta.url).toString()
-
-        const text = document.createElement('span')
-        text.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
-        text.textContent = viewModel.name
-
-        const childrenContainer = document.createElement('div')
-        childrenContainer.classList.add(CLASS_TREE_NODE_CHILDREN)
-        if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED)
-        else childrenContainer.classList.remove(CLASS_EXPANDED)
-
-        box.appendChild(openStatus)
-        box.appendChild(icon)
-        box.appendChild(text)
-
-        const wrapper = document.createElement('div')
-        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-        wrapper.appendChild(box)
-        wrapper.appendChild(childrenContainer)
-
-        this.pathToTreeWrapperMap.set(viewModel.path, wrapper)
-        container.appendChild(wrapper)
-
-        if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
-            for (const child of viewModel.children) {
-                this._renderNode(childrenContainer, child)
-            }
-        }
-    }
-
-    createGhostBox(count: number) {
-        if (this.ghostBox) return this.ghostBox
-
-        const div = document.createElement('div')
-        div.classList.add(CLASS_TREE_GHOST)
-        div.textContent = `${count} items`
- 
-        this.ghostBox = div
-        document.body.appendChild(div)
-
-        return this.ghostBox
-    }
-
-    removeGhostBox() {
-        if (this.ghostBox) {
-            this.ghostBox.remove()
-            this.ghostBox = null
-        }
-    }
-
-    loadFlattenArrayAndMaps(tree: TreeViewModel) {
-        this.flattenTreeArray = this.flattenTree(tree)
-        this.rebuildIndexMap()
-    }
-
-    rebuildIndexMap() {
-        this.pathToFlattenArrayIndexMap.clear()
-
-        for (let i = 0; i < this.flattenTreeArray.length; i++) {
-            const viewModel = this.flattenTreeArray[i]
-            const path = viewModel.path
-
-            this.pathToFlattenArrayIndexMap.set(path, i)
-        }
-    }
-
-    private flattenTree(tree: TreeViewModel): TreeViewModel[] {
-        const result: TreeViewModel[] = []
-
-        function dfs(node: TreeViewModel) {
-            result.push(node)
-            if (node.children) {
-                for (const child of node.children) {
-                    dfs(child)
-                }
-            }
-        }
-
-        dfs(tree)
-        return result
+        return this.store.toTreeViewModel(dto)
     }
 
     extractTreeViewModel(): TreeViewModel | null {
-        if (!this.flattenTreeArray || this.flattenTreeArray.length === 0) return null
-
-        const pathToNode = new Map<string, TreeViewModel>()
-        const root = this.flattenTreeArray[0]
-        pathToNode.set(root.path, root)
-
-        for (let i = 1; i < this.flattenTreeArray.length; i++) {
-            const node = this.flattenTreeArray[i]
-            pathToNode.set(node.path, node)
-        }
-
-        for (let i = 1; i < this.flattenTreeArray.length; i++) {
-            const node = pathToNode.get(this.flattenTreeArray[i].path)!
-            for (let j = i - 1; j >= 0; j--) {
-                const possibleParent = this.flattenTreeArray[j]
-                if (possibleParent.indent === node.indent - 1) {
-                    const parent = pathToNode.get(possibleParent.path)!
-                    if (!parent.children) parent.children = []
-                    parent.children.push(node)
-                    break
-                }
-            }
-        }
-
-        return root
+        return this.store.extractTreeViewModel()
     }
 
+
+
     expandNode(node: TreeViewModel) {
-        const index = this.flattenTreeArray.findIndex(dto => dto.path === node.path)
-        if (index === -1) return
-
-        const childrenToInsert = this.flattenTree(node).slice(1) // Remove the first element (the node itself) using slice(1)
-        this.flattenTreeArray.splice(index + 1, 0, ...childrenToInsert)
-
-        this.rebuildIndexMap()
+        this.store.expandNode(node)
     }
 
     collapseNode(node: TreeViewModel) {
-        const index = this.flattenTreeArray.findIndex(dto => dto.path === node.path)
-        if (index === -1) return
-
-        let removeCount = 0
-        for (let i = index + 1; i < this.flattenTreeArray.length; i++) {
-            if (this.flattenTreeArray[i].indent <= node.indent) break
-            removeCount++
-        }
-        this.flattenTreeArray.splice(index + 1, removeCount)
-
-        this.rebuildIndexMap()
+        this.store.collapseNode(node)
     }
 
-    isAnyTreeNodeSelected(): boolean {
-        return this._lastSelectedIndex > 0
+
+
+    getFlattenTreeArrayLength(): number {
+        return this.store.flattenTreeArray.length
     }
 
-    getFlattenTreeIndexByPath(path: string) {
-        return this.pathToFlattenArrayIndexMap.get(path)
+    getFlattenArrayIndexByPath(path: string) {
+        return this.store.getFlattenArrayIndexByPath(path)
     }
 
-    setFlattenTreeIndexByPath(path: string, index: number) {
-        this.pathToFlattenArrayIndexMap.set(path, index)
+    findParentDirectoryIndex(index: number) {
+        return this.store.findParentDirectoryIndex(index)
     }
 
-    getTreeNodeByPath(path: string) {
-        const wrapper = this.pathToTreeWrapperMap.get(path)
-        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-    }
 
-    getTreeWrapperByPath(path: string) {
-        return this.pathToTreeWrapperMap.get(path)
-    }
-
-    setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
-        this.pathToTreeWrapperMap.set(path, wrapper)
-    }
-
-    getTreeNodeByIndex(index: number) {
-        const wrapper = this.pathToTreeWrapperMap.get(this.getTreeViewModelByIndex(index).path)
-        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-    }
-
-    getTreeWrapperByIndex(index: number) {
-        return this.pathToTreeWrapperMap.get(this.getTreeViewModelByIndex(index).path)
-    }
-
-    setTreeWrapperByIndex(index: number, wrapper: HTMLElement) {
-        this.pathToTreeWrapperMap.set(this.getTreeViewModelByIndex(index).path, wrapper)
-    }
-
-    getIndexByPath(path: string) {
-        return this.pathToFlattenArrayIndexMap.get(path)
-    }
 
     getTreeViewModelByIndex(index: number) {
-        return this.flattenTreeArray[index]
+        return this.store.getTreeViewModelByIndex(index)
     }
 
     getTreeViewModelByPath(path: string) {
-        return this.flattenTreeArray[this.pathToFlattenArrayIndexMap.get(path)]
+        return this.store.getTreeViewModelByPath(path)
     }
 
-    // Is needed ?
-    // getPathByTreeNode(treeNode: HTMLElement) {
-    //     return treeNode.dataset[DATASET_ATTR_TREE_PATH]
-    // }
 
+
+    isAnyTreeNodeSelected(): boolean {
+        return this.store.lastSelectedIndex > 0
+    }
+    
     get lastSelectedIndex() {
-        return this._lastSelectedIndex
+        return this.store.lastSelectedIndex
     }
 
     set lastSelectedIndex(index: number) {
-        this._lastSelectedIndex = index
+        this.store.lastSelectedIndex = index
     }
 
     setLastSelectedIndexByPath(path: string) {
-        this._lastSelectedIndex = this.pathToFlattenArrayIndexMap.get(path)
+        this.store.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path)
     }
 
     removeLastSelectedIndex() {
-        this._lastSelectedIndex = -1
-    }
-
-    get selectedDragIndex() {
-        return this._selectedDragIndex
-    }
-
-    setSelectedDragIndexByPath(path: string) {
-        this._selectedDragIndex = this.getIndexByPath(path)
+        this.store.lastSelectedIndex = -1
     }
 
     get contextTreeIndex() {
-        return this._contextTreeIndex
+        return this.store.contextTreeIndex
     }
 
     set contextTreeIndex(index: number) {
-        this._contextTreeIndex = index
+        this.store.contextTreeIndex = index
     }
 
     setContextTreeIndexByPath(path: string) {
-        this._contextTreeIndex = this.pathToFlattenArrayIndexMap.get(path)
+        this.store.contextTreeIndex = this.store.getFlattenArrayIndexByPath(path)
     }
 
     removeContextTreeIndex() {
-        this._contextTreeIndex = -1
+        this.store.removeContextTreeIndex()
     }
 
+    get selectedDragIndex() {
+        return this.store.selectedDragIndex
+    }
+
+    setSelectedDragIndexByPath(path: string) {
+        this.store.selectedDragIndex = this.store.getFlattenArrayIndexByPath(path)
+    }
+
+
+
     addSelectedIndices(index: number) {
-        this._selectedIndices.add(index)
+        this.store.addSelectedIndices(index)
     }
 
     getSelectedIndices(): number[] {
-        return [...this._selectedIndices]
+        return this.store.getSelectedIndices()
     }
 
     clearSelectedIndices() {
-        this._selectedIndices.clear()
+        this.store.clearSelectedIndices()
     }
 
     addClipboardPaths(path: string) {
-        this._clipboardPaths.add(path)
+        this.store.addClipboardPaths(path)
     }
 
     getClipboardPaths(): string[] {
-        return [...this._clipboardPaths]
+        return this.store.getClipboardPaths()
     }
 
     clearClipboardPaths() {
-        this._clipboardPaths.clear()
-    }
-
-    getFlattenTreeArrayLength(): number {
-        return this.flattenTreeArray.length
+        this.store.clearClipboardPaths()
     }
 
     get clipboardMode() {
-        return this._clipboardMode
+        return this.store.clipboardMode
     }
 
     set clipboardMode(mode: ClipboardMode) {
-        this._clipboardMode = mode
+        this.store.clipboardMode = mode
     }
 
-    findParentDirectory(index: number) {
-        const indent = this.flattenTreeArray[index].indent
-        let i = index - 1
-        while (i >= 0) {
-            if (this.flattenTreeArray[i].indent < indent) {
-                return i
-            }
-            i--
-        }
-        return 0
+
+
+    clean(container: HTMLElement) {
+        this.renderer.clean(container)
+    }
+
+    renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
+        this.renderer.renderTreeData(viewModel, container)
     }
 
     createInputbox(directory: boolean, indent: number) {
-        const box = document.createElement('div')
-        box.classList.add('tree_node_temp')
-        box.style.paddingLeft = `${indent * 16}px`
+        return this.renderer.createInputbox(directory, indent)
+    }
 
-        const openStatus = document.createElement('span')
-        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (directory) openStatus.textContent = NOT_EXPANDED_TEXT
 
-        const icon = document.createElement('img')
-        icon.classList.add(CLASS_TREE_NODE_ICON)
-        icon.src = directory
-            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
-            : new URL('../../assets/icons/file.png', import.meta.url).toString()
+    
+    createGhostBox(count: number) {
+        return this.renderer.createGhostBox(count)
+    }
 
-        const input = document.createElement('input')
-        input.type = 'text'
-        input.value = ''
-        input.classList.add(CLASS_TREE_NODE_INPUT)
+    removeGhostBox() {
+        this.renderer.removeGhostBox()
+    }
 
-        box.appendChild(openStatus)
-        box.appendChild(icon)
-        box.appendChild(input)
 
-        const wrapper = document.createElement('div')
-        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-        wrapper.appendChild(box)
+    getTreeNodeByPath(path: string) {
+        return this.renderer.getTreeNodeByPath(path)
+    }
 
-        return { wrapper, input }
+    getTreeWrapperByPath(path: string) {
+        return this.renderer.getTreeWrapperByPath(path)
+    }
+
+    setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
+        this.renderer.setTreeWrapperByPath(path, wrapper)
+    }
+
+    getTreeWrapperByIndex(index: number) {
+        const viewModel = this.store.getTreeViewModelByIndex(index)
+        return this.renderer.getTreeWrapperByPath(viewModel.path)
+    }
+
+    getTreeNodeByIndex(index: number) {
+        const wrapper = this.getTreeWrapperByIndex(index)
+        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+    }
+
+
+
+    loadFlattenArrayAndMaps(json: TreeViewModel) {
+        const arr = this.store.flattenTree(json)
+        this.store.setFlattenTree(arr)
+        this.store.rebuildPathToFlattenArrayIndexMap()
     }
 
     async rename(preBase: string, newBase: string) {
@@ -442,16 +203,16 @@ export default class TreeFacade {
         if (!response.result) return response
         newBase = response.data
 
-        const start = this.getFlattenTreeIndexByPath(preBase)
+        const start = this.store.getFlattenArrayIndexByPath(preBase)
 
-        for (let i = start; i < this.flattenTreeArray.length; i++) {
-            const node = this.flattenTreeArray[i]
+        for (let i = start; i < this.store.flattenTreeArray.length; i++) {
+            const node = this.getTreeViewModelByIndex(i)
             if (node.path.startsWith(preBase)) {
-                const treeWrapper = this.pathToTreeWrapperMap.get(node.path)
-                const idx = this.pathToFlattenArrayIndexMap.get(node.path)
-                const treeNode = this.getTreeNodeByIndex(idx)
-                this.pathToFlattenArrayIndexMap.delete(node.path)
-                this.pathToTreeWrapperMap.delete(node.path)
+                const treeWrapper = this.renderer.getTreeWrapperByPath(node.path)
+                const idx = this.store.getFlattenArrayIndexByPath(node.path)
+                const treeNode = this.renderer.getTreeNodeByPath(node.path)
+                this.store.deleteFlattenArrayIndexByPath(node.path)
+                this.renderer.deleteTreeWrapperByPath(node.path)
 
                 const relative = window.utils.getRelativePath(preBase, node.path)
                 const newPath = window.utils.getJoinedPath(newBase, relative)
@@ -460,8 +221,8 @@ export default class TreeFacade {
                 treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
                 treeNode.title = newPath
 
-                this.pathToFlattenArrayIndexMap.set(newPath, idx)
-                this.pathToTreeWrapperMap.set(newPath, treeWrapper)
+                this.store.setFlattenArrayIndexByPath(newPath, idx)
+                this.renderer.setTreeWrapperByPath(newPath, treeWrapper)
             } else {
                 break
             }
@@ -474,14 +235,14 @@ export default class TreeFacade {
         indices.sort((a, b) => b - a)
 
         for (const index of indices) {
-            const target = this.flattenTreeArray[index]
+            const target = this.store.flattenTreeArray[index]
 
             const toDelete: TreeViewModel[] = []
             const baseIndent = target.indent
 
             // Collects the deletion target: Self + all children
-            for (let i = index; i < this.flattenTreeArray.length; i++) {
-                const node = this.flattenTreeArray[i]
+            for (let i = index; i < this.store.flattenTreeArray.length; i++) {
+                const node = this.store.getTreeViewModelByIndex(i)
                 if (i !== index && node.indent <= baseIndent) break
                 toDelete.push(node)
             }
@@ -489,17 +250,15 @@ export default class TreeFacade {
             for (const node of toDelete) {
                 const path = node.path
 
-                const wrapper = this.pathToTreeWrapperMap.get(path)
+                const wrapper = this.renderer.getTreeWrapperByPath(path)
                 wrapper?.remove()
 
-                // this.pathToFlattenArrayIndexMap.delete(path)
-                this.pathToTreeWrapperMap.delete(path)
+                this.renderer.deleteTreeWrapperByPath(path)
             }
 
-            this.flattenTreeArray.splice(index, toDelete.length)
-            
+            this.store.spliceFlattenTreeArray(index, toDelete.length)
         }
 
-        this.rebuildIndexMap()
+        this.store.rebuildPathToFlattenArrayIndexMap()
     }
 }

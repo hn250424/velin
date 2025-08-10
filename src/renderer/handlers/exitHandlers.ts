@@ -5,12 +5,12 @@ import TreeFacade from "../modules/tree/TreeFacade"
 // TODO: Alt+F4
 export default function registerExitHandlers(
     tabEditorFacade: TabEditorFacade,
-    treeLayoutFacade: TreeFacade
+    treeFacade: TreeFacade
 ) {
     document.querySelectorAll('.exit').forEach(dom => {
         dom.addEventListener('click', () => {
             const tabSessionData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
-            const treeSessionData = treeLayoutFacade.toTreeDto(treeLayoutFacade.extractTreeViewModel())
+            const treeSessionData = treeFacade.toTreeDto(treeFacade.extractTreeViewModel())
             window.rendererToMain.exit(tabSessionData, treeSessionData)
         })
     })

@@ -169,7 +169,7 @@ function bindTreeClickEvents(
 
         if (e.shiftKey && treeFacade.isAnyTreeNodeSelected()) {
             const startIndex = treeFacade.lastSelectedIndex
-            const endIndex = treeFacade.getIndexByPath(path)
+            const endIndex = treeFacade.getFlattenArrayIndexByPath(path)
             treeFacade.setLastSelectedIndexByPath(path)
             const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
@@ -181,7 +181,7 @@ function bindTreeClickEvents(
 
         } else if (e.ctrlKey) {
             treeNode.classList.add(CLASS_SELECTED)
-            const index = treeFacade.getIndexByPath(path)
+            const index = treeFacade.getFlattenArrayIndexByPath(path)
             treeFacade.setLastSelectedIndexByPath(path)
             treeFacade.addSelectedIndices(index)
 
@@ -195,7 +195,7 @@ function bindTreeClickEvents(
             treeFacade.clearSelectedIndices()
             treeNode.classList.add(CLASS_SELECTED)
             treeFacade.setLastSelectedIndexByPath(path)
-            treeFacade.addSelectedIndices(treeFacade.getIndexByPath(path))
+            treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path))
 
             const viewModel = treeFacade.getTreeViewModelByPath(path)
             if (viewModel.directory) {

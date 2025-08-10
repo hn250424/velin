@@ -6,7 +6,7 @@ import Response from "@shared/types/Response"
 
 export default class RenameCommand implements ICommand {
     constructor(
-        private treeLayoutFacade: TreeFacade,
+        private treeFacade: TreeFacade,
         private tabEditorFacade: TabEditorFacade,
         private treeNode: HTMLElement,
         private isDir: boolean,
@@ -15,7 +15,7 @@ export default class RenameCommand implements ICommand {
     ) { }
 
     async execute() {
-        const response: Response<string> = await this.treeLayoutFacade.rename(this.prePath, this.newPath)
+        const response: Response<string> = await this.treeFacade.rename(this.prePath, this.newPath)
         if (!response.result) throw new Error('Rename failed')
         this.newPath = response.data
 
@@ -29,7 +29,7 @@ export default class RenameCommand implements ICommand {
     }
 
     async undo() {
-        await this.treeLayoutFacade.rename(this.newPath, this.prePath)
+        await this.treeFacade.rename(this.newPath, this.prePath)
         const oldSpan = document.createElement('span')
         oldSpan.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
         oldSpan.textContent = window.utils.getBaseName(this.prePath)

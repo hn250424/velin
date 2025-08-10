@@ -488,7 +488,7 @@ export default class CommandDispatcher {
         let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
         if (!viewModel.directory) {
-            idx = this.treeFacade.findParentDirectory(idx)
+            idx = this.treeFacade.findParentDirectoryIndex(idx)
             viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
         }
 

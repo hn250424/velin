@@ -8,7 +8,7 @@ export default class DeleteCommand implements ICommand {
     private trashMap: TrashMap[] | null
 
     constructor(
-        private treeLayoutFacade: TreeFacade,
+        private treeFacade: TreeFacade,
         private tabEditorFacade: TabEditorFacade,
         private selectedIndices: number[],
     ) {
@@ -19,7 +19,7 @@ export default class DeleteCommand implements ICommand {
         const pathsToDelete: string[] = []
         const idsToDelete: number[] = []
         for (let i = 0; i < this.selectedIndices.length; i++) {
-            const viewModel = this.treeLayoutFacade.getTreeViewModelByIndex(this.selectedIndices[i])
+            const viewModel = this.treeFacade.getTreeViewModelByIndex(this.selectedIndices[i])
             pathsToDelete.push(viewModel.path)
             const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(viewModel.path)
             if (tabEditorView) idsToDelete.push(tabEditorView.getId())
@@ -32,13 +32,13 @@ export default class DeleteCommand implements ICommand {
         for (let i = 0; i < idsToDelete.length; i++) {
             this.tabEditorFacade.removeTab(idsToDelete[i])
         }
-        this.treeLayoutFacade.delete(this.selectedIndices)
-        this.treeLayoutFacade.clearSelectedIndices()
+        this.treeFacade.delete(this.selectedIndices)
+        this.treeFacade.clearSelectedIndices()
 
         const tabEditorDto = this.tabEditorFacade.getAllTabEditorData()
         await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto)
 
-        const treeDto = this.treeLayoutFacade.toTreeDto(this.treeLayoutFacade.extractTreeViewModel())
+        const treeDto = this.treeFacade.toTreeDto(this.treeFacade.extractTreeViewModel())
         await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
     }
 
@@ -48,9 +48,9 @@ export default class DeleteCommand implements ICommand {
 
         const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
         if (newTreeSession) {
-            const viewModel = this.treeLayoutFacade.toTreeViewModel(newTreeSession)
-            this.treeLayoutFacade.renderTreeData(viewModel)
-            this.treeLayoutFacade.loadFlattenArrayAndMaps(viewModel)
+            const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+            this.treeFacade.renderTreeData(viewModel)
+            this.treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
     }
 }
