@@ -1,14 +1,15 @@
 @use './global_variables.scss' as gv;
 
 $dropdown_min_width: 150px;
-$dropdown_border_color: gv.$grey-2;
-$dropdown_item_hover_color: gv.$grey-1;
-$dropdown_divider_color: gv.$grey-2;
 $dropdown_padding: 5px;
 $dropdown_item_padding: 5px 10px;
+
 $shortcut_font_size: 0.85em;
 $shortcut_left_margin: 20px;
-$shortcut_color: gv.$grey-4;
+
+$tooltip_horizontal_padding: 8px;
+$tooltip_vertical_padding: 4px;
+$tooltip_border_radius: 4px;
 
 * {
     margin: 0;
@@ -29,7 +30,7 @@ $shortcut_color: gv.$grey-4;
     display: none;
     position: absolute;
     background: white;
-    border: 1px solid $dropdown_border_color;
+    border: 1px solid var(--dropdown-border);
     min-width: $dropdown_min_width;
     z-index: 99;
     padding: $dropdown_padding;
@@ -47,19 +48,19 @@ $shortcut_color: gv.$grey-4;
 }
 
 .dropdown_item:hover {
-    background-color: $dropdown_item_hover_color;
+    background-color: var(--dropdown-item-hover);
 }
 
 .dropdown_divider {
     height: 1px;
     margin: 1px;
-    background-color: $dropdown_divider_color;
+    background-color: var(--dropdown-divider);
 }
 
 .shortcut {
     font-size: $shortcut_font_size;
     margin-left: $shortcut_left_margin;
-    color: $shortcut_color;
+    color: var(--shortcut-font);
     user-select: none;
 }
 
@@ -71,6 +72,58 @@ $shortcut_color: gv.$grey-4;
 
 .deactive,
 .not_implemented {
-    color: gv.$grey-3 !important;
+    color: var(--not-implemented) !important;
     cursor: default !important;
+}
+
+input:focus {
+    outline: none;
+}
+
+.tooltip-btn {
+    position: relative;
+}
+
+.tooltip {
+    visibility: hidden;
+
+    position: absolute;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-font);
+
+    padding: $tooltip_vertical_padding $tooltip_horizontal_padding;
+    border-radius: $tooltip_border_radius;
+    font-size: 0.7rem;
+
+    white-space: nowrap;
+    pointer-events: none;
+
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    z-index: 101;
+
+    &-bottom {
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &-right {
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+    }
+
+    &-bottom-left {
+        top: 100%;
+        right: 0;
+        left: auto;
+        transform: none;
+    }
+}
+
+.tooltip-btn:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
 }

@@ -1,5 +1,55 @@
 @use '../global_variables.scss' as gv;
 
+$major: gv.$grey-4;
+$secondary: gv.$grey-3;
+$accent: gv.$blue-3;
+
+$active: gv.$grey-3;
+$deactive: gv.$grey-2;
+
 $theme-default: (
-    --title-color: gv.$green-3
+    --app-bg: #{gv.$grey-1},
+    --app-font: black,
+
+    --title-bg: #{$major},
+    --side-menu-bg: #{$secondary},
+    --side-resizer: #{$accent},
+
+    --menu-item-hover: #{gv.$grey-3},
+    --window-icon-hover: #{gv.$grey-3},
+
+    --find-replace-container-bg: #{gv.$grey-2},
+    --find-replace-input: white,
+    --find-replace-button-hover: #{gv.$grey-3},
+    
+    --tooltip-bg: #{gv.$grey-6},
+    --tooltip-font: white,
+
+    --shortcut-font: #{gv.$grey-3},
+    --not-implemented: #{gv.$grey-3},
+
+    --dropdown-border: #{gv.$grey-1},
+    --dropdown-item-hover: #{gv.$grey-1},
+    --dropdown-divider: #{gv.$grey-2},
+
+    --search-highlight: #{gv.$yellow-1},
+    --search-highlight-current: #{gv.$yellow-3},
+
+    --scrollbar-thumb: #{gv.$grey-2},
+    --scrollbar-thumb-hover: #{gv.$grey-3},
+
+    --tab-bg: #{gv.$grey-2},
+    --tab-ghost-bg: #{gv.$grey-1},
+    --tab-selected: white,
+    --tab-btn-bg: transparent,
+    --tab-btn-hover-bg: #{gv.$grey-3},
+    --tab-btn-hover-font: black,
+    --tab-indicator: #{$accent},
+
+    --tree-node-cut: #{gv.$grey-4},
+    --tree-node-focused: #{$accent},
+    --tree-node-selected: #{gv.$grey-2},
+    --tree-node-hover: #{gv.$grey-2},
+    --tree-ghost-bg: #{gv.$grey-5},
+    --tree-top-icon-hover: #{gv.$grey-2},
 );

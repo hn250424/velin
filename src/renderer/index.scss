@@ -1,7 +1,7 @@
 @use './styles/global_variables.scss' as gv;
 @use './styles/common.scss';
 @use './styles/title.scss';
-@use './styles//content.scss';
+@use './styles/content.scss';
 
 html,
 body,
@@ -16,6 +16,7 @@ body,
     justify-content: flex-start;
     align-items: stretch;
     overflow: hidden;
-
-    background-color: gv.$red-1;
+    
+    background-color: var(--app-bg);
+    color: var(--app-font);
 }

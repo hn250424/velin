@@ -7,6 +7,7 @@ $tab_right_margin: 10px;
 $tab_elem_padding: 5px;
 $tab_button_width: 20px;
 $tab_button_radius: 5px;
+$indicator-size: 3px;
 
 #tab_container {
     display: flex;
@@ -14,23 +15,26 @@ $tab_button_radius: 5px;
     width: 100%;
     height: $tab_height;
 
-    overflow: auto;
+    overflow-y: hidden;
+    overflow-x: scroll;
+
+    position: relative;
 
     &::-webkit-scrollbar {
-        height: 6px;
+        height: 2px;
     }
 
     &::-webkit-scrollbar-track {
-        background: transparent;
+        background: var(--tab-selected);
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: #888;
-        border-radius: 3px;
+        background-color: var(--tab-selected);
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background-color: #555;
+        cursor: pointer;
+        background-color: var(--scrollbar-thumb-hover);
     }
 }
 
@@ -48,8 +52,6 @@ $tab_button_radius: 5px;
     padding: $tab_elem_padding;
 
     user-select: none;
-
-    background-color: grey;
 }
 
 .tab:hover,
@@ -58,11 +60,12 @@ $tab_button_radius: 5px;
 }
 
 .tab {
-    background-color: gv.$grey-2;
+    background-color: var(--tab-bg);
+    font-size: 0.9rem;
 }
 
 .tab.selected {
-    background-color: red;
+    background-color: var(--tab-selected);
 }
 
 .tab>span {
@@ -77,18 +80,21 @@ $tab_button_radius: 5px;
 .tab>button {
     width: $tab_button_width;
     height: $tab_button_width;
+    
     border-radius: $tab_button_radius;
-    background-color: transparent;
+    
+    background-color: var(--tab-btn-bg);
     transition: background-color 0.2s ease;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     position: relative;
 }
 
 .tab>button:hover {
-    background-color: gv.$grey-4;
-    color: transparent;
+    background-color: var(--tab-btn-hover-bg);
 }
 
 .tab>button:hover::after {
@@ -97,7 +103,7 @@ $tab_button_radius: 5px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: black;
+    color: var(--tab-btn-hover-font);
 }
 
 #tab_context_menu {
@@ -120,15 +126,21 @@ $tab_button_radius: 5px;
 }
 
 .tab-indicator {
-    width: 3px;
+    width: $indicator-size;
     height: 100%;
-    background-color: blue;
+    background-color: var(--tab-indicator);
+
+    position: absolute;
+    top: 0;
+    pointer-events: none;
 }
 
 .tab_ghost {
     position: fixed;
-    height: 3px;
+    width: $tab_max_width;
+    height: $tab_height;
     pointer-events: none;
     opacity: 0.7;
     z-index: 90;
+    background-color: var(--tab-ghost-bg);
 }

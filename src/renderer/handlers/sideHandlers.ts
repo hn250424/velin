@@ -1,5 +1,7 @@
 import SideState from "../modules/state/SideState"
+import { CLASS_SELECTED } from "../constants/dom"
 
+// TODO.
 export default function registerSideHandlers(sideState: SideState) {
     let isDragging = false
     let sideWidth = 150
@@ -13,16 +15,27 @@ export default function registerSideHandlers(sideState: SideState) {
     const tree = document.getElementById('tree')
     const resizer = document.getElementById('side_resizer')
 
+    const isOpen = sideState.isOpen()
+    if (isOpen) {
+        tree.style.width = '0px'
+        treeToggle.classList.remove(CLASS_SELECTED)
+    } else {
+        tree.style.width = `${sideWidth}px`
+        treeToggle.classList.add(CLASS_SELECTED)
+    }
+    sideState.setOpenState(!isOpen)
+
     treeToggle.addEventListener('click', () => {
         const isOpen = sideState.isOpen()
-        tree.style.width = isOpen ? '0px' : `${sideWidth}px`
+        if (isOpen) {
+            tree.style.width = '0px'
+            treeToggle.classList.remove(CLASS_SELECTED)
+        } else {
+            tree.style.width = `${sideWidth}px`
+            treeToggle.classList.add(CLASS_SELECTED)
+        }
         sideState.setOpenState(!isOpen)
     })
-
-    // TODO
-    const isOpen = sideState.isOpen()
-    tree.style.width = isOpen ? '0px' : `${sideWidth}px`
-    sideState.setOpenState(!isOpen)
 
     resizer.addEventListener('mousedown', (e) => {
         if (!sideState.isOpen()) {
@@ -35,7 +48,7 @@ export default function registerSideHandlers(sideState: SideState) {
         document.body.style.cursor = 'ew-resize'
         document.body.style.userSelect = 'none'
     })
-    
+
     document.addEventListener('mousemove', (e) => {
         if (!isDragging) return
 

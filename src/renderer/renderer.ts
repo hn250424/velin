@@ -84,13 +84,11 @@ window.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window.rendererToMain.loadedRenderer()
 
-    document.getElementById('settings').addEventListener('click', () => {
-        document.documentElement.classList.add('dark')
-    })
-
-    document.getElementById('logo').addEventListener('click', () => {
-        document.documentElement.classList.remove('dark')
-    })
+    // TODO.
+    // document.getElementById('settings').addEventListener('click', () => {
+    //     document.documentElement.className = ''
+    //     document.documentElement.classList.add('dark')
+    // })
 })
 
 function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {

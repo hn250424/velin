@@ -21,7 +21,8 @@ import {
     ID_REPLACE,
     ID_FIND_INPUT,
     ID_REPLACE_INPUT,
-    ID_FIND_INFO
+    ID_FIND_INFO,
+    SELECTOR_TREE_NODE_ICON
 } from "./constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -140,11 +141,17 @@ export default class CommandDispatcher {
         if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
 
         const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLElement
+        const icon = treeDiv.querySelector(SELECTOR_TREE_NODE_ICON) as HTMLImageElement
         const treeDivChildren = maybeChildren as HTMLElement
 
         function updateUI(viewModel: TreeViewModel, expanded: boolean) {
             viewModel.expanded = expanded
+
             openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
+            icon.src = expanded
+                ? new URL('./assets/icons/opened_folder.png', import.meta.url).toString()
+                : new URL('./assets/icons/folder.png', import.meta.url).toString()
+
             if (expanded) treeDivChildren.classList.add(CLASS_EXPANDED)
             else treeDivChildren.classList.remove(CLASS_EXPANDED)
         }
@@ -382,13 +389,13 @@ export default class CommandDispatcher {
 
             const selectedViewModels = []
             const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
-            
+
             for (const path of clipboardPaths) {
                 selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
             }
-            
+
             const cmd = new PasteCommand(this.treeFacade, this.tabEditorFacade, targetViewModel, selectedViewModels, this.treeFacade.clipboardMode)
-            
+
             try {
                 window.rendererToMain.setWatchSkipState(true)
                 await cmd.execute()
@@ -424,11 +431,22 @@ export default class CommandDispatcher {
         treeNode.replaceChild(treeInput, treeSpan)
 
         treeInput.focus()
-        treeInput.select()
+
+        // Except ext name.
+        const fileName = treeInput.value
+        const lastDotIndex = fileName.lastIndexOf('.')
+        if (lastDotIndex > 0) {
+            treeInput.setSelectionRange(0, lastDotIndex)
+        } else {
+            treeInput.select()
+        }
 
         let alreadyFinished = false
 
-        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Enter') finishRename() }
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') finishRename()
+            else if (e.key === 'Escape') cancelRename()
+        }
         const onBlur = () => finishRename()
         treeInput.addEventListener('keydown', onKeyDown)
         treeInput.addEventListener('blur', onBlur)
@@ -460,6 +478,16 @@ export default class CommandDispatcher {
                 await sleep(300)
                 window.rendererToMain.setWatchSkipState(false)
             }
+        }
+
+        const cancelRename = () => {
+            if (alreadyFinished) return
+            alreadyFinished = true
+
+            treeInput.removeEventListener('keydown', onKeyDown)
+            treeInput.removeEventListener('blur', onBlur)
+
+            treeNode.replaceChild(treeSpan, treeInput)
         }
     }
 
@@ -500,7 +528,7 @@ export default class CommandDispatcher {
             parentContainer = parentWrapper.querySelector('.tree_node_children') as HTMLElement
         }
 
-        const { wrapper, input } = this.treeFacade.createInputbox(viewModel.directory, viewModel.indent)
+        const { wrapper, input } = this.treeFacade.createInputbox(directory, viewModel.indent)
         parentContainer.appendChild(wrapper)
         input.focus()
 
@@ -558,7 +586,7 @@ export default class CommandDispatcher {
     }
 
     toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
-        this.findAndReplaceContainer.style.display = 'block'
+        this.findAndReplaceContainer.style.display = 'flex'
         this.replaceBox.style.display = showReplace ? 'flex' : 'none'
 
         if (showReplace) this.replaceInput.focus()

@@ -1,6 +1,8 @@
 @use './global_variables.scss' as gv;
 
+$scrollbar-size: 8px;
 $tree_horizontal_margin: 5px;
+$ghost-padding: 4px;
 
 #tree {
     width: 0px;
@@ -11,44 +13,57 @@ $tree_horizontal_margin: 5px;
     flex-direction: column;
 
     overflow: hidden;
-
-    background-color: white;
 }
 
 #tree_top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    background-color: aqua;
 }
 
 #tree_top_name {
     margin: 0 $tree_horizontal_margin;
     flex: 1;
-
-    background-color: aliceblue;
+    font-size: 0.9rem;
 }
 
 #tree_top_icons {
     display: flex;
+    position: relative;
 }
 
 #tree_top_icons img {
     width: gv.$icon_size;
     height: gv.$icon_size;
     margin-right: $tree_horizontal_margin;
-    background-color: white;
+}
+
+#tree_top_icons img:hover {
+    cursor: pointer;
+    background-color: var(--tree-top-icon-hover);
 }
 
 #tree_node_container {
     flex: 1;
-    border: 1px solid transparent;
-    overflow-y: scroll;
-}
+    overflow: scroll;
 
-#tree_node_container.focused {
-    border: 1px solid aqua;
+    &::-webkit-scrollbar {
+        width: $scrollbar-size;
+        height: $scrollbar-size;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        cursor: pointer;
+        background-color: var(--scrollbar-thumb-hover);
+    }
 }
 
 .tree_node_wrapper {
@@ -60,7 +75,7 @@ $tree_horizontal_margin: 5px;
 }
 
 .tree_node_wrapper.cut {
-    color: gold;
+    color: var(--tree-node-cut);
 }
 
 .tree_node_temp,
@@ -72,23 +87,29 @@ $tree_horizontal_margin: 5px;
     border: 1px solid transparent;
 }
 
-.tree_node.focused {
-    border: 1px solid red;
+.tree_node_temp > input {
+    border: 1px solid var(--tree-node-focused);
 }
 
-.tree_node.selected {
-    background-color: grey;
+.tree_node.focused {
+    border: 1px solid var(--tree-node-focused);
 }
 
 .tree_node:hover {
     cursor: pointer;
-    background-color: gv.$grey-1;
+    background-color: var(--tree-node-hover);
+}
+
+.tree_node.selected {
+    background-color: var(--tree-node-selected);
 }
 
 .tree_node_open,
 .tree_node_icon {
-    min-width: gv.$icon_size;
-    min-height: gv.$icon_size;
+    // min-width: gv.$icon_size;
+    // min-height: gv.$icon_size;
+    width: gv.$icon_size;
+    height: gv.$icon_size;
 
     text-align: center;
     flex-shrink: 0;
@@ -121,9 +142,9 @@ $tree_horizontal_margin: 5px;
 .tree_ghost {
     position: fixed;
     pointer-events: none;
-    background-color: rgba($color: #000000, $alpha: 0.7);
+    background-color: var(--tree-ghost-bg);
     color: white;
-    font-size: 1rem;
-    padding: 4px;
+    font-size: 0.7rem;
+    padding: $ghost-padding;
     z-index: 90;
 }

@@ -70,8 +70,21 @@ function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorFacade: TabEd
         if (dragManager.getInsertIndex() === insertIndex) return
         dragManager.setInsertIndex(insertIndex)
         const indicator = tabEditorFacade.createIndicator()
-        const refNode = tabEditorFacade.getTabEditorViewByIndex(insertIndex)?.tabDiv ?? null
-        tabContainer.insertBefore(indicator, refNode)
+        const tab = tabEditorFacade.getTabEditorViewByIndex(insertIndex)
+        if (tab) {
+            const tabRect = tab.tabDiv.getBoundingClientRect()
+            indicator.style.left = `${tabRect.left - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft}px`
+        } else {
+            const lastTab = tabEditorFacade.getTabEditorViewByIndex(insertIndex - 1)
+            if (lastTab) {
+                const lastRect = lastTab.tabDiv.getBoundingClientRect()
+                indicator.style.left = `${lastRect.right - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft}px`
+            } else {
+                indicator.style.left = `0px`
+            }
+        }
+
+        tabContainer.appendChild(indicator)
     }, 1000))
 }
 

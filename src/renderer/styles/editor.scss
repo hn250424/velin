@@ -2,14 +2,14 @@
 @use './findAndReplace.scss';
 
 $milkdown-padding: 16px;
+$scrollbar-size: 8px;
 
 #editor_container {
     width: 100%;
     height: 100%;
 
     overflow: hidden;
-
-    background-color: yellowgreen;
+    background-color: var(--tab-selected);
 }
 
 .editorBox {
@@ -17,8 +17,6 @@ $milkdown-padding: 16px;
     height: 100%;
     
     display: none;
-
-    background-color: gv.$green-1;
 }
 
 .milkdown {
@@ -27,12 +25,11 @@ $milkdown-padding: 16px;
     overflow: auto;
 
     padding: $milkdown-padding;
-
-    background-color: gv.$green-2;
+    background-color: var(--tab-selected);
 
     &::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: $scrollbar-size;
+        height: $scrollbar-size;
     }
 
     &::-webkit-scrollbar-track {
@@ -40,12 +37,12 @@ $milkdown-padding: 16px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: #888;
-        border-radius: 3px;
+        background-color: var(--scrollbar-thumb);
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background-color: #555;
+        cursor: pointer;
+        background-color: var(--scrollbar-thumb-hover);
     }
 }
 
@@ -53,14 +50,4 @@ $milkdown-padding: 16px;
     width: 100%;
     height: 100%;
     white-space: pre;
-}
-
-.search-highlight {
-    background-color: rgba(255, 255, 0, 0.3);
-    border-radius: 2px;
-}
-
-.search-highlight-current {
-    background-color: rgba(255, 150, 0, 0.5);
-    border-radius: 2px;
 }

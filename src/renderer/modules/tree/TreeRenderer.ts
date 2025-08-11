@@ -69,9 +69,16 @@ export default class TreeRenderer {
 
         const icon = document.createElement('img')
         icon.classList.add(CLASS_TREE_NODE_ICON)
-        icon.src = viewModel.directory
-            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
-            : new URL('../../assets/icons/file.png', import.meta.url).toString()
+
+        if (!viewModel.directory) {
+            icon.src = new URL('../../assets/icons/file.png', import.meta.url).toString();
+        } else {
+            if (viewModel.expanded) {
+                icon.src = new URL('../../assets/icons/opened_folder.png', import.meta.url).toString();
+            } else {
+                icon.src = new URL('../../assets/icons/folder.png', import.meta.url).toString();
+            }
+        }
 
         const text = document.createElement('span')
         text.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
@@ -112,8 +119,9 @@ export default class TreeRenderer {
 
         const icon = document.createElement('img')
         icon.classList.add(CLASS_TREE_NODE_ICON)
+        console.log(directory)
         icon.src = directory
-            ? new URL('../../assets/icons/setting.png', import.meta.url).toString()
+            ? new URL('../../assets/icons/folder.png', import.meta.url).toString()
             : new URL('../../assets/icons/file.png', import.meta.url).toString()
 
         const input = document.createElement('input')
@@ -138,7 +146,7 @@ export default class TreeRenderer {
         const div = document.createElement('div')
         div.classList.add(CLASS_TREE_GHOST)
         div.textContent = `${count} items`
- 
+
         this.ghostBox = div
         document.body.appendChild(div)
 
@@ -152,7 +160,7 @@ export default class TreeRenderer {
         }
     }
 
-    
+
 
     getTreeNodeByPath(path: string) {
         const wrapper = this._pathToTreeWrapperMap.get(path)

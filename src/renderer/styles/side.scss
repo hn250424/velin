@@ -1,6 +1,8 @@
 @use './global_variables.scss' as gv;
 @use './tree.scss';
 
+$risizer-size: 3px;
+
 #side {
     height: 100%;
     display: flex;
@@ -8,33 +10,44 @@
     user-select: none;
 }
 
+@mixin button-selected {
+    filter: invert(1) brightness(2);
+}
+
 #side_menu_container {
-    width: gv.$icon_size;
-    margin: gv.$icon_vertical_margin gv.$icon_horizontal_margin;
     height: 100%;
 
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+
+    background-color: var(--side-menu-bg);
+
+    > button.selected img {
+        @include button-selected;
+    }
+
+    > button:hover img {
+        cursor: pointer;
+        @include button-selected;
+    }
 }
 
 #side_menu_container img {
     width: gv.$icon_size;
     height: gv.$icon_size;
-
     margin: gv.$icon_vertical_margin gv.$icon_horizontal_margin;
-
-    background-color: white;
-}
-
-#side_menu_container img:hover {
-    cursor: pointer;
 }
 
 #side_resizer {
-    width: 3px;
+    width: $risizer-size;
     height: 100%;
     cursor: ew-resize;
-    background-color: blue;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+#side_resizer:hover {
+    background-color: var(--side-resizer);
 }

@@ -1,9 +1,12 @@
 @use './global_variables.scss' as gv;
 @use './theme/theme.scss';
 
-$title_height: 40px;
+$title_height: 32px;
 $window_width: 100px;
 $window_gap: 5px;
+$menu_horizontal_padding: 4px;
+$menu_border_radius: 4px;
+$window_icon_border_radius: 4px;
 
 $menu_container_horizontal_margin: 10px;
 
@@ -18,55 +21,57 @@ $menu_container_horizontal_margin: 10px;
     height: $title_height;
     flex-shrink: 0;
 
-    background-color: var(--title-color);
-    // background-color: gv.$title-color;
+    background-color: var(--title-bg);
 }
 
 #logo {
-    color: green;
     margin-left: gv.$icon_horizontal_margin;
     margin-right: gv.$icon_horizontal_margin;
+    
+    // TODO
+    color: green;
+    cursor: default;
+    user-select: none;
 }
 
 #window {
-    margin-left: auto;
     width: $window_width;
+    border-radius: $window_icon_border_radius;
+
+    margin-left: auto;
+    margin-right: gv.$icon_horizontal_margin;
 
     display: flex;
     justify-content: space-between;
 
     padding: $window_gap;
-
-    background-color: blueviolet;
 }
 
 #window img {
     width: gv.$icon_size;
     height: gv.$icon_size;
-
-    background-color: white;
 }
 
 #window img:hover {
     cursor: pointer;
+    background: var(--window-icon-hover);
 }
 
 #menu_container {
     flex-shrink: 0;
 
     display: flex;
-
-    background-color: gv.$green-1;
-}
-
-#menu_container .menu_item {
-    margin-left: $menu_container_horizontal_margin;
-    margin-right: $menu_container_horizontal_margin;
-
-    background-color: chartreuse;
 }
 
 .menu_item {
+    border-radius: $menu_border_radius;
+    padding: 0 $menu_horizontal_padding;
+
+    text-align: center;
+
+    margin-right: $menu_container_horizontal_margin;
+    font-size: 0.9rem;
+
     position: relative;
     cursor: pointer;
     user-select: none;
@@ -78,4 +83,5 @@ $menu_container_horizontal_margin: 10px;
 
 .menu_item:hover {
     cursor: pointer;
+    background: var(--menu-item-hover);
 }
