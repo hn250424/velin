@@ -1,3 +1,7 @@
+import { injectable } from "inversify"
+import { CLASS_TREE_DRAG_OVERLAY } from "../../constants/dom"
+
+@injectable()
 export default class TreeDragManager {
     private _isMouseDown = false
     private _isDrag = false
@@ -23,10 +27,6 @@ export default class TreeDragManager {
 
     startDrag() {
         this._isDrag = true
-        // this._count = -1
-        // this._x = 0
-        // this._y = 0
-        // this._insertPath = null
     }
 
     endDrag() {
@@ -37,7 +37,7 @@ export default class TreeDragManager {
         this._start_y = 0
         this._insertPath = ''
         if (this._insertWrapper) {
-            this._insertWrapper.style.background = ''
+            this._insertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
             this._insertWrapper = null
         }
     }
@@ -71,7 +71,7 @@ export default class TreeDragManager {
         return this._insertWrapper
     }
 
-    setInsertWrapper(wrapper: HTMLElement) {
+    setInsertWrapper(wrapper: HTMLElement | null) {
         this._insertWrapper = wrapper
     }
 

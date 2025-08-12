@@ -10,11 +10,13 @@ import {
 import TreeViewModel from "../../viewmodels/TreeViewModel"
 import TreeRenderer from "./TreeRenderer"
 import TreeStore from "./TreeStore"
+import TreeDragManager from "./TreeDragManager"
 
 export default class TreeFacade {
     constructor(
         @inject(DI_KEYS.TreeRenderer) private readonly renderer: TreeRenderer,
-        @inject(DI_KEYS.TreeStore) private readonly store: TreeStore
+        @inject(DI_KEYS.TreeStore) private readonly store: TreeStore,
+        @inject(DI_KEYS.TreeDragManager) private readonly drag: TreeDragManager,
     ) { }
 
     toTreeDto(viewModel: TreeViewModel): TreeDto {
@@ -189,6 +191,70 @@ export default class TreeFacade {
         const wrapper = this.getTreeWrapperByIndex(index)
         return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
     }
+
+
+
+    //
+    isMouseDown(): boolean {
+            return this.drag.isMouseDown()
+        }
+    
+    setMouseDown(state: boolean) {
+        this.drag.setMouseDown(state)
+    }
+
+    isDrag(): boolean {
+        return this.drag.isDrag()
+    }
+
+    startDrag() {
+        this.drag.startDrag()
+    }
+
+    endDrag() {
+        this.drag.endDrag()
+    }
+
+    getStartPosition() {
+        return this.drag.getStartPosition()
+    }
+
+    setStartPosition(x: number, y: number) {
+        this.drag.setStartPosition(x, y)
+    }
+
+    getStartPosition_x() {
+        return this.drag.getStartPosition_x()
+    }
+
+    getStartPosition_y() {
+        return this.drag.getStartPosition_y()
+    }
+
+    getDragTreeCount() {
+        return this.drag.getDragTreeCount()
+    }
+
+    setDragTreeCount(count: number) {
+        this.drag.setDragTreeCount(count)
+    }
+
+    getInsertWrapper() {
+        return this.drag.getInsertWrapper()
+    }
+
+    setInsertWrapper(wrapper: HTMLElement | null) {
+        this.drag.setInsertWrapper(wrapper)
+    }
+
+    getInsertPath() {
+        return this.drag.getInsertPath()
+    }
+
+    setInsertPath(path: string) {
+        this.drag.setInsertPath(path)
+    }
+    //
 
 
 

@@ -1,4 +1,4 @@
-@use './global_variables.scss' as gv;
+@use './variables.scss' as gv;
 
 $scrollbar-size: 8px;
 $tree_horizontal_margin: 5px;
@@ -46,6 +46,7 @@ $ghost-padding: 4px;
 #tree_node_container {
     flex: 1;
     overflow: scroll;
+    border: 1px solid transparent;
 
     &::-webkit-scrollbar {
         width: $scrollbar-size;
@@ -64,6 +65,10 @@ $ghost-padding: 4px;
         cursor: pointer;
         background-color: var(--scrollbar-thumb-hover);
     }
+}
+
+#tree_node_container.focused {
+    border: 1px solid var(--tree-node-focused);
 }
 
 .tree_node_wrapper {
@@ -147,4 +152,8 @@ $ghost-padding: 4px;
     font-size: 0.7rem;
     padding: $ghost-padding;
     z-index: 90;
+}
+
+.tree_drag_overlay {
+    background-color: var(--tree_wrapper-drag-overlay);
 }

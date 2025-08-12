@@ -4,6 +4,7 @@ export const DATASET_ATTR_TREE_PATH = 'treePath'
 export const CLASS_FOCUSED = 'focused'
 export const CLASS_SELECTED = 'selected'
 export const CLASS_EXPANDED = 'expanded'
+export const CLASS_TREE_DRAG_OVERLAY = 'tree_drag_overlay'
 
 export const CLASS_DEACTIVE = 'deactive'
 export const CLASS_CUT = 'cut'

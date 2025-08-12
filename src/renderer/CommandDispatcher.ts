@@ -662,6 +662,22 @@ export default class CommandDispatcher {
             } else if (activateElement === this.replaceInput) {
                 this.performReplace(source)
             }
+
+            return
+        }
+
+        if (focus === 'tree') {
+            const idx = this.treeFacade.lastSelectedIndex
+            const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
+            
+            if (viewModel.directory) {
+                const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
+                this.performOpenDirectory('programmatic', treeNode)
+            } else {
+                this.performOpenFile('programmatic', viewModel.path)
+            }
+
+            return
         }
     }
 }

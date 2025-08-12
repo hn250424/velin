@@ -1,3 +1,6 @@
+import { injectable } from "inversify"
+
+@injectable()
 export default class TabDragManager {
     private _isMouseDown = false
     private _isDrag = false

@@ -9,11 +9,13 @@ import TabViewModel from '../../viewmodels/TabViewModel'
 import TabEditorRenderer from "./TabEditorRenderer"
 import TabEditorStore from "./TabEditorStore"
 import TabEditorView from './TabEditorView'
+import TabDragManager from "./TabDragManager"
 
 export default class TabEidorFacde {
     constructor(
         @inject(DI_KEYS.TabEditorRenderer) private readonly renderer: TabEditorRenderer,
         @inject(DI_KEYS.TabEditorStore) private readonly store: TabEditorStore,
+        @inject(DI_KEYS.TabDragManager) private readonly drag: TabDragManager,
     ) { }
 
     async loadTabs(dto: TabEditorsDto) {
@@ -383,5 +385,83 @@ export default class TabEidorFacde {
 
     removeIndicator() {
         this.renderer.removeIndicator()
+    }
+
+
+    
+    isMouseDown(): boolean {
+        return this.drag.isMouseDown()
+    }
+
+    setMouseDown(state: boolean) {
+        this.drag.setMouseDown(state)
+    }
+
+    isDrag(): boolean {
+        return this.drag.isDrag()
+    }
+
+    setTargetElement(tab: HTMLElement) {
+        return this.drag.setTargetElement(tab)
+    }
+
+    getTabs() {
+        return this.drag.getTabs()
+    }
+
+    setTabs(tabs: HTMLElement[]) {
+        this.drag.setTabs(tabs)
+    }
+
+    startDrag() {
+        this.drag.startDrag()
+    }
+
+    endDrag() {
+        this.drag.endDrag()
+    }
+
+    getStartPosition() {
+        return this.drag.getStartPosition()
+    }
+
+    setStartPosition(x: number, y: number) {
+        this.drag.setStartPosition(x, y)
+    }
+
+    getStartPosition_x() {
+        return this.drag.getStartPosition_x()
+    }
+
+    getStartPosition_y() {
+        return this.drag.getStartPosition_y()
+    }
+
+    getDragTargetTab() {
+        return this.drag.getDragTargetTab()
+    }
+
+    getDragTargetTabId() {
+        return this.drag.getDragTargetTabId()
+    }
+
+    setDragTargetTabId(id: number) {
+        this.drag.setDragTargetTabId(id)
+    }
+
+    getDragTargetTabName() {
+        return this.drag.getDragTargetTabName()
+    }
+
+    setDragTargetTabName(name: string) {
+        this.drag.setDragTargetTabName(name)
+    }
+
+    getInsertIndex(): number | null {
+        return this.drag.getInsertIndex()
+    }
+
+    setInsertIndex(index: number) {
+        this.drag.setInsertIndex(index)
     }
 }

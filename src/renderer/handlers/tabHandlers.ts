@@ -6,12 +6,10 @@ import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, DATASET_ATTR_TREE_PATH, SELECTOR_T
 import CommandDispatcher from "../CommandDispatcher"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
-import TabDragManager from "../modules/drag/TabDragManager"
 import { throttle } from "../utils/throttle"
 
 export default function registerTabHandlers(
     commandDispatcher: CommandDispatcher,
-    dragManager: TabDragManager,
     tabContainer: HTMLElement,
     tabEditorFacade: TabEditorFacade,
     tabContextMenu: HTMLElement,
@@ -23,52 +21,52 @@ export default function registerTabHandlers(
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorFacade)
 
     // Drag.
-    bindMouseDownEvents(dragManager, tabEditorFacade, tabContainer)
-    bindMouseMoveEvents(dragManager, tabEditorFacade, tabContainer)
-    bindMouseUpEvents(dragManager, tabEditorFacade)
+    bindMouseDownEvents(tabEditorFacade, tabContainer)
+    bindMouseMoveEvents(tabEditorFacade, tabContainer)
+    bindMouseUpEvents(tabEditorFacade)
 }
 
-function bindMouseDownEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
+function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
     tabContainer.addEventListener('mousedown', (e) => {
         const target = e.target as HTMLElement
         const tab = target.closest(SELECTOR_TAB) as HTMLElement
         if (!tab) return
         const id = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10)
         const viewModel = tabEditorFacade.getTabEditorViewModelById(id)
-        dragManager.setDragTargetTabName(viewModel.fileName)
-        dragManager.setDragTargetTabId(id)
-        dragManager.setTargetElement(tab)
-        dragManager.setTabs(Array.from(tabContainer.children) as HTMLElement[])
-        dragManager.setMouseDown(true)
-        dragManager.setStartPosition(e.clientX, e.clientY)
+        tabEditorFacade.setDragTargetTabName(viewModel.fileName)
+        tabEditorFacade.setDragTargetTabId(id)
+        tabEditorFacade.setTargetElement(tab)
+        tabEditorFacade.setTabs(Array.from(tabContainer.children) as HTMLElement[])
+        tabEditorFacade.setMouseDown(true)
+        tabEditorFacade.setStartPosition(e.clientX, e.clientY)
     })
 }
 
-function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
+function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
     document.addEventListener('mousemove', (e: MouseEvent) => {
-        if (!dragManager.isMouseDown()) return
+        if (!tabEditorFacade.isMouseDown()) return
 
-        if (!dragManager.isDrag()) {
-            const dx = Math.abs(e.clientX - dragManager.getStartPosition_x())
-            const dy = Math.abs(e.clientY - dragManager.getStartPosition_y())
+        if (!tabEditorFacade.isDrag()) {
+            const dx = Math.abs(e.clientX - tabEditorFacade.getStartPosition_x())
+            const dy = Math.abs(e.clientY - tabEditorFacade.getStartPosition_y())
             if (dx > 5 || dy > 5) {
-                dragManager.startDrag()
+                tabEditorFacade.startDrag()
             } else {
                 return
             }
         }
 
-        const div = tabEditorFacade.createGhostBox(dragManager.getDragTargetTabName())
+        const div = tabEditorFacade.createGhostBox(tabEditorFacade.getDragTargetTabName())
         div.style.left = `${e.clientX + 5}px`
         div.style.top = `${e.clientY + 5}px`
     })
 
     document.addEventListener('mousemove', throttle((e: MouseEvent) => {
-        if (!dragManager.isDrag()) return
+        if (!tabEditorFacade.isDrag()) return
 
-        const insertIndex = getInsertIndexFromMouseX(dragManager.getTabs(), e.clientX)
-        if (dragManager.getInsertIndex() === insertIndex) return
-        dragManager.setInsertIndex(insertIndex)
+        const insertIndex = getInsertIndexFromMouseX(tabEditorFacade.getTabs(), e.clientX)
+        if (tabEditorFacade.getInsertIndex() === insertIndex) return
+        tabEditorFacade.setInsertIndex(insertIndex)
         const indicator = tabEditorFacade.createIndicator()
         const tab = tabEditorFacade.getTabEditorViewByIndex(insertIndex)
         if (tab) {
@@ -88,19 +86,19 @@ function bindMouseMoveEvents(dragManager: TabDragManager, tabEditorFacade: TabEd
     }, 1000))
 }
 
-function bindMouseUpEvents(dragManager: TabDragManager, tabEditorFacade: TabEditorFacade) {
+function bindMouseUpEvents(tabEditorFacade: TabEditorFacade) {
     document.addEventListener('mouseup', async (e: MouseEvent) => {
-        if (!dragManager.isDrag()) {
-            dragManager.setMouseDown(false)
+        if (!tabEditorFacade.isDrag()) {
+            tabEditorFacade.setMouseDown(false)
             return
         }
 
-        const to = dragManager.getInsertIndex()
-        const id = dragManager.getDragTargetTabId()
+        const to = tabEditorFacade.getInsertIndex()
+        const id = tabEditorFacade.getDragTargetTabId()
         const from = tabEditorFacade.getTabEditorViewIndexById(id)
         tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(from, to)
 
-        dragManager.endDrag()
+        tabEditorFacade.endDrag()
         tabEditorFacade.removeIndicator()
         tabEditorFacade.removeGhostBox()
 

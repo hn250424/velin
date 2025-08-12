@@ -19,16 +19,12 @@ import diContainer from './diContainer'
 import DI_KEYS from './constants/di_keys'
 import CommandDispatcher from './CommandDispatcher'
 import {
-    SELECTOR_TREE_NODE,
-    CLASS_TREE_NODE,
     CLASS_FOCUSED,
     CLASS_SELECTED,
     ID_TREE_NODE_CONTAINER
 } from './constants/dom'
 import WindowLayoutManager from './modules/state/WindowLayoutManager'
 import ZoomManager from './modules/layout/ZoomManager'
-import TabDragManager from './modules/drag/TabDragManager'
-import TreeDragManager from './modules/drag/TreeDragManager'
 import FindReplaceState from './modules/state/FindReplaceState'
 import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
@@ -59,10 +55,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
 
     const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
-    const tabDragManager = diContainer.get<TabDragManager>(DI_KEYS.TabDragManager)
     
     const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
-    const treeDragManager = diContainer.get<TreeDragManager>(DI_KEYS.TreeDragManager)
     
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
@@ -73,8 +67,8 @@ window.addEventListener('DOMContentLoaded', () => {
     registerEditHandlers(commandDispatcher, shortcutRegistry)
     registerViewHandlers(shortcutRegistry, zoomManager)
     registerSideHandlers(sideState)
-    registerTabHandlers(commandDispatcher, tabDragManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
-    registerTreeHandlers(commandDispatcher, focusManager, treeDragManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
+    registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
+    registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
 
     bindSyncEventFromWatch(tabEditorFacade, treeFacade)

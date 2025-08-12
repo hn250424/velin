@@ -1,4 +1,4 @@
-@use '../global_variables.scss' as gv;
+@use '../variables.scss' as gv;
 
 $major: gv.$grey-4;
 $secondary: gv.$grey-3;
@@ -21,7 +21,7 @@ $theme-default: (
     --find-replace-container-bg: #{gv.$grey-2},
     --find-replace-input: white,
     --find-replace-button-hover: #{gv.$grey-3},
-    
+
     --tooltip-bg: #{gv.$grey-6},
     --tooltip-font: white,
 
@@ -52,4 +52,6 @@ $theme-default: (
     --tree-node-hover: #{gv.$grey-2},
     --tree-ghost-bg: #{gv.$grey-5},
     --tree-top-icon-hover: #{gv.$grey-2},
+    --tree_wrapper-drag-overlay: #{gv.$grey-2},
+    
 );
