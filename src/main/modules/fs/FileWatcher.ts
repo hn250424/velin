@@ -3,13 +3,12 @@ import { BrowserWindow } from 'electron'
 import { injectable } from 'inversify'
 import path from 'path'
 import IFileManager from '../contracts/IFileManager'
-import ITabManager from '../contracts/ITabManager'
-import ITreeManager from '../contracts/ITreeManager'
+import ITabUtils from '../contracts/ITabUtils'
+import ITreeUtils from '../contracts/ITreeUtils'
 import ITabRepository from '../contracts/ITabRepository'
 import ITreeRepository from '../contracts/ITreeRepository'
 import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
 import TreeDto from '@shared/dto/TreeDto'
-import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 
 @injectable()
 export default class FileWatcher {
@@ -19,13 +18,11 @@ export default class FileWatcher {
     constructor(
         private mainWindow: BrowserWindow,
         private fileManager: IFileManager,
-        private tabManager: ITabManager,
-        private treeManager: ITreeManager,
+        private tabUtils: ITabUtils,
+        private treeUtils: ITreeUtils,
         private tabRepository: ITabRepository,
         private treeRepository: ITreeRepository
-    ) {
-
-    }
+    ) { }
 
     setSkipState(state: boolean) {
         this.skip = state
@@ -63,14 +60,14 @@ export default class FileWatcher {
         if (this.skip) return
 
         const tabSession = await this.tabRepository.readTabSession()
-        const newTabSession = tabSession ? await this.tabManager.syncSessionWithFs(tabSession) : null
+        const newTabSession = tabSession ? await this.tabUtils.syncSessionWithFs(tabSession) : null
         if (newTabSession) await this.tabRepository.writeTabSession(newTabSession)
 
         const treeSession = await this.treeRepository.readTreeSession()
-        const newTreeSession = treeSession ? await this.treeManager.syncWithFs(treeSession) : null
+        const newTreeSession = treeSession ? await this.treeUtils.syncWithFs(treeSession) : null
         if (newTreeSession) await this.treeRepository.writeTreeSession(newTreeSession)
 
-        const tabDto = newTabSession ? await this.tabManager.toTabEditorsDto(newTabSession) : null
+        const tabDto = newTabSession ? await this.tabUtils.toTabEditorsDto(newTabSession) : null
         const treeDto = newTreeSession ? newTreeSession as TreeDto : null
 
         this.mainWindow.webContents.send(electronAPI.events.mainToRenderer.syncFromWatch, tabDto, treeDto)

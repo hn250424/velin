@@ -14,9 +14,9 @@ import DI_KEYS from './constants/di_keys'
 import IFileManager from './modules/contracts/IFileManager'
 import ITreeRepository from './modules/contracts/ITreeRepository'
 import ITabRepository from './modules/contracts/ITabRepository'
-import ITreeManager from './modules/contracts/ITreeManager'
+import ITreeUtils from './modules/contracts/ITreeUtils'
 import IDialogManager from './modules/contracts/IDialogManager'
-import ITabManager from './modules/contracts/ITabManager'
+import ITabUtils from './modules/contracts/ITabUtils'
 import DIContainer from './DiContainer'
 import IFileWatcher from './modules/contracts/IFileWatcher'
 import registerWatchHandlers from './handlers/watchHandlers'
@@ -34,7 +34,6 @@ const createMainWindow = () => {
         titleBarStyle: 'hidden',
         show: false,
         webPreferences: {
-            // preload: path.join(__dirname, 'preload.js'),
             preload: path.join(__dirname, 'preload.js'),
             sandbox: false,
         },
@@ -48,9 +47,12 @@ const loadUrl = (mainWindow: BrowserWindow) => {
         mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
     } else {
         mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`))
+        // const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+        // console.log('index.html path:', filePath)
+        // mainWindow.loadFile(filePath)
     }
 
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
 const createWindow = () => {
@@ -64,15 +66,15 @@ const createWindow = () => {
     const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
     const dialogManager = diContainer.get<IDialogManager>(DI_KEYS.dialogManager)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
-    const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeReposotory)
-    const tabManager = diContainer.get<ITabManager>(DI_KEYS.TabManager)
-    const treeManager = diContainer.get<ITreeManager>(DI_KEYS.TreeManager)
+    const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeRepository)
+    const tabUtils = diContainer.get<ITabUtils>(DI_KEYS.TabUtils)
+    const treeUtils = diContainer.get<ITreeUtils>(DI_KEYS.TreeUtils)
 
-    const fileService = diContainer.get(DI_KEYS.FileService)
-    const tabService = diContainer.get(DI_KEYS.TabService)
-    const treeService = diContainer.get(DI_KEYS.TreeService)
+    const fileService = diContainer.get<FileService>(DI_KEYS.FileService)
+    const tabService = diContainer.get<TabService>(DI_KEYS.TabService)
+    const treeService = diContainer.get<TreeService>(DI_KEYS.TreeService)
 
-    registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
+    registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabUtils, treeUtils)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogManager, tabRepository, treeRepository)

@@ -1,4 +1,4 @@
-import ITreeManager from '@modules_contracts/ITreeManager'
+import ITreeUtils from '@main/modules/contracts/ITreeUtils'
 import TreeDto from '@shared/dto/TreeDto'
 import fs from 'fs'
 import path from 'path'
@@ -8,7 +8,7 @@ import DI_KEYS from '../../constants/di_keys'
 import IFileManager from '../contracts/IFileManager'
 
 @injectable()
-export default class TreeManager implements ITreeManager {
+export default class TreeUtils implements ITreeUtils {
 
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,

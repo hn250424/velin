@@ -1,7 +1,15 @@
 @use './styles/variables.scss' as gv;
-@use './styles/common.scss';
+@use './styles/utils.scss';
+@use './styles/elements.scss';
 @use './styles/title.scss';
 @use './styles/content.scss';
+@use './styles/theme/theme.scss';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 html,
 body,

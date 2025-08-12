@@ -11,14 +11,14 @@ import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 import TreeDto from '@shared/dto/TreeDto'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
-import FakeTreeManager from '../modules/tree/FakeTreeManager'
+import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 
 const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
 let fakeMainWindow: FakeMainWindow
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
-let fakeTreeManager: FakeTreeManager
+let fakeTreeUtils: FakeTreeUtils
 let fakeTreeRepository: FakeTreeRepository
 
 const preFilePath = 'preFilePath'
@@ -102,7 +102,7 @@ describe('exitService.exit', () => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
     })
 

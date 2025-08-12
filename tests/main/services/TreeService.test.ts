@@ -5,7 +5,7 @@ import path from 'path'
 import { beforeEach, describe, expect, test } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
-import FakeTreeManager from '../modules/tree/FakeTreeManager'
+import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 
@@ -13,7 +13,7 @@ const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
 
 let fakeFileManager: FakeFileManager
-let fakeTreeMnager: FakeTreeManager
+let fakeTreeUtils: FakeTreeUtils
 let fakeTabRepository: FakeTabRepository
 let fakeTreeRepository: FakeTreeRepository
 let treeService: TreeService
@@ -211,10 +211,10 @@ function deepCopyTreeDto(dto: TreeDto): TreeDto {
 describe('treeService.rename', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+        treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository)
     })
 
     test('should sync renamed session including children nodes', async () => {
@@ -268,10 +268,10 @@ describe('treeService.rename', () => {
 describe('treeService.paste', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+        treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository)
     })
 
     test('should delete original file and copy to new path when clipboardMode is cut', async () => {
@@ -479,10 +479,10 @@ describe('treeService.paste', () => {
 describe('treeService.create', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+        treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository)
     })
 
     test('should create new file', async () => {
@@ -565,10 +565,10 @@ describe('treeService.create', () => {
 describe('treeService.syncTreeSessionFromRenderer', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+        treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository)
     })
 
     test('a write session was received from the renderer for synchronization', async () => {
@@ -594,10 +594,10 @@ describe('treeService.syncTreeSessionFromRenderer', () => {
 describe('treeService.getSyncedTreeSession', () => {
     beforeEach(() => {
         fakeFileManager = new FakeFileManager()
-        fakeTreeMnager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
-        treeService = new TreeService(fakeFileManager, fakeTreeMnager, fakeTreeRepository)
+        treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository)
     })
 
     test('should sync with file system and update tree session', async () => {
@@ -620,7 +620,7 @@ describe('treeService.getSyncedTreeSession', () => {
             expanded: false,
             children: null,
         })
-        fakeTreeMnager.setTree(copiedModel)
+        fakeTreeUtils.setTree(copiedModel)
 
         // // When.
         await treeService.getSyncedTreeSession()
@@ -646,7 +646,7 @@ describe('treeService.getSyncedTreeSession', () => {
         if (removedFilePath) {
             fakeFileManager.setPathExistence(removedFilePath, false)
         }
-        fakeTreeMnager.setTree(copiedModel)
+        fakeTreeUtils.setTree(copiedModel)
 
         // When.
         await treeService.getSyncedTreeSession()

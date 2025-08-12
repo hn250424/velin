@@ -78,9 +78,14 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
         const target = e.target as HTMLElement
         let wrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
         let isContainer = false
+
+        const previousInsertWrapper = treeFacade.getInsertWrapper()
+
         if (!wrapper) {
             const _container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
             if (!_container) {
+                if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
+
                 treeFacade.setInsertWrapper(null)
                 treeFacade.setInsertPath('') // Set falsy empty string as flag since path-based logic must run if mouse up event completes properly.
                 return 
@@ -90,10 +95,8 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
             isContainer = true
         }
 
-        const inserWrapper = treeFacade.getInsertWrapper()
-        if (inserWrapper === wrapper) return // Wrapper comparison faster than Path
-        
-        if (inserWrapper) inserWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
+        if (previousInsertWrapper === wrapper) return // Wrapper comparison faster than Path
+        if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
 
         let viewModel
         if (!isContainer) {
@@ -132,7 +135,7 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
         if (isRight) {
             treeFacade.setSelectedDragIndexByPath(path)
             await commandDispatcher.performCut('drag')
-            commandDispatcher.performPaste('drag')
+            await commandDispatcher.performPaste('drag')
         }
     })
 }

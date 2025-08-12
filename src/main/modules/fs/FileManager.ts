@@ -2,7 +2,7 @@ import fs from 'fs'
 import fsExtra from 'fs-extra'
 import path, { dirname } from 'path'
 import { app } from 'electron'
-import IFileManager from "src/main/modules/contracts/IFileManager"
+import IFileManager from "@main/modules/contracts/IFileManager"
 import { injectable } from 'inversify'
 import TrashMap from '@shared/types/TrashMap'
 

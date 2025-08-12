@@ -1,8 +1,8 @@
 import TreeSessionModel from 'src/main/models/TreeSessionModel'
-import IFileManager from 'src/main/modules/contracts/IFileManager'
-import ITreeReposotory from 'src/main/modules/contracts/ITreeRepository'
+import IFileManager from '@main/modules/contracts/IFileManager'
+import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 
-export default class TreeReposotory implements ITreeReposotory {
+export default class TreeRepository implements ITreeRepository {
     private session: TreeSessionModel | null = null
 
     constructor(

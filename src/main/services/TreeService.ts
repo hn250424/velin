@@ -7,14 +7,14 @@ import IFileManager from "../modules/contracts/IFileManager"
 import TreeDto from "@shared/dto/TreeDto"
 import TrashMap from "@shared/types/TrashMap"
 import ClipboardMode from "@shared/types/ClipboardMode"
-import ITreeManager from "@main/modules/contracts/ITreeManager"
+import ITreeUtils from "@main/modules/contracts/ITreeUtils"
 import Response from "@shared/types/Response"
 
 export default class TreeService {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-        @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,
-        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
+        @inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
+        @inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository
     ) {
 
     }
@@ -163,7 +163,7 @@ export default class TreeService {
 
     async getSyncedTreeSession(): Promise<TreeDto | null> {
         const session = await this.treeRepository.readTreeSession()
-        const newSession = await this.treeManager.syncWithFs(session)
+        const newSession = await this.treeUtils.syncWithFs(session)
         if (newSession) await this.treeRepository.writeTreeSession(newSession)
         return newSession
     }
