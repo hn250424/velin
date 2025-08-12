@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron"
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
-import IFileManager from "src/main/modules/contracts/IFileManager"
+import IFileManager from "@main/modules/contracts/IFileManager"
 import ITabRepository from "src/main/modules/contracts/ITabRepository"
 import IDialogManager from "src/main/modules/contracts/IDialogManager"
 import { TabSessionModel, TabSessionData } from "../models/TabSessionModel"

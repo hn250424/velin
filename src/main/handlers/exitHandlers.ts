@@ -4,7 +4,7 @@ import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 import { BrowserWindow, ipcMain } from 'electron'
 import IDialogManager from 'src/main/modules/contracts/IDialogManager'
-import IFileManager from 'src/main/modules/contracts/IFileManager'
+import IFileManager from '@main/modules/contracts/IFileManager'
 import ITabRepository from 'src/main/modules/contracts/ITabRepository'
 import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 

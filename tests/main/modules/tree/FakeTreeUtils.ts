@@ -1,17 +1,15 @@
 import path from 'path'
-import ITreeManager from "src/main/modules/contracts/ITreeManager"
+import ITreeUtils from "@main/modules/contracts/ITreeUtils"
 import TreeDto from "@shared/dto/TreeDto"
 import TreeSessionModel from "@main/models/TreeSessionModel"
 import IFileManager from "@main/modules/contracts/IFileManager"
 
-export default class FakeTreeManager implements ITreeManager {
+export default class FakeTreeUtils implements ITreeUtils {
     private tree: TreeDto | null = null
 
     constructor(
         private fakeFileManager: IFileManager
-    ) {
-
-    }
+    ) { }
 
     setTree(tree: TreeDto) {
         this.tree = tree

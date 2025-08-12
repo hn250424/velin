@@ -13,7 +13,7 @@ export default class TabService {
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
         @inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
-        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository
+        @inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository
     ) {
 
     }

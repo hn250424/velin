@@ -1,12 +1,12 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
 import { electronAPI } from '@shared/constants/electronAPI/electronAPI'
-import IFileManager from 'src/main/modules/contracts/IFileManager'
+import IFileManager from '@main/modules/contracts/IFileManager'
 import ITabRepository from 'src/main/modules/contracts/ITabRepository'
-import ITreeManager from 'src/main/modules/contracts/ITreeManager'
+import ITreeUtils from '@main/modules/contracts/ITreeUtils'
 import ITreeRepository from 'src/main/modules/contracts/ITreeRepository'
 import { loadedRenderer } from '../services/loadService'
-import ITabManager from '@main/modules/contracts/ITabManager'
+import ITabUtils from '@main/modules/contracts/ITabUtils'
 import IFileWatcher from '@main/modules/contracts/IFileWatcher'
 
 export default function registerLoadHandlers(
@@ -15,11 +15,11 @@ export default function registerLoadHandlers(
     fileWatcher: IFileWatcher,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
-    tabManager: ITabManager,
-    treeManager: ITreeManager
+    tabUtils: ITabUtils,
+    treeUtils: ITreeUtils
 ) {
     ipcMain.on(electronAPI.events.rendererToMain.loadedRenderer, async (e) => {
-        loadedRenderer(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabManager, treeManager)
+        loadedRenderer(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabUtils, treeUtils)
     })
 
     ipcMain.on(electronAPI.events.rendererToMain.showMainWindow, () => {

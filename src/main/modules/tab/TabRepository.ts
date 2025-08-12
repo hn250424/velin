@@ -1,5 +1,5 @@
 
-import IFileManager from 'src/main/modules/contracts/IFileManager'
+import IFileManager from '@main/modules/contracts/IFileManager'
 import ITabRepository from 'src/main/modules/contracts/ITabRepository'
 import { TabSessionModel } from '../../models/TabSessionModel'
 import { injectable } from 'inversify'

@@ -5,8 +5,8 @@ import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
-import FakeTreeManager from '../modules/tree/FakeTreeManager'
-import FakeTabManager from '../modules/tab/FakeTabManager'
+import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
+import FakeTabUtils from '../modules/tab/FakeTabUtils'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 
@@ -17,17 +17,17 @@ describe('loadService.loadedRenderer: ', () => {
     let fakeMainWindow: FakeMainWindow
     let fakeFileManager: FakeFileManager
     let fakeTabRepository: FakeTabRepository
-    let fakeTabManager: FakeTabManager
+    let fakeTabUtils: FakeTabUtils
     let fakeTreeRepository: FakeTreeRepository
-    let fakeTreeManager: FakeTreeManager
+    let fakeTreeUtils: FakeTreeUtils
     let fakeFileWatcher: FakeFileWatcher
 
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
-        fakeTabManager = new FakeTabManager(fakeFileManager)
+        fakeTabUtils = new FakeTabUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
     })
@@ -87,13 +87,13 @@ describe('loadService.loadedRenderer: ', () => {
         fakeFileManager.setPathExistence('/project/index.ts', true)
         fakeFileManager.setPathExistence('/project/src', true)
         fakeFileManager.setPathExistence('/project/src/main.ts', true)
-        fakeTreeManager.setTree(initialTreeSession)
+        fakeTreeUtils.setTree(initialTreeSession)
 
         await fakeTabRepository.setTabSession(initialSession)
         await fakeTreeRepository.setTreeSession(initialTreeSession)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
@@ -124,7 +124,7 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTabRepository.setTabSession(null)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabManager, fakeTreeManager)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()

@@ -8,7 +8,7 @@ import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import { TabSessionData, TabSessionModel } from "../models/TabSessionModel"
 import TreeDto from "@shared/dto/TreeDto"
-import ITreeManager from "src/main/modules/contracts/ITreeManager"
+import ITreeUtils from "@main/modules/contracts/ITreeUtils"
 import IFileWatcher from "@main/modules/contracts/IFileWatcher"
 
 export default class FileService {
@@ -16,8 +16,8 @@ export default class FileService {
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
         @inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
         @inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
-        @inject(DI_KEYS.TreeReposotory) private readonly treeRepository: ITreeRepository,
-        @inject(DI_KEYS.TreeManager) private readonly treeManager: ITreeManager,
+        @inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository,
+        @inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
         @inject(DI_KEYS.FileWatcher) private readonly fileWatcher: IFileWatcher,
     ) {
 
@@ -73,13 +73,13 @@ export default class FileService {
             indent = dto.indent
         }
 
-        const fsTree = await this.treeManager.getDirectoryTree(path, indent)
+        const fsTree = await this.treeUtils.getDirectoryTree(path, indent)
         if (indent === 0) {
             await this.treeRepository.writeTreeSession(fsTree)
             this.fileWatcher.watch(path)
         } else {
             const session = await this.treeRepository.readTreeSession()
-            const updatedSession = await this.treeManager.getSessionModelWithFs(path, indent, fsTree.children, session)
+            const updatedSession = await this.treeUtils.getSessionModelWithFs(path, indent, fsTree.children, session)
             await this.treeRepository.writeTreeSession(updatedSession)
         }
 

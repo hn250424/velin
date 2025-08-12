@@ -2,11 +2,11 @@ import { TabSessionModel } from '@main/models/TabSessionModel'
 import { inject, injectable } from 'inversify'
 import DI_KEYS from '../../constants/di_keys'
 import IFileManager from '../contracts/IFileManager'
-import ITabManager from '../contracts/ITabManager'
+import ITabUtils from '../contracts/ITabUtils'
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 
 @injectable()
-export default class TabManager implements ITabManager {
+export default class TabUtils implements ITabUtils {
     constructor(
         @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
     ) { }

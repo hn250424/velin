@@ -12,7 +12,7 @@ import fakeDialogManager, {
 } from '../modules/ui/fakeDialogManager'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
-import FakeTreeManager from '../modules/tree/FakeTreeManager'
+import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 import TreeDto from '@shared/dto/TreeDto'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 
@@ -20,7 +20,7 @@ const tabSessionPath = '/fake/path/tabSession.json'
 const treeSessionPath = '/fake/path/treeSession.json'
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
-let fakeTreeManager: FakeTreeManager
+let fakeTreeUtils: FakeTreeUtils
 let fakeTreeRepository: FakeTreeRepository
 let fakeFileWatcher: FakeFileWatcher
 let fileService: FileService
@@ -123,9 +123,9 @@ describe('FileService.newTab', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('should create a new tab with an incremented ID based on the existing session', async () => {
@@ -152,9 +152,9 @@ describe('FileService.openFile', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('should return false when the open dialog is canceled', async () => {
@@ -220,16 +220,16 @@ describe('FileService.openDirectory', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('should return correctly updated root tree without dto', async () => {
         // Given.
         const copiedDto = {...treeDto}
-        fakeTreeManager.setTree(copiedDto)
+        fakeTreeUtils.setTree(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
             filePaths: ['/project']
@@ -247,7 +247,7 @@ describe('FileService.openDirectory', () => {
     test('should return correctly updated children tree without dto', async () => {
         // Given.
         const copiedDto = {...treeDto}
-        fakeTreeManager.setTree(copiedDto)
+        fakeTreeUtils.setTree(copiedDto)
         fakeTreeRepository.setTreeSession(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
@@ -266,7 +266,7 @@ describe('FileService.openDirectory', () => {
     test('should return the correctly updated root tree when opening the root dto', async () => {
         // Given.
         const copiedDto = {...treeDto}
-        fakeTreeManager.setTree(copiedDto)
+        fakeTreeUtils.setTree(copiedDto)
 
         // When.
         const response = await fileService.openDirectory(copiedDto)
@@ -280,7 +280,7 @@ describe('FileService.openDirectory', () => {
     test('should return the correctly updated child tree and mark it as expanded when opening a child dto', async () => {
         // Given.
         const copiedDto = {...treeDto}
-        fakeTreeManager.setTree(copiedDto)
+        fakeTreeUtils.setTree(copiedDto)
         fakeTreeRepository.setTreeSession(copiedDto)
 
         // When.
@@ -299,9 +299,9 @@ describe('FileService.save', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('Save with empty filePath and cancel dialog', async () => {
@@ -374,9 +374,9 @@ describe('FileService.saveAs', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('should return false when SaveDialog is canceled', async () => {
@@ -427,9 +427,9 @@ describe('FileService.saveAll', () => {
         fakeFileManager = new FakeFileManager()
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-        fakeTreeManager = new FakeTreeManager(fakeFileManager)
+        fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
-        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeManager, fakeFileWatcher)
+        fileService = new FileService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository, fakeTreeUtils, fakeFileWatcher)
     })
 
     test('test all cases with confirmed dialog', async () => {

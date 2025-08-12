@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'node:path'
 
 export default defineConfig({
     build: {
-        lib: {
-            entry: 'src/renderer/renderer.ts',
-            formats: ['es'],
+        rollupOptions: {
+            input: resolve(process.cwd(), 'index.html')
         },
+        emptyOutDir: true,
     },
     resolve: {
         alias: [
@@ -15,3 +16,10 @@ export default defineConfig({
         ]
     }
 })
+
+// build: {
+//     lib: {
+//         entry: 'src/renderer/renderer.ts',
+//         formats: ['es'],
+//     },
+// },
