@@ -46,12 +46,22 @@ $menu_container_horizontal_margin: 10px;
     padding: $window_gap;
 }
 
-#window img {
+#window button {
     width: gv.$icon_size;
     height: gv.$icon_size;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
-#window img:hover {
+#window img {
+    width: gv.$icon_size * 0.7;
+    height: gv.$icon_size * 0.7;
+}
+
+#window button:hover {
     cursor: pointer;
     background: var(--window-icon-hover);
 }

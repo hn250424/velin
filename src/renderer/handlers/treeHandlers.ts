@@ -127,6 +127,7 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
 
         let isRight = true
         const path = treeFacade.getInsertPath()
+        console.log('insert-path: ', path)
         if (path === '') isRight = false
 
         treeFacade.endDrag()

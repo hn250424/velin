@@ -4,14 +4,12 @@ import {
     CLASS_TREE_GHOST,
     CLASS_TREE_NODE,
     CLASS_TREE_NODE_CHILDREN,
-    CLASS_TREE_NODE_ICON,
+    CLASS_TREE_NODE_TYPE,
     CLASS_TREE_NODE_INPUT,
     CLASS_TREE_NODE_OPEN,
     CLASS_TREE_NODE_TEXT,
     CLASS_TREE_NODE_WRAPPER,
     DATASET_ATTR_TREE_PATH,
-    EXPANDED_TEXT,
-    NOT_EXPANDED_TEXT,
     SELECTOR_TREE_NODE
 } from "../../constants/dom"
 import TreeViewModel from "../../viewmodels/TreeViewModel"
@@ -63,20 +61,23 @@ export default class TreeRenderer {
         box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
         box.title = viewModel.path
 
-        const openStatus = document.createElement('span')
+        const openStatus = document.createElement('img')
         openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (viewModel.directory) openStatus.textContent = viewModel.expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
+        if (viewModel.directory) openStatus.src = viewModel.expanded 
+            ? new URL('../../assets/icons/expanded.png', import.meta.url).toString()
+            : new URL('../../assets/icons/not_expanded.png', import.meta.url).toString()
+        else openStatus.classList.add('file')
 
-        const icon = document.createElement('img')
-        icon.classList.add(CLASS_TREE_NODE_ICON)
+        const nodeType = document.createElement('img')
+        nodeType.classList.add(CLASS_TREE_NODE_TYPE)
 
         if (!viewModel.directory) {
-            icon.src = new URL('../../assets/icons/file.png', import.meta.url).toString();
+            nodeType.src = new URL('../../assets/icons/file.png', import.meta.url).toString();
         } else {
             if (viewModel.expanded) {
-                icon.src = new URL('../../assets/icons/opened_folder.png', import.meta.url).toString();
+                nodeType.src = new URL('../../assets/icons/opened_folder.png', import.meta.url).toString();
             } else {
-                icon.src = new URL('../../assets/icons/folder.png', import.meta.url).toString();
+                nodeType.src = new URL('../../assets/icons/folder.png', import.meta.url).toString();
             }
         }
 
@@ -90,7 +91,7 @@ export default class TreeRenderer {
         else childrenContainer.classList.remove(CLASS_EXPANDED)
 
         box.appendChild(openStatus)
-        box.appendChild(icon)
+        box.appendChild(nodeType)
         box.appendChild(text)
 
         const wrapper = document.createElement('div')
@@ -113,14 +114,14 @@ export default class TreeRenderer {
         box.classList.add('tree_node_temp')
         box.style.paddingLeft = `${indent * 16}px`
 
-        const openStatus = document.createElement('span')
+        const openStatus = document.createElement('img')
         openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (directory) openStatus.textContent = NOT_EXPANDED_TEXT
+        if (directory) openStatus.src = new URL('../../assets/icons/not_expanded.png', import.meta.url).toString()
+        else openStatus.classList.add('file')
 
-        const icon = document.createElement('img')
-        icon.classList.add(CLASS_TREE_NODE_ICON)
-        console.log(directory)
-        icon.src = directory
+        const nodeType = document.createElement('img')
+        nodeType.classList.add(CLASS_TREE_NODE_TYPE)
+        nodeType.src = directory
             ? new URL('../../assets/icons/folder.png', import.meta.url).toString()
             : new URL('../../assets/icons/file.png', import.meta.url).toString()
 
@@ -130,7 +131,7 @@ export default class TreeRenderer {
         input.classList.add(CLASS_TREE_NODE_INPUT)
 
         box.appendChild(openStatus)
-        box.appendChild(icon)
+        box.appendChild(nodeType)
         box.appendChild(input)
 
         const wrapper = document.createElement('div')

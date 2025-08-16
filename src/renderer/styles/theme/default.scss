@@ -1,7 +1,7 @@
 @use '../variables.scss' as gv;
 
-$major: gv.$grey-4;
-$secondary: gv.$grey-3;
+// $major: gv.$grey-4;
+// $secondary: gv.$grey-3;
 $accent: gv.$blue-3;
 
 $active: gv.$grey-3;
@@ -11,12 +11,12 @@ $theme-default: (
     --app-bg: #{gv.$grey-1},
     --app-font: black,
 
-    --title-bg: #{$major},
-    --side-menu-bg: #{$secondary},
+    --title-bg: #{gv.$blue-3},
+    --side-menu-bg: #{gv.$grey-2},
     --side-resizer: #{$accent},
 
-    --menu-item-hover: #{gv.$grey-3},
-    --window-icon-hover: #{gv.$grey-3},
+    --menu-item-hover: #{gv.$blue-2},
+    --window-icon-hover: #{gv.$blue-2},
 
     --find-replace-container-bg: #{gv.$grey-2},
     --find-replace-input: white,

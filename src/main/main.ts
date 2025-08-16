@@ -52,7 +52,7 @@ const loadUrl = (mainWindow: BrowserWindow) => {
         // mainWindow.loadFile(filePath)
     }
 
-    // mainWindow.webContents.openDevTools({ mode: 'detach' })
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
 const createWindow = () => {

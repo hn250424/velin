@@ -10,8 +10,6 @@ import {
     SELECTOR_TREE_NODE_TEXT,
     DATASET_ATTR_TAB_ID,
     DATASET_ATTR_TREE_PATH,
-    EXPANDED_TEXT,
-    NOT_EXPANDED_TEXT,
     SELECTOR_TREE_NODE_OPEN,
     CLASS_TREE_NODE_INPUT,
     CLASS_SELECTED,
@@ -22,7 +20,7 @@ import {
     ID_FIND_INPUT,
     ID_REPLACE_INPUT,
     ID_FIND_INFO,
-    SELECTOR_TREE_NODE_ICON
+    SELECTOR_TREE_NODE_TYPE
 } from "./constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -140,15 +138,17 @@ export default class CommandDispatcher {
         const maybeChildren = treeDiv.nextElementSibling
         if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
 
-        const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLElement
-        const icon = treeDiv.querySelector(SELECTOR_TREE_NODE_ICON) as HTMLImageElement
+        const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLImageElement
+        const nodeType = treeDiv.querySelector(SELECTOR_TREE_NODE_TYPE) as HTMLImageElement
         const treeDivChildren = maybeChildren as HTMLElement
 
         function updateUI(viewModel: TreeViewModel, expanded: boolean) {
             viewModel.expanded = expanded
 
-            openStatus.textContent = expanded ? EXPANDED_TEXT : NOT_EXPANDED_TEXT
-            icon.src = expanded
+            openStatus.src = expanded
+                ? new URL('./assets/icons/expanded.png', import.meta.url).toString()
+                : new URL('./assets/icons/not_expanded.png', import.meta.url).toString()
+            nodeType.src = expanded
                 ? new URL('./assets/icons/opened_folder.png', import.meta.url).toString()
                 : new URL('./assets/icons/folder.png', import.meta.url).toString()
 

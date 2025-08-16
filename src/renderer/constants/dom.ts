@@ -51,8 +51,8 @@ export const SELECTOR_TREE_NODE_INPUT = `.${CLASS_TREE_NODE_INPUT}`
 export const CLASS_TREE_NODE_OPEN = 'tree_node_open'
 export const SELECTOR_TREE_NODE_OPEN = `.${CLASS_TREE_NODE_OPEN}`
 
-export const CLASS_TREE_NODE_ICON = 'tree_node_icon'
-export const SELECTOR_TREE_NODE_ICON = `.${CLASS_TREE_NODE_ICON}`
+export const CLASS_TREE_NODE_TYPE = 'tree_node_type'
+export const SELECTOR_TREE_NODE_TYPE = `.${CLASS_TREE_NODE_TYPE}`
 
 export const CLASS_TREE_NODE_WRAPPER = 'tree_node_wrapper'
 export const SELECTOR_TREE_NODE_WRAPPER = `.${CLASS_TREE_NODE_WRAPPER}`
@@ -68,6 +68,3 @@ export const SELECTOR_TREE_GHOST = `.${CLASS_TREE_GHOST}`
 
 export const MODIFIED_TEXT = '•'
 export const NOT_MODIFIED_TEXT = '×'
-
-export const EXPANDED_TEXT = '▽'
-export const NOT_EXPANDED_TEXT = '▷'
