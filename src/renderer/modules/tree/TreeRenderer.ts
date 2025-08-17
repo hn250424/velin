@@ -163,6 +163,9 @@ export default class TreeRenderer {
     }
 
 
+    clearPathToTreeWrapperMap() {
+        this._pathToTreeWrapperMap.clear()
+    }
 
     getTreeNodeByPath(path: string) {
         const wrapper = this._pathToTreeWrapperMap.get(path)

@@ -30,22 +30,14 @@ import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 import SideState from './modules/state/SideState'
 
-let tabContextMenu: HTMLElement
-let menuContainer: HTMLElement
-let tabContainer: HTMLElement
-let menuItems: NodeListOf<HTMLElement>
-let title: HTMLElement
-let treeNodeContainer: HTMLElement
-let treeContextMenu: HTMLElement
-
 window.addEventListener('DOMContentLoaded', () => {
-    title = document.getElementById('title')
-    tabContainer = document.getElementById('tab_container')
-    tabContextMenu = document.getElementById('tab_context_menu')
-    treeContextMenu = document.getElementById('tree_context_menu')
-    menuContainer = document.getElementById('menu_container')
-    menuItems = document.querySelectorAll('#menu_container .menu_item')
-    treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER)
+    const title = document.getElementById('title')
+    const tabContainer = document.getElementById('tab_container')
+    const tabContextMenu = document.getElementById('tab_context_menu')
+    const treeContextMenu = document.getElementById('tree_context_menu')
+    const menuContainer = document.getElementById('menu_container')
+    const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll('#menu_container .menu_item')
+    const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER)
 
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
     const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState)
@@ -73,15 +65,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     bindSyncEventFromWatch(tabEditorFacade, treeFacade)
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)
-    bindDocumentMousedownEvnet(focusManager, tabEditorFacade, treeFacade)
+    bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade)
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
     window.rendererToMain.loadedRenderer()
 
     // TODO.
     // document.getElementById('settings').addEventListener('click', () => {
-    //     document.documentElement.className = ''
-    //     document.documentElement.classList.add('dark')
+        // document.documentElement.className = ''
+        // document.documentElement.classList.add('dark')
     // })
 })
 
@@ -93,7 +85,10 @@ function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: Tr
 
         if (treeDto) {
             const viewModel = treeFacade.toTreeViewModel(treeDto)
+
+            treeFacade.clearPathToTreeWrapperMap() // Must clear map manually before renderTreeData (no built-in clear).
             treeFacade.renderTreeData(viewModel)
+
             treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
     })
@@ -106,7 +101,14 @@ function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HT
     })
 }
 
-function bindDocumentMousedownEvnet(focusManager: FocusManager, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
+function bindDocumentMousedownEvnet(
+    menuItems: NodeListOf<HTMLElement>,
+    tabContextMenu: HTMLElement,
+    treeContextMenu: HTMLElement,
+    focusManager: FocusManager, 
+    tabEditorFacade: TabEditorFacade,
+    treeFacade: TreeFacade
+) {
     document.addEventListener('mousedown', (e) => {
         const target = e.target as HTMLElement
         const isInTreeContextMenu = !!target.closest('#tree_context_menu')

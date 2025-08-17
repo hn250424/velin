@@ -170,6 +170,10 @@ export default class TreeFacade {
     }
 
 
+    clearPathToTreeWrapperMap() {
+        this.renderer.clearPathToTreeWrapperMap()
+    }
+
     getTreeNodeByPath(path: string) {
         return this.renderer.getTreeNodeByPath(path)
     }

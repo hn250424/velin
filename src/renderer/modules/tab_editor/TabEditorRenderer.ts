@@ -32,6 +32,14 @@ export default class TabEditorRenderer {
         this.editorContainer = document.getElementById('editor_container')
     }
 
+    // temp
+    t_tabs() {
+        return this._tabEditorViews
+    }
+    t_tabsmap() {
+        return this.pathToTabEditorViewMap
+    }
+
     private createTabBox(fileName: string) {
         const div = document.createElement('div')
         div.classList.add(CLASS_TAB)

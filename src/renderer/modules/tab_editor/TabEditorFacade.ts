@@ -18,6 +18,14 @@ export default class TabEidorFacde {
         @inject(DI_KEYS.TabDragManager) private readonly drag: TabDragManager,
     ) { }
 
+    // temp
+    t_tabs() {
+        return this.renderer.t_tabs()
+    }
+    t_tabsmap() {
+        return this.renderer.t_tabsmap()
+    }
+
     async loadTabs(dto: TabEditorsDto) {
         this.store.activeTabId = dto.activatedId
         const tabs = dto.data
