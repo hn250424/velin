@@ -14,23 +14,25 @@ export default class TabUtils implements ITabUtils {
     async syncSessionWithFs(session: TabSessionModel): Promise<TabSessionModel> {
         if (!session) return { activatedId: -1, data: [] }
 
-        const syncedData = await Promise.all(
-            session.data.map(async (data) => {
-                const filePath = data.filePath ?? ''
-                try {
-                    const result = await this.fileManager.exists(filePath)
-                    if (!result) throw new Error('No file path')
-                    return data
-                } catch {
-                    return null
-                }
-            })
-        )
+        let isActivatedTabDeleted = false
+        const filteredData: TabEditorDto[] = []
 
-        const filteredData: TabEditorDto[] = syncedData.filter((d): d is TabEditorDto  => d !== null)
+        for (const data of session.data) {
+            try {
+                const exists = await this.fileManager.exists(data.filePath)
+                if (!exists) throw new Error('No file path')
+                filteredData.push(data as TabEditorDto)
+            } catch {
+                if (data.id === session.activatedId) isActivatedTabDeleted = true
+            }
+        }
+
+        const newActivatedId = isActivatedTabDeleted && filteredData.length > 0
+            ? filteredData[filteredData.length - 1].id
+            : session.activatedId
 
         return {
-            activatedId: session.activatedId,
+            activatedId: newActivatedId,
             data: filteredData
         }
     }
