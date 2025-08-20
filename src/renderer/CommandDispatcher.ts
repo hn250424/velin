@@ -385,7 +385,12 @@ export default class CommandDispatcher {
             else if (source === 'drag') targetIndex = this.treeFacade.selectedDragIndex
 
             if (targetIndex === -1) return
-            const targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
+            let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
+
+            if (!targetViewModel.directory) {
+                targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex)
+                targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
+            }
 
             const selectedViewModels = []
             const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
@@ -393,7 +398,7 @@ export default class CommandDispatcher {
             for (const path of clipboardPaths) {
                 selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
             }
-
+            
             const cmd = new PasteCommand(this.treeFacade, this.tabEditorFacade, targetViewModel, selectedViewModels, this.treeFacade.clipboardMode)
 
             try {

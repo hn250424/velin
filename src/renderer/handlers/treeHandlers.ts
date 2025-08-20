@@ -126,12 +126,14 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
         }
 
         let isRight = true
+        
         const path = treeFacade.getInsertPath()
-        console.log('insert-path: ', path)
         if (path === '') isRight = false
 
         treeFacade.endDrag()
         treeFacade.removeGhostBox()
+
+        console.log('treeHandlers mouse up events is right? -- ', isRight)
         
         if (isRight) {
             treeFacade.setSelectedDragIndexByPath(path)
