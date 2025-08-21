@@ -270,14 +270,18 @@ export default class CommandDispatcher {
     async performCut(source: CommandSource) {
         const focus = this.focusManager.getFocus()
 
-        if (focus === 'editor' && source === 'shortcut') return
-
         if (focus === 'editor') {
-            const sel = window.getSelection()
-            const selectedText = window.getSelection()?.toString()
-            if (!sel || !selectedText) return
-            await window.rendererToMain.cutEditor(selectedText)
-            sel.deleteFromDocument()
+            if (source !== 'shortcut') {
+                const sel = window.getSelection()
+                const selectedText = sel?.toString()
+                if (!sel || !selectedText) return
+
+                await window.rendererToMain.cutEditor(selectedText)
+                sel.deleteFromDocument()
+            }
+
+            const view = this.tabEditorFacade.getActiveTabEditorView()
+            view.markAsModified()
 
             return
         }
@@ -321,6 +325,7 @@ export default class CommandDispatcher {
             const sel = window.getSelection()
             const selectedText = window.getSelection()?.toString()
             if (!sel || !selectedText) return
+
             await window.rendererToMain.copyEditor(selectedText)
 
             return
@@ -356,24 +361,29 @@ export default class CommandDispatcher {
     async performPaste(source: CommandSource) {
         const focus = this.focusManager.getFocus()
 
-        if (focus === 'editor' && source === 'shortcut') return
-
         if (focus === 'editor') {
-            const editable = document.querySelector('#editor_container [contenteditable="true"]') as HTMLElement
-            if (!editable) return
-            editable.focus()
-            const sel = window.getSelection()
-            if (!sel || !sel.rangeCount) return
-            sel.deleteFromDocument()
-            const text = await window.rendererToMain.pasteEditor()
-            const textNode = document.createTextNode(text)
-            const range = sel.getRangeAt(0)
-            range.insertNode(textNode)
-            range.setStartAfter(textNode)
-            // Defensive code to ensure cursor positioning
-            range.collapse(true)
-            sel.removeAllRanges()
-            sel.addRange(range)
+            if (source !== 'shortcut') {
+                const editable = document.querySelector('#editor_container [contenteditable="true"]') as HTMLElement
+                if (!editable) return
+                editable.focus()
+
+                const sel = window.getSelection()
+                if (!sel || !sel.rangeCount) return
+                sel.deleteFromDocument()
+
+                const text = await window.rendererToMain.pasteEditor()
+                const textNode = document.createTextNode(text)
+                const range = sel.getRangeAt(0)
+                range.insertNode(textNode)
+                range.setStartAfter(textNode)
+                // Defensive code to ensure cursor positioning
+                range.collapse(true)
+                sel.removeAllRanges()
+                sel.addRange(range)
+            }
+
+            const view = this.tabEditorFacade.getActiveTabEditorView()
+            view.markAsModified()
 
             return
         }
@@ -398,7 +408,7 @@ export default class CommandDispatcher {
             for (const path of clipboardPaths) {
                 selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
             }
-            
+
             const cmd = new PasteCommand(this.treeFacade, this.tabEditorFacade, targetViewModel, selectedViewModels, this.treeFacade.clipboardMode)
 
             try {
@@ -674,7 +684,7 @@ export default class CommandDispatcher {
         if (focus === 'tree') {
             const idx = this.treeFacade.lastSelectedIndex
             const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-            
+
             if (viewModel.directory) {
                 const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
                 this.performOpenDirectory('programmatic', treeNode)

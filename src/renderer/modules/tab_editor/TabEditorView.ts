@@ -242,9 +242,7 @@ export default class TabEditorView {
         })
 
         if (replaced) {
-            if (this.onEditorInputCallback) {
-                this.onEditorInputCallback()
-            }
+            this.markAsModified()
         }
         return replaced
     }
@@ -273,13 +271,17 @@ export default class TabEditorView {
                     view.dispatch(tr)
                 }
 
-                if (this.onEditorInputCallback) {
-                    this.onEditorInputCallback()
-                }
+                this.markAsModified()
             }
         })
 
         return replacedCount
+    }
+
+    markAsModified() {
+        if (this.onEditorInputCallback) {
+            this.onEditorInputCallback()
+        }
     }
 
     get editor(): Editor {
