@@ -229,7 +229,8 @@ export default class CommandDispatcher {
                 await cmd.undo()
                 this.redoStack.push(cmd)
             } catch (err) {
-
+                // Undo failed (e.g., parent copied into child, or src/dest no longer exists).
+                // OS/File system may have ignored the operation; we just skip it to avoid breaking the stack.
             } finally {
                 await sleep(300)
                 window.rendererToMain.setWatchSkipState(false)
