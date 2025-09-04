@@ -26,11 +26,16 @@ $menu_container_horizontal_margin: 10px;
 #logo {
     margin-left: gv.$icon_horizontal_margin;
     margin-right: gv.$icon_horizontal_margin;
-    
-    // TODO
-    color: green;
-    cursor: default;
-    user-select: none;
+
+    width: gv.$icon_size;
+    height: gv.$icon_size;
+}
+
+#logo > img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
 }
 
 #window {

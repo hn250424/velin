@@ -33,6 +33,7 @@ const createMainWindow = () => {
         height: 600,
         titleBarStyle: 'hidden',
         show: false,
+        icon: path.join(__dirname, '..', 'shared', 'logo', 'logo'),    // Icon for the app window.
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             sandbox: false,
@@ -52,7 +53,7 @@ const loadUrl = (mainWindow: BrowserWindow) => {
         // mainWindow.loadFile(filePath)
     }
 
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
 const createWindow = () => {
