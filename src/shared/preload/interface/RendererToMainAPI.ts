@@ -3,6 +3,7 @@ import TreeDto from "@shared/dto/TreeDto"
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import TrashMap from "@shared/types/TrashMap"
+import SideDto from "@shared/dto/SideDto"
 
 export default interface RendererToMainAPI {
     loadedRenderer: () => void
@@ -38,6 +39,7 @@ export default interface RendererToMainAPI {
     deletePermanently: (path: string) => Promise<void>
     create: (path: string, directory: boolean) => Promise<void>
 
+    syncSideSessionFromRenderer: (dto: SideDto) => Promise<boolean>
     syncTabSessionFromRenderer: (dto: TabEditorsDto) => Promise<boolean>
     syncTreeSessionFromRenderer: (dto: TreeDto) => Promise<boolean>
     getSyncedTreeSession: () => Promise<TreeDto | null>

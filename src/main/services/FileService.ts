@@ -24,7 +24,7 @@ export default class FileService {
     }
 
     async newTab() {
-        const model = await this.tabRepository.readTabSession()
+        const model = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] }
         const arr = model.data
         const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
         arr.push({ id: id, filePath: '' })

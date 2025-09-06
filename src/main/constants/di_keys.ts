@@ -6,10 +6,12 @@ const DI_KEYS = {
     TreeRepository: Symbol('TreeRepository'),
     TabUtils: Symbol('TabUtils'),
     TreeUtils: Symbol('TreeUtils'),
+    SideRepository: Symbol('SideRepository'),
 
     FileService: Symbol('FileService'),
     TabService: Symbol('TabService'),
     TreeService: Symbol('TreeService'),
+    SideService: Symbol('SideService')
 }
 
 export default DI_KEYS

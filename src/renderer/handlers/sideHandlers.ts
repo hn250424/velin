@@ -1,10 +1,9 @@
 import SideState from "../modules/state/SideState"
 import { CLASS_SELECTED } from "../constants/dom"
+import SideDto from "@shared/dto/SideDto"
 
-// TODO.
 export default function registerSideHandlers(sideState: SideState) {
     let isDragging = false
-    let sideWidth = 150
     let animationFrameId: number | null = null
 
     const minWidth = 100
@@ -15,33 +14,20 @@ export default function registerSideHandlers(sideState: SideState) {
     const tree = document.getElementById('tree')
     const resizer = document.getElementById('side_resizer')
 
-    const isOpen = sideState.isOpen()
-    if (isOpen) {
-        tree.style.width = '0px'
-        treeToggle.classList.remove(CLASS_SELECTED)
-    } else {
-        tree.style.width = `${sideWidth}px`
-        treeToggle.classList.add(CLASS_SELECTED)
-    }
-    sideState.setOpenState(!isOpen)
+    processOpenState()
 
-    treeToggle.addEventListener('click', () => {
+    treeToggle.addEventListener('click', async () => {
         const isOpen = sideState.isOpen()
-        if (isOpen) {
-            tree.style.width = '0px'
-            treeToggle.classList.remove(CLASS_SELECTED)
-        } else {
-            tree.style.width = `${sideWidth}px`
-            treeToggle.classList.add(CLASS_SELECTED)
-        }
         sideState.setOpenState(!isOpen)
+        syncSession()
+        processOpenState()
     })
 
     resizer.addEventListener('mousedown', (e) => {
         if (!sideState.isOpen()) {
             tree.style.width = `${minWidth}px`
             sideState.setOpenState(true)
-            sideWidth = minWidth
+            sideState.setSidth(minWidth)
         }
 
         isDragging = true
@@ -65,7 +51,7 @@ export default function registerSideHandlers(sideState: SideState) {
         })
     })
 
-    document.addEventListener('mouseup', (e) => {
+    document.addEventListener('mouseup', async (e) => {
         if (!isDragging) return
 
         isDragging = false
@@ -81,6 +67,26 @@ export default function registerSideHandlers(sideState: SideState) {
         const offsetX = e.clientX - sideRect.left
         const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
 
-        sideWidth = newWidth
+        sideState.setSidth(newWidth)
+        syncSession()
     })
+
+    function processOpenState() {
+        const isOpen = sideState.isOpen()
+        if (isOpen) {
+            tree.style.width = `${sideState.getWidth()}px`
+            treeToggle.classList.add(CLASS_SELECTED)
+        } else {
+            tree.style.width = '0px'
+            treeToggle.classList.remove(CLASS_SELECTED)
+        }
+    }
+
+    async function syncSession() {
+        const sideDto: SideDto = {
+            open: sideState.isOpen(),
+            width: sideState.getWidth()
+        }
+        const result = await window.rendererToMain.syncSideSessionFromRenderer(sideDto)
+    }
 }

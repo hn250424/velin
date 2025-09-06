@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { TAB_SESSION_PATH, TREE_SESSION_PATH } from './constants/file_info'
+import { TAB_SESSION_PATH, TREE_SESSION_PATH, SIDE_SESSION_PATH } from './constants/file_info'
 import { Container } from 'inversify'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from '@main/modules/contracts/IFileManager'
@@ -21,6 +21,9 @@ import ITabUtils from './modules/contracts/ITabUtils'
 import TabUtils from './modules/tab/TabUtils'
 import IFileWatcher from './modules/contracts/IFileWatcher'
 import FileWatcher from './modules/fs/FileWatcher'
+import ISideRepository from './modules/contracts/ISideRepository'
+import SideRepository from './modules/side/SideRepository'
+import SideService from './services/SideService'
 
 export default class DIContainer {
     private static _instance: Container | null = null
@@ -47,6 +50,7 @@ export default class DIContainer {
             const userDataPath = app.getPath('userData')
             const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
             const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
+            const sideSessionPath = path.join(userDataPath, SIDE_SESSION_PATH)
 
             const fileManager = container.get<IFileManager>(DI_KEYS.FileManager)
 
@@ -56,6 +60,10 @@ export default class DIContainer {
 
             container.bind<ITreeRepository>(DI_KEYS.TreeRepository)
                 .toDynamicValue(() => new TreeRepository(treeSessionPath, fileManager))
+                .inSingletonScope()
+
+            container.bind<ISideRepository>(DI_KEYS.SideRepository)
+                .toDynamicValue(() => new SideRepository(sideSessionPath, fileManager))
                 .inSingletonScope()
 
             const tabUtils = container.get<ITabUtils>(DI_KEYS.TabUtils)
@@ -70,6 +78,7 @@ export default class DIContainer {
             container.bind(DI_KEYS.FileService).to(FileService).inSingletonScope()
             container.bind(DI_KEYS.TabService).to(TabService).inSingletonScope()
             container.bind(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
+            container.bind(DI_KEYS.SideService).to(SideService).inSingletonScope()
 
             this._instance = container
         }

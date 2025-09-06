@@ -3,10 +3,11 @@ import { electronAPI } from "@shared/constants/electronAPI/electronAPI"
 import { MainToRendererAPI } from "@shared/preload"
 import { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import TreeDto from "@shared/dto/TreeDto"
+import SideDto from "@shared/dto/SideDto"
 
 const mainToRenderer: MainToRendererAPI = {
-    session: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
-        ipcRenderer.on(electronAPI.events.mainToRenderer.session, (e, tabEditorsDto, treeDto) => { callback(tabEditorsDto, treeDto) })
+    session: (callback: (sideDto: SideDto, tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
+        ipcRenderer.on(electronAPI.events.mainToRenderer.session, (e, sideDto, tabEditorsDto, treeDto) => { callback(sideDto, tabEditorsDto, treeDto) })
     },
     syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
         ipcRenderer.on(electronAPI.events.mainToRenderer.syncFromWatch, (e, tabEditorsDto, treeDto) => { callback(tabEditorsDto, treeDto) })

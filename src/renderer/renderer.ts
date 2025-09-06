@@ -45,23 +45,21 @@ window.addEventListener('DOMContentLoaded', () => {
     const windowLayoutManager = diContainer.get<WindowLayoutManager>(DI_KEYS.WindowLayoutManager)
     const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
     const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
-
     const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
-    
     const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
-    
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
     registerWindowHandlers(windowLayoutManager)
     registerFileHandlers(commandDispatcher, tabEditorFacade, shortcutRegistry)
-    registerLoadHandlers(tabEditorFacade, treeFacade)
     registerExitHandlers(tabEditorFacade, treeFacade)
     registerEditHandlers(commandDispatcher, shortcutRegistry)
     registerViewHandlers(shortcutRegistry, zoomManager)
-    registerSideHandlers(sideState)
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
     registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
+    registerLoadHandlers(sideState, tabEditorFacade, treeFacade, () => {
+        registerSideHandlers(sideState)
+    })
 
     bindSyncEventFromWatch(tabEditorFacade, treeFacade)
     bindDocumentClickEvent(tabContextMenu, treeContextMenu)

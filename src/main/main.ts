@@ -23,6 +23,9 @@ import registerWatchHandlers from './handlers/watchHandlers'
 import FileService from './services/FileService'
 import TabService from './services/TabService'
 import TreeService from './services/TreeService'
+import ISideRepository from './modules/contracts/ISideRepository'
+import SideService from './services/SideService'
+import registerSideHandlers from './handlers/sideHandlers'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -53,7 +56,7 @@ const loadUrl = (mainWindow: BrowserWindow) => {
         // mainWindow.loadFile(filePath)
     }
 
-    // mainWindow.webContents.openDevTools({ mode: 'detach' })
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
 const createWindow = () => {
@@ -66,6 +69,7 @@ const createWindow = () => {
     const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
     const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
     const dialogManager = diContainer.get<IDialogManager>(DI_KEYS.dialogManager)
+    const sideRepository = diContainer.get<ISideRepository>(DI_KEYS.SideRepository)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeRepository)
     const tabUtils = diContainer.get<ITabUtils>(DI_KEYS.TabUtils)
@@ -74,13 +78,15 @@ const createWindow = () => {
     const fileService = diContainer.get<FileService>(DI_KEYS.FileService)
     const tabService = diContainer.get<TabService>(DI_KEYS.TabService)
     const treeService = diContainer.get<TreeService>(DI_KEYS.TreeService)
+    const sideService = diContainer.get<SideService>(DI_KEYS.SideService)
 
-    registerLoadHandlers(mainWindow, fileManager, fileWatcher, tabRepository, treeRepository, tabUtils, treeUtils)
+    registerLoadHandlers(mainWindow, fileManager, fileWatcher, sideRepository, tabRepository, treeRepository, tabUtils, treeUtils)
     registerWindowHandlers(mainWindow)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogManager, tabRepository, treeRepository)
     registerTabHandlers(mainWindow, tabService)
     registerTreeHandlers(mainWindow, treeService)
+    registerSideHandlers(mainWindow, sideService)
     registerEditHandlers()
     registerWatchHandlers(mainWindow, fileWatcher)
 

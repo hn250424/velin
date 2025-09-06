@@ -9,13 +9,16 @@ import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 import FakeTabUtils from '../modules/tab/FakeTabUtils'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
+import FakeSideRepository from '../modules/side/FakeSideRepository'
 
 describe('loadService.loadedRenderer: ', () => {
+    const sideSessionPath = '/fake/path/sideSession.json' 
     const tabSessionPath = '/fake/path/tabSession.json'
     const treeSessionPath = '/fake/path/treeSession.json'
 
     let fakeMainWindow: FakeMainWindow
     let fakeFileManager: FakeFileManager
+    let fakeSideRepository: FakeSideRepository
     let fakeTabRepository: FakeTabRepository
     let fakeTabUtils: FakeTabUtils
     let fakeTreeRepository: FakeTreeRepository
@@ -25,6 +28,7 @@ describe('loadService.loadedRenderer: ', () => {
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
         fakeFileManager = new FakeFileManager()
+        fakeSideRepository = new FakeSideRepository(sideSessionPath, fakeFileManager)
         fakeTabUtils = new FakeTabUtils(fakeFileManager)
         fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
         fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
@@ -93,12 +97,12 @@ describe('loadService.loadedRenderer: ', () => {
         await fakeTreeRepository.setTreeSession(initialTreeSession)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
-        const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][1]
+        const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][2]
         expect(tabSentData.data.length).toBe(2)
         expect(tabSentData.data[0]).toEqual({
             id: 0,
@@ -114,7 +118,7 @@ describe('loadService.loadedRenderer: ', () => {
             fileName: 'file2.txt',
             content: 'test2',
         })
-        const treeSentData = fakeMainWindow.webContents.send.mock.calls[0][2]
+        const treeSentData = fakeMainWindow.webContents.send.mock.calls[0][3]
         expect(treeSentData).toEqual(initialTreeSession)
     })
 
@@ -124,7 +128,7 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTabRepository.setTabSession(null)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()

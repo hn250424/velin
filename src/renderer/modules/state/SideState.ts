@@ -1,5 +1,6 @@
 export default class SideState {
-    private _isOpen = false
+    private _isOpen = true
+    private _width = 150
     
     constructor() {}
 
@@ -9,5 +10,13 @@ export default class SideState {
 
     setOpenState(state: boolean) {
         this._isOpen = state
+    }
+
+    getWidth() {
+        return this._width
+    }
+
+    setSidth(width: number) {
+        this._width = width
     }
 }
