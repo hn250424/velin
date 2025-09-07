@@ -10,6 +10,7 @@ import FakeTabUtils from '../modules/tab/FakeTabUtils'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 import FakeSideRepository from '../modules/side/FakeSideRepository'
+import SideSessionModel from '@main/models/SideSessionModel'
 
 describe('loadService.loadedRenderer: ', () => {
     const sideSessionPath = '/fake/path/sideSession.json' 
@@ -38,7 +39,12 @@ describe('loadService.loadedRenderer: ', () => {
 
     test('loadedRenderer: normal', async () => {
         // Given.
-        const initialSession: TabSessionModel = {
+        const initialSideSession: SideSessionModel = {
+            open: true,
+            width: 150
+        }
+
+        const initialTabSession: TabSessionModel = {
             activatedId: 1,
             data: [
                 { id: 0, filePath: 'file1.txt' },
@@ -81,6 +87,7 @@ describe('loadService.loadedRenderer: ', () => {
             ],
         }
 
+        fakeFileManager.setPathExistence(sideSessionPath, true)
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
         fakeFileManager.setPathExistence('file1.txt', true)
@@ -93,7 +100,8 @@ describe('loadService.loadedRenderer: ', () => {
         fakeFileManager.setPathExistence('/project/src/main.ts', true)
         fakeTreeUtils.setTree(initialTreeSession)
 
-        await fakeTabRepository.setTabSession(initialSession)
+        await fakeSideRepository.setSideSession(initialSideSession)
+        await fakeTabRepository.setTabSession(initialTabSession)
         await fakeTreeRepository.setTreeSession(initialTreeSession)
 
         // When.
@@ -102,6 +110,9 @@ describe('loadService.loadedRenderer: ', () => {
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
+        const sideSentData = fakeMainWindow.webContents.send.mock.calls[0][1]
+        expect(sideSentData.open).toBe(initialSideSession.open)
+        expect(sideSentData.width).toBe(initialSideSession.width)
         const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][2]
         expect(tabSentData.data.length).toBe(2)
         expect(tabSentData.data[0]).toEqual({
