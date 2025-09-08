@@ -43,8 +43,6 @@ export default class TreeService {
             }
         }
 
-        const session: TreeSessionModel = await this.treeRepository.readTreeSession()
-
         const targetDir = path.dirname(newPath)
         const existingNames = new Set(await this.fileManager.readDir(targetDir))
         const requestedFileName = path.basename(newPath)
@@ -52,6 +50,7 @@ export default class TreeService {
         const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName])
         const finalNewPath = path.join(targetDir, uniqueFileName[0])
 
+        const session: TreeSessionModel = await this.treeRepository.readTreeSession()
         const updated = updateTreeSession(prePath, finalNewPath, session)
         if (updated) {
             await this.fileManager.rename(prePath, finalNewPath)
@@ -163,8 +162,12 @@ export default class TreeService {
 
     async getSyncedTreeSession(): Promise<TreeDto | null> {
         const session = await this.treeRepository.readTreeSession()
-        const newSession = await this.treeUtils.syncWithFs(session)
-        if (newSession) await this.treeRepository.writeTreeSession(newSession)
-        return newSession
+        if (session) {
+            const newSession = await this.treeUtils.syncWithFs(session)
+            if (newSession) await this.treeRepository.writeTreeSession(newSession)
+            return newSession
+        } else {
+            return null
+        }
     }
 }
