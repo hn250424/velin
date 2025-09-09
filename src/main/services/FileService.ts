@@ -102,9 +102,10 @@ export default class FileService {
             } else {
                 await this.fileManager.write(result.filePath, data.content)
 
-                const tabSession = await this.tabRepository.readTabSession()
+                const tabSession = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] } 
                 const tabSessionData = tabSession.data
-                tabSessionData.find(s => s.id === data.id).filePath = result.filePath
+                const session = tabSessionData.find(s => s.id === data.id)
+                if (session) session.filePath = result.filePath
                 if (writeSession) await this.tabRepository.writeTabSession(tabSession)
 
                 return {
@@ -133,7 +134,7 @@ export default class FileService {
         } else {
             await this.fileManager.write(result.filePath, data.content)
 
-            const model = await this.tabRepository.readTabSession()
+            const model = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] }
             const arr = model.data
             const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
             arr.push({ id: id, filePath: result.filePath })

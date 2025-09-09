@@ -39,7 +39,7 @@ export default class TabService {
         // Delete session.
         if (writeSession) {
             try {
-                const tabSession = await this.tabRepository.readTabSession()
+                const tabSession = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] }
                 const updatedData = tabSession.data.filter(session => session.id !== data.id)
                 await this.tabRepository.writeTabSession({
                     activatedId: tabSession.activatedId,
