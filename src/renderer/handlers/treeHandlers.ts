@@ -319,6 +319,15 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
     if (e.shiftKey) {
         newTreeNode.classList.add(CLASS_SELECTED)
         treeFacade.addSelectedIndices(lastIdx)
+    } else {
+        const selectedIndices = treeFacade.getSelectedIndices()
+        for (const i of selectedIndices) {
+            const div = treeFacade.getTreeNodeByIndex(i)
+            div.classList.remove(CLASS_SELECTED)
+        }
+        treeFacade.clearSelectedIndices()
+        newTreeNode.classList.add(CLASS_SELECTED)
+        treeFacade.addSelectedIndices(lastIdx)
     }
 }
 
@@ -338,6 +347,15 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
     newTreeNode.classList.add(CLASS_FOCUSED)
 
     if (e.shiftKey) {
+        newTreeNode.classList.add(CLASS_SELECTED)
+        treeFacade.addSelectedIndices(lastIdx)
+    } else {
+        const selectedIndices = treeFacade.getSelectedIndices()
+        for (const i of selectedIndices) {
+            const div = treeFacade.getTreeNodeByIndex(i)
+            div.classList.remove(CLASS_SELECTED)
+        }
+        treeFacade.clearSelectedIndices()
         newTreeNode.classList.add(CLASS_SELECTED)
         treeFacade.addSelectedIndices(lastIdx)
     }

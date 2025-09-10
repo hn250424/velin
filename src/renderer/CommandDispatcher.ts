@@ -432,10 +432,8 @@ export default class CommandDispatcher {
         const focus = this.focusManager.getFocus()
         if (focus !== 'tree') return
 
-        const selectedIndices = this.treeFacade.getSelectedIndices()
-        if (selectedIndices.length !== 1) return
-
-        const treeNode = this.treeFacade.getTreeNodeByIndex(selectedIndices[0])
+        const lastSelectedIndex = this.treeFacade.lastSelectedIndex
+        const treeNode = this.treeFacade.getTreeNodeByIndex(lastSelectedIndex)
         const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
         if (!treeSpan) return
 
