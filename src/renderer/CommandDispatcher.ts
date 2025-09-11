@@ -585,6 +585,11 @@ export default class CommandDispatcher {
                 } finally {
                     await sleep(300)
                     window.rendererToMain.setWatchSkipState(false)
+
+                    if (!directory) {
+                        const filePath = window.utils.getJoinedPath(viewModel.path, name)
+                        this.performOpenFile('programmatic', filePath)
+                    }
                 }
             }
         }
@@ -681,7 +686,7 @@ export default class CommandDispatcher {
         }
 
         if (focus === 'tree') {
-            const idx = this.treeFacade.lastSelectedIndex
+            const idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
             const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
             if (viewModel.directory) {

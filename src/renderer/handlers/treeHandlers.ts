@@ -29,7 +29,7 @@ export default function registerTreeHandlers(
     bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeFacade, treeContextPasteButton)
     bindCommandsWithContextmenu(commandDispatcher)
     bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeFacade)
-    bindTreeMenuEvents(commandDispatcher, treeNodeContainer)
+    bindTreeMenuEvents(commandDispatcher, treeNodeContainer, treeFacade)
 
     // Drag.
     bindMouseDownEvents(treeFacade, treeNodeContainer)
@@ -143,12 +143,14 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
     })
 }
 
-function bindTreeMenuEvents(commandDispatcher: CommandDispatcher, treeNodeContainer: HTMLElement) {
+function bindTreeMenuEvents(commandDispatcher: CommandDispatcher, treeNodeContainer: HTMLElement, treeFacade: TreeFacade) {
     const addFile = document.getElementById('tree_top_add_file')
     const addDirectory = document.getElementById('tree_top_add_directory')
 
     addFile.addEventListener('click', () => {
         commandDispatcher.performCreate('element', treeNodeContainer, false)
+        // TODO: 
+        // treeFacade
     })
 
     addDirectory.addEventListener('click', () => {

@@ -133,8 +133,7 @@ export default class FileManager implements IFileManager {
             } else {
                 const dirName = path.dirname(targetPath)
                 await fs.promises.mkdir(dirName, { recursive: true })
-                const baseName = path.basename(targetPath)
-                await fs.promises.writeFile(targetPath, baseName)
+                await fs.promises.writeFile(targetPath, '')
             }
         } catch (error) {
             console.error('[create] Failed to create:', error)
