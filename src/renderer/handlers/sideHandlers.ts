@@ -25,9 +25,7 @@ export default function registerSideHandlers(sideState: SideState) {
 
     resizer.addEventListener('mousedown', (e) => {
         if (!sideState.isOpen()) {
-            tree.style.width = `${minWidth}px`
             sideState.setOpenState(true)
-            sideState.setSidth(minWidth)
         }
 
         isDragging = true
