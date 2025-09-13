@@ -23,7 +23,7 @@ import {
     CLASS_SELECTED,
     ID_TREE_NODE_CONTAINER
 } from './constants/dom'
-import WindowLayoutManager from './modules/state/WindowLayoutManager'
+import WindowState from './modules/state/WindowState'
 import ZoomManager from './modules/layout/ZoomManager'
 import FindReplaceState from './modules/state/FindReplaceState'
 import { TabEditorsDto } from '@shared/dto/TabEditorDto'
@@ -42,14 +42,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
     const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState)
     const sideState = diContainer.get<SideState>(DI_KEYS.SideState)
-    const windowLayoutManager = diContainer.get<WindowLayoutManager>(DI_KEYS.WindowLayoutManager)
+    const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState)
     const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
     const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
     const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
     const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
-    registerWindowHandlers(windowLayoutManager)
     registerFileHandlers(commandDispatcher, tabEditorFacade, shortcutRegistry)
     registerExitHandlers(tabEditorFacade, treeFacade)
     registerEditHandlers(commandDispatcher, shortcutRegistry)
@@ -57,7 +56,8 @@ window.addEventListener('DOMContentLoaded', () => {
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
     registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
-    registerLoadHandlers(sideState, tabEditorFacade, treeFacade, () => {
+    registerLoadHandlers(windowState, sideState, tabEditorFacade, treeFacade, () => {
+        registerWindowHandlers(windowState)
         registerSideHandlers(sideState)
     })
 
@@ -66,6 +66,7 @@ window.addEventListener('DOMContentLoaded', () => {
     bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade)
     bindShortcutEvent(commandDispatcher, shortcutRegistry)
     document.addEventListener('keydown', (e) => { shortcutRegistry.handleKeyEvent(e) })
+    
     window.rendererToMain.loadedRenderer()
 
     // TODO.

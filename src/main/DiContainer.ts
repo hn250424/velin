@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { TAB_SESSION_PATH, TREE_SESSION_PATH, SIDE_SESSION_PATH } from './constants/file_info'
+import { TAB_SESSION_PATH, TREE_SESSION_PATH, SIDE_SESSION_PATH, WINDOW_SESSION_PATH } from './constants/file_info'
 import { Container } from 'inversify'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from '@main/modules/contracts/IFileManager'
@@ -24,6 +24,10 @@ import FileWatcher from './modules/fs/FileWatcher'
 import ISideRepository from './modules/contracts/ISideRepository'
 import SideRepository from './modules/side/SideRepository'
 import SideService from './services/SideService'
+import IWindowRepository from './modules/contracts/IWindowRepository'
+import WindowRepository from './modules/window/WindowRepository'
+import WindowUtils from './modules/window/WindowUtils'
+import IWindowUtils from './modules/contracts/IWindowUtils'
 
 export default class DIContainer {
     private static _instance: Container | null = null
@@ -46,11 +50,13 @@ export default class DIContainer {
             container.bind<IDialogManager>(DI_KEYS.dialogManager).toConstantValue(dialogManager)
             container.bind<ITreeUtils>(DI_KEYS.TreeUtils).to(TreeUtils).inSingletonScope()
             container.bind<ITabUtils>(DI_KEYS.TabUtils).to(TabUtils).inSingletonScope()
+            container.bind<IWindowUtils>(DI_KEYS.WindowUtils).to(WindowUtils).inSingletonScope()
 
             const userDataPath = app.getPath('userData')
             const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
             const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
             const sideSessionPath = path.join(userDataPath, SIDE_SESSION_PATH)
+            const windowSessionPath = path.join(userDataPath, WINDOW_SESSION_PATH)
 
             const fileManager = container.get<IFileManager>(DI_KEYS.FileManager)
 
@@ -64,6 +70,10 @@ export default class DIContainer {
 
             container.bind<ISideRepository>(DI_KEYS.SideRepository)
                 .toDynamicValue(() => new SideRepository(sideSessionPath, fileManager))
+                .inSingletonScope()
+
+            container.bind<IWindowRepository>(DI_KEYS.WindowRepository)
+                .toDynamicValue(() => new WindowRepository(windowSessionPath, fileManager))
                 .inSingletonScope()
 
             const tabUtils = container.get<ITabUtils>(DI_KEYS.TabUtils)

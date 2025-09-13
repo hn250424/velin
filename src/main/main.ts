@@ -26,6 +26,8 @@ import TreeService from './services/TreeService'
 import ISideRepository from './modules/contracts/ISideRepository'
 import SideService from './services/SideService'
 import registerSideHandlers from './handlers/sideHandlers'
+import IWindowRepository from './modules/contracts/IWindowRepository'
+import IWindowUtils from './modules/contracts/IWindowUtils'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -69,9 +71,11 @@ const createWindow = () => {
     const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
     const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
     const dialogManager = diContainer.get<IDialogManager>(DI_KEYS.dialogManager)
+    const windowRepository = diContainer.get<IWindowRepository>(DI_KEYS.WindowRepository)
     const sideRepository = diContainer.get<ISideRepository>(DI_KEYS.SideRepository)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeRepository)
+    const windowUtils = diContainer.get<IWindowUtils>(DI_KEYS.WindowUtils)
     const tabUtils = diContainer.get<ITabUtils>(DI_KEYS.TabUtils)
     const treeUtils = diContainer.get<ITreeUtils>(DI_KEYS.TreeUtils)
 
@@ -80,8 +84,8 @@ const createWindow = () => {
     const treeService = diContainer.get<TreeService>(DI_KEYS.TreeService)
     const sideService = diContainer.get<SideService>(DI_KEYS.SideService)
 
-    registerLoadHandlers(mainWindow, fileManager, fileWatcher, sideRepository, tabRepository, treeRepository, tabUtils, treeUtils)
-    registerWindowHandlers(mainWindow)
+    registerLoadHandlers(mainWindow, fileManager, fileWatcher, windowRepository, sideRepository, tabRepository, treeRepository, windowUtils, tabUtils, treeUtils)
+    registerWindowHandlers(mainWindow, windowRepository)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogManager, tabRepository, treeRepository)
     registerTabHandlers(mainWindow, tabService)

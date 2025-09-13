@@ -4,9 +4,15 @@ import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import TreeFacade from "../modules/tree/TreeFacade"
 import SideDto from "@shared/dto/SideDto"
 import SideState from "../modules/state/SideState"
+import WindowState from "../modules/state/WindowState"
+import WindowDto from "@shared/dto/WindowDto"
 
-export default function registerLoadHandlers(sideState: SideState, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade, callback: Function) {
-    window.mainToRenderer.session(async (sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
+export default function registerLoadHandlers(windowState: WindowState, sideState: SideState, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade, callback: Function) {
+    window.mainToRenderer.session(async (windowDto: WindowDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
+        if (windowDto) {
+            windowState.setWindowMaximizeState(windowDto.maximize)
+        }
+
         if (sideDto) {
             sideState.setOpenState(sideDto.open)
             sideState.setSidth(sideDto.width)

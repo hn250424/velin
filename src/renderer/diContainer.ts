@@ -10,7 +10,7 @@ import FindReplaceState from './modules/state/FindReplaceState'
 import TabDragManager from './modules/tab_editor/TabDragManager'
 import TreeDragManager from './modules/tree/TreeDragManager'
 import SideState from './modules/state/SideState'
-import WindowLayoutManager from './modules/state/WindowLayoutManager'
+import WindowState from './modules/state/WindowState'
 import ZoomManager from './modules/layout/ZoomManager'
 import TabEditorRenderer from './modules/tab_editor/TabEditorRenderer'
 import TabEditorStore from './modules/tab_editor/TabEditorStore'
@@ -22,7 +22,7 @@ const diContainer = new Container()
 diContainer.bind(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope()
 diContainer.bind(DI_KEYS.FindReplaceState).to(FindReplaceState).inSingletonScope()
 diContainer.bind(DI_KEYS.SideState).to(SideState).inSingletonScope()
-diContainer.bind(DI_KEYS.WindowLayoutManager).to(WindowLayoutManager).inSingletonScope()
+diContainer.bind(DI_KEYS.WindowState).to(WindowState).inSingletonScope()
 
 diContainer.bind(DI_KEYS.ZoomManager).to(ZoomManager).inSingletonScope()
 

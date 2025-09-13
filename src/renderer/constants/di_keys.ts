@@ -2,7 +2,7 @@ const DI_KEYS = {
     FocusManager: Symbol('FocusManager'),
     FindReplaceState: Symbol('FindReplaceState'),
     SideState: Symbol('SideState'),
-    WindowLayoutManager: Symbol('WindowLayoutManager'),
+    WindowState: Symbol('WindowState'),
 
     ZoomManager: Symbol('ZoomManager'),
 

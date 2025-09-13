@@ -19,22 +19,22 @@ function bindCommandsWithMenu(zoomManager: ZoomManager) {
         zoomManager.resetZoom()
     })
 
-    document.getElementById('view_menu_fullscreen').addEventListener('click', () => {
-        performFullscreen()
-    })
+    // document.getElementById('view_menu_fullscreen').addEventListener('click', () => {
+    //     performFullscreen()
+    // })
 }
 
 function bindCommandsWithShortcut(shortcutRegistry: ShortcutRegistry, zoomManager: ZoomManager) {
     shortcutRegistry.register('Ctrl++', (e: KeyboardEvent) => zoomManager.zoomIn())
     shortcutRegistry.register('Ctrl+-', (e: KeyboardEvent) => zoomManager.zoomOut())
     shortcutRegistry.register('Ctrl+0', (e: KeyboardEvent) => zoomManager.resetZoom())
-    shortcutRegistry.register('F11', (e: KeyboardEvent) => performFullscreen())
+    // shortcutRegistry.register('F11', (e: KeyboardEvent) => performFullscreen())
 }
 
-function performFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen()
-    } else {
-        document.exitFullscreen()
-    }
-}
+// function performFullscreen() {
+//     if (!document.fullscreenElement) {
+//         document.documentElement.requestFullscreen()
+//     } else {
+//         document.exitFullscreen()
+//     }
+// }
