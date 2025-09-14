@@ -149,8 +149,6 @@ function bindTreeMenuEvents(commandDispatcher: CommandDispatcher, treeNodeContai
 
     addFile.addEventListener('click', () => {
         commandDispatcher.performCreate('element', treeNodeContainer, false)
-        // TODO: 
-        // treeFacade
     })
 
     addDirectory.addEventListener('click', () => {

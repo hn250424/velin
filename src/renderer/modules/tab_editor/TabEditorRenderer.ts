@@ -75,6 +75,7 @@ export default class TabEditorRenderer {
                 view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
             )
         })
+        editorBoxDiv.setAttribute('spellcheck', 'false')
         this.editorContainer.appendChild(editorBoxDiv)
 
         const tabEditorView = new TabEditorView(div, span, button, editorBoxDiv, editor)
