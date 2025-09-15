@@ -1,0 +1,116 @@
+@use './variables.scss' as gv;
+
+#settings-overlay {
+    position: fixed;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 98;
+
+    background-color: transparent;
+}
+
+#settings-container {
+    width: 70%;
+    height: 70%;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;   // cause settings-top.
+    border-radius: gv.$window_icon_border_radius;
+
+    box-shadow: 0 4px 16px rgb(0, 0, 0, 0.3);
+    background-color: var(--settings-bg);
+}
+
+#settings-top {
+    height: 32px;
+
+    display: flex;
+    justify-content: end;
+    align-items: center;
+
+    background-color: var(--title-bg);
+}
+
+#settings-top img {
+    width: gv.$icon_size * 0.7;
+    height: gv.$icon_size * 0.7;
+}
+
+#settings-top button {
+    width: gv.$icon_size;
+    height: gv.$icon_size;
+    margin-right: gv.$icon_horizontal_margin;
+}
+
+#settings-top button:hover {
+    cursor: pointer;
+    background: var(--window-icon-hover);
+}
+
+#settings-section {
+    flex: 1;
+    display: flex;
+}
+
+#settings-bottom {
+    height: 30px; 
+}
+
+#settings-menu {
+    min-width: 110px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: end;
+
+    gap: 5px;
+}
+
+#settings-menu button {
+    width: 100px;
+    background-color: white;
+}
+
+#settings-menu button:hover {
+    cursor: pointer;
+    background-color: yellow;
+}
+
+#settings-contents {
+    flex: 1;
+}
+
+#settings-contents div {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+
+
+
+
+#settings-menu {
+    background-color: aqua;
+}
+#settings-section {
+    background-color: blue;
+}
+#settings-bottom {
+    background-color: chocolate;
+}
+#settings-contents-theme {
+    background-color: black;
+}
+#settings-contents-font {
+    background-color: gray;
+}

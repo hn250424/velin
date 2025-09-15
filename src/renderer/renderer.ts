@@ -11,6 +11,7 @@ import registerTreeHandlers from './handlers/treeHandlers'
 import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
+
 import FocusManager from './modules/state/FocusManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
 import TabEditorFacade from './modules/tab_editor/TabEditorFacade'

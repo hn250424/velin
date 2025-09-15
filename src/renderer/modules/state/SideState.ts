@@ -1,22 +1,32 @@
 export default class SideState {
-    private _isOpen = true
-    private _width = 150
+    private _isTreeOpen = true
+    private _treeWidth = 150
+
+    private _isSettingsOpen = false
     
     constructor() {}
 
-    isOpen(): boolean {
-        return this._isOpen
+    isTreeOpen(): boolean {
+        return this._isTreeOpen
     }
 
-    setOpenState(state: boolean) {
-        this._isOpen = state
+    setTreeOpenState(state: boolean) {
+        this._isTreeOpen = state
     }
 
-    getWidth() {
-        return this._width
+    getTreeWidth() {
+        return this._treeWidth
     }
 
-    setSidth(width: number) {
-        this._width = width
+    setTreeSidth(width: number) {
+        this._treeWidth = width
+    }
+
+    getSettingsOpen() {
+        return this._isSettingsOpen
+    }
+
+    setSettingsOpenState(state: boolean) {
+        this._isSettingsOpen = state
     }
 }

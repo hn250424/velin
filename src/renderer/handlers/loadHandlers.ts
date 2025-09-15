@@ -14,8 +14,8 @@ export default function registerLoadHandlers(windowState: WindowState, sideState
         }
 
         if (sideDto) {
-            sideState.setOpenState(sideDto.open)
-            sideState.setSidth(sideDto.width)
+            sideState.setTreeOpenState(sideDto.open)
+            sideState.setTreeSidth(sideDto.width)
         }
 
         if (tabs) {

@@ -5,7 +5,6 @@ $window_width: 100px;
 $window_gap: 5px;
 $menu_horizontal_padding: 4px;
 $menu_border_radius: 4px;
-$window_icon_border_radius: 4px;
 
 $menu_container_horizontal_margin: 10px;
 
@@ -40,7 +39,7 @@ $menu_container_horizontal_margin: 10px;
 
 #window {
     width: $window_width;
-    border-radius: $window_icon_border_radius;
+    border-radius: gv.$window_icon_border_radius;
 
     margin-left: auto;
     margin-right: gv.$icon_horizontal_margin;

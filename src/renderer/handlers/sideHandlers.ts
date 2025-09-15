@@ -10,22 +10,56 @@ export default function registerSideHandlers(sideState: SideState) {
     const maxWidth = 500
 
     const side = document.getElementById('side')
+
     const treeToggle = document.getElementById('treeToggle')
     const tree = document.getElementById('tree')
     const resizer = document.getElementById('side_resizer')
 
-    processOpenState()
+    const settingsBtn = document.getElementById('settingsBtn')
+    const settingsOverlay = document.getElementById('settings-overlay')
+    const settingsContainer = document.getElementById('settings-container')
+    const settingsTop = document.getElementById('settings-top')
+    const settingsExit = document.getElementById('settings-exit')
+    const settingsSection = document.getElementById('settings-section')
+    
+    const settingsMenuTheme = document.getElementById('settings-menu-theme')
+    const settingsMenuFont = document.getElementById('settings-menu-font')
+    const settingsContentsTheme = document.getElementById('settings-contents-theme')
+    const settingsContentsFont = document.getElementById('settings-contents-font')
 
+    processTreeOpenState()
+
+    // open & close file tree.
     treeToggle.addEventListener('click', async () => {
-        const isOpen = sideState.isOpen()
-        sideState.setOpenState(!isOpen)
+        const isOpen = sideState.isTreeOpen()
+        sideState.setTreeOpenState(!isOpen)
         syncSession()
-        processOpenState()
+        processTreeOpenState()
     })
 
+    function processTreeOpenState() {
+        const isOpen = sideState.isTreeOpen()
+        if (isOpen) {
+            tree.style.width = `${sideState.getTreeWidth()}px`
+            treeToggle.classList.add(CLASS_SELECTED)
+        } else {
+            tree.style.width = '0px'
+            treeToggle.classList.remove(CLASS_SELECTED)
+        }
+    }
+
+    async function syncSession() {
+        const sideDto: SideDto = {
+            open: sideState.isTreeOpen(),
+            width: sideState.getTreeWidth()
+        }
+        const result = await window.rendererToMain.syncSideSessionFromRenderer(sideDto)
+    }
+
+    // resize.
     resizer.addEventListener('mousedown', (e) => {
-        if (!sideState.isOpen()) {
-            sideState.setOpenState(true)
+        if (!sideState.isTreeOpen()) {
+            sideState.setTreeOpenState(true)
         }
 
         isDragging = true
@@ -65,26 +99,30 @@ export default function registerSideHandlers(sideState: SideState) {
         const offsetX = e.clientX - sideRect.left
         const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
 
-        sideState.setSidth(newWidth)
+        sideState.setTreeSidth(newWidth)
         syncSession()
     })
 
-    function processOpenState() {
-        const isOpen = sideState.isOpen()
-        if (isOpen) {
-            tree.style.width = `${sideState.getWidth()}px`
-            treeToggle.classList.add(CLASS_SELECTED)
-        } else {
-            tree.style.width = '0px'
-            treeToggle.classList.remove(CLASS_SELECTED)
-        }
-    }
+    // open & close settings container.
+    settingsBtn.addEventListener('click', () => {
+        settingsOverlay.style.display = 'flex'
+        sideState.setSettingsOpenState(true)
+        settingsBtn.classList.add(CLASS_SELECTED)
+    })
 
-    async function syncSession() {
-        const sideDto: SideDto = {
-            open: sideState.isOpen(),
-            width: sideState.getWidth()
-        }
-        const result = await window.rendererToMain.syncSideSessionFromRenderer(sideDto)
-    }
+    settingsExit.addEventListener('click', () => {
+        settingsOverlay.style.display = 'none'
+        sideState.setSettingsOpenState(false)
+        settingsBtn.classList.remove(CLASS_SELECTED)
+    })
+
+    settingsMenuTheme.addEventListener('click', () => {
+        settingsContentsTheme.style.display = 'block'
+        settingsContentsFont.style.display = 'none'
+    })
+
+    settingsMenuFont.addEventListener('click', () => {
+        settingsContentsFont.style.display = 'block'
+        settingsContentsTheme.style.display = 'none'
+    })
 }

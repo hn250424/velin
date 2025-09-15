@@ -3,11 +3,38 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Hello World!</title>
+    <title>Velin</title>
 
 </head>
 
 <body>
+    <div id="settings-overlay">
+        <div id="settings-container">
+            <div id="settings-top">
+                <button id="settings-exit" class="tooltip-btn">
+                    <img class="icon-grey" src="src/renderer/assets/icons/close.png" />
+                    <span class="tooltip tooltip-bottom">Close</span>
+                </button>
+            </div>
+
+            <div id="settings-section">
+                <div id="settings-menu">
+                    <button id="settings-menu-theme">Theme</button>
+                    <button id="settings-menu-font">Font</button>
+                </div>
+                <div id="settings-contents">
+                    <div id="settings-contents-theme"></div>
+                    <div id="settings-contents-font"></div>
+                </div>
+            </div>
+
+            <div id="settings-bottom">
+                <button id="settings-apply">Apply</button>
+                <button id="settings-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="find_replace_container">
         <div id="find">
             <input id="find_input" type="text" />
@@ -182,7 +209,7 @@
                         <img src="src/renderer/assets/icons/files.png" />
                         <span class="tooltip tooltip-right">Project tree</span>
                     </button>
-                    <button id="settings" class="tooltip-btn">
+                    <button id="settingsBtn" class="tooltip-btn">
                         <img src="src/renderer/assets/icons/settings.png" />
                         <span class="tooltip tooltip-right">Settings</span>
                     </button>
