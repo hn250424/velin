@@ -24,13 +24,18 @@
                 </div>
                 <div id="settings-contents">
                     <div id="settings-contents-theme"></div>
-                    <div id="settings-contents-font"></div>
+                    <div id="settings-contents-font">
+                        <div id="setting-node-font-size" class="setting-node">
+                            <label>size</label>
+                            <input type="number" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div id="settings-bottom">
-                <button id="settings-apply">Apply</button>
-                <button id="settings-cancel">Cancel</button>
+                <button id="settings-apply-btn">Apply</button>
+                <button id="settings-cancel-btn">Cancel</button>
             </div>
         </div>
     </div>
@@ -129,7 +134,7 @@
                         <div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut"></span>
                         </div>
                         <div class="dropdown_divider"></div>
-                        <div id="file_menu_settings" class="dropdown_item not_implemented">Settings<span
+                        <div id="file_menu_settings" class="dropdown_item">Settings<span
                                 class="shortcut">Ctrl+,</span></div>
                         <div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span>
                         </div>
@@ -208,10 +213,6 @@
                     <button id="treeToggle" class="tooltip-btn">
                         <img src="src/renderer/assets/icons/files.png" />
                         <span class="tooltip tooltip-right">Project tree</span>
-                    </button>
-                    <button id="settingsBtn" class="tooltip-btn">
-                        <img src="src/renderer/assets/icons/settings.png" />
-                        <span class="tooltip tooltip-right">Settings</span>
                     </button>
                 </div>
 

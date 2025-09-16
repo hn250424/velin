@@ -1,8 +1,6 @@
 export default class SideState {
     private _isTreeOpen = true
     private _treeWidth = 150
-
-    private _isSettingsOpen = false
     
     constructor() {}
 
@@ -20,13 +18,5 @@ export default class SideState {
 
     setTreeSidth(width: number) {
         this._treeWidth = width
-    }
-
-    getSettingsOpen() {
-        return this._isSettingsOpen
-    }
-
-    setSettingsOpenState(state: boolean) {
-        this._isSettingsOpen = state
     }
 }

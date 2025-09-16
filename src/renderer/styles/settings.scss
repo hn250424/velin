@@ -1,9 +1,22 @@
 @use './variables.scss' as gv;
 
+$settings-menu-width: 110px;
+$settings-menu-button-width: 100px;
+$settings-menu-button-height: 24px;
+$settings-menu-gap: 5px;
+
+$settings-button-width: 100px;
+$settings-button-height: 32px;
+$settings-button-margin: 10px;
+
+$setting-node-margin: 5px;
+$setting-node-label-width: 100px;
+$setting-node-input-width: 50px;
+
 #settings-overlay {
     position: fixed;
 
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
 
@@ -26,11 +39,11 @@
     border-radius: gv.$window_icon_border_radius;
 
     box-shadow: 0 4px 16px rgb(0, 0, 0, 0.3);
-    background-color: var(--settings-bg);
+    background-color: var(--settings-container);
 }
 
 #settings-top {
-    height: 32px;
+    height: gv.$title_height;
 
     display: flex;
     justify-content: end;
@@ -60,57 +73,113 @@
     display: flex;
 }
 
-#settings-bottom {
-    height: 30px; 
-}
-
 #settings-menu {
-    min-width: 110px;
+    min-width: $settings-menu-width;
 
     display: flex;
     flex-direction: column;
     justify-content: baseline;
     align-items: end;
 
-    gap: 5px;
+    gap: $settings-menu-gap;
+
+    background-color: var(--settings-menu-container);
 }
 
 #settings-menu button {
-    width: 100px;
-    background-color: white;
+    width: $settings-menu-button-width;
+    height: $settings-menu-button-height;
+    
+    font-size: 0.8rem;
+
+    background-color: var(--settings-menu-button-bg);
 }
 
 #settings-menu button:hover {
     cursor: pointer;
-    background-color: yellow;
+    background-color: var(--settings-menu-button-hover);
+}
+
+#settings-menu button.selected {
+    background-color: var(--settings-menu-button-selected);
 }
 
 #settings-contents {
     flex: 1;
+    background-color: var(--settings-contents);
 }
 
-#settings-contents div {
+#settings-contents > div {
     width: 100%;
     height: 100%;
     display: none;
 }
 
-
-
-
-
-#settings-menu {
-    background-color: aqua;
-}
-#settings-section {
-    background-color: blue;
-}
 #settings-bottom {
-    background-color: chocolate;
+    display: flex;
+    justify-content: end;
+    background-color: var(--title-bg);
 }
-#settings-contents-theme {
-    background-color: black;
+
+#settings-bottom button {
+    width: $settings-button-width;
+    height: $settings-button-height;
+    margin: $settings-button-margin;
+
+    background-color: var(--settings-button-bg);
 }
-#settings-contents-font {
-    background-color: gray;
+
+#settings-bottom button:hover {
+    cursor: pointer;
+    background-color: var(--settings-button-hover-bg);
 }
+
+.setting-node {
+    display: flex;
+}
+
+.setting-node * {
+    border: 1px solid var(--setting-node-border-color);
+    margin: $setting-node-margin;
+}
+
+.setting-node > label {
+    width: $setting-node-label-width;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.setting-node > input {
+    width: $setting-node-input-width;
+
+    text-align: center;
+    vertical-align: middle;
+}
+
+.setting-node > input[type='number'] {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
+
+
+// #settings-menu {
+//     background-color: aqua;
+// }
+// #settings-section {
+//     background-color: blue;
+// }
+// #settings-bottom {
+//     background-color: chocolate;
+// }
+// #settings-contents-theme {
+//     background-color: black;
+// }
+// #settings-contents-font {
+//     background-color: gray;
+// }

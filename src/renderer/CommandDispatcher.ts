@@ -658,6 +658,14 @@ export default class CommandDispatcher {
         if (activeView) activeView.clearSearch()
     }
 
+    performOpenSettings(source: CommandSource) {
+        console.log('performOpenSettings')
+    }
+
+    performCloseSettings(source: CommandSource) {
+        console.log('performCloseSettings')
+    }
+
     async performESC(source: CommandSource) {
         const focus = this.focusManager.getFocus()
 

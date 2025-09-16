@@ -53,6 +53,14 @@ $theme-default: (
     --tree-ghost-bg: #{gv.$grey-5},
     --tree-top-icon-hover: #{gv.$grey-2},
     --tree_wrapper-drag-overlay: #{gv.$grey-2},
-    
-    --settings-bg: white,
+
+    --settings-container: white,
+    --settings-menu-container: #{gv.$grey-2},
+    --settings-menu-button-bg: #{gv.$grey-1},
+    --settings-menu-button-hover: white,
+    --settings-menu-button-selected: white,
+    --settings-contents: white,
+    --settings-button-bg: #{gv.$grey-1},
+    --settings-button-hover-bg: white,
+    --setting-node-border-color: #ccc,
 );

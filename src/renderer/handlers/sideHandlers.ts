@@ -16,16 +16,6 @@ export default function registerSideHandlers(sideState: SideState) {
     const resizer = document.getElementById('side_resizer')
 
     const settingsBtn = document.getElementById('settingsBtn')
-    const settingsOverlay = document.getElementById('settings-overlay')
-    const settingsContainer = document.getElementById('settings-container')
-    const settingsTop = document.getElementById('settings-top')
-    const settingsExit = document.getElementById('settings-exit')
-    const settingsSection = document.getElementById('settings-section')
-    
-    const settingsMenuTheme = document.getElementById('settings-menu-theme')
-    const settingsMenuFont = document.getElementById('settings-menu-font')
-    const settingsContentsTheme = document.getElementById('settings-contents-theme')
-    const settingsContentsFont = document.getElementById('settings-contents-font')
 
     processTreeOpenState()
 
@@ -101,28 +91,5 @@ export default function registerSideHandlers(sideState: SideState) {
 
         sideState.setTreeSidth(newWidth)
         syncSession()
-    })
-
-    // open & close settings container.
-    settingsBtn.addEventListener('click', () => {
-        settingsOverlay.style.display = 'flex'
-        sideState.setSettingsOpenState(true)
-        settingsBtn.classList.add(CLASS_SELECTED)
-    })
-
-    settingsExit.addEventListener('click', () => {
-        settingsOverlay.style.display = 'none'
-        sideState.setSettingsOpenState(false)
-        settingsBtn.classList.remove(CLASS_SELECTED)
-    })
-
-    settingsMenuTheme.addEventListener('click', () => {
-        settingsContentsTheme.style.display = 'block'
-        settingsContentsFont.style.display = 'none'
-    })
-
-    settingsMenuFont.addEventListener('click', () => {
-        settingsContentsFont.style.display = 'block'
-        settingsContentsTheme.style.display = 'none'
     })
 }

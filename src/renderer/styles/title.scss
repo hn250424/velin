@@ -1,6 +1,6 @@
 @use './variables.scss' as gv;
 
-$title_height: 32px;
+
 $window_width: 100px;
 $window_gap: 5px;
 $menu_horizontal_padding: 4px;
@@ -16,7 +16,7 @@ $menu_container_horizontal_margin: 10px;
 
 #title {
     width: 100%;
-    height: $title_height;
+    height: gv.$title_height;
     flex-shrink: 0;
 
     background-color: var(--title-bg);
