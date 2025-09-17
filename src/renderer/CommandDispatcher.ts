@@ -39,8 +39,9 @@ import FindReplaceState from "./modules/state/FindReplaceState"
 import CreateCommand from "./commands/CreateCommand"
 
 import { debounce } from "./utils/debounce"
+import SettingsFacade from "./modules/settings/SettingsFacade"
 
-type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic'
+type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic' | 'element_button'
 
 /**
  * CommandDispatcher centrally manages and executes commands that involve side effects,
@@ -69,6 +70,7 @@ export default class CommandDispatcher {
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
         @inject(DI_KEYS.FindReplaceState) private readonly findReplaceState: FindReplaceState,
+        @inject(DI_KEYS.SettingsFacade) private readonly settingsFacade: SettingsFacade,
         @inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
         @inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
     ) {
@@ -659,11 +661,18 @@ export default class CommandDispatcher {
     }
 
     performOpenSettings(source: CommandSource) {
-        console.log('performOpenSettings')
+        this.settingsFacade.openSettings()
+    }
+
+    performApplySettings(source: CommandSource) {
+        console.log(
+            this.settingsFacade.getSettingsValue()
+        )
+        
     }
 
     performCloseSettings(source: CommandSource) {
-        console.log('performCloseSettings')
+        this.settingsFacade.closeSettings()
     }
 
     async performESC(source: CommandSource) {

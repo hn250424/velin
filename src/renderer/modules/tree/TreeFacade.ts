@@ -1,7 +1,7 @@
 import TreeDto from "@shared/dto/TreeDto"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import Response from "@shared/types/Response"
-import { inject } from "inversify"
+import { inject, injectable } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
 import {
     DATASET_ATTR_TREE_PATH,
@@ -12,6 +12,7 @@ import TreeRenderer from "./TreeRenderer"
 import TreeStore from "./TreeStore"
 import TreeDragManager from "./TreeDragManager"
 
+@injectable()
 export default class TreeFacade {
     constructor(
         @inject(DI_KEYS.TreeRenderer) private readonly renderer: TreeRenderer,

@@ -1,4 +1,4 @@
-import WindowSessionModel from 'src/main/models/WindowSessionModel'
+import { WindowSessionModel } from 'src/main/models/WindowSessionModel'
 import IFileManager from '@main/modules/contracts/IFileManager'
 import IWindowRepository from 'src/main/modules/contracts/IWindowRepository'
 

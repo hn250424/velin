@@ -12,17 +12,20 @@ import SideDto from "@shared/dto/SideDto"
 import IWindowRepository from "@main/modules/contracts/IWindowRepository"
 import { getBoundsByWindowSession } from "../actions/windowActions"
 import IWindowUtils from "@main/modules/contracts/IWindowUtils"
-// import { getBoundsByWindowSession } from "@main/actions/windowActions"
+import ISettingsRepository from "@main/modules/contracts/ISettingsRepository"
+import ISettingsUtils from "@main/modules/contracts/ISettingsUtils"
 
 export async function loadedRenderer(
     mainWindow: BrowserWindow,
     fileManager: IFileManager,
     fileWatcher: IFileWatcher,
     windowRepository: IWindowRepository,
+    settingsRepository: ISettingsRepository,
     sideRepository: ISideRepository,
     tabRepository: ITabRepository,
     treeRepository: ITreeRepository,
     windowUtils: IWindowUtils,
+    settingsUtils: ISettingsUtils,
     tabUtils: ITabUtils,
     treeUtils: ITreeUtils
 ) {
@@ -36,6 +39,8 @@ export async function loadedRenderer(
     })
     if (windowSession?.maximize) mainWindow.maximize()
 
+    const settingsSession = await settingsRepository.readSettingsSession()
+
     const sideSession = await sideRepository.readSideSession()
 
     const tabSession = await tabRepository.readTabSession()
@@ -47,11 +52,12 @@ export async function loadedRenderer(
     if (newTreeSession) await treeRepository.writeTreeSession(newTreeSession)
 
     const windowDto = windowSession ? windowUtils.toWindowDto(windowSession) : null
+    const settingsDto = settingsSession ? settingsUtils.toSettingsDto(settingsSession) : null
     const sideDto = sideSession ? sideSession as SideDto : null
     const tabDto = newTabSession ? await tabUtils.toTabEditorsDto(newTabSession) : null
     const treeDto = newTreeSession ? newTreeSession as TreeDto : null
 
-    mainWindow.webContents.send(electronAPI.events.mainToRenderer.session, windowDto, sideDto, tabDto, treeDto)
+    mainWindow.webContents.send(electronAPI.events.mainToRenderer.session, windowDto, settingsDto, sideDto, tabDto, treeDto)
     fileManager.cleanTrash()
 
     if (newTreeSession) fileWatcher.watch(newTreeSession.path)

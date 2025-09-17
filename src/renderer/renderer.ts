@@ -31,6 +31,7 @@ import FindReplaceState from './modules/state/FindReplaceState'
 import { TabEditorsDto } from '@shared/dto/TabEditorDto'
 import TreeDto from '@shared/dto/TreeDto'
 import SideState from './modules/state/SideState'
+import SettingsFacade from './modules/settings/SettingsFacade'
 
 window.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('title')
@@ -47,8 +48,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState)
     const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
     const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
+
+    const settingsFacade = diContainer.get<SettingsFacade>(DI_KEYS.SettingsFacade)
     const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
     const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
+    
     const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher)
 
     registerFileHandlers(commandDispatcher, tabEditorFacade, shortcutRegistry)
@@ -58,10 +62,13 @@ window.addEventListener('DOMContentLoaded', () => {
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
     registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
     registerMenuHandlers(menuItems)
-    registerSettingsHandlers(commandDispatcher, shortcutRegistry)
-    registerLoadHandlers(windowState, sideState, tabEditorFacade, treeFacade, () => {
+    
+    registerLoadHandlers(windowState, settingsFacade, sideState, tabEditorFacade, treeFacade, () => {
+        // TODO: Facade ?
         registerWindowHandlers(windowState)
         registerSideHandlers(sideState)
+        
+        registerSettingsHandlers(commandDispatcher, shortcutRegistry, settingsFacade)
     })
 
     bindSyncEventFromWatch(tabEditorFacade, treeFacade)

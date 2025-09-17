@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { TAB_SESSION_PATH, TREE_SESSION_PATH, SIDE_SESSION_PATH, WINDOW_SESSION_PATH } from './constants/file_info'
+import { TAB_SESSION_PATH, TREE_SESSION_PATH, SIDE_SESSION_PATH, WINDOW_SESSION_PATH, SETTINGS_SESSION_PATH } from './constants/file_info'
 import { Container } from 'inversify'
 import DI_KEYS from './constants/di_keys'
 import IFileManager from '@main/modules/contracts/IFileManager'
@@ -28,6 +28,9 @@ import IWindowRepository from './modules/contracts/IWindowRepository'
 import WindowRepository from './modules/window/WindowRepository'
 import WindowUtils from './modules/window/WindowUtils'
 import IWindowUtils from './modules/contracts/IWindowUtils'
+import ISettingsRepository from './modules/contracts/ISettingsRepository'
+import SettingsRepository from './modules/settings/SettingsRepository'
+import SettingsService from './services/SettingsService'
 
 export default class DIContainer {
     private static _instance: Container | null = null
@@ -51,12 +54,14 @@ export default class DIContainer {
             container.bind<ITreeUtils>(DI_KEYS.TreeUtils).to(TreeUtils).inSingletonScope()
             container.bind<ITabUtils>(DI_KEYS.TabUtils).to(TabUtils).inSingletonScope()
             container.bind<IWindowUtils>(DI_KEYS.WindowUtils).to(WindowUtils).inSingletonScope()
+            container.bind<ITabUtils>(DI_KEYS.SettingsUtils).to(TabUtils).inSingletonScope()
 
             const userDataPath = app.getPath('userData')
             const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)
             const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH)
             const sideSessionPath = path.join(userDataPath, SIDE_SESSION_PATH)
             const windowSessionPath = path.join(userDataPath, WINDOW_SESSION_PATH)
+            const settingsSessionPath = path.join(userDataPath, SETTINGS_SESSION_PATH)
 
             const fileManager = container.get<IFileManager>(DI_KEYS.FileManager)
 
@@ -76,10 +81,16 @@ export default class DIContainer {
                 .toDynamicValue(() => new WindowRepository(windowSessionPath, fileManager))
                 .inSingletonScope()
 
+            container.bind<ISettingsRepository>(DI_KEYS.SettingsRepository)
+                .toDynamicValue(() => new SettingsRepository(settingsSessionPath, fileManager))
+                .inSingletonScope()
+
             const tabUtils = container.get<ITabUtils>(DI_KEYS.TabUtils)
             const treeUtils = container.get<ITreeUtils>(DI_KEYS.TreeUtils)
+            const settingsUtils = container.get<ITabUtils>(DI_KEYS.SettingsUtils)
             const tabRepository = container.get<ITabRepository>(DI_KEYS.TabRepository)
             const treeRepository = container.get<ITreeRepository>(DI_KEYS.TreeRepository)
+            const settingsRepository = container.get<ISettingsRepository>(DI_KEYS.SettingsRepository)
 
             container.bind<IFileWatcher>(DI_KEYS.FileWatcher)
                 .toDynamicValue(() => new FileWatcher(this._mainWindow, fileManager, tabUtils, treeUtils, tabRepository, treeRepository))
@@ -89,6 +100,7 @@ export default class DIContainer {
             container.bind(DI_KEYS.TabService).to(TabService).inSingletonScope()
             container.bind(DI_KEYS.TreeService).to(TreeService).inSingletonScope()
             container.bind(DI_KEYS.SideService).to(SideService).inSingletonScope()
+            container.bind(DI_KEYS.SettingsService).to(SettingsService).inSingletonScope()
 
             this._instance = container
         }

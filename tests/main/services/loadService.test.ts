@@ -1,3 +1,4 @@
+import '../mocks/screen'
 import { loadedRenderer } from '@services/loadService'
 import { TAB_SESSION_PATH } from 'src/main/constants/file_info'
 import { beforeEach, describe, expect, test } from 'vitest'
@@ -11,11 +12,19 @@ import { TabSessionModel } from 'src/main/models/TabSessionModel'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 import FakeSideRepository from '../modules/side/FakeSideRepository'
 import SideSessionModel from '@main/models/SideSessionModel'
+import FakeSettingsRepository from '../modules/settings/FakeSettingsRepository'
+import FakeSettingsUtils from '../modules/settings/FakeSettingsUtils'
+import FakeWindowRepository from '../modules/window/FakeWindowRepository'
+import FakeWindowUtils from '../modules/window/FakeWindowUtils'
+import { WindowSessionModel } from '@main/models/WindowSessionModel'
+import SettingsSessionModel from '@main/models/SettingsSessionModel'
 
 describe('loadService.loadedRenderer: ', () => {
     const sideSessionPath = '/fake/path/sideSession.json' 
     const tabSessionPath = '/fake/path/tabSession.json'
     const treeSessionPath = '/fake/path/treeSession.json'
+    const settingsSessionPath = '/fake/path/settingsSession.json'
+    const windowSessionPath = '/fake/path/windowSession.json'
 
     let fakeMainWindow: FakeMainWindow
     let fakeFileManager: FakeFileManager
@@ -25,6 +34,10 @@ describe('loadService.loadedRenderer: ', () => {
     let fakeTreeRepository: FakeTreeRepository
     let fakeTreeUtils: FakeTreeUtils
     let fakeFileWatcher: FakeFileWatcher
+    let fakeSettingsRepository: FakeSettingsRepository
+    let fakeSettingsUtils: FakeSettingsUtils
+    let fakeWindowRepository: FakeWindowRepository
+    let fakeWindowUtils: FakeWindowUtils
 
     beforeEach(() => {
         fakeMainWindow = new FakeMainWindow()
@@ -35,10 +48,32 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
         fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
         fakeFileWatcher = new FakeFileWatcher()
+        fakeSettingsRepository = new FakeSettingsRepository(settingsSessionPath, fakeFileManager)
+        fakeSettingsUtils = new FakeSettingsUtils(fakeFileManager)
+        fakeWindowRepository = new FakeWindowRepository(windowSessionPath, fakeFileManager)
+        fakeWindowUtils = new FakeWindowUtils()
     })
 
     test('loadedRenderer: normal', async () => {
         // Given.
+        const initialWindowSession: WindowSessionModel = {
+            maximize: false,
+            width: 800,
+            height: 600,
+            x: 100,
+            y: 100,
+        }
+
+        const initialSettingsSession: SettingsSessionModel = {
+            settingFontSessionModel: {
+                size: 16
+            },
+
+            settingThemeSessionModel: {
+
+            }
+        }
+
         const initialSideSession: SideSessionModel = {
             open: true,
             width: 150
@@ -87,6 +122,8 @@ describe('loadService.loadedRenderer: ', () => {
             ],
         }
 
+        fakeFileManager.setPathExistence(windowSessionPath, true)
+        fakeFileManager.setPathExistence(settingsSessionPath, true)
         fakeFileManager.setPathExistence(sideSessionPath, true)
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -100,20 +137,26 @@ describe('loadService.loadedRenderer: ', () => {
         fakeFileManager.setPathExistence('/project/src/main.ts', true)
         fakeTreeUtils.setTree(initialTreeSession)
 
+        await fakeWindowRepository.setWindowSession(initialWindowSession)
+        await fakeSettingsRepository.setSettingsSession(initialSettingsSession)
         await fakeSideRepository.setSideSession(initialSideSession)
         await fakeTabRepository.setTabSession(initialTabSession)
         await fakeTreeRepository.setTreeSession(initialTreeSession)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeWindowRepository, fakeSettingsRepository, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeWindowUtils, fakeSettingsUtils, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
         expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe('session')
-        const sideSentData = fakeMainWindow.webContents.send.mock.calls[0][1]
+        const windowSentData = fakeMainWindow.webContents.send.mock.calls[0][1]
+        expect(windowSentData.maximize).toBe(initialWindowSession.maximize)
+        const settingsSentData = fakeMainWindow.webContents.send.mock.calls[0][2]
+        expect(settingsSentData.settingFontDto.size).toBe(initialSettingsSession.settingFontSessionModel.size)
+        const sideSentData = fakeMainWindow.webContents.send.mock.calls[0][3]
         expect(sideSentData.open).toBe(initialSideSession.open)
         expect(sideSentData.width).toBe(initialSideSession.width)
-        const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][2]
+        const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][4]
         expect(tabSentData.data.length).toBe(2)
         expect(tabSentData.data[0]).toEqual({
             id: 0,
@@ -129,7 +172,7 @@ describe('loadService.loadedRenderer: ', () => {
             fileName: 'file2.txt',
             content: 'test2',
         })
-        const treeSentData = fakeMainWindow.webContents.send.mock.calls[0][3]
+        const treeSentData = fakeMainWindow.webContents.send.mock.calls[0][5]
         expect(treeSentData).toEqual(initialTreeSession)
     })
 
@@ -139,7 +182,7 @@ describe('loadService.loadedRenderer: ', () => {
         fakeTabRepository.setTabSession(null)
 
         // When.
-        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeTabUtils, fakeTreeUtils)
+        await loadedRenderer(fakeMainWindow as any, fakeFileManager, fakeFileWatcher, fakeWindowRepository, fakeSettingsRepository, fakeSideRepository, fakeTabRepository, fakeTreeRepository, fakeWindowUtils, fakeSettingsUtils, fakeTabUtils, fakeTreeUtils)
 
         // Then.
         expect(fakeMainWindow.webContents.send).toHaveBeenCalled()

@@ -28,6 +28,10 @@ import SideService from './services/SideService'
 import registerSideHandlers from './handlers/sideHandlers'
 import IWindowRepository from './modules/contracts/IWindowRepository'
 import IWindowUtils from './modules/contracts/IWindowUtils'
+import registerSettingsHandlers from './handlers/settingsHandlers'
+import ISettingsRepository from './modules/contracts/ISettingsRepository'
+import SettingsService from './services/SettingsService'
+import ISettingsUtils from './modules/contracts/ISettingsUtils'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -71,11 +75,15 @@ const createWindow = () => {
     const fileManager = diContainer.get<IFileManager>(DI_KEYS.FileManager)
     const fileWatcher = diContainer.get<IFileWatcher>(DI_KEYS.FileWatcher)
     const dialogManager = diContainer.get<IDialogManager>(DI_KEYS.dialogManager)
+
     const windowRepository = diContainer.get<IWindowRepository>(DI_KEYS.WindowRepository)
+    const settingsRepository = diContainer.get<ISettingsRepository>(DI_KEYS.SettingsRepository)
     const sideRepository = diContainer.get<ISideRepository>(DI_KEYS.SideRepository)
     const tabRepository = diContainer.get<ITabRepository>(DI_KEYS.TabRepository)
     const treeRepository = diContainer.get<ITreeRepository>(DI_KEYS.TreeRepository)
+    
     const windowUtils = diContainer.get<IWindowUtils>(DI_KEYS.WindowUtils)
+    const settingsUtils = diContainer.get<ISettingsUtils>(DI_KEYS.SettingsUtils)
     const tabUtils = diContainer.get<ITabUtils>(DI_KEYS.TabUtils)
     const treeUtils = diContainer.get<ITreeUtils>(DI_KEYS.TreeUtils)
 
@@ -83,8 +91,9 @@ const createWindow = () => {
     const tabService = diContainer.get<TabService>(DI_KEYS.TabService)
     const treeService = diContainer.get<TreeService>(DI_KEYS.TreeService)
     const sideService = diContainer.get<SideService>(DI_KEYS.SideService)
+    const settingsService = diContainer.get<SettingsService>(DI_KEYS.SettingsService)
 
-    registerLoadHandlers(mainWindow, fileManager, fileWatcher, windowRepository, sideRepository, tabRepository, treeRepository, windowUtils, tabUtils, treeUtils)
+    registerLoadHandlers(mainWindow, fileManager, fileWatcher, windowRepository, settingsRepository, sideRepository, tabRepository, treeRepository, windowUtils, settingsUtils, tabUtils, treeUtils)
     registerWindowHandlers(mainWindow, windowRepository)
     registerFileHandlers(mainWindow, fileService)
     registerExitHandlers(mainWindow, fileManager, dialogManager, tabRepository, treeRepository)
@@ -93,6 +102,7 @@ const createWindow = () => {
     registerSideHandlers(mainWindow, sideService)
     registerEditHandlers()
     registerWatchHandlers(mainWindow, fileWatcher)
+    registerSettingsHandlers(mainWindow, settingsService)
 
     loadUrl(mainWindow)
 }

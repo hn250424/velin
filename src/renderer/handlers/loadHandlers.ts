@@ -6,11 +6,18 @@ import SideDto from "@shared/dto/SideDto"
 import SideState from "../modules/state/SideState"
 import WindowState from "../modules/state/WindowState"
 import WindowDto from "@shared/dto/WindowDto"
+import SettingsDto from "@shared/dto/SettingsDto"
+import SettingsFacade from "../modules/settings/SettingsFacade"
 
-export default function registerLoadHandlers(windowState: WindowState, sideState: SideState, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade, callback: Function) {
-    window.mainToRenderer.session(async (windowDto: WindowDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
+export default function registerLoadHandlers(windowState: WindowState, settingsFacade: SettingsFacade, sideState: SideState, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade, callback: Function) {
+    window.mainToRenderer.session(async (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
         if (windowDto) {
             windowState.setWindowMaximizeState(windowDto.maximize)
+        }
+
+        if (settingsDto) {
+            const settingsViewModel = settingsFacade.toSettingsViewModel(settingsDto)
+            settingsFacade.setSettingsValue(settingsViewModel)
         }
 
         if (sideDto) {

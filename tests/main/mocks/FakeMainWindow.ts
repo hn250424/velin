@@ -6,4 +6,6 @@ export default class FakeMainWindow {
     }
 
     close = vi.fn()
+    setBounds = vi.fn()
+    maximize = vi.fn()
 }

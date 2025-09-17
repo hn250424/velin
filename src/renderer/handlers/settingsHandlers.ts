@@ -1,11 +1,15 @@
 import CommandDispatcher from "../CommandDispatcher"
 import { CLASS_SELECTED } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
+import SettingsFacade from "../modules/settings/SettingsFacade"
 
 export default function registerSettingsHandlers(
     commandDispatcher: CommandDispatcher,
     shortcutRegistry: ShortcutRegistry,
+    settingsFacade: SettingsFacade
 ) {
+    settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
+
     bindCommandWithmenu(commandDispatcher)
     bindCommandWithShortcut(commandDispatcher, shortcutRegistry)
     bindCommandWithSettingsContainer(commandDispatcher)
@@ -22,36 +26,30 @@ function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutR
 }
 
 function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher) {
-    const settingsOverlay = document.getElementById('settings-overlay')
-    const settingsExit = document.getElementById('settings-exit')
-    const settingsApplyBtn = document.getElementById('settings-apply-btn')
-    const settingsCancelBtn = document.getElementById('settings-cancel-btn')
-    
+    document.getElementById('settings-exit').addEventListener('click', () => {
+        commandDispatcher.performCloseSettings('element_button')
+    })
+
+    document.getElementById('settings-apply-btn').addEventListener('click', () => {
+        commandDispatcher.performApplySettings('element_button')
+    })
+
+    document.getElementById('settings-cancel-btn').addEventListener('click', () => {
+        commandDispatcher.performCloseSettings('element_button')
+    })
+
+
     const settingsMenus = [
-        document.getElementById('settings-menu-theme'),
         document.getElementById('settings-menu-font'),
+        document.getElementById('settings-menu-theme'),
     ]
     const settingsContents = [
-        document.getElementById('settings-contents-theme'),
         document.getElementById('settings-contents-font'),
+        document.getElementById('settings-contents-theme'),
     ]
+    settingsMenus[0].classList.add(CLASS_SELECTED)
+    settingsContents[0].style.display = 'block'
     
-    settingsExit.addEventListener('click', () => {
-        settingsOverlay.style.display = 'none'
-    })
-
-    settingsApplyBtn.addEventListener('click', () => {
-        // TODO:
-        // save session.
-        // adapt settings.
-
-        settingsOverlay.style.display = 'none'
-    })
-
-    settingsCancelBtn.addEventListener('click', () => {
-        settingsOverlay.style.display = 'none'
-    })
-
     settingsMenus.forEach((el, idx) => {
         el.addEventListener('click', () => {
             settingsMenus.forEach(m => m.classList.remove(CLASS_SELECTED))
@@ -61,9 +59,4 @@ function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher) 
             settingsContents[idx].style.display = 'block'
         })
     })
-
-    // if (settingsMenus.length > 0 && settingsContents.length > 0) {
-    //     settingsMenus[0].classList.add(CLASS_SELECTED);
-    //     settingsContents[0].style.display = 'block';
-    // }
 }

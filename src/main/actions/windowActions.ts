@@ -5,10 +5,10 @@ import IWindowRepository from '@main/modules/contracts/IWindowRepository'
 export function getBoundsByWindowSession(session: WindowSessionModel | null): WindowBoundsModel {
     const { width: screenW, height: screenH } = screen.getPrimaryDisplay().workAreaSize
 
-    const width = session.width ? session.width : 800
-    const height = session.height ? session.height : 600
-    const x = session.x ? session.x : Math.floor((screenW - width) / 2)
-    const y = session.y ? session.y : Math.floor((screenH - height) / 2)
+    const width = session?.width ?? 800
+    const height = session?.height ?? 600
+    const x = session?.x ?? Math.floor((screenW - width) / 2)
+    const y = session?.y ?? Math.floor((screenH - height) / 2)
 
     return { x, y, width, height }
 }

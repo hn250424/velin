@@ -17,6 +17,10 @@ const DI_KEYS = {
     TreeRenderer: Symbol('TreeRenderer'),
     TreeStore: Symbol('TreeStore'),
     TreeDragManager: Symbol('TreeDragManager'),
+
+    SettingsFacade: Symbol('SettingsFacade'),
+    SettingsRenderer: Symbol('SettingsRenderer'),
+    SettingsStore: Symbol('SettingsStore'),
     
     CommandDispatcher: Symbol('CommandDispatcher'),
 }

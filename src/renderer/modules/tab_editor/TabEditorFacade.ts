@@ -1,6 +1,6 @@
 import "@milkdown/theme-nord/style.css"
 import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
-import { inject } from "inversify"
+import { inject, injectable } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
 import {
     NOT_MODIFIED_TEXT
@@ -11,6 +11,7 @@ import TabEditorStore from "./TabEditorStore"
 import TabEditorView from './TabEditorView'
 import TabDragManager from "./TabDragManager"
 
+@injectable()
 export default class TabEidorFacde {
     constructor(
         @inject(DI_KEYS.TabEditorRenderer) private readonly renderer: TabEditorRenderer,
