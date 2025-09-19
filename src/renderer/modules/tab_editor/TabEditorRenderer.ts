@@ -212,4 +212,10 @@ export default class TabEditorRenderer {
             this.indicator = null
         }
     }
+
+
+    
+    changeFontSize(size: number) {
+        this.editorContainer.style.fontSize = `${size}px`
+    }
 }

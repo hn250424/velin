@@ -40,6 +40,7 @@ import CreateCommand from "./commands/CreateCommand"
 
 import { debounce } from "./utils/debounce"
 import SettingsFacade from "./modules/settings/SettingsFacade"
+import SettingsViewModel from "./viewmodels/SettingsViewModel"
 
 type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic' | 'element_button'
 
@@ -664,14 +665,24 @@ export default class CommandDispatcher {
         this.settingsFacade.openSettings()
     }
 
-    performApplySettings(source: CommandSource) {
-        console.log(
-            this.settingsFacade.getSettingsValue()
-        )
-        
+    async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
+        const fontChangeSet = viewModel.settingFontViewModel
+        // const themeChangeSet = changeSet.settingThemeViewModel
+
+        if (fontChangeSet.size !== null) {
+            this.tabEditorFacade.changeFontSize(fontChangeSet.size)
+        }
+
+        this.settingsFacade.applyChangeSet()
+
+        if (source === 'element_button') {
+            const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
+            await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
+        }
     }
 
     performCloseSettings(source: CommandSource) {
+        this.settingsFacade.resetChangeSet()
         this.settingsFacade.closeSettings()
     }
 

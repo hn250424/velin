@@ -31,6 +31,8 @@ import IWindowUtils from './modules/contracts/IWindowUtils'
 import ISettingsRepository from './modules/contracts/ISettingsRepository'
 import SettingsRepository from './modules/settings/SettingsRepository'
 import SettingsService from './services/SettingsService'
+import ISettingsUtils from './modules/contracts/ISettingsUtils'
+import SettingsUtils from './modules/settings/SettingsUtils'
 
 export default class DIContainer {
     private static _instance: Container | null = null
@@ -54,7 +56,7 @@ export default class DIContainer {
             container.bind<ITreeUtils>(DI_KEYS.TreeUtils).to(TreeUtils).inSingletonScope()
             container.bind<ITabUtils>(DI_KEYS.TabUtils).to(TabUtils).inSingletonScope()
             container.bind<IWindowUtils>(DI_KEYS.WindowUtils).to(WindowUtils).inSingletonScope()
-            container.bind<ITabUtils>(DI_KEYS.SettingsUtils).to(TabUtils).inSingletonScope()
+            container.bind<ISettingsUtils>(DI_KEYS.SettingsUtils).to(SettingsUtils).inSingletonScope()
 
             const userDataPath = app.getPath('userData')
             const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH)

@@ -11,7 +11,6 @@ This is still a beta version.
 - The find/replace feature only works within the currently opened file, not across the entire file tree.  
 - Only one theme and font available.  
 - Opening a new directory will destroy the previous session.
-- There’s no custom installer or fancy logo—just a simple setup so you can try out the features.
 - Runs only on Windows OS.
 
 ## Installation

@@ -4,10 +4,11 @@ import { injectable } from "inversify"
 
 @injectable()
 export default class SettingsStore {
-    private _viewModel: SettingsViewModel
+    private _currentSettings: SettingsViewModel
+    private _draftSettings: SettingsViewModel
 
     constructor() {
-        this._viewModel = {
+        this._currentSettings = {
             settingFontViewModel: {
                 size: 16
             },
@@ -16,6 +17,8 @@ export default class SettingsStore {
 
             }
         }
+
+        this.resetChangeSet()
     }
 
     
@@ -37,7 +40,7 @@ export default class SettingsStore {
 
 
     getSettingsValue() {
-        return JSON.parse(JSON.stringify(this._viewModel))
+        return JSON.parse(JSON.stringify(this._currentSettings))
     }
 
     setSettingsValue(viewModel: SettingsViewModel) {
@@ -46,7 +49,7 @@ export default class SettingsStore {
     }
 
     private _setSettingFont(fontViewModel: SettingFontViewModel) {
-        this._viewModel.settingFontViewModel.size = fontViewModel?.size ?? this._viewModel.settingFontViewModel.size
+        this._currentSettings.settingFontViewModel.size = fontViewModel?.size ?? this._currentSettings.settingFontViewModel.size
     }
 
     private _setSettingTheme(themeViewModel: SettingThemeViewModel) {
@@ -55,7 +58,38 @@ export default class SettingsStore {
 
 
 
-    setFontSize(size: number) {
-        this._viewModel.settingFontViewModel.size = size
+    getCurrentSettings() {
+        return JSON.parse(JSON.stringify(this._currentSettings))
+    }
+
+    getDraftSettings() {
+        return JSON.parse(JSON.stringify(this._draftSettings))
+    }
+
+
+    
+    getChangeSet(): SettingsViewModel {
+        return {
+            settingFontViewModel: {
+                size: this._currentSettings.settingFontViewModel.size !== this._draftSettings.settingFontViewModel.size 
+                    ? this._draftSettings.settingFontViewModel.size : null
+            },
+
+            settingThemeViewModel: {
+
+            }
+        }
+    }
+
+    resetChangeSet() {
+        this._draftSettings = JSON.parse(JSON.stringify(this._currentSettings))
+    }
+
+    applyChangeSet() {
+        this._currentSettings = JSON.parse(JSON.stringify(this._draftSettings))
+    }
+
+    onChangeFontSize(size: number) {
+        this._draftSettings.settingFontViewModel.size = size
     }
 }

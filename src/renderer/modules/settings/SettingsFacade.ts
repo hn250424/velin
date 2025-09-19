@@ -11,9 +11,7 @@ export default class SettingsFacade {
         @inject(DI_KEYS.SettingsRenderer) private readonly renderer: SettingsRenderer,
         @inject(DI_KEYS.SettingsStore) private readonly store: SettingsStore,
     ) { 
-        this.renderer.onChangeFontSize((size: number) => {
-            this.store.setFontSize(size)
-        })
+        this._bindChangeEvents()
     }
 
     openSettings() {
@@ -53,4 +51,42 @@ export default class SettingsFacade {
 
 
 
+    getCurrentSettings() {
+        return this.store.getCurrentSettings()
+    }
+
+    getDraftSettings() {
+        return this.store.getDraftSettings()
+    }
+
+
+
+    getChangeSet() {
+        return this.store.getChangeSet()
+    }
+
+    resetChangeSet() {
+        this.store.resetChangeSet()
+    }
+
+    applyChangeSet() {
+        this.store.applyChangeSet()
+    }
+
+    private _bindChangeEvents() {
+        const bindings = [
+            {
+                on: this.renderer.onChangeFontSize.bind(this.renderer),
+                update: this.store.onChangeFontSize.bind(this.store),
+            },
+            // {
+            //     on: this.renderer.onChangeTheme.bind(this.renderer),
+            //     update: this.store.setTheme.bind(this.store),
+            // },
+        ]
+
+        for (const { on, update } of bindings) {
+            on((value: any) => update(value))
+        }
+    }
 }

@@ -6,6 +6,7 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import ClipboardMode from "@shared/types/ClipboardMode"
 import TrashMap from "@shared/types/TrashMap"
 import SideDto from "@shared/dto/SideDto"
+import SettingsDto from "@shared/dto/SettingsDto"
 
 const rendererToMain: RendererToMainAPI = {
     loadedRenderer: () => { ipcRenderer.send(electronAPI.events.rendererToMain.loadedRenderer) },
@@ -41,6 +42,7 @@ const rendererToMain: RendererToMainAPI = {
     deletePermanently: (path: string) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.deletePermanently, path) },
     create: (path: string, directory: boolean) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.create, path, directory) },
 
+    syncSettingsSessionFromRenderer: (dto: SettingsDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncSettingsSessionFromRenderer, dto )},
     syncSideSessionFromRenderer: (dto: SideDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncSideSessionFromRenderer, dto) },
     syncTabSessionFromRenderer: (tabEditorsDto: TabEditorsDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTabSessionFromRenderer, tabEditorsDto) },
     syncTreeSessionFromRenderer: (treeDto: TreeDto) => { return ipcRenderer.invoke(electronAPI.events.rendererToMain.syncTreeSessionFromRenderer, treeDto) },

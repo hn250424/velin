@@ -389,6 +389,12 @@ export default class TabEidorFacde {
     }
 
 
+
+    changeFontSize(size: number) {
+        this.renderer.changeFontSize(size)
+    }
+
+
     
     isMouseDown(): boolean {
         return this.drag.isMouseDown()

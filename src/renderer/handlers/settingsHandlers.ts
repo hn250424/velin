@@ -8,11 +8,14 @@ export default function registerSettingsHandlers(
     shortcutRegistry: ShortcutRegistry,
     settingsFacade: SettingsFacade
 ) {
+    // Init.
     settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
+    commandDispatcher.performApplySettings('programmatic', settingsFacade.getSettingsValue())
 
+    // Bind.
     bindCommandWithmenu(commandDispatcher)
     bindCommandWithShortcut(commandDispatcher, shortcutRegistry)
-    bindCommandWithSettingsContainer(commandDispatcher)
+    bindCommandWithSettingsContainer(commandDispatcher, settingsFacade)
 }
 
 function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
@@ -25,16 +28,16 @@ function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutR
     shortcutRegistry.register('Ctrl+,', (e: KeyboardEvent) => commandDispatcher.performOpenSettings('shortcut'))
 }
 
-function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher) {
+function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher, settingsFacade: SettingsFacade) {
     document.getElementById('settings-exit').addEventListener('click', () => {
         commandDispatcher.performCloseSettings('element_button')
     })
 
     document.getElementById('settings-apply-btn').addEventListener('click', () => {
-        commandDispatcher.performApplySettings('element_button')
+        commandDispatcher.performApplySettings('element_button', settingsFacade.getChangeSet())
     })
 
-    document.getElementById('settings-cancel-btn').addEventListener('click', () => {
+    document.getElementById('settings-close-btn').addEventListener('click', () => {
         commandDispatcher.performCloseSettings('element_button')
     })
 
