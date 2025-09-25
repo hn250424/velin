@@ -8,5 +8,6 @@ export interface TabEditorDto {
     isModified: boolean,
     filePath: string,
     fileName: string,
-    content: string
+    content: string,
+    isBinary: boolean,
 }

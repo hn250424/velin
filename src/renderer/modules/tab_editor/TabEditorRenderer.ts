@@ -11,10 +11,12 @@ import {
     MODIFIED_TEXT,
     CLASS_EDITOR_BOX,
     NOT_MODIFIED_TEXT,
-    CLASS_TAB_GHOST
+    CLASS_TAB_GHOST,
+    CLASS_BINARY
 } from '../../constants/dom'
 import TabEditorView from "./TabEditorView"
 import TabViewModel from "src/renderer/viewmodels/TabViewModel"
+import { BINARY_FILE_WARNING } from "./TabEditorFacade"
 
 @injectable()
 export default class TabEditorRenderer {
@@ -49,7 +51,7 @@ export default class TabEditorRenderer {
     }
 
     async createTabAndEditor(viewModel: TabViewModel, content: string) {
-        const { id, isModified, filePath, fileName } = viewModel
+        const { id, isModified, isBinary, filePath, fileName } = viewModel
 
         const { div, span, button } = this.createTabBox(fileName)
         div.dataset[DATASET_ATTR_TAB_ID] = id.toString()
@@ -58,41 +60,54 @@ export default class TabEditorRenderer {
 
         const editorBoxDiv = document.createElement('div')
         editorBoxDiv.className = CLASS_EDITOR_BOX
-        const editor = await Editor.make()
-            .config((ctx) => {
-                ctx.set(rootCtx, editorBoxDiv)
-                nord(ctx)
-            })
-            .use(commonmark)
-            .use(history)
-            .create()
-        editor.action(ctx => {
-            const parser = ctx.get(parserCtx)
-            const view = ctx.get(editorViewCtx)
-            const doc = parser(content)
 
-            view.dispatch(
-                view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
-            )
-        })
-        editorBoxDiv.setAttribute('spellcheck', 'false')
+        let editor = null
+
+        if (isBinary) {
+            editorBoxDiv.innerText = BINARY_FILE_WARNING
+            editorBoxDiv.classList.add(CLASS_BINARY)
+        } else {
+            editor = await Editor.make()
+                .config((ctx) => {
+                    ctx.set(rootCtx, editorBoxDiv)
+                    nord(ctx)
+                })
+                .use(commonmark)
+                .use(history)
+                .create()
+            editor.action(ctx => {
+                const parser = ctx.get(parserCtx)
+                const view = ctx.get(editorViewCtx)
+                const doc = parser(content)
+
+                view.dispatch(
+                    view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
+                )
+            })
+            editorBoxDiv.setAttribute('spellcheck', 'false')
+        }
+
         this.editorContainer.appendChild(editorBoxDiv)
 
         const tabEditorView = new TabEditorView(div, span, button, editorBoxDiv, editor)
-        tabEditorView.observeEditor(
-            () => {
-                if (!viewModel.isModified) {
-                    viewModel.isModified = true
-                    tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
+
+        if (!isBinary) {
+            tabEditorView.observeEditor(
+                () => {
+                    if (!viewModel.isModified) {
+                        viewModel.isModified = true
+                        tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
+                    }
+                },
+                () => {
+                    if (!viewModel.filePath && viewModel.isModified) {
+                        const firstLine = tabEditorView.getEditorFirstLine()
+                        tabEditorView.setTabSpanTextContent(firstLine || 'Untitled')
+                    }
                 }
-            },
-            () => {
-                if (!viewModel.filePath && viewModel.isModified) {
-                    const firstLine = tabEditorView.getEditorFirstLine()
-                    tabEditorView.setTabSpanTextContent(firstLine || 'Untitled')
-                }
-            }
-        )
+            )
+        }
+
         this._tabEditorViews.push(tabEditorView)
         this.setTabEditorViewByPath(filePath, tabEditorView)
     }

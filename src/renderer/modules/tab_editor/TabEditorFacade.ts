@@ -11,6 +11,8 @@ import TabEditorStore from "./TabEditorStore"
 import TabEditorView from './TabEditorView'
 import TabDragManager from "./TabDragManager"
 
+export const BINARY_FILE_WARNING = 'Binary File'
+
 @injectable()
 export default class TabEidorFacde {
     constructor(
@@ -24,8 +26,8 @@ export default class TabEidorFacde {
         const tabs = dto.data
 
         for (let i = 0; i < tabs.length; i++) {
-            if (tabs[i].id === this.store.activeTabId) await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, true)
-            else await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, false)
+            if (tabs[i].id === this.store.activeTabId) await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, true)
+            else await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, false)
         }
     }
 
@@ -59,8 +61,8 @@ export default class TabEidorFacde {
         }
     }
 
-    async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', activate: boolean = true) {
-        const tabViewModel = { id: id, isModified: false, filePath: filePath, fileName: fileName }
+    async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', isBinary: boolean = false, activate: boolean = true) {
+        const tabViewModel = { id: id, isModified: false, isBinary: isBinary, filePath: filePath, fileName: fileName }
         this.store.setTabEditorViewModelById(id, tabViewModel)
         await this.renderer.createTabAndEditor(tabViewModel, content)
         if (activate) {
@@ -74,6 +76,8 @@ export default class TabEidorFacde {
 
 
     applySaveResult(result: TabEditorDto) {
+        if (result.isBinary) return false
+
         let wasApplied = false
         for (let i = 0; i < this.renderer.tabEditorViews.length; i++) {
             const data = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId())
@@ -260,7 +264,8 @@ export default class TabEidorFacde {
             isModified: data.isModified,
             filePath: data.filePath,
             fileName: this.resolveFileNameByView(view),
-            content: view.getContent()
+            content: data.isBinary ? BINARY_FILE_WARNING : view.getContent(),
+            isBinary: data.isBinary,
         }
     }
 

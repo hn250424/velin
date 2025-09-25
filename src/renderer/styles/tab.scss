@@ -9,6 +9,8 @@ $tab_button_width: 20px;
 $tab_button_radius: 5px;
 $indicator-size: 3px;
 
+$padding-top-binary-warning: 40px;
+
 #tab_container {
     display: flex;
 
@@ -123,6 +125,15 @@ $indicator-size: 3px;
 
 .editorBox.selected {
     display: block;
+}
+
+.editorBox.binary {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--warning-color);
+    padding-top: $padding-top-binary-warning;
+    cursor: default;
 }
 
 .tab-indicator {

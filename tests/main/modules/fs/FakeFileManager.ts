@@ -25,9 +25,22 @@ export default class FakeFileManager implements IFileManager {
         return path.basename(filePath)
     }
 
+    async getBuffer(path: string): Promise<Buffer> {
+        const content = this.savedFiles[path]
+        if (content === undefined) {
+            throw new Error(`File not found: ${path}`)
+        }
+        return Buffer.from(content, 'utf8')
+    }
+
+    toStringFromBuffer(buffer: Buffer, encoding: BufferEncoding = 'utf8'): string {
+        return buffer.toString(encoding)
+    }
+
     async read(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
-        if (!(path in this.savedFiles)) throw new Error(`File not found: ${path}`)
-        return this.savedFiles[path]
+        const buffer = await this.getBuffer(path)
+        const content = this.toStringFromBuffer(buffer)
+        return content
     }
 
     async readDir(dirPath: string): Promise<string[]> {
@@ -184,5 +197,20 @@ export default class FakeFileManager implements IFileManager {
         }
     
         return results
+    }
+
+    isBinaryContent(buffer: Buffer, sampleSize: number = 8000): boolean {
+        const len = Math.min(buffer.length, sampleSize)
+
+        let suspicious = 0
+
+        for (let i = 0; i < len; i++) {
+            const byte = buffer[i]
+
+            if (byte === 0) return true
+            if ((byte > 0 && byte < 0x09) || (byte > 0x0D && byte < 0x20)) suspicious++
+        }
+
+        return suspicious / len > 0.3
     }
 }

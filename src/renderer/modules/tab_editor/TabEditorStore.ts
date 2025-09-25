@@ -21,6 +21,7 @@ export default class TabEditorStore {
             isModified: dto.isModified,
             filePath: dto.filePath,
             fileName: dto.fileName,
+            isBinary: dto.isBinary,
         }
     }
 

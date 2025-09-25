@@ -33,7 +33,7 @@ export default class FileService {
         return id
     }
 
-    async openFile(filePath?: string) {
+    async openFile(filePath?: string): Promise<TabEditorDto> {
         if (!filePath) {
             const result = await this.dialogManager.showOpenFileDialog()
             if (result.canceled || result.filePaths.length === 0) {
@@ -43,7 +43,9 @@ export default class FileService {
         }
 
         const fileName = this.fileManager.getBasename(filePath)
-        const content = await this.fileManager.read(filePath)
+        const buffer = await this.fileManager.getBuffer(filePath)
+        const isBinary = this.fileManager.isBinaryContent(buffer)
+        const content = this.fileManager.toStringFromBuffer(buffer)
 
         const model = await this.tabRepository.readTabSession() ?? { activatedId: -1, data: [] }
         const arr = model.data
@@ -53,7 +55,7 @@ export default class FileService {
         model.data = arr
         await this.tabRepository.writeTabSession(model)
 
-        return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content }
+        return { id: id, isModified: false, filePath: filePath, fileName: fileName, content: content, isBinary: isBinary }
     }
 
     async openDirectory(dto?: TreeDto): Promise<TreeDto | null> {
@@ -126,7 +128,7 @@ export default class FileService {
         }
     }
 
-    async saveAs(data: TabEditorDto, mainWindow: BrowserWindow) {
+    async saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto> {
         const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
         if (result.canceled || !result.filePath) {
@@ -146,7 +148,8 @@ export default class FileService {
                 isModified: false,
                 filePath: result.filePath,
                 fileName: this.fileManager.getBasename(result.filePath),
-                content: data.content
+                content: data.content,
+                isBinary: data.isBinary
             }
         }
     }
@@ -156,11 +159,11 @@ export default class FileService {
         const responseArr: TabEditorDto[] = []
 
         for (const tab of dto.data) {
-            const { id, isModified, filePath, fileName, content } = tab
+            const { id, isModified, filePath, fileName, content, isBinary } = tab
 
             if (!isModified) {
                 sessionArr.push({ id: id, filePath: filePath })
-                responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: fileName, content: content })
+                responseArr.push({ id: id, isModified: false, filePath: filePath, fileName: fileName, content: content, isBinary: isBinary })
                 continue
             }
 

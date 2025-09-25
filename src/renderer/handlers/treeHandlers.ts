@@ -133,8 +133,6 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
         treeFacade.endDrag()
         treeFacade.removeGhostBox()
 
-        console.log('treeHandlers mouse up events is right? -- ', isRight)
-        
         if (isRight) {
             treeFacade.setSelectedDragIndexByPath(path)
             await commandDispatcher.performCut('drag')

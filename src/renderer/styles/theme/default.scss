@@ -63,4 +63,6 @@ $theme-default: (
     --settings-button-bg: #{gv.$grey-1},
     --settings-button-hover-bg: white,
     --setting-node-border-color: #ccc,
+
+    --warning-color: #{gv.$red-3},
 );

@@ -50,9 +50,13 @@ export default class TabUtils implements ITabUtils {
                 }
 
                 let content = ''
+                let isBinary = false
                 if (data.filePath) {
                     try {
-                        content = await this.fileManager.read(data.filePath)
+                        const buffer = await this.fileManager.getBuffer(data.filePath)
+                        isBinary = this.fileManager.isBinaryContent(buffer)
+                        content = this.fileManager.toStringFromBuffer(buffer)
+                        // content = await this.fileManager.read(data.filePath)
                     } catch {
                         content = ''
                     }
@@ -63,6 +67,7 @@ export default class TabUtils implements ITabUtils {
                     filePath: data.filePath,
                     fileName,
                     content,
+                    isBinary,
                 }
             })
         )

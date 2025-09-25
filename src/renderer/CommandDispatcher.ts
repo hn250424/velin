@@ -105,7 +105,7 @@ export default class CommandDispatcher {
         const response: Response<TabEditorDto> = await window.rendererToMain.openFile(filePath)
         if (response.result && response.data) {
             const data = response.data
-            await this.tabEditorFacade.addTab(data.id, data.filePath, data.fileName, data.content)
+            await this.tabEditorFacade.addTab(data.id, data.filePath, data.fileName, data.content, data.isBinary)
         }
     }
 
@@ -202,7 +202,14 @@ export default class CommandDispatcher {
         const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
         if (response.result && response.data) {
             const wasApplied = this.tabEditorFacade.applySaveResult(response.data)
-            if (!wasApplied) await this.tabEditorFacade.addTab(response.data.id, response.data.filePath, response.data.fileName, response.data.content, true)
+            if (!wasApplied) await this.tabEditorFacade.addTab(
+                response.data.id, 
+                response.data.filePath, 
+                response.data.fileName, 
+                response.data.content, 
+                response.data.isBinary, 
+                true
+            )
         }
     }
 
@@ -667,7 +674,6 @@ export default class CommandDispatcher {
 
     async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
         const fontChangeSet = viewModel.settingFontViewModel
-        // const themeChangeSet = changeSet.settingThemeViewModel
 
         if (fontChangeSet.size !== null) {
             this.tabEditorFacade.changeFontSize(fontChangeSet.size)

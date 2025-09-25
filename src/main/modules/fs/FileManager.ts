@@ -25,8 +25,18 @@ export default class FileManager implements IFileManager {
         return path.basename(filePath)
     }
 
+    async getBuffer(path: string): Promise<Buffer> {
+        return await fs.promises.readFile(path)
+    }
+
+    toStringFromBuffer(buffer: Buffer, encoding: BufferEncoding = 'utf8'): string {
+        return buffer.toString(encoding)
+    }
+
     async read(path: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
-        return await fs.promises.readFile(path, { encoding: encoding })
+        const buffer = await this.getBuffer(path)
+        const content = this.toStringFromBuffer(buffer)
+        return content
     }
 
     async readDir(dirPath: string) {
@@ -166,5 +176,25 @@ export default class FileManager implements IFileManager {
         }
     
         return results
+    }
+    
+    isBinaryContent(buffer: Buffer, sampleSize: number = 8000): boolean {
+        const len = Math.min(buffer.length, sampleSize)
+
+        let suspicious = 0
+
+        for (let i = 0; i < len; i++) {
+            const byte = buffer[i]
+
+            // if null exists, 
+            if (byte === 0) return true
+
+            // if it contains something that is not used often.
+            if ((byte > 0 && byte < 0x09) || (byte > 0x0D && byte < 0x20)) {
+                suspicious++
+            }
+        }
+
+        return suspicious / len > 0.3
     }
 }
