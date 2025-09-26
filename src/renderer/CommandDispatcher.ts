@@ -42,7 +42,7 @@ import { debounce } from "./utils/debounce"
 import SettingsFacade from "./modules/settings/SettingsFacade"
 import SettingsViewModel from "./viewmodels/SettingsViewModel"
 
-type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic' | 'element_button'
+type CommandSource = 'shortcut' | 'menu' | 'element' | 'context_menu' | 'drag' | 'programmatic' | 'button'
 
 /**
  * CommandDispatcher centrally manages and executes commands that involve side effects,
@@ -681,7 +681,7 @@ export default class CommandDispatcher {
 
         this.settingsFacade.applyChangeSet()
 
-        if (source === 'element_button') {
+        if (source === 'button') {
             const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
             await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
         }

@@ -30,15 +30,15 @@ function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutR
 
 function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher, settingsFacade: SettingsFacade) {
     document.getElementById('settings-exit').addEventListener('click', () => {
-        commandDispatcher.performCloseSettings('element_button')
+        commandDispatcher.performCloseSettings('button')
     })
 
     document.getElementById('settings-apply-btn').addEventListener('click', () => {
-        commandDispatcher.performApplySettings('element_button', settingsFacade.getChangeSet())
+        commandDispatcher.performApplySettings('button', settingsFacade.getChangeSet())
     })
 
     document.getElementById('settings-close-btn').addEventListener('click', () => {
-        commandDispatcher.performCloseSettings('element_button')
+        commandDispatcher.performCloseSettings('button')
     })
 
 
