@@ -2,6 +2,8 @@
 
 A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
+![Preview](./preview/preview.gif)
+
 ## Note
 
 This is still a beta version.  
