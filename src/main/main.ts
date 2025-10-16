@@ -49,6 +49,11 @@ const createMainWindow = () => {
         },
     })
 
+    mainWindow.webContents.on('did-finish-load', () => {
+        mainWindow.webContents.session.setSpellCheckerLanguages([])
+        mainWindow.webContents.session.setSpellCheckerEnabled(false)
+    })
+
     return mainWindow
 }
 
