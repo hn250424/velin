@@ -16,9 +16,9 @@ const dialogManager: IDialogManager = {
     async showOpenFileDialog() {
         return await dialog.showOpenDialog({
             title: 'Open',
-            filters: [
-                { name: 'Markdown', extensions: ['md', 'markdown'] }
-            ],
+            // filters: [
+            //     { name: 'Markdown', extensions: ['md', 'markdown'] }
+            // ],
             properties: ['openFile']
         })
     },

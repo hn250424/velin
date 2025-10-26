@@ -97,6 +97,7 @@ $padding-top-binary-warning: 40px;
 
 .tab>button:hover {
     background-color: var(--tab-btn-hover-bg);
+    color: transparent;
 }
 
 .tab>button:hover::after {

@@ -11,7 +11,8 @@ import TabEditorStore from "./TabEditorStore"
 import TabEditorView from './TabEditorView'
 import TabDragManager from "./TabDragManager"
 
-export const BINARY_FILE_WARNING = 'Binary File'
+// export const BINARY_FILE_WARNING = '❌'
+export const BINARY_FILE_WARNING = `Can't read this file`
 
 @injectable()
 export default class TabEidorFacde {

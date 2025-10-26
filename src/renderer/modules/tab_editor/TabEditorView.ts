@@ -92,7 +92,7 @@ export default class TabEditorView {
     }
 
     destroy() {
-        this._editor.destroy()
+        this._editor?.destroy()
         this._editorBoxDiv.remove()
         this._tabDiv.remove()
     }
