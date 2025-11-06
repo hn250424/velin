@@ -20,7 +20,8 @@ import {
     ID_FIND_INPUT,
     ID_REPLACE_INPUT,
     ID_FIND_INFO,
-    SELECTOR_TREE_NODE_TYPE
+    SELECTOR_TREE_NODE_TYPE,
+    CLASS_FOCUSED
 } from "./constants/dom"
 
 import TreeDto from "@shared/dto/TreeDto"
@@ -590,16 +591,28 @@ export default class CommandDispatcher {
                     await cmd.execute()
                     this.undoStack.push(cmd)
                     this.redoStack.length = 0
+
+                    // TODO
+                    const filePath = window.utils.getJoinedPath(viewModel.path, name)
+                    const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)
+                    this.treeFacade.lastSelectedIndex = createdIdx
+                    const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx)
+                    createdNode.classList.add(CLASS_FOCUSED)
+                    const selectedIndices = this.treeFacade.getSelectedIndices()
+                    for (const i of selectedIndices) {
+                        const div = this.treeFacade.getTreeNodeByIndex(i)
+                        div.classList.remove(CLASS_SELECTED)
+                    }
+                    this.treeFacade.clearSelectedIndices()
+                    createdNode.classList.add(CLASS_SELECTED)
+                    this.treeFacade.addSelectedIndices(createdIdx)
+
+                    if (!directory) this.performOpenFile('programmatic', filePath)
                 } catch (error) {
                     console.error('Create failed:', error)
                 } finally {
                     await sleep(300)
                     window.rendererToMain.setWatchSkipState(false)
-
-                    if (!directory) {
-                        const filePath = window.utils.getJoinedPath(viewModel.path, name)
-                        this.performOpenFile('programmatic', filePath)
-                    }
                 }
             }
         }
