@@ -1,5 +1,5 @@
 import TreeFacade from "../modules/tree/TreeFacade"
-import TabEidorFacde from "../modules/tab_editor/TabEditorFacade"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import ICommand from "./ICommand"
 
 export default class CreateCommand implements ICommand {
@@ -8,7 +8,7 @@ export default class CreateCommand implements ICommand {
 
     constructor(
         private treeFacade: TreeFacade,
-        private tabEditorFacade: TabEidorFacde,
+        private tabEditorFacade: TabEditorFacade,
         private parentPath: string,
         private name: string,
         private isDirectory: boolean,
