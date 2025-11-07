@@ -1,11 +1,14 @@
 import TreeFacade from "../modules/tree/TreeFacade"
+import TabEidorFacde from "../modules/tab_editor/TabEditorFacade"
 import ICommand from "./ICommand"
 
 export default class CreateCommand implements ICommand {
     private createdPath: string = ""
+    private openedTabId: number | null = null
 
     constructor(
         private treeFacade: TreeFacade,
+        private tabEditorFacade: TabEidorFacde,
         private parentPath: string,
         private name: string,
         private isDirectory: boolean,
@@ -38,8 +41,19 @@ export default class CreateCommand implements ICommand {
                 this.treeFacade.renderTreeData(viewModel)
                 this.treeFacade.loadFlattenArrayAndMaps(viewModel)
             }
+
+            if (this.openedTabId !== null) {
+                const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)
+                const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)
+                this.tabEditorFacade.removeTab(tabEditorView.getId())
+            }
+
         } catch (error) {
             console.error('Undo create failed:', error)
         }
+    }
+
+    setOpenedTabId(id: number) {
+        this.openedTabId = id
     }
 }

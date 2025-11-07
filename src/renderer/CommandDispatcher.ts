@@ -581,6 +581,7 @@ export default class CommandDispatcher {
             if (name) {
                 const cmd = new CreateCommand(
                     this.treeFacade,
+                    this.tabEditorFacade,
                     viewModel.path,
                     name,
                     directory,
@@ -607,7 +608,12 @@ export default class CommandDispatcher {
                     createdNode.classList.add(CLASS_SELECTED)
                     this.treeFacade.addSelectedIndices(createdIdx)
 
-                    if (!directory) this.performOpenFile('programmatic', filePath)
+                    if (!directory) {
+                        await this.performOpenFile('programmatic', filePath)
+
+                        const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)
+                        cmd.setOpenedTabId(createdTabView.getId())
+                    }
                 } catch (error) {
                     console.error('Create failed:', error)
                 } finally {
