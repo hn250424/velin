@@ -307,15 +307,32 @@ export default class TreeFacade {
 
         for (const index of indices) {
             const target = this.store.flattenTreeArray[index]
+            const baseIndent = target.indent
+
+            let parentIndex = -1
+            for (let i = index - 1; i >= 0; i--) {
+                if (this.store.flattenTreeArray[i].indent === baseIndent - 1) {
+                    parentIndex = i
+                    break
+                }
+            }
 
             const toDelete: TreeViewModel[] = []
-            const baseIndent = target.indent
 
             // Collects the deletion target: Self + all children
             for (let i = index; i < this.store.flattenTreeArray.length; i++) {
                 const node = this.store.getTreeViewModelByIndex(i)
                 if (i !== index && node.indent <= baseIndent) break
                 toDelete.push(node)
+            }
+
+            if (parentIndex >= 0) {
+                const parent = this.store.flattenTreeArray[parentIndex]
+                if (parent.children) {
+                    parent.children = parent.children.filter(
+                        child => !toDelete.some(deleted => deleted.path === child.path)
+                    )
+                }
             }
 
             for (const node of toDelete) {
