@@ -124,6 +124,8 @@ export default class CommandDispatcher {
      * @returns Promise<void>
      */
     async performOpenDirectory(source: CommandSource, treeDiv?: HTMLElement) {
+        this.treeFacade.test()
+
         // New open when shortcut or file menu.
         if (!treeDiv) {
             const response: Response<TreeDto> = await window.rendererToMain.openDirectory()

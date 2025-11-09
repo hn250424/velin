@@ -30,7 +30,7 @@ export default class PasteCommand implements ICommand {
         })
 
         const response: Response<string[]> = await window.rendererToMain.pasteTree(targetDto, selectedDtos, this.clipboardMode)
-        
+
         if (response.result) {
             const newPaths = response.data
 
@@ -65,6 +65,8 @@ export default class PasteCommand implements ICommand {
                 this.treeFacade.renderTreeData(viewModel)
                 this.treeFacade.loadFlattenArrayAndMaps(viewModel)
             }
+        } else {
+
         }
     }
 

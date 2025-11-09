@@ -183,4 +183,8 @@ export default class TreeRenderer {
     deleteTreeWrapperByPath(path: string) {
         this._pathToTreeWrapperMap.delete(path)
     }
+
+    test() {
+        return this._pathToTreeWrapperMap
+    }
 }

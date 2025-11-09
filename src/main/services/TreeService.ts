@@ -75,33 +75,54 @@ export default class TreeService {
         const existingNames = new Set(await this.fileManager.readDir(targetDir))
         const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames)
 
-        const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
-            if (!Array.isArray(child.children)) {
-                child.children = []
-            }
-
-            // Children first,
-            for (const grandChild of child.children) {
-                await sortData(child, grandChild)
-            }
-
-            const newPath = path.join(parent.path, child.name)
-            await this.fileManager.copy(child.path, newPath)
-            copiedPaths.push(newPath)
-
-            if (clipboardMode === 'cut') cutPaths.push(child.path)
-
-            child.path = newPath
+        const updateTreeDto = (parent: TreeDto, child: TreeDto): void => {
+            child.path = path.join(parent.path, child.name)
             child.indent = parent.indent + 1
+
+            if (Array.isArray(child.children)) {
+                for (const grandChild of child.children) {
+                    updateTreeDto(child, grandChild)
+                }
+            }
         }
 
-        try {
-            for (const [index, child] of selectedDtos.entries()) {
-                const fileName = uniqueNames[index]
-                child.name = fileName
-                await sortData(targetDto, child)
-            }
+        // const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
+        //     if (!Array.isArray(child.children)) {
+        //         child.children = []
+        //     }
 
+        //     // Children first,
+        //     for (const grandChild of child.children) {
+        //         await sortData(child, grandChild)
+        //     }
+
+        //     const newPath = path.join(parent.path, child.name)
+        //     await this.fileManager.copy(child.path, newPath)
+        //     copiedPaths.push(newPath)
+
+        //     if (clipboardMode === 'cut') cutPaths.push(child.path)
+
+        //     child.path = newPath
+        //     child.indent = parent.indent + 1
+        // }
+
+        try {
+            for (const [index, dto] of selectedDtos.entries()) {
+                const uniqueName = uniqueNames[index]
+                const oldPath = dto.path
+                dto.name = uniqueName
+
+                const newPath = path.join(targetDir, uniqueName)
+                await this.fileManager.copy(oldPath, newPath)
+                copiedPaths.push(newPath)
+                if (clipboardMode === 'cut') cutPaths.push(oldPath)
+                
+                // await sortData(targetDto, child)
+                dto.path = newPath
+                dto.indent = targetDto.indent + 1
+                updateTreeDto(dto, dto)
+            }
+            
             if (clipboardMode === 'cut') {
                 for (const p of cutPaths) {
                     await this.fileManager.deletePermanently(p)

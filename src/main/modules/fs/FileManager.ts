@@ -151,6 +151,9 @@ export default class FileManager implements IFileManager {
     }
 
     getUniqueFileNames(existingNames: Set<string>, fileNames: string[]): string[] {
+        // Create a working copy to avoid mutating the original existingNames
+        // Handles duplicate filenames in array: ['file.txt', 'file.txt'] → ['file.txt', 'file-1.txt']
+        const nameTracker = new Set(existingNames)
         const results: string[] = []
         const reg = /^(.*?)-(\d+)$/
     
@@ -159,17 +162,17 @@ export default class FileManager implements IFileManager {
             const nameWithoutExt = path.basename(fileName, ext)
             const baseName = nameWithoutExt.match(reg)?.[1] ?? nameWithoutExt
     
-            if (!existingNames.has(fileName)) {
+            if (!nameTracker.has(fileName)) {
                 results.push(fileName)
-                existingNames.add(fileName)
+                nameTracker.add(fileName)
                 continue
             }
     
             for (let i = 1; ; i++) {
                 const newFileName = `${baseName}-${i}${ext}`
-                if (!existingNames.has(newFileName)) {
+                if (!nameTracker.has(newFileName)) {
                     results.push(newFileName)
-                    existingNames.add(newFileName)
+                    nameTracker.add(newFileName)
                     break
                 }
             }
