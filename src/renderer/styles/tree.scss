@@ -38,8 +38,8 @@ $ghost-padding: 4px;
 }
 
 #tree_top_icons img {
-    width: gv.$icon_size;
-    height: gv.$icon_size;
+    width: gv.$tree_icon_size;
+    height: gv.$tree_icon_size;
     margin-right: $tree_horizontal_margin;
 }
 
@@ -116,8 +116,8 @@ $ghost-padding: 4px;
 
 .tree_node_open,
 .tree_node_type {
-    width: gv.$icon_size;
-    height: gv.$icon_size;
+    width: gv.$tree_icon_size;
+    height: gv.$tree_icon_size;
 
     text-align: center;
     flex-shrink: 0;
