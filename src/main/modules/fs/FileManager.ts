@@ -108,7 +108,7 @@ export default class FileManager implements IFileManager {
         try {
             for (const { originalPath, trashPath } of trashMap) {
                 await fsExtra.copy(trashPath, originalPath)
-                await fs.promises.unlink(trashPath)
+                await fsExtra.remove(trashPath)
             }
         } catch (error) {
             console.error('[undo_delete] Failed to restore files from trash:', error)
