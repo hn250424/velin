@@ -250,8 +250,4 @@ export default class TreeStore {
     set clipboardMode(mode: ClipboardMode) {
         this._clipboardMode = mode
     }
-
-    test() {
-        return this._flattenTreeArray
-    }
 }

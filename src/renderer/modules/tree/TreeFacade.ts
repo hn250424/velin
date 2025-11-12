@@ -349,9 +349,4 @@ export default class TreeFacade {
 
         this.store.rebuildPathToFlattenArrayIndexMap()
     }
-
-    test() {
-        console.log( this.store.test() )
-        console.log( this.renderer.test() )
-    }
 }
