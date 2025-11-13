@@ -4,6 +4,8 @@ $scrollbar-size: 8px;
 $tree_horizontal_margin: 5px;
 $ghost-padding: 4px;
 
+$tree_top_min_height: 25px;
+
 #tree {
     width: 0px;
     height: 100%;
@@ -24,12 +26,17 @@ $ghost-padding: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: $tree_top_min_height;
 }
 
 #tree_top_name {
     margin: 0 $tree_horizontal_margin;
     flex: 1;
     font-size: 0.9rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
 }
 
 #tree_top_icons {
@@ -93,7 +100,6 @@ $ghost-padding: 4px;
     font-size: 0.8rem;
     display: flex;
     align-items: center;
-    gap: $tree_horizontal_margin;
     border: 1px solid transparent;
 }
 
@@ -112,6 +118,10 @@ $ghost-padding: 4px;
 
 .tree_node.selected {
     background-color: var(--tree-node-selected);
+}
+
+.tree_node > span {
+    margin-left: 1px;
 }
 
 .tree_node_open,
