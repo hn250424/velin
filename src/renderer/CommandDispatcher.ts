@@ -126,13 +126,18 @@ export default class CommandDispatcher {
     async performOpenDirectory(source: CommandSource, treeDiv?: HTMLElement) {
         // New open when shortcut or file menu.
         if (!treeDiv) {
-            const response: Response<TreeDto> = await window.rendererToMain.openDirectory()
-            if (!response.data) return
+            const openDirectoryResponse: Response<TreeDto> = await window.rendererToMain.openDirectory()
+            if (!openDirectoryResponse.data) return
 
-            const responseViewModel = this.treeFacade.toTreeViewModel(response.data)
+            // Close existing tab.
+            const tabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+            const closeAllTabsResponse = await window.rendererToMain.closeAllTabs(tabEditorsDto)
+            if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data)
 
+            const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data)
             this.treeFacade.renderTreeData(responseViewModel)
             this.treeFacade.loadFlattenArrayAndMaps(responseViewModel)
+
             return
         }
 
