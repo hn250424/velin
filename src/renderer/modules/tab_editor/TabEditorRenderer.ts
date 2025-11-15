@@ -80,9 +80,14 @@ export default class TabEditorRenderer {
                 const view = ctx.get(editorViewCtx)
                 const doc = parser(content)
 
-                view.dispatch(
-                    view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
-                )
+                // Apply initial content without pushing it to the undo stack.
+                const tr = view.state.tr.replaceWith(
+                    0,
+                    view.state.doc.content.size,
+                    doc.content
+                ).setMeta('addToHistory', false)
+
+                view.dispatch(tr)
             })
         }
 
@@ -96,7 +101,7 @@ export default class TabEditorRenderer {
                     if (!viewModel.isModified) {
                         viewModel.isModified = true
                         tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
-                    }
+                    } 
                 },
                 () => {
                     if (!viewModel.filePath && viewModel.isModified) {
