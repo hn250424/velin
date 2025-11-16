@@ -1,7 +1,8 @@
 @use './variables.scss' as gv;
 @use './findAndReplace.scss';
 
-$editor-padding: 16px;
+$editor-horizontal-padding: 16px;
+$editor-vertical-padding: 8px;
 $scrollbar-size: 8px;
 
 #editor_container {
@@ -47,6 +48,8 @@ $scrollbar-size: 8px;
 }
 
 .milkdown>.editor {
-    padding: $editor-padding;
+    width: 100%;
+    min-height: 100%;
+    padding: $editor-vertical-padding $editor-horizontal-padding;
     white-space: pre;
 }
