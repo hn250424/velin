@@ -5,7 +5,7 @@ import DI_KEYS from "../../constants/di_keys"
 import {
     NOT_MODIFIED_TEXT
 } from '../../constants/dom'
-import TabViewModel from '../../viewmodels/TabViewModel'
+import TabEditorViewModel from '../../viewmodels/TabEditorViewModel'
 import TabEditorRenderer from "./TabEditorRenderer"
 import TabEditorStore from "./TabEditorStore"
 import TabEditorView from './TabEditorView'
@@ -63,9 +63,10 @@ export default class TabEditorFacde {
     }
 
     async addTab(id: number = 0, filePath: string = '', fileName: string = '', content: string = '', isBinary: boolean = false, activate: boolean = true) {
-        const tabViewModel = { id: id, isModified: false, isBinary: isBinary, filePath: filePath, fileName: fileName }
-        this.store.setTabEditorViewModelById(id, tabViewModel)
-        await this.renderer.createTabAndEditor(tabViewModel, content)
+        const vm: TabEditorViewModel = { id: id, isModified: false, isBinary: isBinary, filePath: filePath, fileName: fileName, initialContent: content }
+        
+        this.store.setTabEditorViewModelById(id, vm)
+        await this.renderer.createTabAndEditor(vm)
         if (activate) {
             this.renderer.tabEditorViews[this.store.activeTabIndex]?.setDeactive()
             this.store.activeTabIndex = this.renderer.tabEditorViews.length - 1
@@ -191,7 +192,7 @@ export default class TabEditorFacde {
                     const newFilePath = window.utils.getJoinedPath(newPath, relative)
                     const preData = this.getTabEditorDataByView(view)
                     const newData = { ...preData, filePath: newFilePath }
-                    const viewModel = this.toTabViewModel(newData)
+                    const viewModel = this.toTabEditorViewModel(newData)
 
                     this.store.setTabEditorViewModelById(viewModel.id, viewModel)
                     this.renderer.deleteTabEditorViewByPath(filePath)
@@ -292,15 +293,15 @@ export default class TabEditorFacde {
 
 
 
-    toTabViewModel(dto: TabEditorDto): TabViewModel {
-        return this.store.toTabViewModel(dto)
+    toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
+        return this.store.toTabEditorViewModel(dto)
     }
 
     getTabEditorViewModelById(id: number) {
         return this.store.getTabEditorViewModelById(id)
     }
 
-    setTabEditorViewModelById(id: number, viewModel: TabViewModel) {
+    setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
         this.store.setTabEditorViewModelById(id, viewModel)
     }
 

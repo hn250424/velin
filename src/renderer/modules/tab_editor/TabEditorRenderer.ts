@@ -15,7 +15,7 @@ import {
     CLASS_BINARY
 } from '../../constants/dom'
 import TabEditorView from "./TabEditorView"
-import TabViewModel from "src/renderer/viewmodels/TabViewModel"
+import TabEditorViewModel from "src/renderer/viewmodels/TabEditorViewModel"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
 
 @injectable()
@@ -50,8 +50,8 @@ export default class TabEditorRenderer {
         return { div, span, button }
     }
 
-    async createTabAndEditor(viewModel: TabViewModel, content: string) {
-        const { id, isModified, isBinary, filePath, fileName } = viewModel
+    async createTabAndEditor(viewModel: TabEditorViewModel) {
+        const { id, isModified, isBinary, filePath, fileName, initialContent } = viewModel
 
         const { div, span, button } = this.createTabBox(fileName)
         div.dataset[DATASET_ATTR_TAB_ID] = id.toString()
@@ -78,7 +78,7 @@ export default class TabEditorRenderer {
             editor.action(ctx => {
                 const parser = ctx.get(parserCtx)
                 const view = ctx.get(editorViewCtx)
-                const doc = parser(content)
+                const doc = parser(initialContent)
 
                 // Apply initial content without pushing it to the undo stack.
                 const tr = view.state.tr.replaceWith(
@@ -98,10 +98,16 @@ export default class TabEditorRenderer {
         if (!isBinary) {
             tabEditorView.observeEditor(
                 () => {
-                    if (!viewModel.isModified) {
+                    const current = tabEditorView.getContent()
+                    const isModified = current !== viewModel.initialContent
+
+                    if (isModified && !viewModel.isModified) {
                         viewModel.isModified = true
                         tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
-                    } 
+                    } else if (!isModified && viewModel.isModified) {
+                        viewModel.isModified = false
+                        tabEditorView.setTabButtonTextContent(NOT_MODIFIED_TEXT)
+                    }
                 },
                 () => {
                     if (!viewModel.filePath && viewModel.isModified) {

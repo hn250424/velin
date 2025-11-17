@@ -1,10 +1,10 @@
 import { injectable } from "inversify"
-import TabViewModel from "../../viewmodels/TabViewModel"
+import TabEditorViewModel from "../../viewmodels/TabEditorViewModel"
 import { TabEditorDto } from "@shared/dto/TabEditorDto"
 
 @injectable()
 export default class TabEditorStore {
-    private _idToTabViewModelMap: Map<number, TabViewModel> = new Map()
+    private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map()
 
     private _activeTabId = -1
     private _activeTabIndex = -1
@@ -12,16 +12,14 @@ export default class TabEditorStore {
 
     constructor() { }
 
-    // toTabEditorDto(viewModel: TabViewModel): TabEditorDto {
-    // }
-
-    toTabViewModel(dto: TabEditorDto): TabViewModel {
+    toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
         return {
             id: dto.id,
             isModified: dto.isModified,
             filePath: dto.filePath,
             fileName: dto.fileName,
             isBinary: dto.isBinary,
+            initialContent: this._idToTabEditorViewModelMap.get(dto.id).initialContent
         }
     }
 
@@ -53,19 +51,19 @@ export default class TabEditorStore {
         this._contextTabId = -1
     }
 
-    get idToTabViewModelMap(): ReadonlyMap<number, TabViewModel> {
-        return this._idToTabViewModelMap
+    get idToTabEditorViewModelMap(): ReadonlyMap<number, TabEditorViewModel> {
+        return this._idToTabEditorViewModelMap
     }
 
     getTabEditorViewModelById(id: number) {
-        return this._idToTabViewModelMap.get(id)
+        return this._idToTabEditorViewModelMap.get(id)
     }
 
-    setTabEditorViewModelById(id: number, viewModel: TabViewModel) {
-        this._idToTabViewModelMap.set(id, viewModel)
+    setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
+        this._idToTabEditorViewModelMap.set(id, viewModel)
     }
 
     deleteTabEditorViewModelById(id: number) {
-        this._idToTabViewModelMap.delete(id)
+        this._idToTabEditorViewModelMap.delete(id)
     }
 }

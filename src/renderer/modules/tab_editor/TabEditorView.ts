@@ -38,17 +38,21 @@ export default class TabEditorView {
     }
 
     observeEditor(onInput: () => void, onBlur: () => void) {
-        // Store the input callback globally to be triggered when content is replaced
         this.onEditorInputCallback = onInput
 
         this.editor.action(ctx => {
             const view = ctx.get(editorViewCtx)
+
             view.setProps({
-                handleDOMEvents: {
-                    input: () => {
+                dispatchTransaction: (tr) => {
+                    const newState = view.state.apply(tr)
+                    view.updateState(newState)
+
+                    if (tr.docChanged) {
                         onInput()
-                        return false
-                    },
+                    }
+                },
+                handleDOMEvents: {
                     blur: () => {
                         onBlur()
                         return false
