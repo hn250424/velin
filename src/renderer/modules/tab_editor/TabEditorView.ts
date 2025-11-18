@@ -13,6 +13,8 @@ export default class TabEditorView {
     private _tabButton: HTMLElement
     private _editorBoxDiv: HTMLElement
 
+    private suppressInputEvent = false
+
     private searchHighlightKey = new PluginKey("searchHighlight")
     private searchResults: { from: number; to: number }[] = []
     private currentSearchIndex: number = -1
@@ -49,6 +51,7 @@ export default class TabEditorView {
                     view.updateState(newState)
 
                     if (tr.docChanged) {
+                        if (this.suppressInputEvent) return
                         onInput()
                     }
                 },
@@ -287,6 +290,16 @@ export default class TabEditorView {
             this.onEditorInputCallback()
         }
     }
+
+    setSuppressInputEvent(value: boolean) {
+        this.suppressInputEvent = value
+    }
+
+    shouldSuppressInputEvent(): boolean {
+        return this.suppressInputEvent
+    }
+
+
 
     get editor(): Editor {
         return this._editor

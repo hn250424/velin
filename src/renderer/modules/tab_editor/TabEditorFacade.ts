@@ -84,12 +84,21 @@ export default class TabEditorFacde {
         for (let i = 0; i < this.renderer.tabEditorViews.length; i++) {
             const data = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId())
             if ((data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
+                const tv = this.renderer.tabEditorViews[i]
+                const vm = this.store.getTabEditorViewModelById(tv.getId())
+
+                vm.initialContent = result.content
+
+                tv.setSuppressInputEvent(true)
+                tv.setContent(result.content)
+                tv.setSuppressInputEvent(false)
+                
+                tv.setTabSpanTextContent(result.fileName)
+                tv.setTabButtonTextContent(NOT_MODIFIED_TEXT)
+
                 data.isModified = false
                 data.filePath = result.filePath
                 data.fileName = result.fileName
-                this.renderer.tabEditorViews[i].setTabSpanTextContent(result.fileName)
-                this.renderer.tabEditorViews[i].setTabButtonTextContent(NOT_MODIFIED_TEXT)
-                this.renderer.tabEditorViews[i].setContent(result.content)
 
                 wasApplied = true
             }
