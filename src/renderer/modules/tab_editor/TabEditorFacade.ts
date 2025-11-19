@@ -90,7 +90,9 @@ export default class TabEditorFacde {
                 vm.initialContent = result.content
 
                 tv.setSuppressInputEvent(true)
+                const selection = tv.getSelection()
                 tv.setContent(result.content)
+                tv.setSelection(selection)
                 tv.setSuppressInputEvent(false)
                 
                 tv.setTabSpanTextContent(result.fileName)

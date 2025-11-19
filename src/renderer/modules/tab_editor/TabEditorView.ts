@@ -98,6 +98,30 @@ export default class TabEditorView {
         })
     }
 
+    getSelection() {
+        return this.editor.action(ctx => {
+            const view = ctx.get(editorViewCtx)
+            const sel = view.state.selection
+
+            return {
+                anchor: sel.anchor,
+                head: sel.head,
+            }
+        })
+    }
+
+    setSelection(sel: { anchor: number, head: number }) {
+        return this.editor.action(ctx => {
+            const view = ctx.get(editorViewCtx)
+            const state = view.state
+
+            const newSel = TextSelection.create(state.doc, sel.anchor, sel.head)
+
+            const tr = state.tr.setSelection(newSel)
+            view.dispatch(tr)
+        })
+    }
+
     destroy() {
         this._editor?.destroy()
         this._editorBoxDiv.remove()
