@@ -8,8 +8,8 @@
 </head>
 
 <body>
-    <div id="settings-overlay">
-        <div id="settings-container">
+    <div id="settings-overlay" class="overlay">
+        <div id="settings-container" class="overlay-surface">
             <div id="settings-top">
                 <button id="settings-exit" class="tooltip-btn">
                     <img class="icon-grey" src="src/renderer/assets/icons/close.png" />
@@ -74,6 +74,21 @@
             </button>
 
             <span id="replace_info"></span>
+        </div>
+    </div>
+
+    <div id="info-overlay" class="overlay">
+        <div id="info-container" class="overlay-surface">
+            <div id="info-top"></div>
+            <div id="info-content">
+                <div id="info-version">
+                    <label>version</label>
+                    <span></span>
+                </div>
+            </div>
+            <div id="info-bottom">
+                <button id="info-button">Close</button>
+            </div>
         </div>
     </div>
 
@@ -186,8 +201,8 @@
                 <div class="menu_item" tabindex="0">
                     Help
                     <div class="dropdown">
-                        <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div>
-                        <div class="dropdown_item">Information<span class="shortcut">F1</span></div>
+                        <!-- <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div> -->
+                        <div id="help-information" class="dropdown_item">Information<span class="shortcut">F1</span></div>
                     </div>
                 </div>
             </div>

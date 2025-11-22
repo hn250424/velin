@@ -20,6 +20,7 @@ import {
     ID_FIND_INPUT,
     ID_REPLACE_INPUT,
     ID_FIND_INFO,
+    ID_HELP_INFO_OVERLAY,
     SELECTOR_TREE_NODE_TYPE,
     CLASS_FOCUSED
 } from "./constants/dom"
@@ -69,6 +70,11 @@ export default class CommandDispatcher {
     private replaceInput: HTMLInputElement
     private findInfo: HTMLElement
 
+    private helpInfoOverlay: HTMLElement
+    private helpInfoContainer: HTMLElement
+    private helpInfoContent: HTMLElement
+    private helpInfoButton: HTMLElement
+
     constructor(
         @inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
         @inject(DI_KEYS.FindReplaceState) private readonly findReplaceState: FindReplaceState,
@@ -82,6 +88,8 @@ export default class CommandDispatcher {
         this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement
         this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement
         this.findInfo = document.getElementById(ID_FIND_INFO)
+
+        this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY)
 
         this.findInput.addEventListener('input', debounce(() => {
             this.performFind('programmatic', this.findReplaceState.getDirectionUp() ? 'up' : 'down')
@@ -716,6 +724,14 @@ export default class CommandDispatcher {
     performCloseSettings(source: CommandSource) {
         this.settingsFacade.resetChangeSet()
         this.settingsFacade.closeSettings()
+    }
+
+    performShowInformation(source: CommandSource) {
+        this.helpInfoOverlay.style.display = 'flex'
+    }
+
+    performHideInformation(source: CommandSource) {
+        this.helpInfoOverlay.style.display = 'none'
     }
 
     async performESC(source: CommandSource) {

@@ -27,6 +27,9 @@ export const SELECTOR_REPLACE_INPUT = `#${ID_REPLACE_INPUT}`
 export const ID_FIND_INFO = 'find_info'
 export const SELECTOR_FIND_INFO = `#${ID_FIND_INFO}`
 
+export const ID_HELP_INFO_OVERLAY = 'info-overlay'
+export const SELECTOR_HELP_INFO_OVERLAY = `#${ID_HELP_INFO_OVERLAY}`
+
 export const ID_TREE_CONTEXT_PASTE = 'tree_context_paste'
 export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
 

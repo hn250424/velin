@@ -5,27 +5,16 @@ $settings-menu-button-width: 100px;
 $settings-menu-button-height: 24px;
 $settings-menu-gap: 5px;
 
-$settings-button-width: 100px;
-$settings-button-height: 32px;
-$settings-button-margin: 10px;
+$settings-button-width: gv.$button-width;
+$settings-button-height: gv.$button-height;
+$settings-button-margin: gv.$button-margin;
 
 $setting-node-margin: 5px;
 $setting-node-label-width: 100px;
 $setting-node-input-width: 50px;
 
 #settings-overlay {
-    position: fixed;
-
     display: none;
-    justify-content: center;
-    align-items: center;
-
-    width: 100%;
-    height: 100%;
-
-    z-index: 98;
-
-    background-color: transparent;
 }
 
 #settings-container {
@@ -36,10 +25,6 @@ $setting-node-input-width: 50px;
     flex-direction: column;
 
     overflow: hidden;   // cause settings-top.
-    border-radius: gv.$window_icon_border_radius;
-
-    box-shadow: 0 4px 16px rgb(0, 0, 0, 0.3);
-    background-color: var(--settings-container);
 }
 
 #settings-top {
@@ -126,12 +111,12 @@ $setting-node-input-width: 50px;
     height: $settings-button-height;
     margin: $settings-button-margin;
 
-    background-color: var(--settings-button-bg);
+    background-color: var(--overlay-surface-button-bg);
 }
 
 #settings-bottom button:hover {
     cursor: pointer;
-    background-color: var(--settings-button-hover-bg);
+    background-color: var(--overlay-surface-button-hover-bg);
 }
 
 .setting-node {

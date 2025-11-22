@@ -9,7 +9,24 @@ import WindowDto from "@shared/dto/WindowDto"
 import SettingsDto from "@shared/dto/SettingsDto"
 import SettingsFacade from "../modules/settings/SettingsFacade"
 
-export default function registerLoadHandlers(windowState: WindowState, settingsFacade: SettingsFacade, sideState: SideState, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade, callback: Function) {
+export default function registerLoadHandlers(
+    windowState: WindowState, 
+    settingsFacade: SettingsFacade,
+    sideState: SideState, 
+    tabEditorFacade: TabEditorFacade, 
+    treeFacade: TreeFacade, 
+    callback: Function
+) {
+    let sessionDone = false
+    let infoDone = false
+
+    function finish() {
+        if (sessionDone && infoDone) {
+            callback()  
+            window.rendererToMain.showMainWindow()
+        }
+    }
+
     window.mainToRenderer.session(async (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
         if (windowDto) {
             windowState.setWindowMaximizeState(windowDto.maximize)
@@ -35,8 +52,14 @@ export default function registerLoadHandlers(windowState: WindowState, settingsF
             treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
 
-        callback()
+        sessionDone = true
+        finish()
+    })
 
-        window.rendererToMain.showMainWindow()
+    window.mainToRenderer.info((version: string) => {
+        document.querySelector('#info-version > span').textContent = version
+
+        infoDone = true
+        finish()
     })
 }

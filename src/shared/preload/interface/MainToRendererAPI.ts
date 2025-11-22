@@ -6,6 +6,7 @@ import SettingsDto from '@shared/dto/SettingsDto'
 
 export default interface MainToRendererAPI {
     session: (callback: (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void
+    info: (callback: (version: string) => void) => void
     syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void
     onMaximizeWindow: (callback: () => void) => void
     onUnmaximizeWindow: (callback: () => void) => void

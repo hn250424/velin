@@ -11,6 +11,7 @@ const mainToRenderer: MainToRendererAPI = {
     session: (callback: (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
         ipcRenderer.on(electronAPI.events.mainToRenderer.session, (e, windowDto, settingsDto, sideDto, tabEditorsDto, treeDto) => { callback(windowDto, settingsDto, sideDto, tabEditorsDto, treeDto) })
     },
+    info: (callback: (version: string) => void) => { ipcRenderer.on(electronAPI.events.mainToRenderer.info, (e, version) => { callback(version) }) },
     syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
         ipcRenderer.on(electronAPI.events.mainToRenderer.syncFromWatch, (e, tabEditorsDto, treeDto) => { callback(tabEditorsDto, treeDto) })
     },

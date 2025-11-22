@@ -12,6 +12,7 @@ import registerViewHandlers from './handlers/viewHandlers'
 import registerWindowHandlers from './handlers/windowHandlers'
 import registerMenuHandlers from './handlers/menuHandlers'
 import registerSettingsHandlers from './handlers/settingsHandlers'
+import registerHelpHandlers from './handlers/helpHandlers'
 
 import FocusManager from './modules/state/FocusManager'
 import ShortcutRegistry from './modules/input/ShortcutRegistry'
@@ -61,6 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
     registerViewHandlers(shortcutRegistry, zoomManager)
     registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
     registerTreeHandlers(commandDispatcher, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
+    registerHelpHandlers(commandDispatcher, shortcutRegistry)
     registerMenuHandlers(menuItems)
     
     registerLoadHandlers(windowState, settingsFacade, sideState, tabEditorFacade, treeFacade, () => {

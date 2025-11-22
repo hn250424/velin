@@ -2,7 +2,7 @@ import ITreeUtils from "@main/modules/contracts/ITreeUtils"
 import ITreeRepository from "src/main/modules/contracts/ITreeRepository"
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI"
 import TreeDto from "@shared/dto/TreeDto"
-import { BrowserWindow } from "electron"
+import { app, BrowserWindow } from "electron"
 import IFileManager from "../modules/contracts/IFileManager"
 import ITabRepository from "../modules/contracts/ITabRepository"
 import ITabUtils from "../modules/contracts/ITabUtils"
@@ -29,6 +29,7 @@ export async function loadedRenderer(
     tabUtils: ITabUtils,
     treeUtils: ITreeUtils
 ) {
+    // session.
     const windowSession = await windowRepository.readWindowSession()
     const windowBoundsModel = getBoundsByWindowSession(windowSession)
     mainWindow.setBounds({
@@ -61,4 +62,8 @@ export async function loadedRenderer(
     fileManager.cleanTrash()
 
     if (newTreeSession) fileWatcher.watch(newTreeSession.path)
+
+    // info.
+    const version = app.getVersion()
+    mainWindow.webContents.send(electronAPI.events.mainToRenderer.info, version)
 }

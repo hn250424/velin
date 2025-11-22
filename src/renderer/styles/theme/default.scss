@@ -11,6 +11,11 @@ $theme-default: (
     --app-bg: #{gv.$grey-1},
     --app-font: black,
 
+    --overlay-surface-bg: white,
+
+    --overlay-surface-button-bg: #{gv.$grey-1},
+    --overlay-surface-button-hover-bg: white,
+
     --title-bg: #{gv.$blue-3},
     --side-menu-bg: #{gv.$grey-2},
     --side-resizer: #{$accent},
@@ -54,15 +59,12 @@ $theme-default: (
     --tree-top-icon-hover: #{gv.$grey-2},
     --tree_wrapper-drag-overlay: #{gv.$grey-2},
 
-    --settings-container: white,
     --settings-menu-container: #{gv.$grey-2},
     --settings-menu-button-bg: #{gv.$grey-1},
     --settings-menu-button-hover: white,
     --settings-menu-button-selected: white,
     --settings-contents: white,
-    --settings-button-bg: #{gv.$grey-1},
-    --settings-button-hover-bg: white,
     --setting-node-border-color: #ccc,
-
+    
     --warning-color: #{gv.$red-3},
 );
