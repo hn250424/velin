@@ -649,6 +649,8 @@ export default class CommandDispatcher {
     }
 
     toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
+        this.focusManager.setFocus('find_replace')
+
         this.findAndReplaceContainer.style.display = 'flex'
         this.replaceBox.style.display = showReplace ? 'flex' : 'none'
 
@@ -696,6 +698,8 @@ export default class CommandDispatcher {
     }
 
     performCloseFindReplaceBox(source: CommandSource) {
+        this.focusManager.setFocus(null)
+        
         this.findAndReplaceContainer.style.display = 'none'
 
         const activeView = this.tabEditorFacade.getActiveTabEditorView()
