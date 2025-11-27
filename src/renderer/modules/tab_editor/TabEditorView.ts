@@ -122,6 +122,13 @@ export default class TabEditorView {
         })
     }
 
+    focus() {
+        this.editor.action(ctx => {
+            const view = ctx.get(editorViewCtx)
+            view.focus()
+        })
+    }
+
     destroy() {
         this._editor?.destroy()
         this._editorBoxDiv.remove()
@@ -131,6 +138,7 @@ export default class TabEditorView {
     setActive() {
         this.editorBoxDiv.classList.add(CLASS_SELECTED)
         this.tabDiv.classList.add(CLASS_SELECTED)
+        this.focus()
     }
 
     setDeactive() {
