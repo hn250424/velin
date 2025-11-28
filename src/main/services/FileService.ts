@@ -76,6 +76,8 @@ export default class FileService {
         }
 
         const fsTree = await this.treeUtils.getDirectoryTree(path, indent)
+        if (!fsTree) return null
+        
         if (indent === 0) {
             await this.treeRepository.writeTreeSession(fsTree)
             this.fileWatcher.watch(path)
