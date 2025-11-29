@@ -120,7 +120,12 @@ export default class TreeService {
                 // await sortData(targetDto, child)
                 dto.path = newPath
                 dto.indent = targetDto.indent + 1
-                updateTreeDto(dto, dto)
+                // updateTreeDto(dto, dto)
+                if (Array.isArray(dto.children)) {
+                    for (const child of dto.children) {
+                        updateTreeDto(dto, child)
+                    }
+                }
             }
             
             if (clipboardMode === 'cut') {
