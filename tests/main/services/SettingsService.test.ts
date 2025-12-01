@@ -1,12 +1,13 @@
-import SideService from '@services/SideService'
-import SideDto from '@shared/dto/SideDto'
 import { beforeEach, describe, expect, test } from 'vitest'
 import FakeFileManager from '../modules/fs/FakeFileManager'
-import FakeSideRepository from '../modules/side/FakeSideRepository'
-import SettingsDto, { SettingFontDto, SettingThemeDto } from '@shared/dto/SettingsDto'
+import SettingsDto from '@shared/dto/SettingsDto'
 import SettingsService from '@main/services/SettingsService'
 import FakeSettingsRepository from '../modules/settings/FakeSettingsRepository'
 import FakeSettingsUtils from '../modules/settings/FakeSettingsUtils'
+
+import {
+    settingsSessionPath
+} from '../data/test_data'
 
 describe('SettingsService.syncSettingsSession', () => {
     const settingsDto: SettingsDto = {
@@ -17,8 +18,6 @@ describe('SettingsService.syncSettingsSession', () => {
 
         }
     }
-
-    const settingsSessionPath = '/fake/path/settingsSession.json' 
 
     let fakeFileManager: FakeFileManager
     let fakeSettingsRepository: FakeSettingsRepository

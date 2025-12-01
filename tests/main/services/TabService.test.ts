@@ -1,82 +1,29 @@
-import Response from '@shared/types/Response'
-import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
+import { TabEditorDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
 import fakeDialogManager, {
     setFakeConfirmResult,
-    setFakeOpenFileDialogResult,
-    setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
 } from '../modules/ui/fakeDialogManager'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 import TabService from '@services/TabService'
 
-const tabSessionPath = '/fake/path/tabSession.json'
-const treeSessionPath = '/fake/path/treeSession.json'
+import {
+    tabSessionPath,
+    treeSessionPath,
+    newFilePath,
+    emptyFilePathTabEditorDto,
+    defaultTabEditorDto,
+    tabEidtorsDto,
+} from '../data/test_data'
+
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeRepository: FakeTreeRepository
 let tabService: TabService
 const fakeMainWindow = new FakeMainWindow()
-
-const preFilePath = 'preFilePath'
-const newFilePath = 'newFilePath'
-const preFileName = 'preFileName'
-const newFileName = 'newFileName'
-const preFileContent = 'preFileContent'
-const newFileContent = 'newFileContent'
-
-const emptyFilePathData: TabEditorDto = {
-    id: 0,
-    isModified: true,
-    filePath: '',
-    fileName: preFileName,
-    content: preFileContent
-}
-
-const defaultData: TabEditorDto = {
-    id: 0,
-    isModified: true,
-    filePath: preFilePath,
-    fileName: preFileName,
-    content: preFileContent
-}
-
-const tabEidtorDto: TabEditorsDto = {
-    activatedId: 1,
-    data: [
-        {
-            id: 0,
-            isModified: false,
-            filePath: '',
-            fileName: 'Untitled',
-            content: ''
-        },
-        {
-            id: 1,
-            isModified: false,
-            filePath: `${preFilePath}_1`,
-            fileName: `${preFileName}_1`,
-            content: `${preFileContent}_1`
-        },
-        {
-            id: 2,
-            isModified: true,
-            filePath: `${preFilePath}_2`,
-            fileName: `${preFileName}_2`,
-            content: `${preFileContent}_2`
-        },
-        {
-            id: 3,
-            isModified: true,
-            filePath: '',
-            fileName: `${preFileName}_3`,
-            content: `${preFileContent}_3`
-        },
-    ]
-}
 
 describe('tabService.closeTab', () => {
     beforeEach(() => {
@@ -88,7 +35,7 @@ describe('tabService.closeTab', () => {
 
     test('should write when closeTab if data is modified', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         fakeTabRepository.setTabSession({
@@ -109,7 +56,7 @@ describe('tabService.closeTab', () => {
 
     test('should remove without saving if user cancels confirm on modified data', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         await fakeTabRepository.setTabSession({
@@ -128,7 +75,7 @@ describe('tabService.closeTab', () => {
 
     test('should save to new path and remove session when closing modified data', async () => {
         // Given.
-        const data = { ...emptyFilePathData }
+        const data = { ...emptyFilePathTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -153,7 +100,7 @@ describe('tabService.closeTab', () => {
 
     test('should remain in the program when save dialog is canceled during closeTab', async () => {
         // Given.
-        const data = { ...emptyFilePathData }
+        const data = { ...emptyFilePathTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -176,7 +123,7 @@ describe('tabService.closeTab', () => {
 
     test('should just remove session when closeTab if data is not modified', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         await fakeTabRepository.setTabSession({
             activatedId: data.id,
@@ -203,7 +150,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should retain only selected tab and save others modified file', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -231,7 +178,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should retain only the selected tab when user declines to save', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -258,7 +205,7 @@ describe('tabService.closeTabsExcept', () => {
 
     test('should keep selected tab and tabs with canceled save dialog after confirm', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -298,7 +245,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain only the tabs to the left of the reference tab and save modified files', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -326,7 +273,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain only the tabs to the left of the reference tab when user decline to save', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -353,7 +300,7 @@ describe('tabService.closeTabsToRight', () => {
 
     test('should retain left tabs and right tabs if user cancels save dialog after confirming to save', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -393,7 +340,7 @@ describe('tabService.closeAllTabs', () => {
 
     test('should close all tabs and save modified files', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -418,7 +365,7 @@ describe('tabService.closeAllTabs', () => {
 
     test('should close all tabs when user declines to save', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(false)
         setFakeSaveDialogResult({
@@ -442,7 +389,7 @@ describe('tabService.closeAllTabs', () => {
 
     test('should retain tab if user confirms save but cancels save dialog', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeConfirmResult(true)
         setFakeSaveDialogResult({
@@ -479,7 +426,7 @@ describe('tabService.syncTabSession', () => {
 
     test('a write session was received from the renderer for synchronization', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
 
         // When.
         await tabService.syncTabSession(copiedDto)

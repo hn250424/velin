@@ -1,11 +1,9 @@
 import FileService from '@services/FileService'
-import Response from '@shared/types/Response'
-import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
+import { TabEditorDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
 import fakeDialogManager, {
-    setFakeConfirmResult,
     setFakeOpenFileDialogResult,
     setFakeOpenDirectoryDialogResult,
     setFakeSaveDialogResult
@@ -13,11 +11,19 @@ import fakeDialogManager, {
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
-import TreeDto from '@shared/dto/TreeDto'
 import FakeFileWatcher from '../modules/fs/FakeFileWatcher'
 
-const tabSessionPath = '/fake/path/tabSession.json'
-const treeSessionPath = '/fake/path/treeSession.json'
+import {
+    tabSessionPath,
+    treeSessionPath,
+    newFilePath,
+    emptyFilePathTabEditorDto,
+    defaultTabEditorDto,
+    tabEidtorsDto,
+    treeDto,
+} from '../data/test_data'
+import path from 'path'
+
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeUtils: FakeTreeUtils
@@ -25,98 +31,6 @@ let fakeTreeRepository: FakeTreeRepository
 let fakeFileWatcher: FakeFileWatcher
 let fileService: FileService
 const fakeMainWindow = new FakeMainWindow()
-
-const preFilePath = 'preFilePath'
-const newFilePath = 'newFilePath'
-const preFileName = 'preFileName'
-const newFileName = 'newFileName'
-const preFileContent = 'preFileContent'
-const newFileContent = 'newFileContent'
-
-const emptyFilePathData: TabEditorDto = {
-    id: 0,
-    isModified: true,
-    filePath: '',
-    fileName: preFileName,
-    content: preFileContent
-}
-
-const defaultData: TabEditorDto = {
-    id: 0,
-    isModified: true,
-    filePath: preFilePath,
-    fileName: preFileName,
-    content: preFileContent
-}
-
-const tabEidtorDto: TabEditorsDto = {
-    activatedId: 1,
-    data: [
-        {
-            id: 0,
-            isModified: false,
-            filePath: '',
-            fileName: 'Untitled',
-            content: ''
-        },
-        {
-            id: 1,
-            isModified: false,
-            filePath: `${preFilePath}_1`,
-            fileName: `${preFileName}_1`,
-            content: `${preFileContent}_1`
-        },
-        {
-            id: 2,
-            isModified: true,
-            filePath: `${preFilePath}_2`,
-            fileName: `${preFileName}_2`,
-            content: `${preFileContent}_2`
-        },
-        {
-            id: 3,
-            isModified: true,
-            filePath: '',
-            fileName: `${preFileName}_3`,
-            content: `${preFileContent}_3`
-        },
-    ]
-}
-
-const treeDto: TreeDto = {
-    path: '/project',
-    name: 'project',
-    indent: 0,
-    directory: true,
-    expanded: true,
-    children: [
-        {
-            path: '/project/index.ts',
-            name: 'index.ts',
-            indent: 1,
-            directory: false,
-            expanded: false,
-            children: null,
-        },
-        {
-            path: '/project/src',
-            name: 'src',
-            indent: 1,
-            directory: true,
-            expanded: false,
-            children: [
-                {
-                    path: '/project/src/main.ts',
-                    name: 'main.ts',
-                    indent: 2,
-                    directory: false,
-                    expanded: false,
-                    children: null as null,
-                },
-            ],
-        },
-    ],
-}
 
 describe('FileService.newTab', () => {
     beforeEach(() => {
@@ -232,7 +146,7 @@ describe('FileService.openDirectory', () => {
         fakeTreeUtils.setTree(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
-            filePaths: ['/project']
+            filePaths: [copiedDto.path]
         })
 
         // When.
@@ -251,14 +165,14 @@ describe('FileService.openDirectory', () => {
         fakeTreeRepository.setTreeSession(copiedDto)
         setFakeOpenDirectoryDialogResult({
             canceled: false,
-            filePaths: ['/project/src']
+            filePaths: [copiedDto.path]
         })
 
         // When.
         const response = await fileService.openDirectory()
 
         // Then.
-        expect(response.path).toBe('/project/src')
+        expect(response.path).toBe(copiedDto.path)
         const session = await fakeTreeRepository.readTreeSession()
         expect(response.path).toBe(session.path)
     })
@@ -287,7 +201,7 @@ describe('FileService.openDirectory', () => {
         const response = await fileService.openDirectory(copiedDto.children[1])
 
         // Then.
-        expect(response.path).toBe('/project/src')
+        expect(response.path).toBe(path.join(copiedDto.path, copiedDto.children[1].name))
         const session = await fakeTreeRepository.readTreeSession()
         expect(response.path).toBe(session.children[1].path)
         expect(session.children[1].expanded).toBe(true)
@@ -306,7 +220,7 @@ describe('FileService.save', () => {
 
     test('Save with empty filePath and cancel dialog', async () => {
         // Given.
-        const data: TabEditorDto = { ...emptyFilePathData }
+        const data: TabEditorDto = { ...emptyFilePathTabEditorDto }
 
         setFakeSaveDialogResult({
             canceled: true,
@@ -322,7 +236,7 @@ describe('FileService.save', () => {
 
     test('Save with empty filePath and confirmed dialog', async () => {
         // Given.
-        const data: TabEditorDto = { ...emptyFilePathData }
+        const data: TabEditorDto = { ...emptyFilePathTabEditorDto }
         setFakeSaveDialogResult({
             canceled: false,
             filePath: newFilePath
@@ -348,7 +262,7 @@ describe('FileService.save', () => {
 
     test('Save with filePath', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         await fakeTabRepository.setTabSession({
             activatedId: 1,
@@ -381,7 +295,7 @@ describe('FileService.saveAs', () => {
 
     test('should return false when SaveDialog is canceled', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         setFakeSaveDialogResult({
             canceled: true,
             filePath: ''
@@ -396,7 +310,7 @@ describe('FileService.saveAs', () => {
 
     test('should save file and update tabSession when SaveDialog returns path', async () => {
         // Given.
-        const data = { ...defaultData }
+        const data = { ...defaultTabEditorDto }
         setFakeSaveDialogResult({
             canceled: false,
             filePath: newFilePath
@@ -434,7 +348,7 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with confirmed dialog', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: false,
@@ -465,7 +379,7 @@ describe('FileService.saveAll', () => {
 
     test('test all cases with cancel dialog', async () => {
         // Given.
-        const copiedDto = { ...tabEidtorDto }
+        const copiedDto = { ...tabEidtorsDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         setFakeSaveDialogResult({
             canceled: true,

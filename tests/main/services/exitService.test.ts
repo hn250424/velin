@@ -1,5 +1,4 @@
 import exit from '@services/exitService'
-import { TabEditorDto, TabEditorsDto } from '@shared/dto/TabEditorDto'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
@@ -9,93 +8,22 @@ import fakeDialogManager, {
 } from '../modules/ui/fakeDialogManager'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
-import TreeDto from '@shared/dto/TreeDto'
 import { TabSessionModel } from 'src/main/models/TabSessionModel'
 import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 
-const tabSessionPath = '/fake/path/tabSession.json'
-const treeSessionPath = '/fake/path/treeSession.json'
+import {
+    tabSessionPath,
+    treeSessionPath,
+    newFilePath,
+    tabEidtorsDto,
+    treeDto,
+} from '../data/test_data'
+
 let fakeMainWindow: FakeMainWindow
 let fakeFileManager: FakeFileManager
 let fakeTabRepository: FakeTabRepository
 let fakeTreeUtils: FakeTreeUtils
 let fakeTreeRepository: FakeTreeRepository
-
-const preFilePath = 'preFilePath'
-const newFilePath = 'newFilePath'
-const preFileName = 'preFileName'
-const newFileName = 'newFileName'
-const preFileContent = 'preFileContent'
-const newFileContent = 'newFileContent'
-
-const tabEidtorDto: TabEditorsDto = {
-    activatedId: 1,
-    data: [
-        {
-            id: 0,
-            isModified: false,
-            filePath: '',
-            fileName: 'Untitled',
-            content: ''
-        },
-        {
-            id: 1,
-            isModified: false,
-            filePath: `${preFilePath}_1`,
-            fileName: `${preFileName}_1`,
-            content: `${preFileContent}_1`
-        },
-        {
-            id: 2,
-            isModified: true,
-            filePath: `${preFilePath}_2`,
-            fileName: `${preFileName}_2`,
-            content: `${preFileContent}_2`
-        },
-        {
-            id: 3,
-            isModified: true,
-            filePath: '',
-            fileName: `${preFileName}_3`,
-            content: `${preFileContent}_3`
-        },
-    ]
-}
-
-const treeDto: TreeDto = {
-    path: '/project',
-    name: 'project',
-    indent: 0,
-    directory: true,
-    expanded: true,
-    children: [
-        {
-            path: '/project/index.ts',
-            name: 'index.ts',
-            indent: 1,
-            directory: false,
-            expanded: false,
-            children: null
-        },
-        {
-            path: '/project/src',
-            name: 'src',
-            indent: 1,
-            directory: true,
-            expanded: true,
-            children: [
-                {
-                    path: '/project/src/main.ts',
-                    name: 'main.ts',
-                    indent: 2,
-                    directory: false,
-                    expanded: false,
-                    children: null
-                }
-            ]
-        }
-    ]
-}
 
 describe('exitService.exit', () => {
     beforeEach(() => {
@@ -108,7 +36,7 @@ describe('exitService.exit', () => {
 
     test('test when user cancels confirm dialog', async () => {
         // Given.
-        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTabEditorDto = {...tabEidtorsDto}
         const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -156,7 +84,7 @@ describe('exitService.exit', () => {
 
     test('test when user confirm dialog and cancels open dialog', async () => {
         // Given.
-        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTabEditorDto = {...tabEidtorsDto}
         const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)
@@ -197,7 +125,7 @@ describe('exitService.exit', () => {
 
     test('test when user confirm dialog and select file path', async () => {
         // Given.
-        const copiedTabEditorDto = {...tabEidtorDto}
+        const copiedTabEditorDto = {...tabEidtorsDto}
         const copiedTreeDto = { ...treeDto }
         fakeFileManager.setPathExistence(tabSessionPath, true)
         fakeFileManager.setPathExistence(treeSessionPath, true)

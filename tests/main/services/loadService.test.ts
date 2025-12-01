@@ -18,14 +18,15 @@ import FakeWindowRepository from '../modules/window/FakeWindowRepository'
 import FakeWindowUtils from '../modules/window/FakeWindowUtils'
 import { WindowSessionModel } from '@main/models/WindowSessionModel'
 import SettingsSessionModel from '@main/models/SettingsSessionModel'
+import {
+    tabSessionPath,
+    treeSessionPath,
+    sideSessionPath,
+    settingsSessionPath,
+    windowSessionPath,
+} from '../data/test_data'
 
 describe('loadService.loadedRenderer: ', () => {
-    const sideSessionPath = '/fake/path/sideSession.json' 
-    const tabSessionPath = '/fake/path/tabSession.json'
-    const treeSessionPath = '/fake/path/treeSession.json'
-    const settingsSessionPath = '/fake/path/settingsSession.json'
-    const windowSessionPath = '/fake/path/windowSession.json'
-
     let fakeMainWindow: FakeMainWindow
     let fakeFileManager: FakeFileManager
     let fakeSideRepository: FakeSideRepository

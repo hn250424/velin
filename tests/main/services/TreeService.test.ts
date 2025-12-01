@@ -3,107 +3,24 @@ import TreeService from '@services/TreeService'
 import TreeDto from '@shared/dto/TreeDto'
 import path from 'path'
 import { beforeEach, describe, expect, test } from 'vitest'
-import FakeMainWindow from '../mocks/FakeMainWindow'
 import FakeFileManager from '../modules/fs/FakeFileManager'
 import FakeTreeUtils from '../modules/tree/FakeTreeUtils'
 import FakeTabRepository from '../modules/tab/FakeTabRepository'
 import FakeTreeRepository from '../modules/tree/FakeTreeRepository'
 
-const tabSessionPath = '/fake/path/tabSession.json'
-const treeSessionPath = '/fake/path/treeSession.json'
+import {
+    tabSessionPath,
+    treeSessionPath,
+    treeDto,
+} from '../data/test_data'
 
 let fakeFileManager: FakeFileManager
 let fakeTreeUtils: FakeTreeUtils
 let fakeTabRepository: FakeTabRepository
 let fakeTreeRepository: FakeTreeRepository
 let treeService: TreeService
-const fakeMainWindow = new FakeMainWindow()
 
 const treeSessionModel: TreeSessionModel = {
-    "path": "D:\\node-workspace\\velin\\test_file",
-    "name": "test_file",
-    "indent": 0,
-    "directory": true,
-    "expanded": true,
-    "children": [
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\dir333",
-            "name": "dir333",
-            "indent": 1,
-            "directory": true,
-            "expanded": true,
-            "children": [
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\dir333\\deep",
-                    "name": "deep",
-                    "indent": 2,
-                    "directory": true,
-                    "expanded": true,
-                    "children": [
-                        {
-                            "path": "D:\\node-workspace\\velin\\test_file\\dir333\\deep\\14.md",
-                            "name": "14.md",
-                            "indent": 3,
-                            "directory": false,
-                            "expanded": false,
-                            "children": null
-                        },
-                    ]
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
-                    "name": "test139.md",
-                    "indent": 1,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
-                    "name": "test139-1.md",
-                    "indent": 1,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                },
-                {
-                    "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
-                    "name": "test139-3.md",
-                    "indent": 1,
-                    "directory": false,
-                    "expanded": false,
-                    "children": null
-                }
-            ]
-        },
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\test139.md",
-            "name": "test139.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\test139-1.md",
-            "name": "test139-1.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        },
-        {
-            "path": "D:\\node-workspace\\velin\\test_file\\test139-3.md",
-            "name": "test139-3.md",
-            "indent": 1,
-            "directory": false,
-            "expanded": false,
-            "children": null
-        }
-    ]
-}
-
-const treeDto: TreeDto = {
     "path": "D:\\node-workspace\\velin\\test_file",
     "name": "test_file",
     "indent": 0,
