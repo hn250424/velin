@@ -3,6 +3,7 @@ import TreeFacade from "../modules/tree/TreeFacade"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import TrashMap from "@shared/types/TrashMap"
 import Response from "@shared/types/Response"
+import TreeViewModel from "../viewmodels/TreeViewModel"
 
 export default class DeleteCommand implements ICommand {
     private trashMap: TrashMap[] | null
@@ -21,8 +22,7 @@ export default class DeleteCommand implements ICommand {
         for (let i = 0; i < this.selectedIndices.length; i++) {
             const viewModel = this.treeFacade.getTreeViewModelByIndex(this.selectedIndices[i])
             pathsToDelete.push(viewModel.path)
-            const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(viewModel.path)
-            if (tabEditorView) idsToDelete.push(tabEditorView.getId())
+            idsToDelete.push(...this.getIdsFromTreeViewModel(viewModel)) 
         }
 
         const response: Response<TrashMap[] | null> = await window.rendererToMain.delete(pathsToDelete)
@@ -52,5 +52,16 @@ export default class DeleteCommand implements ICommand {
             this.treeFacade.renderTreeData(viewModel)
             this.treeFacade.loadFlattenArrayAndMaps(viewModel)
         }
+    }
+
+    private getIdsFromTreeViewModel(vm: TreeViewModel, arr: number[] = []) {
+        if (vm.directory) {
+            for (const child of vm.children) {
+                this.getIdsFromTreeViewModel(child, arr)
+            }
+        }
+        const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(vm.path)
+        if (tabEditorView) arr.push(tabEditorView.getId())
+        return arr
     }
 }

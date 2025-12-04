@@ -15,7 +15,7 @@ import TabDragManager from "./TabDragManager"
 export const BINARY_FILE_WARNING = `Can't read this file`
 
 @injectable()
-export default class TabEditorFacde {
+export default class TabEditorFacade {
     constructor(
         @inject(DI_KEYS.TabEditorRenderer) private readonly renderer: TabEditorRenderer,
         @inject(DI_KEYS.TabEditorStore) private readonly store: TabEditorStore,
