@@ -333,7 +333,7 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
     if (focusManager.getFocus() !== 'tree') return
 
     let lastIdx = treeFacade.lastSelectedIndex
-    let totalLength = treeFacade.getFlattenTreeArrayLength()
+    const totalLength = treeFacade.getFlattenTreeArrayLength()
     if (lastIdx >= totalLength) return
 
     const preTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)

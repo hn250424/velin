@@ -8,21 +8,23 @@ export default class TreeStore {
     private _flattenTreeArray: TreeViewModel[] = []
     private _pathToFlattenArrayIndexMap: Map<string, number> = new Map()
 
-    private _contextTreeIndex: number = -1
-    private _lastSelectedIndex: number = -1
-    private _selectedDragIndex: number = -1
+    private _contextTreeIndex = -1
+    private _lastSelectedIndex = -1
+    private _selectedDragIndex = -1
 
     // Set of user-selected indices (no children included). For just ui.
-    private _selectedIndices = new Set<number>
+    private _selectedIndices = new Set<number>()
 
     // Set of full paths that have been copied (including all nested children).
     // Unlike selectedIndices, this persists even if folders are collapsed.
     // Used during copy/cut commands to track exactly what to paste later.
     // Always resolved at the time of the command (not tied to UI state).
-    private _clipboardPaths = new Set<string>
+    private _clipboardPaths = new Set<string>()
     private _clipboardMode: ClipboardMode = 'none'
 
-    constructor() { }
+    constructor() {
+        // intentionally empty.
+    }
 
     toTreeDto(viewModel: TreeViewModel): TreeDto {
         return {
@@ -228,6 +230,7 @@ export default class TreeStore {
     }
 
     clearSelectedIndices() {
+        this._lastSelectedIndex = -1
         this._selectedIndices.clear()
     }
 

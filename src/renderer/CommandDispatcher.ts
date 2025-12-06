@@ -282,7 +282,7 @@ export default class CommandDispatcher {
                 await cmd.execute()
                 this.undoStack.push(cmd)
             } catch (err) {
-
+                // intentionally empty
             } finally {
                 await sleep(300)
                 window.rendererToMain.setWatchSkipState(false)
@@ -442,7 +442,7 @@ export default class CommandDispatcher {
                 this.undoStack.push(cmd)
                 this.redoStack.length = 0
             } catch {
-
+                // intentionally empty
             } finally {
                 await sleep(300)
                 window.rendererToMain.setWatchSkipState(false)
@@ -542,7 +542,7 @@ export default class CommandDispatcher {
             this.undoStack.push(cmd)
             this.redoStack.length = 0
         } catch {
-
+            // intentionally empty
         } finally {
             await sleep(300)
             window.rendererToMain.setWatchSkipState(false)
