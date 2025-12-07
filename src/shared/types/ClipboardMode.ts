@@ -1,2 +1,2 @@
-type ClipboardMode = 'cut' | 'copy' | 'none'
-export default ClipboardMode
+type ClipboardMode = "cut" | "copy" | "none";
+export default ClipboardMode;

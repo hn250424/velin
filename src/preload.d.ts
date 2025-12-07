@@ -1,15 +1,15 @@
 import type {
-    MainToRendererAPI,
-    RendererToMainAPI,
-    UtilsAPI
-} from '@shared/preload'
+	MainToRendererAPI,
+	RendererToMainAPI,
+	UtilsAPI,
+} from "@shared/preload";
 
-export { }
+export {};
 
 declare global {
-    interface Window {
-        mainToRenderer: MainToRendererAPI
-        rendererToMain: RendererToMainAPI
-        utils: UtilsAPI
-    }
+	interface Window {
+		mainToRenderer: MainToRendererAPI;
+		rendererToMain: RendererToMainAPI;
+		utils: UtilsAPI;
+	}
 }

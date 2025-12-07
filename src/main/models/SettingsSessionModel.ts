@@ -1,12 +1,11 @@
 export default interface SettingsSessionModel {
-    settingFontSessionModel: SettingFontSessionModel
-    settingThemeSessionModel: SettingThemeSessionModel
+	settingFontSessionModel: SettingFontSessionModel;
+	settingThemeSessionModel: SettingThemeSessionModel;
 }
 
 export interface SettingFontSessionModel {
-    size: number
+	size: number;
 }
 
-export interface SettingThemeSessionModel {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SettingThemeSessionModel {}

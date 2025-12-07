@@ -1,13 +1,11 @@
 export default class FindReplaceState {
-    private isDirectionUp = false
+	private isDirectionUp = false;
 
-    constructor() {}
+	setDirectionUp(value: boolean) {
+		this.isDirectionUp = value;
+	}
 
-    setDirectionUp(value: boolean) {
-        this.isDirectionUp = value
-    }
-
-    getDirectionUp(): boolean {
-        return this.isDirectionUp
-    }
+	getDirectionUp(): boolean {
+		return this.isDirectionUp;
+	}
 }

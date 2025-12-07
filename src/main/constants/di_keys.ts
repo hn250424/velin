@@ -1,25 +1,25 @@
 const DI_KEYS = {
-    FileManager: Symbol('FileManager'),
-    FileWatcher: Symbol('FileWatcher'),
-    
-    dialogManager: Symbol('dialogManager'),
+	FileManager: Symbol("FileManager"),
+	FileWatcher: Symbol("FileWatcher"),
 
-    WindowRepository: Symbol('WindowRepository'),
-    SettingsRepository: Symbol('SettingsRepository'),
-    SideRepository: Symbol('SideRepository'),
-    TabRepository: Symbol('TabRepository'),
-    TreeRepository: Symbol('TreeRepository'),
+	dialogManager: Symbol("dialogManager"),
 
-    WindowUtils: Symbol('WindowUtils'),
-    SettingsUtils: Symbol('SettingsUtils'),
-    TabUtils: Symbol('TabUtils'),
-    TreeUtils: Symbol('TreeUtils'),
+	WindowRepository: Symbol("WindowRepository"),
+	SettingsRepository: Symbol("SettingsRepository"),
+	SideRepository: Symbol("SideRepository"),
+	TabRepository: Symbol("TabRepository"),
+	TreeRepository: Symbol("TreeRepository"),
 
-    FileService: Symbol('FileService'),
-    TabService: Symbol('TabService'),
-    TreeService: Symbol('TreeService'),
-    SideService: Symbol('SideService'),
-    SettingsService: Symbol('SettingsService'),
-}
+	WindowUtils: Symbol("WindowUtils"),
+	SettingsUtils: Symbol("SettingsUtils"),
+	TabUtils: Symbol("TabUtils"),
+	TreeUtils: Symbol("TreeUtils"),
 
-export default DI_KEYS
+	FileService: Symbol("FileService"),
+	TabService: Symbol("TabService"),
+	TreeService: Symbol("TreeService"),
+	SideService: Symbol("SideService"),
+	SettingsService: Symbol("SettingsService"),
+};
+
+export default DI_KEYS;

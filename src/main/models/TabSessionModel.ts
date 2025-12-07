@@ -1,9 +1,9 @@
 export interface TabSessionModel {
-    activatedId: number,
-    data: TabSessionData[]
+	activatedId: number;
+	data: TabSessionData[];
 }
 
 export interface TabSessionData {
-    id: number
-    filePath: string
+	id: number;
+	filePath: string;
 }

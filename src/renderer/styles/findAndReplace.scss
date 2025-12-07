@@ -1,4 +1,4 @@
-@use './variables.scss' as gv;
+@use "./variables.scss" as gv;
 
 $row_height: 24px;
 
@@ -14,80 +14,79 @@ $input_horizontal_padding: 4px;
 $info_horizontal_padding: 4px;
 
 #find_replace_container {
-    display: none;
-    flex-direction: column;
-    gap: $container_gap;
+	display: none;
+	flex-direction: column;
+	gap: $container_gap;
 
-    position: fixed;
-    top: 10%;
-    right: 10%;
-    z-index: 95;
+	position: fixed;
+	top: 10%;
+	right: 10%;
+	z-index: 95;
 
-    padding: $container_padding;
+	padding: $container_padding;
 
-    background-color: var(--find-replace-container-bg)
+	background-color: var(--find-replace-container-bg);
 }
 
 #find,
 #replace {
-    width: 100%;
-    height: $row_height;
+	width: 100%;
+	height: $row_height;
 }
 
 #find > input,
 #replace > input {
-    width: $input_width;
-    padding: 0 $input_horizontal_padding;
-    background: var(--find-replace-input);
+	width: $input_width;
+	padding: 0 $input_horizontal_padding;
+	background: var(--find-replace-input);
 }
 
 #find > button,
 #replace > button {
-    margin: 0 $button_horizontal_margin;
+	margin: 0 $button_horizontal_margin;
 }
 
 #find > button:hover,
 #replace > button:hover {
-    cursor: pointer;
-    background-color: var(--find-replace-button-hover);
+	cursor: pointer;
+	background-color: var(--find-replace-button-hover);
 }
 
 #find_info,
 #replace_info {
-    width: $info_width;
-    padding: 0 $info_horizontal_padding;
-    
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    
-    font-size: 0.7rem;
+	width: $info_width;
+	padding: 0 $info_horizontal_padding;
+
+	display: flex;
+	align-items: center;
+	justify-content: end;
+
+	font-size: 0.7rem;
 }
 
 #find {
-    display: flex;
+	display: flex;
 }
 
 #replace {
-    display: none;
+	display: none;
 }
 
 #find,
 #replace {
-    align-items: center;
+	align-items: center;
 }
 
 #find > button,
 #replace > button {
-    width: gv.$icon_size;
-    height: gv.$icon_size;
-    
+	width: gv.$icon_size;
+	height: gv.$icon_size;
 }
 
 .search-highlight {
-    background-color: var(--search-highlight);
+	background-color: var(--search-highlight);
 }
 
 .search-highlight-current {
-    background-color: var(--search-highlight-current);
+	background-color: var(--search-highlight-current);
 }

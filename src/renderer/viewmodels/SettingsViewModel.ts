@@ -1,12 +1,11 @@
 export default interface SettingsViewModel {
-    settingFontViewModel: SettingFontViewModel
-    settingThemeViewModel: SettingThemeViewModel
+	settingFontViewModel: SettingFontViewModel;
+	settingThemeViewModel: SettingThemeViewModel;
 }
 
 export interface SettingFontViewModel {
-    size: number
+	size: number;
 }
 
-export interface SettingThemeViewModel {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SettingThemeViewModel {}

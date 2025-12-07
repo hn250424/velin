@@ -1,266 +1,292 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Velin</title>
+	</head>
 
-<head>
-    <meta charset="UTF-8" />
-    <title>Velin</title>
+	<body>
+		<div id="settings-overlay" class="overlay">
+			<div id="settings-container" class="overlay-surface">
+				<div id="settings-top">
+					<button id="settings-exit" class="tooltip-btn">
+						<img class="icon-grey" src="src/renderer/assets/icons/close.png" />
+						<span class="tooltip tooltip-bottom">Close</span>
+					</button>
+				</div>
 
-</head>
+				<div id="settings-section">
+					<div id="settings-menu">
+						<button id="settings-menu-font">Font</button>
+						<button id="settings-menu-theme">Theme</button>
+					</div>
+					<div id="settings-contents">
+						<div id="settings-contents-font">
+							<div id="setting-node-font-size" class="setting-node">
+								<label>size</label>
+								<input type="number" />
+							</div>
+						</div>
 
-<body>
-    <div id="settings-overlay" class="overlay">
-        <div id="settings-container" class="overlay-surface">
-            <div id="settings-top">
-                <button id="settings-exit" class="tooltip-btn">
-                    <img class="icon-grey" src="src/renderer/assets/icons/close.png" />
-                    <span class="tooltip tooltip-bottom">Close</span>
-                </button>
-            </div>
+						<div id="settings-contents-theme"></div>
+					</div>
+				</div>
 
-            <div id="settings-section">
-                <div id="settings-menu">
-                    <button id="settings-menu-font">Font</button>
-                    <button id="settings-menu-theme">Theme</button>
-                </div>
-                <div id="settings-contents">
-                    <div id="settings-contents-font">
-                        <div id="setting-node-font-size" class="setting-node">
-                            <label>size</label>
-                            <input type="number" />
-                        </div>
-                    </div>
+				<div id="settings-bottom">
+					<button id="settings-apply-btn">Apply</button>
+					<button id="settings-close-btn">Close</button>
+				</div>
+			</div>
+		</div>
 
-                    <div id="settings-contents-theme"></div>
-                </div>
-            </div>
+		<div id="find_replace_container">
+			<div id="find">
+				<input id="find_input" type="text" />
 
-            <div id="settings-bottom">
-                <button id="settings-apply-btn">Apply</button>
-                <button id="settings-close-btn">Close</button>
-            </div>
-        </div>
-    </div>
+				<button id="find_up" class="tooltip-btn">
+					<img src="src/renderer//assets/icons/find_up.png" />
+					<span class="tooltip tooltip-bottom">Find up</span>
+				</button>
+				<button id="find_down" class="tooltip-btn">
+					<img src="src/renderer/assets/icons/find_down.png" />
+					<span class="tooltip tooltip-bottom">Find down</span>
+				</button>
+				<button id="find_close" class="tooltip-btn">
+					<img src="src/renderer/assets/icons/find_close.png" />
+					<span class="tooltip tooltip-bottom">Close</span>
+				</button>
 
-    <div id="find_replace_container">
-        <div id="find">
-            <input id="find_input" type="text" />
-            
-            <button id="find_up" class="tooltip-btn">
-                <img src="src/renderer//assets/icons/find_up.png">
-                <span class="tooltip tooltip-bottom">Find up</span>
-            </button>
-            <button id="find_down" class="tooltip-btn">
-                <img src="src/renderer/assets/icons/find_down.png">
-                <span class="tooltip tooltip-bottom">Find down</span>
-            </button>
-            <button id="find_close" class="tooltip-btn">
-                <img src="src/renderer/assets/icons/find_close.png">
-                <span class="tooltip tooltip-bottom">Close</span>
-            </button>
+				<span id="find_info"></span>
+			</div>
 
-            <span id="find_info"></span>
-        </div>
+			<div id="replace">
+				<input id="replace_input" type="text" />
 
-        <div id="replace">
-            <input id="replace_input" type="text" />
-            
-            <button id="replace_current" class="tooltip-btn">
-                <img src="src/renderer/assets/icons/replace.png">
-                <span class="tooltip tooltip-bottom">Replace (Enter)</span>
-            </button>
-            <button id="replace_all" class="tooltip-btn">
-                <img src="src/renderer/assets/icons/replace_all.png">
-                <span class="tooltip tooltip-bottom">Replace All (Ctrl+Alt+Enter)</span>
-            </button>
+				<button id="replace_current" class="tooltip-btn">
+					<img src="src/renderer/assets/icons/replace.png" />
+					<span class="tooltip tooltip-bottom">Replace (Enter)</span>
+				</button>
+				<button id="replace_all" class="tooltip-btn">
+					<img src="src/renderer/assets/icons/replace_all.png" />
+					<span class="tooltip tooltip-bottom"
+						>Replace All (Ctrl+Alt+Enter)</span
+					>
+				</button>
 
-            <span id="replace_info"></span>
-        </div>
-    </div>
+				<span id="replace_info"></span>
+			</div>
+		</div>
 
-    <div id="info-overlay" class="overlay">
-        <div id="info-container" class="overlay-surface">
-            <div id="info-top"></div>
-            <div id="info-content">
-                <div id="info-version">
-                    <label>version</label>
-                    <span></span>
-                </div>
-            </div>
-            <div id="info-bottom">
-                <button id="info-button">Close</button>
-            </div>
-        </div>
-    </div>
+		<div id="info-overlay" class="overlay">
+			<div id="info-container" class="overlay-surface">
+				<div id="info-top"></div>
+				<div id="info-content">
+					<div id="info-version">
+						<label>version</label>
+						<span></span>
+					</div>
+				</div>
+				<div id="info-bottom">
+					<button id="info-button">Close</button>
+				</div>
+			</div>
+		</div>
 
-    <div id="tab_context_menu" class="dropdown">
-        <div id="tab_context_close" class="dropdown_item">
-            Close<span class="shortcut">Ctrl+W</span>
-        </div>
-        <div id="tab_context_close_others" class="dropdown_item">
-            Close Others<span class="shortcut"></span>
-        </div>
-        <div id="tab_context_close_right" class="dropdown_item">
-            Close to the Right<span class="shortcut"></span>
-        </div>
-        <div id="tab_context_close_all" class="dropdown_item">
-            Close All<span class="shortcut"></span>
-        </div>
-    </div>
+		<div id="tab_context_menu" class="dropdown">
+			<div id="tab_context_close" class="dropdown_item">
+				Close<span class="shortcut">Ctrl+W</span>
+			</div>
+			<div id="tab_context_close_others" class="dropdown_item">
+				Close Others<span class="shortcut"></span>
+			</div>
+			<div id="tab_context_close_right" class="dropdown_item">
+				Close to the Right<span class="shortcut"></span>
+			</div>
+			<div id="tab_context_close_all" class="dropdown_item">
+				Close All<span class="shortcut"></span>
+			</div>
+		</div>
 
-    <div id="tree_context_menu" class="dropdown">
-        <div id="tree_context_cut" class="dropdown_item">
-            Cut<span class="shortcut">Ctrl+X</span>
-        </div>
-        <div id="tree_context_copy" class="dropdown_item">
-            Copy<span class="shortcut">Ctrl+C</span>
-        </div>
-        <div id="tree_context_paste" class="dropdown_item">
-            Paste<span class="shortcut">Ctrl+V</span>
-        </div>
-        <div id="tree_context_rename" class="dropdown_item">
-            Rename<span class="shortcut">F2</span>
-        </div>
-        <div id="tree_context_delete" class="dropdown_item">
-            Delete<span class="shortcut">DELETE</span>
-        </div>
-    </div>
+		<div id="tree_context_menu" class="dropdown">
+			<div id="tree_context_cut" class="dropdown_item">
+				Cut<span class="shortcut">Ctrl+X</span>
+			</div>
+			<div id="tree_context_copy" class="dropdown_item">
+				Copy<span class="shortcut">Ctrl+C</span>
+			</div>
+			<div id="tree_context_paste" class="dropdown_item">
+				Paste<span class="shortcut">Ctrl+V</span>
+			</div>
+			<div id="tree_context_rename" class="dropdown_item">
+				Rename<span class="shortcut">F2</span>
+			</div>
+			<div id="tree_context_delete" class="dropdown_item">
+				Delete<span class="shortcut">DELETE</span>
+			</div>
+		</div>
 
-    <div id="container">
-        <div id="title" class="drag">
-            <span id="logo" class="no_drag">
-                <img src="src/shared/logo/logo.png" />
-            </span>
+		<div id="container">
+			<div id="title" class="drag">
+				<span id="logo" class="no_drag">
+					<img src="src/shared/logo/logo.png" />
+				</span>
 
-            <div id="menu_container" class="no_drag">
-                <div class="menu_item" tabindex="0">
-                    File
-                    <div class="dropdown">
-                        <!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
-                        <div id="file_menu_new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span>
-                        </div>
-                        <div id="file_menu_open_file" class="dropdown_item">Open File<span
-                                class="shortcut">Ctrl+O</span></div>
-                        <div id="file_menu_open_directory" class="dropdown_item">Open Folder<span
-                                class="shortcut">Ctrl+Shift+O</span></div>
-                        <!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
-                        <div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span>
-                        </div>
-                        <div id="file_menu_save_as" class="dropdown_item">Save As<span
-                                class="shortcut">Ctrl+Shift+S</span></div>
-                        <div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut"></span>
-                        </div>
-                        <div class="dropdown_divider"></div>
-                        <div id="file_menu_settings" class="dropdown_item">Settings<span
-                                class="shortcut">Ctrl+,</span></div>
-                        <div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span>
-                        </div>
-                    </div>
-                </div>
+				<div id="menu_container" class="no_drag">
+					<div class="menu_item" tabindex="0">
+						File
+						<div class="dropdown">
+							<!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
+							<div id="file_menu_new_tab" class="dropdown_item">
+								New Tab<span class="shortcut">Ctrl+T</span>
+							</div>
+							<div id="file_menu_open_file" class="dropdown_item">
+								Open File<span class="shortcut">Ctrl+O</span>
+							</div>
+							<div id="file_menu_open_directory" class="dropdown_item">
+								Open Folder<span class="shortcut">Ctrl+Shift+O</span>
+							</div>
+							<!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
+							<div id="file_menu_save" class="dropdown_item">
+								Save<span class="shortcut">Ctrl+S</span>
+							</div>
+							<div id="file_menu_save_as" class="dropdown_item">
+								Save As<span class="shortcut">Ctrl+Shift+S</span>
+							</div>
+							<div id="file_menu_save_all" class="dropdown_item">
+								Save All<span class="shortcut"></span>
+							</div>
+							<div class="dropdown_divider"></div>
+							<div id="file_menu_settings" class="dropdown_item">
+								Settings<span class="shortcut">Ctrl+,</span>
+							</div>
+							<div id="file_menu_exit" class="exit dropdown_item">
+								Exit<span class="shortcut">Alt+F4</span>
+							</div>
+						</div>
+					</div>
 
-                <div class="menu_item" tabindex="0">
-                    Edit
-                    <div class="dropdown">
-                        <div id="edit_menu_undo" class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span>
-                        </div>
-                        <div id="edit_menu_redo" class="dropdown_item">Redo<span class="shortcut">Ctrl+Shift+Z</span>
-                        </div>
-                        <div class="dropdown_divider"></div>
-                        <div id="edit_menu_cut" class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
-                        <div id="edit_menu_copy" class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span>
-                        </div>
-                        <div id="edit_menu_paste" class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span>
-                        </div>
-                        <div class="dropdown_divider"></div>
-                        <div id="edit_menu_find" class="dropdown_item">Find<span class="shortcut">Ctrl+F</span>
-                        </div>
-                        <div id="edit_menu_replace" class="dropdown_item">Replace<span class="shortcut">Ctrl+R</span>
-                        </div>
-                        <!-- <div class="dropdown_divider"></div>
+					<div class="menu_item" tabindex="0">
+						Edit
+						<div class="dropdown">
+							<div id="edit_menu_undo" class="dropdown_item">
+								Undo<span class="shortcut">Ctrl+Z</span>
+							</div>
+							<div id="edit_menu_redo" class="dropdown_item">
+								Redo<span class="shortcut">Ctrl+Shift+Z</span>
+							</div>
+							<div class="dropdown_divider"></div>
+							<div id="edit_menu_cut" class="dropdown_item">
+								Cut<span class="shortcut">Ctrl+X</span>
+							</div>
+							<div id="edit_menu_copy" class="dropdown_item">
+								Copy<span class="shortcut">Ctrl+C</span>
+							</div>
+							<div id="edit_menu_paste" class="dropdown_item">
+								Paste<span class="shortcut">Ctrl+V</span>
+							</div>
+							<div class="dropdown_divider"></div>
+							<div id="edit_menu_find" class="dropdown_item">
+								Find<span class="shortcut">Ctrl+F</span>
+							</div>
+							<div id="edit_menu_replace" class="dropdown_item">
+								Replace<span class="shortcut">Ctrl+R</span>
+							</div>
+							<!-- <div class="dropdown_divider"></div>
                         <div id="edit_menu_find_in_files" class="dropdown_item">Find in Files<span class="shortcut">Ctrl+Shift+F</span>
                         </div>
                         <div id="edit_menu_replace_in_files" class="dropdown_item">Replace in Files<span class="shortcut">Ctrl+Shift+R</span> -->
-                        <!-- </div> -->
-                    </div>
-                </div>
+							<!-- </div> -->
+						</div>
+					</div>
 
-                <div class="menu_item" tabindex="0">
-                    View
-                    <div class="dropdown">
-                        <div id="view_menu_zoom_in" class="dropdown_item">Zoom In<span class="shortcut">Ctrl++</span>
-                        </div>
-                        <div id="view_menu_zoom_out" class="dropdown_item">Zoom Out<span class="shortcut">Ctrl+-</span>
-                        </div>
-                        <div id="view_menu_zoom_reset" class="dropdown_item">Reset Zoom<span
-                                class="shortcut">Ctrl+0</span></div>
-                        <!-- <div class="dropdown_divider"></div> -->
-                        <!-- <div id="view_menu_fullscreen" class="dropdown_item">Fullscreen<span class="shortcut">F11</span> -->
-                        <!-- </div> -->
-                    </div>
-                </div>
+					<div class="menu_item" tabindex="0">
+						View
+						<div class="dropdown">
+							<div id="view_menu_zoom_in" class="dropdown_item">
+								Zoom In<span class="shortcut">Ctrl++</span>
+							</div>
+							<div id="view_menu_zoom_out" class="dropdown_item">
+								Zoom Out<span class="shortcut">Ctrl+-</span>
+							</div>
+							<div id="view_menu_zoom_reset" class="dropdown_item">
+								Reset Zoom<span class="shortcut">Ctrl+0</span>
+							</div>
+							<!-- <div class="dropdown_divider"></div> -->
+							<!-- <div id="view_menu_fullscreen" class="dropdown_item">Fullscreen<span class="shortcut">F11</span> -->
+							<!-- </div> -->
+						</div>
+					</div>
 
-                <div class="menu_item" tabindex="0">
-                    Help
-                    <div class="dropdown">
-                        <!-- <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div> -->
-                        <div id="help-information" class="dropdown_item">Information<span class="shortcut">F1</span></div>
-                    </div>
-                </div>
-            </div>
+					<div class="menu_item" tabindex="0">
+						Help
+						<div class="dropdown">
+							<!-- <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div> -->
+							<div id="help-information" class="dropdown_item">
+								Information<span class="shortcut">F1</span>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            <div id="window" class="no_drag">
-                <button id="minimizeWindow" class="tooltip-btn">
-                    <img class="icon-grey" src="src/renderer/assets/icons/minimize.png" />
-                    <span class="tooltip tooltip-bottom">Minimize</span>
-                </button>
-                <button id="maximizeWindow" class="tooltip-btn">
-                    <img class="icon-grey" src="src/renderer/assets/icons/maximize.png" />
-                    <span class="tooltip tooltip-bottom">Maximize</span>
-                </button>
-                <button id="title_exit" class="tooltip-btn exit">
-                    <img class="icon-grey" src="src/renderer/assets/icons/close.png" />
-                    <span class="tooltip tooltip-bottom">Close</span>
-                </button>
-            </div>
-        </div>
+				<div id="window" class="no_drag">
+					<button id="minimizeWindow" class="tooltip-btn">
+						<img
+							class="icon-grey"
+							src="src/renderer/assets/icons/minimize.png"
+						/>
+						<span class="tooltip tooltip-bottom">Minimize</span>
+					</button>
+					<button id="maximizeWindow" class="tooltip-btn">
+						<img
+							class="icon-grey"
+							src="src/renderer/assets/icons/maximize.png"
+						/>
+						<span class="tooltip tooltip-bottom">Maximize</span>
+					</button>
+					<button id="title_exit" class="tooltip-btn exit">
+						<img class="icon-grey" src="src/renderer/assets/icons/close.png" />
+						<span class="tooltip tooltip-bottom">Close</span>
+					</button>
+				</div>
+			</div>
 
-        <div id="content">
-            <div id="side">
-                <div id="side_menu_container">
-                    <button id="treeToggle" class="tooltip-btn">
-                        <img src="src/renderer/assets/icons/files.png" />
-                        <span class="tooltip tooltip-right">Project tree</span>
-                    </button>
-                </div>
+			<div id="content">
+				<div id="side">
+					<div id="side_menu_container">
+						<button id="treeToggle" class="tooltip-btn">
+							<img src="src/renderer/assets/icons/files.png" />
+							<span class="tooltip tooltip-right">Project tree</span>
+						</button>
+					</div>
 
-                <div id="tree">
-                    <div id="tree_top">
-                        <span id="tree_top_name"></span>
-                        <div id="tree_top_icons">
-                            <button id="tree_top_add_file" class="tooltip-btn">
-                                <img src="src/renderer/assets/icons/add_file.png" />
-                                <span class="tooltip tooltip-bottom-left">Add File</span>
-                            </button>
-                            <button id="tree_top_add_directory" class="tooltip-btn">
-                                <img  src="src/renderer/assets/icons/add_folder.png" />
-                                <span class="tooltip tooltip-bottom-left">Add Folder</span>
-                            </button>
-                        </div>
-                    </div>
+					<div id="tree">
+						<div id="tree_top">
+							<span id="tree_top_name"></span>
+							<div id="tree_top_icons">
+								<button id="tree_top_add_file" class="tooltip-btn">
+									<img src="src/renderer/assets/icons/add_file.png" />
+									<span class="tooltip tooltip-bottom-left">Add File</span>
+								</button>
+								<button id="tree_top_add_directory" class="tooltip-btn">
+									<img src="src/renderer/assets/icons/add_folder.png" />
+									<span class="tooltip tooltip-bottom-left">Add Folder</span>
+								</button>
+							</div>
+						</div>
 
-                    <div id="tree_node_container"></div>
-                </div>
-                
-                <div id="side_resizer"></div>
-            </div>
+						<div id="tree_node_container"></div>
+					</div>
 
-            <div id="workspace">
-                <div id="tab_container"></div>
-                <div id="editor_container"></div>
-            </div>
-        </div>
-    </div>
+					<div id="side_resizer"></div>
+				</div>
 
-    <script type="module" src="src/renderer/renderer.ts"></script>
-</body>
+				<div id="workspace">
+					<div id="tab_container"></div>
+					<div id="editor_container"></div>
+				</div>
+			</div>
+		</div>
 
+		<script type="module" src="src/renderer/renderer.ts"></script>
+	</body>
 </html>

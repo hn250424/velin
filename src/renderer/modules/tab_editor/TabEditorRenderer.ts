@@ -1,246 +1,241 @@
-import { Editor, editorViewCtx, parserCtx, rootCtx } from "@milkdown/kit/core"
-import { history } from "@milkdown/kit/plugin/history"
-import { commonmark } from "@milkdown/kit/preset/commonmark"
-import { nord } from "@milkdown/theme-nord"
-import "@milkdown/theme-nord/style.css"
-import { redo, undo } from 'prosemirror-history'
-import { injectable } from "inversify"
+import { Editor, editorViewCtx, parserCtx, rootCtx } from "@milkdown/kit/core";
+import { history } from "@milkdown/kit/plugin/history";
+import { commonmark } from "@milkdown/kit/preset/commonmark";
+import { nord } from "@milkdown/theme-nord";
+import "@milkdown/theme-nord/style.css";
+import { redo, undo } from "prosemirror-history";
+import { injectable } from "inversify";
 import {
-    CLASS_TAB,
-    DATASET_ATTR_TAB_ID,
-    MODIFIED_TEXT,
-    CLASS_EDITOR_BOX,
-    NOT_MODIFIED_TEXT,
-    CLASS_TAB_GHOST,
-    CLASS_BINARY
-} from '../../constants/dom'
-import TabEditorView from "./TabEditorView"
-import TabEditorViewModel from "src/renderer/viewmodels/TabEditorViewModel"
-import { BINARY_FILE_WARNING } from "./TabEditorFacade"
+	CLASS_TAB,
+	DATASET_ATTR_TAB_ID,
+	MODIFIED_TEXT,
+	CLASS_EDITOR_BOX,
+	NOT_MODIFIED_TEXT,
+	CLASS_TAB_GHOST,
+	CLASS_BINARY,
+} from "../../constants/dom";
+import TabEditorView from "./TabEditorView";
+import TabEditorViewModel from "src/renderer/viewmodels/TabEditorViewModel";
+import { BINARY_FILE_WARNING } from "./TabEditorFacade";
 
 @injectable()
 export default class TabEditorRenderer {
-    private _tabEditorViews: TabEditorView[] = []
-    private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map()
+	private _tabEditorViews: TabEditorView[] = [];
+	private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
 
-    private ghostTab: HTMLElement | null
-    private indicator: HTMLElement | null
+	private ghostTab: HTMLElement | null;
+	private indicator: HTMLElement | null;
 
-    private tabContainer: HTMLElement
-    private editorContainer: HTMLElement
+	private tabContainer: HTMLElement;
+	private editorContainer: HTMLElement;
 
-    constructor() {
-        this.tabContainer = document.getElementById('tab_container')
-        this.editorContainer = document.getElementById('editor_container')
-    }
+	constructor() {
+		this.tabContainer = document.getElementById("tab_container");
+		this.editorContainer = document.getElementById("editor_container");
+	}
 
-    private createTabBox(fileName: string) {
-        const div = document.createElement('div')
-        div.classList.add(CLASS_TAB)
+	private createTabBox(fileName: string) {
+		const div = document.createElement("div");
+		div.classList.add(CLASS_TAB);
 
-        const span = document.createElement('span')
-        span.textContent = fileName ? fileName : "Untitled"
+		const span = document.createElement("span");
+		span.textContent = fileName ? fileName : "Untitled";
 
-        const button = document.createElement('button')
-        button.textContent = NOT_MODIFIED_TEXT
+		const button = document.createElement("button");
+		button.textContent = NOT_MODIFIED_TEXT;
 
-        div.appendChild(span)
-        div.appendChild(button)
+		div.appendChild(span);
+		div.appendChild(button);
 
-        return { div, span, button }
-    }
+		return { div, span, button };
+	}
 
-    async createTabAndEditor(viewModel: TabEditorViewModel) {
-        const { id, isModified, isBinary, filePath, fileName, initialContent } = viewModel
+	async createTabAndEditor(viewModel: TabEditorViewModel) {
+		const { id, isModified, isBinary, filePath, fileName, initialContent } =
+			viewModel;
 
-        const { div, span, button } = this.createTabBox(fileName)
-        div.dataset[DATASET_ATTR_TAB_ID] = id.toString()
-        span.title = filePath || ''
-        this.tabContainer.appendChild(div)
+		const { div, span, button } = this.createTabBox(fileName);
+		div.dataset[DATASET_ATTR_TAB_ID] = id.toString();
+		span.title = filePath || "";
+		this.tabContainer.appendChild(div);
 
-        const editorBoxDiv = document.createElement('div')
-        editorBoxDiv.className = CLASS_EDITOR_BOX
+		const editorBoxDiv = document.createElement("div");
+		editorBoxDiv.className = CLASS_EDITOR_BOX;
 
-        let editor = null
+		let editor = null;
 
-        if (isBinary) {
-            editorBoxDiv.innerText = BINARY_FILE_WARNING
-            editorBoxDiv.classList.add(CLASS_BINARY)
-        } else {
-            editor = await Editor.make()
-                .config((ctx) => {
-                    ctx.set(rootCtx, editorBoxDiv)
-                    nord(ctx)
-                })
-                .use(commonmark)
-                .use(history)
-                .create()
-            editor.action(ctx => {
-                const parser = ctx.get(parserCtx)
-                const view = ctx.get(editorViewCtx)
-                const doc = parser(initialContent)
+		if (isBinary) {
+			editorBoxDiv.innerText = BINARY_FILE_WARNING;
+			editorBoxDiv.classList.add(CLASS_BINARY);
+		} else {
+			editor = await Editor.make()
+				.config((ctx) => {
+					ctx.set(rootCtx, editorBoxDiv);
+					nord(ctx);
+				})
+				.use(commonmark)
+				.use(history)
+				.create();
+			editor.action((ctx) => {
+				const parser = ctx.get(parserCtx);
+				const view = ctx.get(editorViewCtx);
+				const doc = parser(initialContent);
 
-                // Apply initial content without pushing it to the undo stack.
-                const tr = view.state.tr.replaceWith(
-                    0,
-                    view.state.doc.content.size,
-                    doc.content
-                ).setMeta('addToHistory', false)
+				// Apply initial content without pushing it to the undo stack.
+				const tr = view.state.tr
+					.replaceWith(0, view.state.doc.content.size, doc.content)
+					.setMeta("addToHistory", false);
 
-                view.dispatch(tr)
-            })
-        }
+				view.dispatch(tr);
+			});
+		}
 
-        this.editorContainer.appendChild(editorBoxDiv)
+		this.editorContainer.appendChild(editorBoxDiv);
 
-        const tabEditorView = new TabEditorView(div, span, button, editorBoxDiv, editor)
+		const tabEditorView = new TabEditorView(
+			div,
+			span,
+			button,
+			editorBoxDiv,
+			editor
+		);
 
-        if (!isBinary) {
-            tabEditorView.observeEditor(
-                () => {
-                    const current = tabEditorView.getContent()
-                    const isModified = current !== viewModel.initialContent
+		if (!isBinary) {
+			tabEditorView.observeEditor(
+				() => {
+					const current = tabEditorView.getContent();
+					const isModified = current !== viewModel.initialContent;
 
-                    if (isModified && !viewModel.isModified) {
-                        viewModel.isModified = true
-                        tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
-                    } else if (!isModified && viewModel.isModified) {
-                        viewModel.isModified = false
-                        tabEditorView.setTabButtonTextContent(NOT_MODIFIED_TEXT)
-                    }
-                },
-                () => {
-                    if (!viewModel.filePath && viewModel.isModified) {
-                        const firstLine = tabEditorView.getEditorFirstLine()
-                        tabEditorView.setTabSpanTextContent(firstLine || 'Untitled')
-                    }
-                }
-            )
-        }
+					if (isModified && !viewModel.isModified) {
+						viewModel.isModified = true;
+						tabEditorView.setTabButtonTextContent(MODIFIED_TEXT);
+					} else if (!isModified && viewModel.isModified) {
+						viewModel.isModified = false;
+						tabEditorView.setTabButtonTextContent(NOT_MODIFIED_TEXT);
+					}
+				},
+				() => {
+					if (!viewModel.filePath && viewModel.isModified) {
+						const firstLine = tabEditorView.getEditorFirstLine();
+						tabEditorView.setTabSpanTextContent(firstLine || "Untitled");
+					}
+				}
+			);
+		}
 
-        this._tabEditorViews.push(tabEditorView)
-        this.setTabEditorViewByPath(filePath, tabEditorView)
-    }
+		this._tabEditorViews.push(tabEditorView);
+		this.setTabEditorViewByPath(filePath, tabEditorView);
+	}
 
-    removeTabAndEditor(index: number) {
-        this._tabEditorViews[index].destroy()
-        this._tabEditorViews.splice(index, 1)
-    }
+	removeTabAndEditor(index: number) {
+		this._tabEditorViews[index].destroy();
+		this._tabEditorViews.splice(index, 1);
+	}
 
+	get tabEditorViews(): readonly TabEditorView[] {
+		return this._tabEditorViews;
+	}
 
+	getTabEditorViewByIndex(index: number) {
+		return this._tabEditorViews[index];
+	}
 
-    get tabEditorViews(): readonly TabEditorView[] {
-        return this._tabEditorViews
-    }
+	getTabEditorViewIndexById(id: number) {
+		return this._tabEditorViews.findIndex((v) => v.getId() === id);
+	}
 
-    getTabEditorViewByIndex(index: number) {
-        return this._tabEditorViews[index]
-    }
+	get pathToTabEditorViewMap(): ReadonlyMap<string, TabEditorView> {
+		return this._pathToTabEditorViewMap;
+	}
 
-    getTabEditorViewIndexById(id: number) {
-        return this._tabEditorViews.findIndex(v => v.getId() === id)
-    }
+	deleteTabEditorViewByPath(path: string) {
+		this._pathToTabEditorViewMap.delete(path);
+	}
 
-    get pathToTabEditorViewMap(): ReadonlyMap<string, TabEditorView> {
-        return this._pathToTabEditorViewMap
-    }
+	getTabEditorViewByPath(path: string) {
+		return this._pathToTabEditorViewMap.get(path);
+	}
 
-    deleteTabEditorViewByPath(path: string) {
-        this._pathToTabEditorViewMap.delete(path)
-    }
+	setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
+		this._pathToTabEditorViewMap.set(path, tabEditorVeiw);
+	}
 
-    getTabEditorViewByPath(path: string) {
-        return this._pathToTabEditorViewMap.get(path)
-    }
+	undo(index: number) {
+		this._tabEditorViews[index].editor.action((ctx) => {
+			const view = ctx.get(editorViewCtx);
+			const { state, dispatch } = view;
+			undo(state, dispatch);
+		});
+	}
 
-    setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
-        this._pathToTabEditorViewMap.set(path, tabEditorVeiw)
-    }
+	redo(index: number) {
+		this._tabEditorViews[index].editor.action((ctx) => {
+			const view = ctx.get(editorViewCtx);
+			const { state, dispatch } = view;
+			redo(state, dispatch);
+		});
+	}
 
+	paste(index: number, text: string) {
+		this._tabEditorViews[index].editor.action((ctx) => {
+			const view = ctx.get(editorViewCtx);
+			const { state, dispatch } = view;
+			view.focus();
+			dispatch(state.tr.insertText(text));
+		});
+	}
 
+	activateTabEditorByIndex(targetIndex: number, preActiveindex: number) {
+		this._tabEditorViews[preActiveindex].setDeactive();
+		this._tabEditorViews[targetIndex].setActive();
+	}
 
-    undo(index: number) {
-        this._tabEditorViews[index].editor.action((ctx) => {
-            const view = ctx.get(editorViewCtx)
-            const { state, dispatch } = view
-            undo(state, dispatch)
-        })
-    }
+	moveTabEditorView(fromIndex: number, toIndex: number) {
+		const view = this._tabEditorViews.splice(fromIndex, 1)[0];
+		this._tabEditorViews.splice(toIndex, 0, view);
 
-    redo(index: number) {
-        this._tabEditorViews[index].editor.action((ctx) => {
-            const view = ctx.get(editorViewCtx)
-            const { state, dispatch } = view
-            redo(state, dispatch)
-        })
-    }
+		this.tabContainer.removeChild(view.tabDiv);
+		const refNode = this.tabContainer.children[toIndex] ?? null;
+		this.tabContainer.insertBefore(view.tabDiv, refNode);
+	}
 
-    paste(index: number, text: string) {
-        this._tabEditorViews[index].editor.action((ctx) => {
-            const view = ctx.get(editorViewCtx)
-            const { state, dispatch } = view
-            view.focus()
-            dispatch(state.tr.insertText(text))
-        })
-    }
+	createGhostBox(fileName: string) {
+		if (this.ghostTab) return this.ghostTab;
 
+		const { div, span, button } = this.createTabBox(fileName);
+		div.classList.add(CLASS_TAB_GHOST);
 
+		this.ghostTab = div;
+		document.body.appendChild(this.ghostTab);
 
-    activateTabEditorByIndex(targetIndex: number, preActiveindex: number) {
-        this._tabEditorViews[preActiveindex].setDeactive()
-        this._tabEditorViews[targetIndex].setActive()
-    }
+		return div;
+	}
 
-    moveTabEditorView(fromIndex: number, toIndex: number) {
-        const view = this._tabEditorViews.splice(fromIndex, 1)[0]
-        this._tabEditorViews.splice(toIndex, 0, view)
+	removeGhostBox() {
+		if (this.ghostTab) {
+			this.ghostTab.remove();
+			this.ghostTab = null;
+		}
+	}
 
-        this.tabContainer.removeChild(view.tabDiv)
-        const refNode = this.tabContainer.children[toIndex] ?? null
-        this.tabContainer.insertBefore(view.tabDiv, refNode)
-    }
+	createIndicator() {
+		if (this.indicator) return this.indicator;
 
+		const _indicator = document.createElement("div");
+		_indicator.className = "tab-indicator";
 
+		this.indicator = _indicator;
+		return this.indicator;
+	}
 
-    createGhostBox(fileName: string) {
-        if (this.ghostTab) return this.ghostTab
+	removeIndicator() {
+		if (this.indicator) {
+			this.indicator.remove();
+			this.indicator = null;
+		}
+	}
 
-        const { div, span, button } = this.createTabBox(fileName)
-        div.classList.add(CLASS_TAB_GHOST)
-
-        this.ghostTab = div
-        document.body.appendChild(this.ghostTab)
-
-        return div
-    }
-
-    removeGhostBox() {
-        if (this.ghostTab) {
-            this.ghostTab.remove()
-            this.ghostTab = null
-        }
-    }
-
-    createIndicator() {
-        if (this.indicator) return this.indicator
-
-        const _indicator = document.createElement('div')
-        _indicator.className = 'tab-indicator'
-
-        this.indicator = _indicator
-        return this.indicator
-    }
-
-    removeIndicator() {
-        if (this.indicator) {
-            this.indicator.remove()
-            this.indicator = null
-        }
-    }
-
-
-    
-    changeFontSize(size: number) {
-        this.editorContainer.style.fontSize = `${size}px`
-    }
+	changeFontSize(size: number) {
+		this.editorContainer.style.fontSize = `${size}px`;
+	}
 }

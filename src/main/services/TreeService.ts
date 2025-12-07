@@ -1,199 +1,212 @@
-import { inject } from "inversify"
-import path from 'path'
-import DI_KEYS from '../constants/di_keys'
-import TreeSessionModel from '../models/TreeSessionModel'
-import ITreeRepository from '../modules/contracts/ITreeRepository'
-import IFileManager from "../modules/contracts/IFileManager"
-import TreeDto from "@shared/dto/TreeDto"
-import TrashMap from "@shared/types/TrashMap"
-import ClipboardMode from "@shared/types/ClipboardMode"
-import ITreeUtils from "@main/modules/contracts/ITreeUtils"
-import Response from "@shared/types/Response"
+import { inject } from "inversify";
+import path from "path";
+import DI_KEYS from "../constants/di_keys";
+import TreeSessionModel from "../models/TreeSessionModel";
+import ITreeRepository from "../modules/contracts/ITreeRepository";
+import IFileManager from "../modules/contracts/IFileManager";
+import TreeDto from "@shared/dto/TreeDto";
+import TrashMap from "@shared/types/TrashMap";
+import ClipboardMode from "@shared/types/ClipboardMode";
+import ITreeUtils from "@main/modules/contracts/ITreeUtils";
+import Response from "@shared/types/Response";
 
 export default class TreeService {
-    constructor(
-        @inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-        @inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
-        @inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository
-    ) {
+	constructor(
+		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
+		@inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
+		@inject(DI_KEYS.TreeRepository)
+		private readonly treeRepository: ITreeRepository
+	) {}
 
-    }
+	async rename(prePath: string, newPath: string): Promise<Response<string>> {
+		function updateTreeSession(
+			prePath: string,
+			finalNewPath: string,
+			node: TreeSessionModel
+		): boolean {
+			if (prePath === node.path) {
+				const oldPath = node.path;
 
-    async rename(prePath: string, newPath: string): Promise<Response<string>> {
-        function updateTreeSession(prePath: string, finalNewPath: string, node: TreeSessionModel): boolean {
-            if (prePath === node.path) {
-                const oldPath = node.path
+				const recursivelyUpdatePaths = (n: TreeSessionModel) => {
+					const relative = path.relative(oldPath, n.path);
+					n.path = path.join(finalNewPath, relative);
+					n.name = path.basename(n.path);
+					for (const child of n.children ?? []) {
+						recursivelyUpdatePaths(child);
+					}
+				};
+				recursivelyUpdatePaths(node);
+				return true;
+			} else {
+				for (const child of node.children ?? []) {
+					const found = updateTreeSession(prePath, finalNewPath, child);
+					if (found) return found;
+				}
+				return false;
+			}
+		}
 
-                const recursivelyUpdatePaths = (n: TreeSessionModel) => {
-                    const relative = path.relative(oldPath, n.path)
-                    n.path = path.join(finalNewPath, relative)
-                    n.name = path.basename(n.path)
-                    for (const child of n.children ?? []) {
-                        recursivelyUpdatePaths(child)
-                    }
-                }
-                recursivelyUpdatePaths(node)
-                return true
-            } else {
-                for (const child of node.children ?? []) {
-                    const found = updateTreeSession(prePath, finalNewPath, child)
-                    if (found) return found
-                }
-                return false
-            }
-        }
+		const targetDir = path.dirname(newPath);
+		const existingNames = new Set(await this.fileManager.readDir(targetDir));
+		const requestedFileName = path.basename(newPath);
 
-        const targetDir = path.dirname(newPath)
-        const existingNames = new Set(await this.fileManager.readDir(targetDir))
-        const requestedFileName = path.basename(newPath)
-        
-        const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName])
-        const finalNewPath = path.join(targetDir, uniqueFileName[0])
+		const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [
+			requestedFileName,
+		]);
+		const finalNewPath = path.join(targetDir, uniqueFileName[0]);
 
-        const session: TreeSessionModel = await this.treeRepository.readTreeSession()
-        const updated = updateTreeSession(prePath, finalNewPath, session)
-        if (updated) {
-            await this.fileManager.rename(prePath, finalNewPath)
-            await this.treeRepository.writeTreeSession(session)
-        }
+		const session: TreeSessionModel =
+			await this.treeRepository.readTreeSession();
+		const updated = updateTreeSession(prePath, finalNewPath, session);
+		if (updated) {
+			await this.fileManager.rename(prePath, finalNewPath);
+			await this.treeRepository.writeTreeSession(session);
+		}
 
-        return {
-            result: updated,
-            data: finalNewPath
-        }
-    }
+		return {
+			result: updated,
+			data: finalNewPath,
+		};
+	}
 
-    async copy(src: string, dest: string) {
-        await this.fileManager.copy(src, dest)
-    }
+	async copy(src: string, dest: string) {
+		await this.fileManager.copy(src, dest);
+	}
 
-    async paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<Response<string[]>> {
-        const copiedPaths: string[] = []
-        const cutPaths: string[] = []
-        const originalNames = selectedDtos.map(dto => dto.name)
-        const targetDir = targetDto.path
-        const existingNames = new Set(await this.fileManager.readDir(targetDir))
-        const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames)
+	async paste(
+		targetDto: TreeDto,
+		selectedDtos: TreeDto[],
+		clipboardMode: ClipboardMode
+	): Promise<Response<string[]>> {
+		const copiedPaths: string[] = [];
+		const cutPaths: string[] = [];
+		const originalNames = selectedDtos.map((dto) => dto.name);
+		const targetDir = targetDto.path;
+		const existingNames = new Set(await this.fileManager.readDir(targetDir));
+		const uniqueNames = this.fileManager.getUniqueFileNames(
+			existingNames,
+			originalNames
+		);
 
-        const updateTreeDto = (parent: TreeDto, child: TreeDto): void => {
-            child.path = path.join(parent.path, child.name)
-            child.indent = parent.indent + 1
+		const updateTreeDto = (parent: TreeDto, child: TreeDto): void => {
+			child.path = path.join(parent.path, child.name);
+			child.indent = parent.indent + 1;
 
-            if (Array.isArray(child.children)) {
-                for (const grandChild of child.children) {
-                    updateTreeDto(child, grandChild)
-                }
-            }
-        }
+			if (Array.isArray(child.children)) {
+				for (const grandChild of child.children) {
+					updateTreeDto(child, grandChild);
+				}
+			}
+		};
 
-        // const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
-        //     if (!Array.isArray(child.children)) {
-        //         child.children = []
-        //     }
+		// const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
+		//     if (!Array.isArray(child.children)) {
+		//         child.children = []
+		//     }
 
-        //     // Children first,
-        //     for (const grandChild of child.children) {
-        //         await sortData(child, grandChild)
-        //     }
+		//     // Children first,
+		//     for (const grandChild of child.children) {
+		//         await sortData(child, grandChild)
+		//     }
 
-        //     const newPath = path.join(parent.path, child.name)
-        //     await this.fileManager.copy(child.path, newPath)
-        //     copiedPaths.push(newPath)
+		//     const newPath = path.join(parent.path, child.name)
+		//     await this.fileManager.copy(child.path, newPath)
+		//     copiedPaths.push(newPath)
 
-        //     if (clipboardMode === 'cut') cutPaths.push(child.path)
+		//     if (clipboardMode === 'cut') cutPaths.push(child.path)
 
-        //     child.path = newPath
-        //     child.indent = parent.indent + 1
-        // }
+		//     child.path = newPath
+		//     child.indent = parent.indent + 1
+		// }
 
-        try {
-            for (const [index, dto] of selectedDtos.entries()) {
-                const uniqueName = uniqueNames[index]
-                const oldPath = dto.path
-                dto.name = uniqueName
+		try {
+			for (const [index, dto] of selectedDtos.entries()) {
+				const uniqueName = uniqueNames[index];
+				const oldPath = dto.path;
+				dto.name = uniqueName;
 
-                const newPath = path.join(targetDir, uniqueName)
-                await this.fileManager.copy(oldPath, newPath)
-                copiedPaths.push(newPath)
-                if (clipboardMode === 'cut') cutPaths.push(oldPath)
-                
-                // await sortData(targetDto, child)
-                dto.path = newPath
-                dto.indent = targetDto.indent + 1
-                // updateTreeDto(dto, dto)
-                if (Array.isArray(dto.children)) {
-                    for (const child of dto.children) {
-                        updateTreeDto(dto, child)
-                    }
-                }
-            }
-            
-            if (clipboardMode === 'cut') {
-                for (const p of cutPaths) {
-                    await this.fileManager.deletePermanently(p)
-                }
-            }
+				const newPath = path.join(targetDir, uniqueName);
+				await this.fileManager.copy(oldPath, newPath);
+				copiedPaths.push(newPath);
+				if (clipboardMode === "cut") cutPaths.push(oldPath);
 
-            return {
-                result: true,
-                data: copiedPaths
-            }
-        } catch (err) {
-            for (const p of copiedPaths) {
-                try {
-                    await this.fileManager.deletePermanently(p)
-                } catch (deleteErr) {
-                    console.error('Rollback failed to delete:', p, deleteErr)
-                }
-            }
-            return {
-                result: false,
-                data: []
-            }
-        }
-    }
+				// await sortData(targetDto, child)
+				dto.path = newPath;
+				dto.indent = targetDto.indent + 1;
+				// updateTreeDto(dto, dto)
+				if (Array.isArray(dto.children)) {
+					for (const child of dto.children) {
+						updateTreeDto(dto, child);
+					}
+				}
+			}
 
-    async delete(arr: string[]): Promise<TrashMap[] | null> {
-        return await this.fileManager.moveToTrash(arr)
-    }
+			if (clipboardMode === "cut") {
+				for (const p of cutPaths) {
+					await this.fileManager.deletePermanently(p);
+				}
+			}
 
-    async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
-        return await this.fileManager.restoreFromTrash(trashMap)
-    }
+			return {
+				result: true,
+				data: copiedPaths,
+			};
+		} catch (err) {
+			for (const p of copiedPaths) {
+				try {
+					await this.fileManager.deletePermanently(p);
+				} catch (deleteErr) {
+					console.error("Rollback failed to delete:", p, deleteErr);
+				}
+			}
+			return {
+				result: false,
+				data: [],
+			};
+		}
+	}
 
-    async deletePermanently(path: string): Promise<void> {
-        await this.fileManager.deletePermanently(path)
-    }
+	async delete(arr: string[]): Promise<TrashMap[] | null> {
+		return await this.fileManager.moveToTrash(arr);
+	}
 
-    async create(targetPath: string, directory: boolean) {
-        const dir = path.dirname(targetPath)
-        const base = path.basename(targetPath)
-        const existingNames = new Set(await this.fileManager.readDir(dir))
+	async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
+		return await this.fileManager.restoreFromTrash(trashMap);
+	}
 
-        const res = this.fileManager.getUniqueFileNames(existingNames, [base])
-        const uniqueName = res[0]
+	async deletePermanently(path: string): Promise<void> {
+		await this.fileManager.deletePermanently(path);
+	}
 
-        const uniquePath = path.join(dir, uniqueName)
-        await this.fileManager.create(uniquePath, directory)
-    }
+	async create(targetPath: string, directory: boolean) {
+		const dir = path.dirname(targetPath);
+		const base = path.basename(targetPath);
+		const existingNames = new Set(await this.fileManager.readDir(dir));
 
-    async syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean> {
-        try {
-            await this.treeRepository.writeTreeSession(dto)
-            return true
-        } catch (e) {
-            return false
-        }
-    }
+		const res = this.fileManager.getUniqueFileNames(existingNames, [base]);
+		const uniqueName = res[0];
 
-    async getSyncedTreeSession(): Promise<TreeDto | null> {
-        const session = await this.treeRepository.readTreeSession()
-        if (session) {
-            const newSession = await this.treeUtils.syncWithFs(session)
-            if (newSession) await this.treeRepository.writeTreeSession(newSession)
-            return newSession
-        } else {
-            return null
-        }
-    }
+		const uniquePath = path.join(dir, uniqueName);
+		await this.fileManager.create(uniquePath, directory);
+	}
+
+	async syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean> {
+		try {
+			await this.treeRepository.writeTreeSession(dto);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	async getSyncedTreeSession(): Promise<TreeDto | null> {
+		const session = await this.treeRepository.readTreeSession();
+		if (session) {
+			const newSession = await this.treeUtils.syncWithFs(session);
+			if (newSession) await this.treeRepository.writeTreeSession(newSession);
+			return newSession;
+		} else {
+			return null;
+		}
+	}
 }

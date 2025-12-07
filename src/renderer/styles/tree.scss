@@ -1,4 +1,4 @@
-@use './variables.scss' as gv;
+@use "./variables.scss" as gv;
 
 $scrollbar-size: 8px;
 $tree_horizontal_margin: 5px;
@@ -7,170 +7,171 @@ $ghost-padding: 4px;
 $tree_top_min_height: 25px;
 
 #tree {
-    width: 0px;
-    height: 100%;
-    cursor: default;
+	width: 0px;
+	height: 100%;
+	cursor: default;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    overflow: hidden;
+	overflow: hidden;
 }
 
 // TODO: svg.
 #tree img {
-    filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(90%) contrast(90%);
+	filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%)
+		hue-rotate(180deg) brightness(90%) contrast(90%);
 }
 
 #tree_top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: $tree_top_min_height;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	min-height: $tree_top_min_height;
 }
 
 #tree_top_name {
-    margin: 0 $tree_horizontal_margin;
-    flex: 1;
-    font-size: 0.9rem;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: bold;
+	margin: 0 $tree_horizontal_margin;
+	flex: 1;
+	font-size: 0.9rem;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: bold;
 }
 
 #tree_top_icons {
-    display: flex;
-    position: relative;
+	display: flex;
+	position: relative;
 }
 
 #tree_top_icons img {
-    width: gv.$tree_icon_size;
-    height: gv.$tree_icon_size;
-    margin-right: $tree_horizontal_margin;
+	width: gv.$tree_icon_size;
+	height: gv.$tree_icon_size;
+	margin-right: $tree_horizontal_margin;
 }
 
 #tree_top_icons button:hover {
-    cursor: pointer;
-    background-color: var(--tree-top-icon-hover);
+	cursor: pointer;
+	background-color: var(--tree-top-icon-hover);
 }
 
 #tree_node_container {
-    flex: 1;
-    overflow: scroll;
-    border: 1px solid transparent;
+	flex: 1;
+	overflow: scroll;
+	border: 1px solid transparent;
 
-    &::-webkit-scrollbar {
-        width: $scrollbar-size;
-        height: $scrollbar-size;
-    }
+	&::-webkit-scrollbar {
+		width: $scrollbar-size;
+		height: $scrollbar-size;
+	}
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
 
-    &::-webkit-scrollbar-thumb {
-        background-color: transparent;
-    }
+	&::-webkit-scrollbar-thumb {
+		background-color: transparent;
+	}
 
-    &::-webkit-scrollbar-thumb:hover {
-        cursor: pointer;
-        background-color: var(--scrollbar-thumb-hover);
-    }
+	&::-webkit-scrollbar-thumb:hover {
+		cursor: pointer;
+		background-color: var(--scrollbar-thumb-hover);
+	}
 }
 
 #tree_node_container.focused {
-    border: 1px solid var(--tree-node-focused);
+	border: 1px solid var(--tree-node-focused);
 }
 
 .tree_node_wrapper {
-    // width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 100px;
+	// width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-width: 100px;
 }
 
 .tree_node_wrapper.cut {
-    color: var(--tree-node-cut);
+	color: var(--tree-node-cut);
 }
 
 .tree_node_temp,
 .tree_node {
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    border: 1px solid transparent;
+	font-size: 0.8rem;
+	display: flex;
+	align-items: center;
+	border: 1px solid transparent;
 }
 
 .tree_node_temp > input {
-    border: 1px solid var(--tree-node-focused);
+	border: 1px solid var(--tree-node-focused);
 }
 
 .tree_node.focused {
-    border: 1px solid var(--tree-node-focused);
+	border: 1px solid var(--tree-node-focused);
 }
 
 .tree_node:hover {
-    cursor: pointer;
-    background-color: var(--tree-node-hover);
+	cursor: pointer;
+	background-color: var(--tree-node-hover);
 }
 
 .tree_node.selected {
-    background-color: var(--tree-node-selected);
+	background-color: var(--tree-node-selected);
 }
 
 .tree_node > span {
-    margin-left: 1px;
+	margin-left: 1px;
 }
 
 .tree_node_open,
 .tree_node_type {
-    width: gv.$tree_icon_size;
-    height: gv.$tree_icon_size;
+	width: gv.$tree_icon_size;
+	height: gv.$tree_icon_size;
 
-    text-align: center;
-    flex-shrink: 0;
-    /* prevent icon from shrinking on resize */
+	text-align: center;
+	flex-shrink: 0;
+	/* prevent icon from shrinking on resize */
 }
 
 .tree_node_open.file {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 .tree_node_input {
-    width: 100%;
+	width: 100%;
 }
 
 .tree_node_children {
-    display: none;
+	display: none;
 }
 
 .tree_node_children.expanded {
-    display: block;
+	display: block;
 }
 
 #tree_context_menu {
-    display: none;
-    position: fixed;
-    flex-direction: column;
-    z-index: 90;
+	display: none;
+	position: fixed;
+	flex-direction: column;
+	z-index: 90;
 }
 
 #tree_context_menu.selected {
-    display: flex;
+	display: flex;
 }
 
 .tree_ghost {
-    position: fixed;
-    pointer-events: none;
-    background-color: var(--tree-ghost-bg);
-    color: white;
-    font-size: 0.7rem;
-    padding: $ghost-padding;
-    z-index: 90;
+	position: fixed;
+	pointer-events: none;
+	background-color: var(--tree-ghost-bg);
+	color: white;
+	font-size: 0.7rem;
+	padding: $ghost-padding;
+	z-index: 90;
 }
 
 .tree_drag_overlay {
-    background-color: var(--tree_wrapper-drag-overlay);
+	background-color: var(--tree_wrapper-drag-overlay);
 }

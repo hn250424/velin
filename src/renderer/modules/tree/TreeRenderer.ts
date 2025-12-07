@@ -1,186 +1,206 @@
-import { injectable } from "inversify"
+import { injectable } from "inversify";
 import {
-    CLASS_EXPANDED,
-    CLASS_TREE_GHOST,
-    CLASS_TREE_NODE,
-    CLASS_TREE_NODE_CHILDREN,
-    CLASS_TREE_NODE_TYPE,
-    CLASS_TREE_NODE_INPUT,
-    CLASS_TREE_NODE_OPEN,
-    CLASS_TREE_NODE_TEXT,
-    CLASS_TREE_NODE_WRAPPER,
-    DATASET_ATTR_TREE_PATH,
-    SELECTOR_TREE_NODE
-} from "../../constants/dom"
-import TreeViewModel from "../../viewmodels/TreeViewModel"
+	CLASS_EXPANDED,
+	CLASS_TREE_GHOST,
+	CLASS_TREE_NODE,
+	CLASS_TREE_NODE_CHILDREN,
+	CLASS_TREE_NODE_TYPE,
+	CLASS_TREE_NODE_INPUT,
+	CLASS_TREE_NODE_OPEN,
+	CLASS_TREE_NODE_TEXT,
+	CLASS_TREE_NODE_WRAPPER,
+	DATASET_ATTR_TREE_PATH,
+	SELECTOR_TREE_NODE,
+} from "../../constants/dom";
+import TreeViewModel from "../../viewmodels/TreeViewModel";
 
 @injectable()
 export default class TreeRenderer {
-    private _tree_top_name: HTMLElement
-    private _tree_node_container: HTMLElement
+	private _tree_top_name: HTMLElement;
+	private _tree_node_container: HTMLElement;
 
-    private ghostBox: HTMLElement | null = null
+	private ghostBox: HTMLElement | null = null;
 
-    private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
+	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map();
 
-    constructor() {
-        this._tree_node_container = document.getElementById('tree_node_container')
-        this._tree_top_name = document.getElementById('tree_top_name')
-    }
+	constructor() {
+		this._tree_node_container = document.getElementById("tree_node_container");
+		this._tree_top_name = document.getElementById("tree_top_name");
+	}
 
-    clean(container: HTMLElement) {
-        while (container.firstChild) {
-            container.removeChild(container.firstChild)
-        }
-    }
+	clean(container: HTMLElement) {
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
+	}
 
-    // Each DOM element with class `tree_node` has a dataset attribute for its path.
-    // The root node uses the container `tree_node_container` to hold its path in the dataset.
-    renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
-        if (!container) {
-            this._tree_top_name.textContent = viewModel.name
-            container = this._tree_node_container
+	// Each DOM element with class `tree_node` has a dataset attribute for its path.
+	// The root node uses the container `tree_node_container` to hold its path in the dataset.
+	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
+		if (!container) {
+			this._tree_top_name.textContent = viewModel.name;
+			container = this._tree_node_container;
 
-            this._pathToTreeWrapperMap.set(viewModel.path, container)
-            container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
-        }
+			this._pathToTreeWrapperMap.set(viewModel.path, container);
+			container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path;
+		}
 
-        this.clean(container)
+		this.clean(container);
 
-        if (viewModel.children) {
-            for (const child of viewModel.children) {
-                this._renderNode(container, child)
-            }
-        }
-    }
+		if (viewModel.children) {
+			for (const child of viewModel.children) {
+				this._renderNode(container, child);
+			}
+		}
+	}
 
-    private _renderNode(container: HTMLElement, viewModel: TreeViewModel) {
-        const box = document.createElement('div')
-        box.classList.add(CLASS_TREE_NODE)
-        box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
-        box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
-        box.title = viewModel.path
+	private _renderNode(container: HTMLElement, viewModel: TreeViewModel) {
+		const box = document.createElement("div");
+		box.classList.add(CLASS_TREE_NODE);
+		box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`;
+		box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path;
+		box.title = viewModel.path;
 
-        const openStatus = document.createElement('img')
-        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (viewModel.directory) openStatus.src = viewModel.expanded 
-            ? new URL('../../assets/icons/expanded.png', import.meta.url).toString()
-            : new URL('../../assets/icons/not_expanded.png', import.meta.url).toString()
-        else openStatus.classList.add('file')
+		const openStatus = document.createElement("img");
+		openStatus.classList.add(CLASS_TREE_NODE_OPEN);
+		if (viewModel.directory)
+			openStatus.src = viewModel.expanded
+				? new URL("../../assets/icons/expanded.png", import.meta.url).toString()
+				: new URL(
+						"../../assets/icons/not_expanded.png",
+						import.meta.url).toString();
 
-        const nodeType = document.createElement('img')
-        nodeType.classList.add(CLASS_TREE_NODE_TYPE)
+		else openStatus.classList.add("file");
 
-        if (!viewModel.directory) {
-            nodeType.src = new URL('../../assets/icons/file.png', import.meta.url).toString();
-        } else {
-            if (viewModel.expanded) {
-                nodeType.src = new URL('../../assets/icons/opened_folder.png', import.meta.url).toString();
-            } else {
-                nodeType.src = new URL('../../assets/icons/folder.png', import.meta.url).toString();
-            }
-        }
+		const nodeType = document.createElement("img");
+		nodeType.classList.add(CLASS_TREE_NODE_TYPE);
 
-        const text = document.createElement('span')
-        text.classList.add(CLASS_TREE_NODE_TEXT, 'ellipsis')
-        text.textContent = viewModel.name
+		if (!viewModel.directory) {
+			nodeType.src = new URL(
+				"../../assets/icons/file.png",
+				import.meta.url
+			).toString();
+		} else {
+			if (viewModel.expanded) {
+				nodeType.src = new URL(
+					"../../assets/icons/opened_folder.png",
+					import.meta.url
+				).toString();
+			} else {
+				nodeType.src = new URL(
+					"../../assets/icons/folder.png",
+					import.meta.url
+				).toString();
+			}
+		}
 
-        const childrenContainer = document.createElement('div')
-        childrenContainer.classList.add(CLASS_TREE_NODE_CHILDREN)
-        if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED)
-        else childrenContainer.classList.remove(CLASS_EXPANDED)
+		const text = document.createElement("span");
+		text.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis");
+		text.textContent = viewModel.name;
 
-        box.appendChild(openStatus)
-        box.appendChild(nodeType)
-        box.appendChild(text)
+		const childrenContainer = document.createElement("div");
+		childrenContainer.classList.add(CLASS_TREE_NODE_CHILDREN);
+		if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED);
+		else childrenContainer.classList.remove(CLASS_EXPANDED);
 
-        const wrapper = document.createElement('div')
-        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-        wrapper.appendChild(box)
-        wrapper.appendChild(childrenContainer)
+		box.appendChild(openStatus);
+		box.appendChild(nodeType);
+		box.appendChild(text);
 
-        this._pathToTreeWrapperMap.set(viewModel.path, wrapper)
-        container.appendChild(wrapper)
+		const wrapper = document.createElement("div");
+		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER);
+		wrapper.appendChild(box);
+		wrapper.appendChild(childrenContainer);
 
-        if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
-            for (const child of viewModel.children) {
-                this._renderNode(childrenContainer, child)
-            }
-        }
-    }
+		this._pathToTreeWrapperMap.set(viewModel.path, wrapper);
+		container.appendChild(wrapper);
 
-    createInputbox(directory: boolean, indent: number) {
-        const box = document.createElement('div')
-        box.classList.add('tree_node_temp')
-        box.style.paddingLeft = `${indent * 16}px`
+		if (
+			viewModel.expanded &&
+			viewModel.children &&
+			viewModel.children.length > 0
+		) {
+			for (const child of viewModel.children) {
+				this._renderNode(childrenContainer, child);
+			}
+		}
+	}
 
-        const openStatus = document.createElement('img')
-        openStatus.classList.add(CLASS_TREE_NODE_OPEN)
-        if (directory) openStatus.src = new URL('../../assets/icons/not_expanded.png', import.meta.url).toString()
-        else openStatus.classList.add('file')
+	createInputbox(directory: boolean, indent: number) {
+		const box = document.createElement("div");
+		box.classList.add("tree_node_temp");
+		box.style.paddingLeft = `${indent * 16}px`;
 
-        const nodeType = document.createElement('img')
-        nodeType.classList.add(CLASS_TREE_NODE_TYPE)
-        nodeType.src = directory
-            ? new URL('../../assets/icons/folder.png', import.meta.url).toString()
-            : new URL('../../assets/icons/file.png', import.meta.url).toString()
+		const openStatus = document.createElement("img");
+		openStatus.classList.add(CLASS_TREE_NODE_OPEN);
+		if (directory)
+			openStatus.src = new URL(
+				"../../assets/icons/not_expanded.png",
+				import.meta.url
+			).toString();
+		else openStatus.classList.add("file");
 
-        const input = document.createElement('input')
-        input.type = 'text'
-        input.value = ''
-        input.classList.add(CLASS_TREE_NODE_INPUT)
+		const nodeType = document.createElement("img");
+		nodeType.classList.add(CLASS_TREE_NODE_TYPE);
+		nodeType.src = directory
+			? new URL("../../assets/icons/folder.png", import.meta.url).toString()
+			: new URL("../../assets/icons/file.png", import.meta.url).toString();
 
-        box.appendChild(openStatus)
-        box.appendChild(nodeType)
-        box.appendChild(input)
+		const input = document.createElement("input");
+		input.type = "text";
+		input.value = "";
+		input.classList.add(CLASS_TREE_NODE_INPUT);
 
-        const wrapper = document.createElement('div')
-        wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-        wrapper.appendChild(box)
+		box.appendChild(openStatus);
+		box.appendChild(nodeType);
+		box.appendChild(input);
 
-        return { wrapper, input }
-    }
+		const wrapper = document.createElement("div");
+		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER);
+		wrapper.appendChild(box);
 
-    createGhostBox(count: number) {
-        if (this.ghostBox) return this.ghostBox
+		return { wrapper, input };
+	}
 
-        const div = document.createElement('div')
-        div.classList.add(CLASS_TREE_GHOST)
-        // div.textContent = count >= 1 ? `${count} items` : `1 items`
-        div.textContent = `${count} items`
+	createGhostBox(count: number) {
+		if (this.ghostBox) return this.ghostBox;
 
-        this.ghostBox = div
-        document.body.appendChild(div)
+		const div = document.createElement("div");
+		div.classList.add(CLASS_TREE_GHOST);
+		// div.textContent = count >= 1 ? `${count} items` : `1 items`
+		div.textContent = `${count} items`;
 
-        return this.ghostBox
-    }
+		this.ghostBox = div;
+		document.body.appendChild(div);
 
-    removeGhostBox() {
-        if (this.ghostBox) {
-            this.ghostBox.remove()
-            this.ghostBox = null
-        }
-    }
+		return this.ghostBox;
+	}
 
+	removeGhostBox() {
+		if (this.ghostBox) {
+			this.ghostBox.remove();
+			this.ghostBox = null;
+		}
+	}
 
-    clearPathToTreeWrapperMap() {
-        this._pathToTreeWrapperMap.clear()
-    }
+	clearPathToTreeWrapperMap() {
+		this._pathToTreeWrapperMap.clear();
+	}
 
-    getTreeNodeByPath(path: string) {
-        const wrapper = this._pathToTreeWrapperMap.get(path)
-        return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-    }
+	getTreeNodeByPath(path: string) {
+		const wrapper = this._pathToTreeWrapperMap.get(path);
+		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
+	}
 
-    getTreeWrapperByPath(path: string) {
-        return this._pathToTreeWrapperMap.get(path)
-    }
+	getTreeWrapperByPath(path: string) {
+		return this._pathToTreeWrapperMap.get(path);
+	}
 
-    setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
-        this._pathToTreeWrapperMap.set(path, wrapper)
-    }
+	setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
+		this._pathToTreeWrapperMap.set(path, wrapper);
+	}
 
-    deleteTreeWrapperByPath(path: string) {
-        this._pathToTreeWrapperMap.delete(path)
-    }
+	deleteTreeWrapperByPath(path: string) {
+		this._pathToTreeWrapperMap.delete(path);
+	}
 }

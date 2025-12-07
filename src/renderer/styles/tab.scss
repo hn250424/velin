@@ -1,4 +1,4 @@
-@use './variables.scss' as gv;
+@use "./variables.scss" as gv;
 
 $tab_min_width: 50px;
 $tab_max_width: 150px;
@@ -12,147 +12,147 @@ $indicator-size: 3px;
 $padding-top-binary-warning: 40px;
 
 #tab_container {
-    display: flex;
+	display: flex;
 
-    width: 100%;
-    height: $tab_height;
+	width: 100%;
+	height: $tab_height;
 
-    overflow-y: hidden;
-    overflow-x: scroll;
+	overflow-y: hidden;
+	overflow-x: scroll;
 
-    position: relative;
+	position: relative;
 
-    &::-webkit-scrollbar {
-        height: 2px;
-    }
+	&::-webkit-scrollbar {
+		height: 2px;
+	}
 
-    &::-webkit-scrollbar-track {
-        background: var(--tab-selected);
-    }
+	&::-webkit-scrollbar-track {
+		background: var(--tab-selected);
+	}
 
-    &::-webkit-scrollbar-thumb {
-        background-color: var(--tab-selected);
-    }
+	&::-webkit-scrollbar-thumb {
+		background-color: var(--tab-selected);
+	}
 
-    &::-webkit-scrollbar-thumb:hover {
-        cursor: pointer;
-        background-color: var(--scrollbar-thumb-hover);
-    }
+	&::-webkit-scrollbar-thumb:hover {
+		cursor: pointer;
+		background-color: var(--scrollbar-thumb-hover);
+	}
 }
 
 .tab {
-    flex: 1;
-    min-width: $tab_min_width;
-    max-width: $tab_max_width;
-    height: 100%;
-    margin-right: $tab_right_margin;
+	flex: 1;
+	min-width: $tab_min_width;
+	max-width: $tab_max_width;
+	height: 100%;
+	margin-right: $tab_right_margin;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 
-    padding: $tab_elem_padding;
+	padding: $tab_elem_padding;
 
-    user-select: none;
+	user-select: none;
 }
 
 .tab:hover,
 .tab * {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .tab {
-    background-color: var(--tab-bg);
-    font-size: 0.9rem;
+	background-color: var(--tab-bg);
+	font-size: 0.9rem;
 }
 
 .tab.selected {
-    background-color: var(--tab-selected);
+	background-color: var(--tab-selected);
 }
 
-.tab>span {
-    flex: 1;
-    display: block;
+.tab > span {
+	flex: 1;
+	display: block;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-.tab>button {
-    width: $tab_button_width;
-    height: $tab_button_width;
-    
-    border-radius: $tab_button_radius;
-    
-    background-color: var(--tab-btn-bg);
-    transition: background-color 0.2s ease;
+.tab > button {
+	width: $tab_button_width;
+	height: $tab_button_width;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	border-radius: $tab_button_radius;
 
-    position: relative;
+	background-color: var(--tab-btn-bg);
+	transition: background-color 0.2s ease;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	position: relative;
 }
 
-.tab>button:hover {
-    background-color: var(--tab-btn-hover-bg);
-    color: transparent;
+.tab > button:hover {
+	background-color: var(--tab-btn-hover-bg);
+	color: transparent;
 }
 
-.tab>button:hover::after {
-    content: '×';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--tab-btn-hover-font);
+.tab > button:hover::after {
+	content: "×";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: var(--tab-btn-hover-font);
 }
 
 #tab_context_menu {
-    display: none;
-    position: fixed;
-    flex-direction: column;
-    z-index: 90;
+	display: none;
+	position: fixed;
+	flex-direction: column;
+	z-index: 90;
 }
 
 #tab_context_menu.selected {
-    display: flex;
+	display: flex;
 }
 
 .editorBox {
-    display: none;
+	display: none;
 }
 
 .editorBox.selected {
-    display: block;
+	display: block;
 }
 
 .editorBox.binary {
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-    color: var(--warning-color);
-    padding-top: $padding-top-binary-warning;
-    cursor: default;
+	font-size: 1.5rem;
+	font-weight: bold;
+	text-align: center;
+	color: var(--warning-color);
+	padding-top: $padding-top-binary-warning;
+	cursor: default;
 }
 
 .tab-indicator {
-    width: $indicator-size;
-    height: 100%;
-    background-color: var(--tab-indicator);
+	width: $indicator-size;
+	height: 100%;
+	background-color: var(--tab-indicator);
 
-    position: absolute;
-    top: 0;
-    pointer-events: none;
+	position: absolute;
+	top: 0;
+	pointer-events: none;
 }
 
 .tab_ghost {
-    position: fixed;
-    width: $tab_max_width;
-    height: $tab_height;
-    pointer-events: none;
-    opacity: 0.7;
-    z-index: 90;
-    background-color: var(--tab-ghost-bg);
+	position: fixed;
+	width: $tab_max_width;
+	height: $tab_height;
+	pointer-events: none;
+	opacity: 0.7;
+	z-index: 90;
+	background-color: var(--tab-ghost-bg);
 }

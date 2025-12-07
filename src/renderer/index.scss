@@ -1,32 +1,32 @@
-@use './styles/variables.scss' as gv;
-@use './styles/utils.scss';
-@use './styles/elements.scss';
-@use './styles/title.scss';
-@use './styles/content.scss';
-@use './styles/theme/theme.scss';
-@use './styles/settings.scss';
-@use './styles/info.scss';
+@use "./styles/variables.scss" as gv;
+@use "./styles/utils.scss";
+@use "./styles/elements.scss";
+@use "./styles/title.scss";
+@use "./styles/content.scss";
+@use "./styles/theme/theme.scss";
+@use "./styles/settings.scss";
+@use "./styles/info.scss";
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 html,
 body,
 #container {
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 #container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow: hidden;
-    
-    background-color: var(--app-bg);
-    color: var(--app-font);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	overflow: hidden;
+
+	background-color: var(--app-bg);
+	color: var(--app-font);
 }

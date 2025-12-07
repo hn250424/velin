@@ -1,12 +1,11 @@
 export default interface SettingsDto {
-    settingFontDto: SettingFontDto
-    settingThemeDto: SettingThemeDto
+	settingFontDto: SettingFontDto;
+	settingThemeDto: SettingThemeDto;
 }
 
 export interface SettingFontDto {
-    size: number
+	size: number;
 }
 
-export interface SettingThemeDto {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SettingThemeDto {}

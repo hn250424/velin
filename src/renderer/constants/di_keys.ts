@@ -1,28 +1,28 @@
 const DI_KEYS = {
-    FocusManager: Symbol('FocusManager'),
-    FindReplaceState: Symbol('FindReplaceState'),
-    SideState: Symbol('SideState'),
-    WindowState: Symbol('WindowState'),
+	FocusManager: Symbol("FocusManager"),
+	FindReplaceState: Symbol("FindReplaceState"),
+	SideState: Symbol("SideState"),
+	WindowState: Symbol("WindowState"),
 
-    ZoomManager: Symbol('ZoomManager'),
+	ZoomManager: Symbol("ZoomManager"),
 
-    ShortcutRegistry: Symbol('ShortcutRegistry'),
-    
-    TabEditorFacade: Symbol('TabEditorFacade'),
-    TabEditorRenderer: Symbol('TabEditorRenderer'),
-    TabEditorStore: Symbol('TabEditorStore'),
-    TabDragManager: Symbol('TabDragManager'),
+	ShortcutRegistry: Symbol("ShortcutRegistry"),
 
-    TreeFacade: Symbol('TreeFacade'),
-    TreeRenderer: Symbol('TreeRenderer'),
-    TreeStore: Symbol('TreeStore'),
-    TreeDragManager: Symbol('TreeDragManager'),
+	TabEditorFacade: Symbol("TabEditorFacade"),
+	TabEditorRenderer: Symbol("TabEditorRenderer"),
+	TabEditorStore: Symbol("TabEditorStore"),
+	TabDragManager: Symbol("TabDragManager"),
 
-    SettingsFacade: Symbol('SettingsFacade'),
-    SettingsRenderer: Symbol('SettingsRenderer'),
-    SettingsStore: Symbol('SettingsStore'),
-    
-    CommandDispatcher: Symbol('CommandDispatcher'),
-}
+	TreeFacade: Symbol("TreeFacade"),
+	TreeRenderer: Symbol("TreeRenderer"),
+	TreeStore: Symbol("TreeStore"),
+	TreeDragManager: Symbol("TreeDragManager"),
 
-export default DI_KEYS
+	SettingsFacade: Symbol("SettingsFacade"),
+	SettingsRenderer: Symbol("SettingsRenderer"),
+	SettingsStore: Symbol("SettingsStore"),
+
+	CommandDispatcher: Symbol("CommandDispatcher"),
+};
+
+export default DI_KEYS;
