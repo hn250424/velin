@@ -9,7 +9,7 @@ export default function registerTabHandlers(mainWindow: BrowserWindow, tabServic
 		const result = await tabService.closeTab(data, mainWindow);
 		return {
 			result: result,
-			data: undefined as void,
+			data: null,
 		};
 	});
 

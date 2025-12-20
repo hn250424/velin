@@ -58,6 +58,7 @@ export default class TabUtils implements ITabUtils {
 						content = "";
 					}
 				}
+
 				return {
 					id: data.id,
 					isModified: false,
@@ -73,5 +74,15 @@ export default class TabUtils implements ITabUtils {
 			activatedId: session.activatedId,
 			data,
 		};
+	}
+
+	toTabSessionModel(tabEditorsDto: TabEditorsDto): TabSessionModel {
+		return {
+			activatedId: tabEditorsDto.activatedId,
+			data: tabEditorsDto.data.map((d) => ({
+				id: d.id,
+				filePath: d.filePath
+			}))
+		}
 	}
 }

@@ -1,4 +1,3 @@
-import ITreeRepository from "src/main/modules/contracts/ITreeRepository";
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import { BrowserWindow } from "electron";
 import { inject } from "inversify";
@@ -6,17 +5,15 @@ import DI_KEYS from "../constants/di_keys";
 import IDialogManager from "../modules/contracts/IDialogManager";
 import IFileManager from "../modules/contracts/IFileManager";
 import ITabRepository from "../modules/contracts/ITabRepository";
-import { TabSessionData, TabSessionModel } from "../models/TabSessionModel";
+import { TabSessionData } from "../models/TabSessionModel";
+import ITabUtils from "@main/modules/contracts/ITabUtils";
 
 export default class TabService {
 	constructor(
 		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-		@inject(DI_KEYS.TabRepository)
-		private readonly tabRepository: ITabRepository,
-		@inject(DI_KEYS.dialogManager)
-		private readonly dialogManager: IDialogManager,
-		@inject(DI_KEYS.TreeRepository)
-		private readonly treeRepository: ITreeRepository
+		@inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
+		@inject(DI_KEYS.TabUtils) private readonly tabUtils: ITabUtils,
+		@inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
 	) {}
 	async closeTab(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
 		if (data.isModified) {
@@ -44,13 +41,14 @@ export default class TabService {
 					activatedId: -1,
 					data: [],
 				};
+
 				const updatedData = tabSession.data.filter((session) => session.id !== data.id);
+
 				await this.tabRepository.writeTabSession({
 					activatedId: tabSession.activatedId,
 					data: updatedData,
 				});
 			} catch (e) {
-				console.error(e);
 				return false;
 			}
 		}
@@ -70,6 +68,7 @@ export default class TabService {
 			}
 
 			const result = await this.closeTab(data, mainWindow, false);
+
 			if (result) {
 				responseArr.push(true);
 			} else {
@@ -92,10 +91,11 @@ export default class TabService {
 		mainWindow: BrowserWindow
 	): Promise<boolean[]> {
 		const data = dto.data;
-		const refIdx = data.findIndex((_data) => _data.id === referenceData.id);
+		const refIdx = data.findIndex((d) => d.id === referenceData.id);
 
 		const sessionToKeep = [];
 		const responseArr = [];
+
 		for (let i = 0; i <= refIdx; i++) {
 			sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath });
 			responseArr.push(false);
@@ -103,6 +103,7 @@ export default class TabService {
 
 		for (let i = refIdx + 1; i < data.length; i++) {
 			const result = await this.closeTab(data[i], mainWindow, false);
+
 			if (result) {
 				responseArr.push(true);
 			} else {
@@ -142,15 +143,8 @@ export default class TabService {
 	}
 
 	async syncTabSession(dto: TabEditorsDto): Promise<boolean> {
-		const newSession: TabSessionModel = {
-			activatedId: dto.activatedId,
-			data: dto.data.map((d) => ({
-				id: d.id,
-				filePath: d.filePath,
-			})),
-		};
-
-		await this.tabRepository.writeTabSession(newSession);
+		const session = this.tabUtils.toTabSessionModel(dto);
+		await this.tabRepository.writeTabSession(session);
 		return true;
 	}
 }

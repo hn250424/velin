@@ -1,7 +1,7 @@
 import { TabSessionModel } from "@main/models/TabSessionModel";
 import IFileManager from "@main/modules/contracts/IFileManager";
 import ITabUtils from "@main/modules/contracts/ITabUtils";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import { TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 export default class FakeTabUtils implements ITabUtils {
 	constructor(private fakeFileManager: IFileManager) {}
@@ -48,5 +48,15 @@ export default class FakeTabUtils implements ITabUtils {
 			activatedId: session.activatedId,
 			data,
 		};
+	}
+
+	toTabSessionModel(tabEditorsDto: TabEditorsDto): TabSessionModel {
+		return {
+			activatedId: tabEditorsDto.activatedId,
+			data: tabEditorsDto.data.map((d) => ({
+				id: d.id,
+				filePath: d.filePath
+			}))
+		}
 	}
 }

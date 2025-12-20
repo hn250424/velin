@@ -4,21 +4,20 @@ import FakeMainWindow from "../mocks/FakeMainWindow";
 import FakeFileManager from "../modules/fs/FakeFileManager";
 import fakeDialogManager, { setFakeConfirmResult, setFakeSaveDialogResult } from "../modules/ui/fakeDialogManager";
 import FakeTabRepository from "../modules/tab/FakeTabRepository";
-import FakeTreeRepository from "../modules/tree/FakeTreeRepository";
 import TabService from "@services/TabService";
 
 import {
 	tabSessionPath,
-	treeSessionPath,
 	newFilePath,
 	emptyFilePathTabEditorDto,
 	defaultTabEditorDto,
 	tabEidtorsDto,
 } from "../data/test_data";
+import FakeTabUtils from "../modules/tab/FakeTabUtils";
 
 let fakeFileManager: FakeFileManager;
 let fakeTabRepository: FakeTabRepository;
-let fakeTreeRepository: FakeTreeRepository;
+let fakeTabUtils: FakeTabUtils;
 let tabService: TabService;
 const fakeMainWindow = new FakeMainWindow();
 
@@ -26,8 +25,8 @@ describe("tabService.closeTab", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
-		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository);
+		fakeTabUtils = new FakeTabUtils(fakeFileManager);
+		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
 	test("should write when closeTab if data is modified", async () => {
@@ -141,8 +140,8 @@ describe("tabService.closeTabsExcept", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
-		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository);
+		fakeTabUtils = new FakeTabUtils(fakeFileManager);
+		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
 	test("should retain only selected tab and save others modified file", async () => {
@@ -236,8 +235,8 @@ describe("tabService.closeTabsToRight", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
-		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository);
+		fakeTabUtils = new FakeTabUtils(fakeFileManager);
+		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
 	test("should retain only the tabs to the left of the reference tab and save modified files", async () => {
@@ -331,8 +330,8 @@ describe("tabService.closeAllTabs", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
-		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository);
+		fakeTabUtils = new FakeTabUtils(fakeFileManager);
+		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
 	test("should close all tabs and save modified files", async () => {
@@ -417,8 +416,8 @@ describe("tabService.syncTabSession", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
-		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeDialogManager, fakeTreeRepository);
+		fakeTabUtils = new FakeTabUtils(fakeFileManager);
+		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
 	test("a write session was received from the renderer for synchronization", async () => {
