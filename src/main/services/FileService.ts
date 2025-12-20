@@ -6,7 +6,7 @@ import DI_KEYS from "../constants/di_keys";
 import IDialogManager from "../modules/contracts/IDialogManager";
 import IFileManager from "../modules/contracts/IFileManager";
 import ITabRepository from "../modules/contracts/ITabRepository";
-import { TabSessionData, TabSessionModel } from "../models/TabSessionModel";
+import { TabSessionData } from "../models/TabSessionModel";
 import TreeDto from "@shared/dto/TreeDto";
 import ITreeUtils from "@main/modules/contracts/ITreeUtils";
 import IFileWatcher from "@main/modules/contracts/IFileWatcher";
@@ -14,12 +14,9 @@ import IFileWatcher from "@main/modules/contracts/IFileWatcher";
 export default class FileService {
 	constructor(
 		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
-		@inject(DI_KEYS.TabRepository)
-		private readonly tabRepository: ITabRepository,
-		@inject(DI_KEYS.dialogManager)
-		private readonly dialogManager: IDialogManager,
-		@inject(DI_KEYS.TreeRepository)
-		private readonly treeRepository: ITreeRepository,
+		@inject(DI_KEYS.TabRepository) private readonly tabRepository: ITabRepository,
+		@inject(DI_KEYS.dialogManager) private readonly dialogManager: IDialogManager,
+		@inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository,
 		@inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
 		@inject(DI_KEYS.FileWatcher) private readonly fileWatcher: IFileWatcher
 	) {}
@@ -29,10 +26,10 @@ export default class FileService {
 			activatedId: -1,
 			data: [],
 		};
-		const arr = model.data;
-		const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0;
-		arr.push({ id: id, filePath: "" });
-		model.data = arr;
+
+		const data = model.data;
+		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0;
+		data.push({ id: id, filePath: "" });
 		await this.tabRepository.writeTabSession(model);
 		return id;
 	}
@@ -55,11 +52,11 @@ export default class FileService {
 			activatedId: -1,
 			data: [],
 		};
-		const arr = model.data;
-		const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0;
-		arr.push({ id: id, filePath: filePath });
+
+		const data = model.data;
+		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0;
+		data.push({ id: id, filePath: filePath });
 		model.activatedId = id;
-		model.data = arr;
 		await this.tabRepository.writeTabSession(model);
 
 		return {
@@ -75,6 +72,7 @@ export default class FileService {
 	async openDirectory(dto?: TreeDto): Promise<TreeDto | null> {
 		let path;
 		let indent;
+
 		if (!dto || !dto.path) {
 			const result = await this.dialogManager.showOpenDirectoryDialog();
 
@@ -124,8 +122,8 @@ export default class FileService {
 					activatedId: -1,
 					data: [],
 				};
-				const tabSessionData = tabSession.data;
-				const session = tabSessionData.find((s) => s.id === data.id);
+
+				const session = tabSession.data.find((s) => s.id === data.id);
 				if (session) session.filePath = result.filePath;
 				if (writeSession) await this.tabRepository.writeTabSession(tabSession);
 

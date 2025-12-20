@@ -46,10 +46,10 @@ export default function registerFileHandlers(mainWindow: BrowserWindow, fileServ
 	});
 
 	ipcMain.handle(electronAPI.events.rendererToMain.saveAll, async (e, data: TabEditorsDto) => {
-		const dataArr: TabEditorsDto = await fileService.saveAll(data, mainWindow);
+		const tabEditorsData: TabEditorsDto = await fileService.saveAll(data, mainWindow);
 		return {
 			result: true,
-			data: dataArr,
+			data: tabEditorsData,
 		};
 	});
 }
