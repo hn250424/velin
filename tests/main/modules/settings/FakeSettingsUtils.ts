@@ -4,10 +4,7 @@ import SettingsSessionModel, {
 } from "@main/models/SettingsSessionModel";
 import IFileManager from "@main/modules/contracts/IFileManager";
 import ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
-import SettingsDto, {
-	SettingFontDto,
-	SettingThemeDto,
-} from "@shared/dto/SettingsDto";
+import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
 
 export default class FakeSettingsUtils implements ISettingsUtils {
 	constructor(private fakeFileManager: IFileManager) {}

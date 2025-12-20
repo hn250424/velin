@@ -3,10 +3,7 @@ import IFileManager from "@main/modules/contracts/IFileManager";
 import ISideRepository from "@main/modules/contracts/ISideRepository";
 
 export default class FakeSideRepository implements ISideRepository {
-	constructor(
-		private sideSessionPath: string,
-		private fakeFileManager: IFileManager
-	) {}
+	constructor(private sideSessionPath: string, private fakeFileManager: IFileManager) {}
 
 	async readSideSession(): Promise<SideSessionModel | null> {
 		if (!(await this.fakeFileManager.exists(this.sideSessionPath))) {
@@ -18,10 +15,7 @@ export default class FakeSideRepository implements ISideRepository {
 	}
 
 	async writeSideSession(model: SideSessionModel): Promise<void> {
-		await this.fakeFileManager.write(
-			this.sideSessionPath,
-			JSON.stringify(model, null, 4)
-		);
+		await this.fakeFileManager.write(this.sideSessionPath, JSON.stringify(model, null, 4));
 	}
 
 	async setSideSession(model: SideSessionModel): Promise<void> {

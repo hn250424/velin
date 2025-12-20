@@ -1,8 +1,6 @@
 import { CLASS_SELECTED } from "../constants/dom";
 
-export default function registerMenuHandlers(
-	menuItems: NodeListOf<HTMLElement>
-) {
+export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>) {
 	bindMenucontainerEvents(menuItems);
 }
 
@@ -17,9 +15,7 @@ function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>) {
 		});
 
 		item.addEventListener("mouseenter", () => {
-			const anyActive = Array.from(menuItems).some((i) =>
-				i.classList.contains(CLASS_SELECTED)
-			);
+			const anyActive = Array.from(menuItems).some((i) => i.classList.contains(CLASS_SELECTED));
 			if (anyActive) {
 				menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED));
 				item.classList.add(CLASS_SELECTED);

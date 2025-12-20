@@ -43,27 +43,15 @@ describe("loadService.loadedRenderer: ", () => {
 	beforeEach(() => {
 		fakeMainWindow = new FakeMainWindow();
 		fakeFileManager = new FakeFileManager();
-		fakeSideRepository = new FakeSideRepository(
-			sideSessionPath,
-			fakeFileManager
-		);
+		fakeSideRepository = new FakeSideRepository(sideSessionPath, fakeFileManager);
 		fakeTabUtils = new FakeTabUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
 		fakeFileWatcher = new FakeFileWatcher();
-		fakeSettingsRepository = new FakeSettingsRepository(
-			settingsSessionPath,
-			fakeFileManager
-		);
+		fakeSettingsRepository = new FakeSettingsRepository(settingsSessionPath, fakeFileManager);
 		fakeSettingsUtils = new FakeSettingsUtils(fakeFileManager);
-		fakeWindowRepository = new FakeWindowRepository(
-			windowSessionPath,
-			fakeFileManager
-		);
+		fakeWindowRepository = new FakeWindowRepository(windowSessionPath, fakeFileManager);
 		fakeWindowUtils = new FakeWindowUtils();
 	});
 
@@ -176,9 +164,7 @@ describe("loadService.loadedRenderer: ", () => {
 		const windowSentData = fakeMainWindow.webContents.send.mock.calls[0][1];
 		expect(windowSentData.maximize).toBe(initialWindowSession.maximize);
 		const settingsSentData = fakeMainWindow.webContents.send.mock.calls[0][2];
-		expect(settingsSentData.settingFontDto.size).toBe(
-			initialSettingsSession.settingFontSessionModel.size
-		);
+		expect(settingsSentData.settingFontDto.size).toBe(initialSettingsSession.settingFontSessionModel.size);
 		const sideSentData = fakeMainWindow.webContents.send.mock.calls[0][3];
 		expect(sideSentData.open).toBe(initialSideSession.open);
 		expect(sideSentData.width).toBe(initialSideSession.width);

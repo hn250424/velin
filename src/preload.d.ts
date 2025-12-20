@@ -1,8 +1,4 @@
-import type {
-	MainToRendererAPI,
-	RendererToMainAPI,
-	UtilsAPI,
-} from "@shared/preload";
+import type { MainToRendererAPI, RendererToMainAPI, UtilsAPI } from "@shared/preload";
 
 export {};
 

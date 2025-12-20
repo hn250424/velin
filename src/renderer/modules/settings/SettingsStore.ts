@@ -1,7 +1,4 @@
-import SettingsDto, {
-	SettingFontDto,
-	SettingThemeDto,
-} from "@shared/dto/SettingsDto";
+import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
 import SettingsViewModel, {
 	SettingFontViewModel,
 	SettingThemeViewModel,
@@ -68,8 +65,7 @@ export default class SettingsStore {
 		return {
 			settingFontViewModel: {
 				size:
-					this._currentSettings.settingFontViewModel.size !==
-					this._draftSettings.settingFontViewModel.size
+					this._currentSettings.settingFontViewModel.size !== this._draftSettings.settingFontViewModel.size
 						? this._draftSettings.settingFontViewModel.size
 						: null,
 			},

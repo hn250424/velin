@@ -149,10 +149,7 @@ describe("FileService.openDirectory", () => {
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
 		fakeFileWatcher = new FakeFileWatcher();
 		fileService = new FileService(
 			fakeFileManager,
@@ -225,9 +222,7 @@ describe("FileService.openDirectory", () => {
 		const response = await fileService.openDirectory(copiedDto.children[1]);
 
 		// Then.
-		expect(response.path).toBe(
-			path.join(copiedDto.path, copiedDto.children[1].name)
-		);
+		expect(response.path).toBe(path.join(copiedDto.path, copiedDto.children[1].name));
 		const session = await fakeTreeRepository.readTreeSession();
 		expect(response.path).toBe(session.children[1].path);
 		expect(session.children[1].expanded).toBe(true);
@@ -261,10 +256,7 @@ describe("FileService.save", () => {
 		});
 
 		// When.
-		const result: TabEditorDto = await fileService.save(
-			data,
-			fakeMainWindow as any
-		);
+		const result: TabEditorDto = await fileService.save(data, fakeMainWindow as any);
 
 		// Then.
 		expect(result.isModified).toBe(true);
@@ -368,12 +360,8 @@ describe("FileService.saveAs", () => {
 		const savedFile = await fakeFileManager.read(newFilePath);
 		expect(savedFile).toBe(data.content);
 		const updatedTabSession = await fakeTabRepository.readTabSession();
-		expect(updatedTabSession.data[updatedTabSession.data.length - 1].id).toBe(
-			data.id + 1
-		);
-		expect(
-			updatedTabSession.data[updatedTabSession.data.length - 1].filePath
-		).toBe(newFilePath);
+		expect(updatedTabSession.data[updatedTabSession.data.length - 1].id).toBe(data.id + 1);
+		expect(updatedTabSession.data[updatedTabSession.data.length - 1].filePath).toBe(newFilePath);
 	});
 });
 
@@ -409,10 +397,7 @@ describe("FileService.saveAll", () => {
 		const spy = vi.spyOn(fakeFileManager, "write");
 
 		// When.
-		const response = await fileService.saveAll(
-			copiedDto,
-			fakeMainWindow as any
-		);
+		const response = await fileService.saveAll(copiedDto, fakeMainWindow as any);
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession();
@@ -443,10 +428,7 @@ describe("FileService.saveAll", () => {
 		const spy = vi.spyOn(fakeFileManager, "write");
 
 		// When.
-		const response = await fileService.saveAll(
-			copiedDto,
-			fakeMainWindow as any
-		);
+		const response = await fileService.saveAll(copiedDto, fakeMainWindow as any);
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession();

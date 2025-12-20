@@ -13,10 +13,7 @@ export default class FakeTreeUtils implements ITreeUtils {
 		this.tree = tree;
 	}
 
-	async getDirectoryTree(
-		dirPath: string,
-		indent: number = 0
-	): Promise<TreeDto | null> {
+	async getDirectoryTree(dirPath: string, indent: number = 0): Promise<TreeDto | null> {
 		if (!this.tree) return null;
 
 		const findNode = (node: TreeDto): TreeDto | null => {
@@ -62,19 +59,13 @@ export default class FakeTreeUtils implements ITreeUtils {
 		return updatedTree;
 	}
 
-	private replaceNode(
-		root: TreeSessionModel,
-		targetPath: string,
-		newNode: TreeSessionModel
-	): TreeSessionModel {
+	private replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel {
 		if (root.path === targetPath) {
 			return newNode;
 		}
 
 		if (root.children) {
-			const newChildren = root.children.map((child) =>
-				this.replaceNode(child, targetPath, newNode)
-			);
+			const newChildren = root.children.map((child) => this.replaceNode(child, targetPath, newNode));
 			return { ...root, children: newChildren };
 		}
 

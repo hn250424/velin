@@ -75,9 +75,7 @@
 				</button>
 				<button id="replace_all" class="tooltip-btn">
 					<img src="src/renderer/assets/icons/replace_all.png" />
-					<span class="tooltip tooltip-bottom"
-						>Replace All (Ctrl+Alt+Enter)</span
-					>
+					<span class="tooltip tooltip-bottom">Replace All (Ctrl+Alt+Enter)</span>
 				</button>
 
 				<span id="replace_info"></span>
@@ -100,36 +98,18 @@
 		</div>
 
 		<div id="tab_context_menu" class="dropdown">
-			<div id="tab_context_close" class="dropdown_item">
-				Close<span class="shortcut">Ctrl+W</span>
-			</div>
-			<div id="tab_context_close_others" class="dropdown_item">
-				Close Others<span class="shortcut"></span>
-			</div>
-			<div id="tab_context_close_right" class="dropdown_item">
-				Close to the Right<span class="shortcut"></span>
-			</div>
-			<div id="tab_context_close_all" class="dropdown_item">
-				Close All<span class="shortcut"></span>
-			</div>
+			<div id="tab_context_close" class="dropdown_item">Close<span class="shortcut">Ctrl+W</span></div>
+			<div id="tab_context_close_others" class="dropdown_item">Close Others<span class="shortcut"></span></div>
+			<div id="tab_context_close_right" class="dropdown_item">Close to the Right<span class="shortcut"></span></div>
+			<div id="tab_context_close_all" class="dropdown_item">Close All<span class="shortcut"></span></div>
 		</div>
 
 		<div id="tree_context_menu" class="dropdown">
-			<div id="tree_context_cut" class="dropdown_item">
-				Cut<span class="shortcut">Ctrl+X</span>
-			</div>
-			<div id="tree_context_copy" class="dropdown_item">
-				Copy<span class="shortcut">Ctrl+C</span>
-			</div>
-			<div id="tree_context_paste" class="dropdown_item">
-				Paste<span class="shortcut">Ctrl+V</span>
-			</div>
-			<div id="tree_context_rename" class="dropdown_item">
-				Rename<span class="shortcut">F2</span>
-			</div>
-			<div id="tree_context_delete" class="dropdown_item">
-				Delete<span class="shortcut">DELETE</span>
-			</div>
+			<div id="tree_context_cut" class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
+			<div id="tree_context_copy" class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span></div>
+			<div id="tree_context_paste" class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span></div>
+			<div id="tree_context_rename" class="dropdown_item">Rename<span class="shortcut">F2</span></div>
+			<div id="tree_context_delete" class="dropdown_item">Delete<span class="shortcut">DELETE</span></div>
 		</div>
 
 		<div id="container">
@@ -143,61 +123,33 @@
 						File
 						<div class="dropdown">
 							<!-- <div id="file_menu_new_window" class="dropdown_item not_implemented">New Window<span class="shortcut">Ctrl+Shift+N</span></div> -->
-							<div id="file_menu_new_tab" class="dropdown_item">
-								New Tab<span class="shortcut">Ctrl+T</span>
-							</div>
-							<div id="file_menu_open_file" class="dropdown_item">
-								Open File<span class="shortcut">Ctrl+O</span>
-							</div>
+							<div id="file_menu_new_tab" class="dropdown_item">New Tab<span class="shortcut">Ctrl+T</span></div>
+							<div id="file_menu_open_file" class="dropdown_item">Open File<span class="shortcut">Ctrl+O</span></div>
 							<div id="file_menu_open_directory" class="dropdown_item">
 								Open Folder<span class="shortcut">Ctrl+Shift+O</span>
 							</div>
 							<!-- <div id="file_menu_recent" class="dropdown_item not_implemented">Recent<span class="shortcut"></span></div> -->
-							<div id="file_menu_save" class="dropdown_item">
-								Save<span class="shortcut">Ctrl+S</span>
-							</div>
-							<div id="file_menu_save_as" class="dropdown_item">
-								Save As<span class="shortcut">Ctrl+Shift+S</span>
-							</div>
-							<div id="file_menu_save_all" class="dropdown_item">
-								Save All<span class="shortcut"></span>
-							</div>
+							<div id="file_menu_save" class="dropdown_item">Save<span class="shortcut">Ctrl+S</span></div>
+							<div id="file_menu_save_as" class="dropdown_item">Save As<span class="shortcut">Ctrl+Shift+S</span></div>
+							<div id="file_menu_save_all" class="dropdown_item">Save All<span class="shortcut"></span></div>
 							<div class="dropdown_divider"></div>
-							<div id="file_menu_settings" class="dropdown_item">
-								Settings<span class="shortcut">Ctrl+,</span>
-							</div>
-							<div id="file_menu_exit" class="exit dropdown_item">
-								Exit<span class="shortcut">Alt+F4</span>
-							</div>
+							<div id="file_menu_settings" class="dropdown_item">Settings<span class="shortcut">Ctrl+,</span></div>
+							<div id="file_menu_exit" class="exit dropdown_item">Exit<span class="shortcut">Alt+F4</span></div>
 						</div>
 					</div>
 
 					<div class="menu_item" tabindex="0">
 						Edit
 						<div class="dropdown">
-							<div id="edit_menu_undo" class="dropdown_item">
-								Undo<span class="shortcut">Ctrl+Z</span>
-							</div>
-							<div id="edit_menu_redo" class="dropdown_item">
-								Redo<span class="shortcut">Ctrl+Shift+Z</span>
-							</div>
+							<div id="edit_menu_undo" class="dropdown_item">Undo<span class="shortcut">Ctrl+Z</span></div>
+							<div id="edit_menu_redo" class="dropdown_item">Redo<span class="shortcut">Ctrl+Shift+Z</span></div>
 							<div class="dropdown_divider"></div>
-							<div id="edit_menu_cut" class="dropdown_item">
-								Cut<span class="shortcut">Ctrl+X</span>
-							</div>
-							<div id="edit_menu_copy" class="dropdown_item">
-								Copy<span class="shortcut">Ctrl+C</span>
-							</div>
-							<div id="edit_menu_paste" class="dropdown_item">
-								Paste<span class="shortcut">Ctrl+V</span>
-							</div>
+							<div id="edit_menu_cut" class="dropdown_item">Cut<span class="shortcut">Ctrl+X</span></div>
+							<div id="edit_menu_copy" class="dropdown_item">Copy<span class="shortcut">Ctrl+C</span></div>
+							<div id="edit_menu_paste" class="dropdown_item">Paste<span class="shortcut">Ctrl+V</span></div>
 							<div class="dropdown_divider"></div>
-							<div id="edit_menu_find" class="dropdown_item">
-								Find<span class="shortcut">Ctrl+F</span>
-							</div>
-							<div id="edit_menu_replace" class="dropdown_item">
-								Replace<span class="shortcut">Ctrl+R</span>
-							</div>
+							<div id="edit_menu_find" class="dropdown_item">Find<span class="shortcut">Ctrl+F</span></div>
+							<div id="edit_menu_replace" class="dropdown_item">Replace<span class="shortcut">Ctrl+R</span></div>
 							<!-- <div class="dropdown_divider"></div>
                         <div id="edit_menu_find_in_files" class="dropdown_item">Find in Files<span class="shortcut">Ctrl+Shift+F</span>
                         </div>
@@ -209,15 +161,9 @@
 					<div class="menu_item" tabindex="0">
 						View
 						<div class="dropdown">
-							<div id="view_menu_zoom_in" class="dropdown_item">
-								Zoom In<span class="shortcut">Ctrl++</span>
-							</div>
-							<div id="view_menu_zoom_out" class="dropdown_item">
-								Zoom Out<span class="shortcut">Ctrl+-</span>
-							</div>
-							<div id="view_menu_zoom_reset" class="dropdown_item">
-								Reset Zoom<span class="shortcut">Ctrl+0</span>
-							</div>
+							<div id="view_menu_zoom_in" class="dropdown_item">Zoom In<span class="shortcut">Ctrl++</span></div>
+							<div id="view_menu_zoom_out" class="dropdown_item">Zoom Out<span class="shortcut">Ctrl+-</span></div>
+							<div id="view_menu_zoom_reset" class="dropdown_item">Reset Zoom<span class="shortcut">Ctrl+0</span></div>
 							<!-- <div class="dropdown_divider"></div> -->
 							<!-- <div id="view_menu_fullscreen" class="dropdown_item">Fullscreen<span class="shortcut">F11</span> -->
 							<!-- </div> -->
@@ -228,26 +174,18 @@
 						Help
 						<div class="dropdown">
 							<!-- <div class="dropdown_item">Syntax<span class="shortcut">Ctrl+/</span></div> -->
-							<div id="help-information" class="dropdown_item">
-								Information<span class="shortcut">F1</span>
-							</div>
+							<div id="help-information" class="dropdown_item">Information<span class="shortcut">F1</span></div>
 						</div>
 					</div>
 				</div>
 
 				<div id="window" class="no_drag">
 					<button id="minimizeWindow" class="tooltip-btn">
-						<img
-							class="icon-grey"
-							src="src/renderer/assets/icons/minimize.png"
-						/>
+						<img class="icon-grey" src="src/renderer/assets/icons/minimize.png" />
 						<span class="tooltip tooltip-bottom">Minimize</span>
 					</button>
 					<button id="maximizeWindow" class="tooltip-btn">
-						<img
-							class="icon-grey"
-							src="src/renderer/assets/icons/maximize.png"
-						/>
+						<img class="icon-grey" src="src/renderer/assets/icons/maximize.png" />
 						<span class="tooltip tooltip-bottom">Maximize</span>
 					</button>
 					<button id="title_exit" class="tooltip-btn exit">

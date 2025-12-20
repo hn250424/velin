@@ -97,12 +97,7 @@ export default class FileService {
 			this.fileWatcher.watch(path);
 		} else {
 			const session = await this.treeRepository.readTreeSession();
-			const updatedSession = await this.treeUtils.getSessionModelWithFs(
-				path,
-				indent,
-				fsTree.children,
-				session
-			);
+			const updatedSession = await this.treeUtils.getSessionModelWithFs(path, indent, fsTree.children, session);
 			await this.treeRepository.writeTreeSession(updatedSession);
 		}
 
@@ -116,16 +111,9 @@ export default class FileService {
 		};
 	}
 
-	async save(
-		data: TabEditorDto,
-		mainWindow: BrowserWindow,
-		writeSession = true
-	) {
+	async save(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
 		if (!data.filePath) {
-			const result = await this.dialogManager.showSaveDialog(
-				mainWindow,
-				data.fileName
-			);
+			const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
 
 			if (result.canceled || !result.filePath) {
 				return data;
@@ -159,14 +147,8 @@ export default class FileService {
 		}
 	}
 
-	async saveAs(
-		data: TabEditorDto,
-		mainWindow: BrowserWindow
-	): Promise<TabEditorDto> {
-		const result = await this.dialogManager.showSaveDialog(
-			mainWindow,
-			data.fileName
-		);
+	async saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto> {
+		const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
 
 		if (result.canceled || !result.filePath) {
 			return null;

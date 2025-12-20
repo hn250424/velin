@@ -6,16 +6,11 @@ import SettingsSessionModel, {
 	SettingFontSessionModel,
 	SettingThemeSessionModel,
 } from "@main/models/SettingsSessionModel";
-import SettingsDto, {
-	SettingFontDto,
-	SettingThemeDto,
-} from "@shared/dto/SettingsDto";
+import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
 
 @injectable()
 export default class SettingsUtils implements ISettingsUtils {
-	constructor(
-		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager
-	) {}
+	constructor(@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager) {}
 
 	toSettingsDto(session: SettingsSessionModel): SettingsDto {
 		return {

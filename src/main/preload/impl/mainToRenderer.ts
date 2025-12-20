@@ -29,15 +29,10 @@ const mainToRenderer: MainToRendererAPI = {
 			callback(version);
 		});
 	},
-	syncFromWatch: (
-		callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void
-	) => {
-		ipcRenderer.on(
-			electronAPI.events.mainToRenderer.syncFromWatch,
-			(e, tabEditorsDto, treeDto) => {
-				callback(tabEditorsDto, treeDto);
-			}
-		);
+	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
+		ipcRenderer.on(electronAPI.events.mainToRenderer.syncFromWatch, (e, tabEditorsDto, treeDto) => {
+			callback(tabEditorsDto, treeDto);
+		});
 	},
 	onMaximizeWindow: (callback: () => void) => {
 		ipcRenderer.on(electronAPI.events.mainToRenderer.onMaximizeWindow, () => {

@@ -7,9 +7,7 @@ import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 @injectable()
 export default class TabUtils implements ITabUtils {
-	constructor(
-		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager
-	) {}
+	constructor(@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager) {}
 
 	async syncSessionWithFs(session: TabSessionModel): Promise<TabSessionModel> {
 		if (!session) return { activatedId: -1, data: [] };
@@ -28,9 +26,7 @@ export default class TabUtils implements ITabUtils {
 		}
 
 		const newActivatedId =
-			isActivatedTabDeleted && filteredData.length > 0
-				? filteredData[filteredData.length - 1].id
-				: session.activatedId;
+			isActivatedTabDeleted && filteredData.length > 0 ? filteredData[filteredData.length - 1].id : session.activatedId;
 
 		return {
 			activatedId: newActivatedId,

@@ -33,9 +33,7 @@ export default class TreeStore {
 			indent: viewModel.indent,
 			directory: viewModel.directory,
 			expanded: viewModel.expanded,
-			children: viewModel.children
-				? viewModel.children.map((child) => this.toTreeDto(child))
-				: null,
+			children: viewModel.children ? viewModel.children.map((child) => this.toTreeDto(child)) : null,
 		};
 	}
 
@@ -47,9 +45,7 @@ export default class TreeStore {
 			directory: dto.directory,
 			expanded: dto.expanded,
 			selected: false,
-			children: dto.children
-				? dto.children.map((child) => this.toTreeViewModel(child))
-				: null,
+			children: dto.children ? dto.children.map((child) => this.toTreeViewModel(child)) : null,
 		};
 	}
 
@@ -70,8 +66,7 @@ export default class TreeStore {
 	}
 
 	extractTreeViewModel(): TreeViewModel | null {
-		if (!this._flattenTreeArray || this._flattenTreeArray.length === 0)
-			return null;
+		if (!this._flattenTreeArray || this._flattenTreeArray.length === 0) return null;
 
 		const pathToNode = new Map<string, TreeViewModel>();
 		const root = this._flattenTreeArray[0];
@@ -99,9 +94,7 @@ export default class TreeStore {
 	}
 
 	expandNode(node: TreeViewModel) {
-		const index = this._flattenTreeArray.findIndex(
-			(dto) => dto.path === node.path
-		);
+		const index = this._flattenTreeArray.findIndex((dto) => dto.path === node.path);
 		if (index === -1) return;
 
 		const childrenToInsert = this.flattenTree(node).slice(1); // Remove the first element (the node itself) using slice(1)
@@ -111,9 +104,7 @@ export default class TreeStore {
 	}
 
 	collapseNode(node: TreeViewModel) {
-		const index = this._flattenTreeArray.findIndex(
-			(dto) => dto.path === node.path
-		);
+		const index = this._flattenTreeArray.findIndex((dto) => dto.path === node.path);
 		if (index === -1) return;
 
 		let removeCount = 0;

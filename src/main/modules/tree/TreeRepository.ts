@@ -5,10 +5,7 @@ import ITreeRepository from "src/main/modules/contracts/ITreeRepository";
 export default class TreeRepository implements ITreeRepository {
 	private session: TreeSessionModel | null = null;
 
-	constructor(
-		private treeSessionPath: string,
-		private fileManager: IFileManager
-	) {}
+	constructor(private treeSessionPath: string, private fileManager: IFileManager) {}
 
 	async readTreeSession(): Promise<TreeSessionModel> {
 		if (this.session) return this.session;
@@ -24,9 +21,6 @@ export default class TreeRepository implements ITreeRepository {
 
 	async writeTreeSession(treeSessionModel: TreeSessionModel) {
 		this.session = treeSessionModel;
-		this.fileManager.write(
-			this.treeSessionPath,
-			JSON.stringify(treeSessionModel, null, 4)
-		);
+		this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSessionModel, null, 4));
 	}
 }

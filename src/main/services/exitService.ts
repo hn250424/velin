@@ -17,13 +17,7 @@ export default async function exit(
 	tabSessionData: TabEditorsDto,
 	treeSessionData: TreeDto
 ) {
-	await syncTab(
-		mainWindow,
-		fileManager,
-		dialogManager,
-		tabRepository,
-		tabSessionData
-	);
+	await syncTab(mainWindow, fileManager, dialogManager, tabRepository, tabSessionData);
 	await syncTree(treeRepository, treeSessionData as TreeSessionModel);
 	mainWindow.close();
 }
@@ -45,9 +39,7 @@ async function syncTab(
 			continue;
 		}
 
-		const confirm = await dialogManager.showConfirmDialog(
-			`Do you want to save ${fileName} file?`
-		);
+		const confirm = await dialogManager.showConfirmDialog(`Do you want to save ${fileName} file?`);
 		if (!confirm) {
 			data.push({ id: id, filePath: filePath });
 			continue;
@@ -75,9 +67,6 @@ async function syncTab(
 	});
 }
 
-async function syncTree(
-	treeRepository: ITreeRepository,
-	treeSessionData: TreeSessionModel
-) {
+async function syncTree(treeRepository: ITreeRepository, treeSessionData: TreeSessionModel) {
 	await treeRepository.writeTreeSession(treeSessionData as TreeSessionModel);
 }

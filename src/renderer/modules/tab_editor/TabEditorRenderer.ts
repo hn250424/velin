@@ -51,8 +51,7 @@ export default class TabEditorRenderer {
 	}
 
 	async createTabAndEditor(viewModel: TabEditorViewModel) {
-		const { id, isModified, isBinary, filePath, fileName, initialContent } =
-			viewModel;
+		const { id, isModified, isBinary, filePath, fileName, initialContent } = viewModel;
 
 		const { div, span, button } = this.createTabBox(fileName);
 		div.dataset[DATASET_ATTR_TAB_ID] = id.toString();
@@ -92,13 +91,7 @@ export default class TabEditorRenderer {
 
 		this.editorContainer.appendChild(editorBoxDiv);
 
-		const tabEditorView = new TabEditorView(
-			div,
-			span,
-			button,
-			editorBoxDiv,
-			editor
-		);
+		const tabEditorView = new TabEditorView(div, span, button, editorBoxDiv, editor);
 
 		if (!isBinary) {
 			tabEditorView.observeEditor(

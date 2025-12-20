@@ -53,9 +53,7 @@ export default class PasteCommand implements ICommand {
 
 				if (view) {
 					view.tabDiv.title = newPath;
-					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(
-						view.getId()
-					);
+					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
 					if (viewModel) {
 						viewModel.filePath = newPath;
 					}
@@ -88,9 +86,7 @@ export default class PasteCommand implements ICommand {
 				const view = this.tabEditorFacade.getTabEditorViewByPath(dest);
 				if (view) {
 					view.tabDiv.title = src;
-					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(
-						view.getId()
-					);
+					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
 					if (viewModel) {
 						viewModel.filePath = src;
 					}

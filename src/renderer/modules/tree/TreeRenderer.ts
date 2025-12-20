@@ -66,31 +66,19 @@ export default class TreeRenderer {
 		if (viewModel.directory)
 			openStatus.src = viewModel.expanded
 				? new URL("../../assets/icons/expanded.png", import.meta.url).toString()
-				: new URL(
-						"../../assets/icons/not_expanded.png",
-						import.meta.url).toString();
-
+				: new URL("../../assets/icons/not_expanded.png", import.meta.url).toString();
 		else openStatus.classList.add("file");
 
 		const nodeType = document.createElement("img");
 		nodeType.classList.add(CLASS_TREE_NODE_TYPE);
 
 		if (!viewModel.directory) {
-			nodeType.src = new URL(
-				"../../assets/icons/file.png",
-				import.meta.url
-			).toString();
+			nodeType.src = new URL("../../assets/icons/file.png", import.meta.url).toString();
 		} else {
 			if (viewModel.expanded) {
-				nodeType.src = new URL(
-					"../../assets/icons/opened_folder.png",
-					import.meta.url
-				).toString();
+				nodeType.src = new URL("../../assets/icons/opened_folder.png", import.meta.url).toString();
 			} else {
-				nodeType.src = new URL(
-					"../../assets/icons/folder.png",
-					import.meta.url
-				).toString();
+				nodeType.src = new URL("../../assets/icons/folder.png", import.meta.url).toString();
 			}
 		}
 
@@ -115,11 +103,7 @@ export default class TreeRenderer {
 		this._pathToTreeWrapperMap.set(viewModel.path, wrapper);
 		container.appendChild(wrapper);
 
-		if (
-			viewModel.expanded &&
-			viewModel.children &&
-			viewModel.children.length > 0
-		) {
+		if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
 			for (const child of viewModel.children) {
 				this._renderNode(childrenContainer, child);
 			}
@@ -133,11 +117,7 @@ export default class TreeRenderer {
 
 		const openStatus = document.createElement("img");
 		openStatus.classList.add(CLASS_TREE_NODE_OPEN);
-		if (directory)
-			openStatus.src = new URL(
-				"../../assets/icons/not_expanded.png",
-				import.meta.url
-			).toString();
+		if (directory) openStatus.src = new URL("../../assets/icons/not_expanded.png", import.meta.url).toString();
 		else openStatus.classList.add("file");
 
 		const nodeType = document.createElement("img");

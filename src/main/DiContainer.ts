@@ -48,55 +48,29 @@ export default class DIContainer {
 	private constructor() {}
 
 	public static init(mainWindow: BrowserWindow) {
-		if (this._instance)
-			throw new Error(
-				"DIContainer.init(mainWindow) must be called before getInstance()"
-			);
+		if (this._instance) throw new Error("DIContainer.init(mainWindow) must be called before getInstance()");
 		this._mainWindow = mainWindow;
 	}
 
 	public static getInstance(): Container {
-		if (!this._mainWindow)
-			throw new Error(
-				"DIContainer.init(mainWindow) must be called before getInstance()"
-			);
+		if (!this._mainWindow) throw new Error("DIContainer.init(mainWindow) must be called before getInstance()");
 
 		if (!this._instance) {
 			const container = new Container();
 
-			container
-				.bind<IFileManager>(DI_KEYS.FileManager)
-				.to(FileManager)
-				.inSingletonScope();
-			container
-				.bind<IDialogManager>(DI_KEYS.dialogManager)
-				.toConstantValue(dialogManager);
-			container
-				.bind<ITreeUtils>(DI_KEYS.TreeUtils)
-				.to(TreeUtils)
-				.inSingletonScope();
-			container
-				.bind<ITabUtils>(DI_KEYS.TabUtils)
-				.to(TabUtils)
-				.inSingletonScope();
-			container
-				.bind<IWindowUtils>(DI_KEYS.WindowUtils)
-				.to(WindowUtils)
-				.inSingletonScope();
-			container
-				.bind<ISettingsUtils>(DI_KEYS.SettingsUtils)
-				.to(SettingsUtils)
-				.inSingletonScope();
+			container.bind<IFileManager>(DI_KEYS.FileManager).to(FileManager).inSingletonScope();
+			container.bind<IDialogManager>(DI_KEYS.dialogManager).toConstantValue(dialogManager);
+			container.bind<ITreeUtils>(DI_KEYS.TreeUtils).to(TreeUtils).inSingletonScope();
+			container.bind<ITabUtils>(DI_KEYS.TabUtils).to(TabUtils).inSingletonScope();
+			container.bind<IWindowUtils>(DI_KEYS.WindowUtils).to(WindowUtils).inSingletonScope();
+			container.bind<ISettingsUtils>(DI_KEYS.SettingsUtils).to(SettingsUtils).inSingletonScope();
 
 			const userDataPath = app.getPath("userData");
 			const tabSessionPath = path.join(userDataPath, TAB_SESSION_PATH);
 			const treeSessionPath = path.join(userDataPath, TREE_SESSION_PATH);
 			const sideSessionPath = path.join(userDataPath, SIDE_SESSION_PATH);
 			const windowSessionPath = path.join(userDataPath, WINDOW_SESSION_PATH);
-			const settingsSessionPath = path.join(
-				userDataPath,
-				SETTINGS_SESSION_PATH
-			);
+			const settingsSessionPath = path.join(userDataPath, SETTINGS_SESSION_PATH);
 
 			const fileManager = container.get<IFileManager>(DI_KEYS.FileManager);
 
@@ -117,43 +91,25 @@ export default class DIContainer {
 
 			container
 				.bind<IWindowRepository>(DI_KEYS.WindowRepository)
-				.toDynamicValue(
-					() => new WindowRepository(windowSessionPath, fileManager)
-				)
+				.toDynamicValue(() => new WindowRepository(windowSessionPath, fileManager))
 				.inSingletonScope();
 
 			container
 				.bind<ISettingsRepository>(DI_KEYS.SettingsRepository)
-				.toDynamicValue(
-					() => new SettingsRepository(settingsSessionPath, fileManager)
-				)
+				.toDynamicValue(() => new SettingsRepository(settingsSessionPath, fileManager))
 				.inSingletonScope();
 
 			const tabUtils = container.get<ITabUtils>(DI_KEYS.TabUtils);
 			const treeUtils = container.get<ITreeUtils>(DI_KEYS.TreeUtils);
 			const settingsUtils = container.get<ITabUtils>(DI_KEYS.SettingsUtils);
-			const tabRepository = container.get<ITabRepository>(
-				DI_KEYS.TabRepository
-			);
-			const treeRepository = container.get<ITreeRepository>(
-				DI_KEYS.TreeRepository
-			);
-			const settingsRepository = container.get<ISettingsRepository>(
-				DI_KEYS.SettingsRepository
-			);
+			const tabRepository = container.get<ITabRepository>(DI_KEYS.TabRepository);
+			const treeRepository = container.get<ITreeRepository>(DI_KEYS.TreeRepository);
+			const settingsRepository = container.get<ISettingsRepository>(DI_KEYS.SettingsRepository);
 
 			container
 				.bind<IFileWatcher>(DI_KEYS.FileWatcher)
 				.toDynamicValue(
-					() =>
-						new FileWatcher(
-							this._mainWindow,
-							fileManager,
-							tabUtils,
-							treeUtils,
-							tabRepository,
-							treeRepository
-						)
+					() => new FileWatcher(this._mainWindow, fileManager, tabUtils, treeUtils, tabRepository, treeRepository)
 				)
 				.inSingletonScope();
 
@@ -161,10 +117,7 @@ export default class DIContainer {
 			container.bind(DI_KEYS.TabService).to(TabService).inSingletonScope();
 			container.bind(DI_KEYS.TreeService).to(TreeService).inSingletonScope();
 			container.bind(DI_KEYS.SideService).to(SideService).inSingletonScope();
-			container
-				.bind(DI_KEYS.SettingsService)
-				.to(SettingsService)
-				.inSingletonScope();
+			container.bind(DI_KEYS.SettingsService).to(SettingsService).inSingletonScope();
 
 			this._instance = container;
 		}

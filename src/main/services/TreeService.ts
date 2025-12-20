@@ -19,11 +19,7 @@ export default class TreeService {
 	) {}
 
 	async rename(prePath: string, newPath: string): Promise<Response<string>> {
-		function updateTreeSession(
-			prePath: string,
-			finalNewPath: string,
-			node: TreeSessionModel
-		): boolean {
+		function updateTreeSession(prePath: string, finalNewPath: string, node: TreeSessionModel): boolean {
 			if (prePath === node.path) {
 				const oldPath = node.path;
 
@@ -50,13 +46,10 @@ export default class TreeService {
 		const existingNames = new Set(await this.fileManager.readDir(targetDir));
 		const requestedFileName = path.basename(newPath);
 
-		const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [
-			requestedFileName,
-		]);
+		const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName]);
 		const finalNewPath = path.join(targetDir, uniqueFileName[0]);
 
-		const session: TreeSessionModel =
-			await this.treeRepository.readTreeSession();
+		const session: TreeSessionModel = await this.treeRepository.readTreeSession();
 		const updated = updateTreeSession(prePath, finalNewPath, session);
 		if (updated) {
 			await this.fileManager.rename(prePath, finalNewPath);
@@ -73,20 +66,13 @@ export default class TreeService {
 		await this.fileManager.copy(src, dest);
 	}
 
-	async paste(
-		targetDto: TreeDto,
-		selectedDtos: TreeDto[],
-		clipboardMode: ClipboardMode
-	): Promise<Response<string[]>> {
+	async paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<Response<string[]>> {
 		const copiedPaths: string[] = [];
 		const cutPaths: string[] = [];
 		const originalNames = selectedDtos.map((dto) => dto.name);
 		const targetDir = targetDto.path;
 		const existingNames = new Set(await this.fileManager.readDir(targetDir));
-		const uniqueNames = this.fileManager.getUniqueFileNames(
-			existingNames,
-			originalNames
-		);
+		const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames);
 
 		const updateTreeDto = (parent: TreeDto, child: TreeDto): void => {
 			child.path = path.join(parent.path, child.name);

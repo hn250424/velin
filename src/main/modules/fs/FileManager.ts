@@ -27,10 +27,7 @@ export default class FileManager implements IFileManager {
 		return await fs.promises.readFile(path);
 	}
 
-	toStringFromBuffer(
-		buffer: Buffer,
-		encoding: BufferEncoding = "utf8"
-	): string {
+	toStringFromBuffer(buffer: Buffer, encoding: BufferEncoding = "utf8"): string {
 		return buffer.toString(encoding);
 	}
 
@@ -44,11 +41,7 @@ export default class FileManager implements IFileManager {
 		return fs.promises.readdir(dirPath);
 	}
 
-	async write(
-		path: string,
-		data: string,
-		encoding: BufferEncoding = "utf8"
-	): Promise<void> {
+	async write(path: string, data: string, encoding: BufferEncoding = "utf8"): Promise<void> {
 		return await fs.promises.writeFile(path, data, encoding);
 	}
 
@@ -155,10 +148,7 @@ export default class FileManager implements IFileManager {
 		}
 	}
 
-	getUniqueFileNames(
-		existingNames: Set<string>,
-		fileNames: string[]
-	): string[] {
+	getUniqueFileNames(existingNames: Set<string>, fileNames: string[]): string[] {
 		// Create a working copy to avoid mutating the original existingNames
 		// Handles duplicate filenames in array: ['file.txt', 'file.txt'] → ['file.txt', 'file-1.txt']
 		const nameTracker = new Set(existingNames);

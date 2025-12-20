@@ -22,30 +22,17 @@ export default interface RendererToMainAPI {
 	saveAll: (data: TabEditorsDto) => Promise<Response<TabEditorsDto>>;
 
 	closeTab: (data: TabEditorDto) => Promise<Response<void>>;
-	closeTabsExcept: (
-		exceptData: TabEditorDto,
-		allData: TabEditorsDto
-	) => Promise<Response<boolean[]>>;
-	closeTabsToRight: (
-		referenceData: TabEditorDto,
-		allData: TabEditorsDto
-	) => Promise<Response<boolean[]>>;
+	closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>;
+	closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>;
 	closeAllTabs: (data: TabEditorsDto) => Promise<Response<boolean[]>>;
 
-	exit: (
-		tabSessionData: TabEditorsDto,
-		treeSessionData: TreeDto
-	) => Promise<void>;
+	exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => Promise<void>;
 
 	cutEditor: (text: string) => Promise<void>;
 	copyEditor: (text: string) => Promise<void>;
 	pasteEditor: () => Promise<string>;
 	copyTree: (src: string, dest: string) => Promise<void>;
-	pasteTree: (
-		targetDto: TreeDto,
-		selectedDtos: TreeDto[],
-		clipboardMode: ClipboardMode
-	) => Promise<Response<string[]>>;
+	pasteTree: (targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode) => Promise<Response<string[]>>;
 
 	rename: (prePath: string, newPath: string) => Promise<Response<string>>;
 	delete: (arr: string[]) => Promise<Response<TrashMap[] | null>>;

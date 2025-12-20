@@ -2,12 +2,7 @@ import "@milkdown/theme-nord/style.css";
 
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import Response from "@shared/types/Response";
-import {
-	CLASS_SELECTED,
-	DATASET_ATTR_TAB_ID,
-	DATASET_ATTR_TREE_PATH,
-	SELECTOR_TAB,
-} from "../constants/dom";
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, DATASET_ATTR_TREE_PATH, SELECTOR_TAB } from "../constants/dom";
 import CommandDispatcher from "../CommandDispatcher";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
@@ -23,11 +18,7 @@ export default function registerTabHandlers(
 	bindTabClickEvents(tabContainer, tabEditorFacade);
 	bindTabContextmenuEvents(tabContainer, tabEditorFacade, tabContextMenu);
 	bindCommandsWithContextmenu(commandDispatcher, tabEditorFacade);
-	bindCommandsWithShortcut(
-		commandDispatcher,
-		shortcutRegistry,
-		tabEditorFacade
-	);
+	bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorFacade);
 
 	// Drag.
 	bindMouseDownEvents(tabEditorFacade, tabContainer);
@@ -35,10 +26,7 @@ export default function registerTabHandlers(
 	bindMouseUpEvents(tabEditorFacade);
 }
 
-function bindMouseDownEvents(
-	tabEditorFacade: TabEditorFacade,
-	tabContainer: HTMLElement
-) {
+function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
 	tabContainer.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement;
 		const tab = target.closest(SELECTOR_TAB) as HTMLElement;
@@ -54,10 +42,7 @@ function bindMouseDownEvents(
 	});
 }
 
-function bindMouseMoveEvents(
-	tabEditorFacade: TabEditorFacade,
-	tabContainer: HTMLElement
-) {
+function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
 	document.addEventListener("mousemove", (e: MouseEvent) => {
 		if (!tabEditorFacade.isMouseDown()) return;
 
@@ -71,9 +56,7 @@ function bindMouseMoveEvents(
 			}
 		}
 
-		const div = tabEditorFacade.createGhostBox(
-			tabEditorFacade.getDragTargetTabName()
-		);
+		const div = tabEditorFacade.createGhostBox(tabEditorFacade.getDragTargetTabName());
 		div.style.left = `${e.clientX + 5}px`;
 		div.style.top = `${e.clientY + 5}px`;
 	});
@@ -83,10 +66,7 @@ function bindMouseMoveEvents(
 		throttle((e: MouseEvent) => {
 			if (!tabEditorFacade.isDrag()) return;
 
-			const insertIndex = getInsertIndexFromMouseX(
-				tabEditorFacade.getTabs(),
-				e.clientX
-			);
+			const insertIndex = getInsertIndexFromMouseX(tabEditorFacade.getTabs(), e.clientX);
 			if (tabEditorFacade.getInsertIndex() === insertIndex) return;
 			tabEditorFacade.setInsertIndex(insertIndex);
 			const indicator = tabEditorFacade.createIndicator();
@@ -94,20 +74,14 @@ function bindMouseMoveEvents(
 			if (tab) {
 				const tabRect = tab.tabDiv.getBoundingClientRect();
 				indicator.style.left = `${
-					tabRect.left -
-					tabContainer.getBoundingClientRect().left +
-					tabContainer.scrollLeft
+					tabRect.left - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft
 				}px`;
 			} else {
-				const lastTab = tabEditorFacade.getTabEditorViewByIndex(
-					insertIndex - 1
-				);
+				const lastTab = tabEditorFacade.getTabEditorViewByIndex(insertIndex - 1);
 				if (lastTab) {
 					const lastRect = lastTab.tabDiv.getBoundingClientRect();
 					indicator.style.left = `${
-						lastRect.right -
-						tabContainer.getBoundingClientRect().left +
-						tabContainer.scrollLeft
+						lastRect.right - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft
 					}px`;
 				} else {
 					indicator.style.left = `0px`;
@@ -136,12 +110,9 @@ function bindMouseUpEvents(tabEditorFacade: TabEditorFacade) {
 		tabEditorFacade.removeGhostBox();
 
 		const dtos = tabEditorFacade.getAllTabEditorData();
-		const response = await window.rendererToMain.syncTabSessionFromRenderer(
-			dtos
-		);
+		const response = await window.rendererToMain.syncTabSessionFromRenderer(dtos);
 
-		if (!response)
-			tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(to, from);
+		if (!response) tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(to, from);
 	});
 }
 
@@ -158,10 +129,7 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 	return tabs.length;
 }
 
-function bindTabClickEvents(
-	tabContainer: HTMLElement,
-	tabEditorFacade: TabEditorFacade
-) {
+function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
 	tabContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
 		const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement;
@@ -169,9 +137,7 @@ function bindTabClickEvents(
 			if (target.tagName === "BUTTON") {
 				const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10);
 				const data = tabEditorFacade.getTabEditorDataById(id);
-				const response: Response<void> = await window.rendererToMain.closeTab(
-					data
-				);
+				const response: Response<void> = await window.rendererToMain.closeTab(data);
 				if (response.result) tabEditorFacade.removeTab(data.id);
 			} else if (target.tagName === "SPAN") {
 				const id = tabDiv.dataset[DATASET_ATTR_TAB_ID];
@@ -193,58 +159,34 @@ function bindTabContextmenuEvents(
 		tabContextMenu.classList.add(CLASS_SELECTED);
 		tabContextMenu.style.left = `${e.clientX}px`;
 		tabContextMenu.style.top = `${e.clientY}px`;
-		tabEditorFacade.contextTabId = parseInt(
-			tab.dataset[DATASET_ATTR_TAB_ID],
-			10
-		);
+		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10);
 	});
 }
 
-function bindCommandsWithContextmenu(
-	commandDispatcher: CommandDispatcher,
-	tabEditorFacade: TabEditorFacade
-) {
-	document
-		.getElementById("tab_context_close")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performCloseTab(
-				"context_menu",
-				tabEditorFacade.contextTabId
-			);
-		});
+function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorFacade: TabEditorFacade) {
+	document.getElementById("tab_context_close").addEventListener("click", async () => {
+		await commandDispatcher.performCloseTab("context_menu", tabEditorFacade.contextTabId);
+	});
 
-	document
-		.getElementById("tab_context_close_others")
-		.addEventListener("click", async () => {
-			const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(
-				tabEditorFacade.contextTabId
-			);
-			const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
-			const response: Response<boolean[]> =
-				await window.rendererToMain.closeTabsExcept(exceptData, allData);
-			if (response.result) tabEditorFacade.removeTabsExcept(response.data);
-		});
+	document.getElementById("tab_context_close_others").addEventListener("click", async () => {
+		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId);
+		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData);
+		if (response.result) tabEditorFacade.removeTabsExcept(response.data);
+	});
 
-	document
-		.getElementById("tab_context_close_right")
-		.addEventListener("click", async () => {
-			const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(
-				tabEditorFacade.contextTabId
-			);
-			const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
-			const response: Response<boolean[]> =
-				await window.rendererToMain.closeTabsToRight(referenceData, allData);
-			if (response.result) tabEditorFacade.removeTabsToRight(response.data);
-		});
+	document.getElementById("tab_context_close_right").addEventListener("click", async () => {
+		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId);
+		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData);
+		if (response.result) tabEditorFacade.removeTabsToRight(response.data);
+	});
 
-	document
-		.getElementById("tab_context_close_all")
-		.addEventListener("click", async () => {
-			const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
-			const response: Response<boolean[]> =
-				await window.rendererToMain.closeAllTabs(data);
-			if (response.result) tabEditorFacade.removeAllTabs(response.data);
-		});
+	document.getElementById("tab_context_close_all").addEventListener("click", async () => {
+		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
+		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data);
+		if (response.result) tabEditorFacade.removeAllTabs(response.data);
+	});
 }
 
 function bindCommandsWithShortcut(
@@ -254,10 +196,6 @@ function bindCommandsWithShortcut(
 ) {
 	shortcutRegistry.register(
 		"Ctrl+W",
-		async (e: KeyboardEvent) =>
-			await commandDispatcher.performCloseTab(
-				"shortcut",
-				tabEditorFacade.activeTabId
-			)
+		async (e: KeyboardEvent) => await commandDispatcher.performCloseTab("shortcut", tabEditorFacade.activeTabId)
 	);
 }

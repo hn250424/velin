@@ -2,10 +2,7 @@ import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import SettingsStore from "./SettingsStore";
 import SettingsRenderer from "./SettingsRenderer";
-import SettingsDto, {
-	SettingFontDto,
-	SettingThemeDto,
-} from "@shared/dto/SettingsDto";
+import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
 import SettingsViewModel, {
 	SettingFontViewModel,
 	SettingThemeViewModel,

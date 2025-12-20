@@ -7,10 +7,7 @@ import { injectable } from "inversify";
 export default class TabRepository implements ITabRepository {
 	private session: TabSessionModel | null = null;
 
-	constructor(
-		private tabSessionPath: string,
-		private fileManager: IFileManager
-	) {}
+	constructor(private tabSessionPath: string, private fileManager: IFileManager) {}
 
 	async readTabSession(): Promise<TabSessionModel> {
 		if (this.session) return this.session;
@@ -26,10 +23,7 @@ export default class TabRepository implements ITabRepository {
 
 	async writeTabSession(tabSessionModel: TabSessionModel) {
 		this.session = tabSessionModel;
-		this.fileManager.write(
-			this.tabSessionPath,
-			JSON.stringify(tabSessionModel, null, 4)
-		);
+		this.fileManager.write(this.tabSessionPath, JSON.stringify(tabSessionModel, null, 4));
 	}
 
 	getTabSessionPath(): string {

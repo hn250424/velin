@@ -5,10 +5,7 @@ import ISideRepository from "src/main/modules/contracts/ISideRepository";
 export default class SideRepository implements ISideRepository {
 	private session: SideSessionModel | null = null;
 
-	constructor(
-		private sideSessionPath: string,
-		private fileManager: IFileManager
-	) {}
+	constructor(private sideSessionPath: string, private fileManager: IFileManager) {}
 
 	async readSideSession(): Promise<SideSessionModel> {
 		if (this.session) return this.session;
@@ -24,9 +21,6 @@ export default class SideRepository implements ISideRepository {
 
 	async writeSideSession(model: SideSessionModel) {
 		this.session = model;
-		this.fileManager.write(
-			this.sideSessionPath,
-			JSON.stringify(model, null, 4)
-		);
+		this.fileManager.write(this.sideSessionPath, JSON.stringify(model, null, 4));
 	}
 }

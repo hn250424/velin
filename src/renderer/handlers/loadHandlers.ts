@@ -15,7 +15,7 @@ export default function registerLoadHandlers(
 	sideState: SideState,
 	tabEditorFacade: TabEditorFacade,
 	treeFacade: TreeFacade,
-	callback: () => void,
+	callback: () => void
 ) {
 	let sessionDone = false;
 	let infoDone = false;
@@ -28,20 +28,13 @@ export default function registerLoadHandlers(
 	}
 
 	window.mainToRenderer.session(
-		async (
-			windowDto: WindowDto,
-			settingsDto: SettingsDto,
-			sideDto: SideDto,
-			tabs: TabEditorsDto,
-			tree: TreeDto
-		) => {
+		async (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
 			if (windowDto) {
 				windowState.setWindowMaximizeState(windowDto.maximize);
 			}
 
 			if (settingsDto) {
-				const settingsViewModel =
-					settingsFacade.toSettingsViewModel(settingsDto);
+				const settingsViewModel = settingsFacade.toSettingsViewModel(settingsDto);
 				settingsFacade.setSettingsValue(settingsViewModel);
 			}
 

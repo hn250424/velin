@@ -23,49 +23,28 @@ import SettingsRenderer from "./modules/settings/SettingsRenderer";
 const diContainer = new Container();
 
 diContainer.bind(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope();
-diContainer
-	.bind(DI_KEYS.FindReplaceState)
-	.to(FindReplaceState)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.FindReplaceState).to(FindReplaceState).inSingletonScope();
 diContainer.bind(DI_KEYS.SideState).to(SideState).inSingletonScope();
 diContainer.bind(DI_KEYS.WindowState).to(WindowState).inSingletonScope();
 
 diContainer.bind(DI_KEYS.ZoomManager).to(ZoomManager).inSingletonScope();
 
-diContainer
-	.bind(DI_KEYS.ShortcutRegistry)
-	.to(ShortcutRegistry)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope();
 
-diContainer
-	.bind(DI_KEYS.TabEditorFacade)
-	.to(TabEditorFacade)
-	.inSingletonScope();
-diContainer
-	.bind(DI_KEYS.TabEditorRenderer)
-	.to(TabEditorRenderer)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.TabEditorFacade).to(TabEditorFacade).inSingletonScope();
+diContainer.bind(DI_KEYS.TabEditorRenderer).to(TabEditorRenderer).inSingletonScope();
 diContainer.bind(DI_KEYS.TabEditorStore).to(TabEditorStore).inSingletonScope();
 diContainer.bind(DI_KEYS.TabDragManager).to(TabDragManager).inSingletonScope();
 
 diContainer.bind(DI_KEYS.TreeFacade).to(TreeFacade).inSingletonScope();
 diContainer.bind(DI_KEYS.TreeRenderer).to(TreeRenderer).inSingletonScope();
 diContainer.bind(DI_KEYS.TreeStore).to(TreeStore).inSingletonScope();
-diContainer
-	.bind(DI_KEYS.TreeDragManager)
-	.to(TreeDragManager)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.TreeDragManager).to(TreeDragManager).inSingletonScope();
 
 diContainer.bind(DI_KEYS.SettingsFacade).to(SettingsFacade).inSingletonScope();
-diContainer
-	.bind(DI_KEYS.SettingsRenderer)
-	.to(SettingsRenderer)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.SettingsRenderer).to(SettingsRenderer).inSingletonScope();
 diContainer.bind(DI_KEYS.SettingsStore).to(SettingsStore).inSingletonScope();
 
-diContainer
-	.bind(DI_KEYS.CommandDispatcher)
-	.to(CommandDispatcher)
-	.inSingletonScope();
+diContainer.bind(DI_KEYS.CommandDispatcher).to(CommandDispatcher).inSingletonScope();
 
 export default diContainer;

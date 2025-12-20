@@ -32,8 +32,7 @@ export default class SettingsRenderer {
 	}
 
 	private _renderSettingFont(fontViewModel: SettingFontViewModel) {
-		this._fontSizeDiv.querySelector("input").value =
-			fontViewModel.size.toString();
+		this._fontSizeDiv.querySelector("input").value = fontViewModel.size.toString();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function

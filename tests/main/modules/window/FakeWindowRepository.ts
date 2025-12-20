@@ -3,10 +3,7 @@ import IFileManager from "@main/modules/contracts/IFileManager";
 import IWindowRepository from "@main/modules/contracts/IWindowRepository";
 
 export default class FakeWindowRepository implements IWindowRepository {
-	constructor(
-		private windowSessionPath: string,
-		private fakeFileManager: IFileManager
-	) {}
+	constructor(private windowSessionPath: string, private fakeFileManager: IFileManager) {}
 
 	async readWindowSession(): Promise<WindowSessionModel | null> {
 		if (!(await this.fakeFileManager.exists(this.windowSessionPath))) {
@@ -18,10 +15,7 @@ export default class FakeWindowRepository implements IWindowRepository {
 	}
 
 	async writeWindowSession(model: WindowSessionModel): Promise<void> {
-		await this.fakeFileManager.write(
-			this.windowSessionPath,
-			JSON.stringify(model, null, 4)
-		);
+		await this.fakeFileManager.write(this.windowSessionPath, JSON.stringify(model, null, 4));
 	}
 
 	async setWindowSession(model: WindowSessionModel): Promise<void> {

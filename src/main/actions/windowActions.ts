@@ -1,15 +1,9 @@
 import { BrowserWindow, screen } from "electron";
-import {
-	WindowSessionModel,
-	WindowBoundsModel,
-} from "@main/models/WindowSessionModel";
+import { WindowSessionModel, WindowBoundsModel } from "@main/models/WindowSessionModel";
 import IWindowRepository from "@main/modules/contracts/IWindowRepository";
 
-export function getBoundsByWindowSession(
-	session: WindowSessionModel | null
-): WindowBoundsModel {
-	const { width: screenW, height: screenH } =
-		screen.getPrimaryDisplay().workAreaSize;
+export function getBoundsByWindowSession(session: WindowSessionModel | null): WindowBoundsModel {
+	const { width: screenW, height: screenH } = screen.getPrimaryDisplay().workAreaSize;
 
 	const width = session?.width ?? 800;
 	const height = session?.height ?? 600;
@@ -19,13 +13,9 @@ export function getBoundsByWindowSession(
 	return { x, y, width, height };
 }
 
-export async function syncWindowMaximizeSession(
-	mainWindow: BrowserWindow,
-	windowRepository: IWindowRepository
-) {
+export async function syncWindowMaximizeSession(mainWindow: BrowserWindow, windowRepository: IWindowRepository) {
 	const session = await windowRepository.readWindowSession();
-	const windowBoundsModel: WindowBoundsModel =
-		getBoundsByWindowSession(session);
+	const windowBoundsModel: WindowBoundsModel = getBoundsByWindowSession(session);
 
 	const model: WindowSessionModel = {
 		maximize: mainWindow.isMaximized(),
@@ -37,10 +27,7 @@ export async function syncWindowMaximizeSession(
 	await windowRepository.writeWindowSession(model);
 }
 
-export async function syncWindowBoundSession(
-	mainWindow: BrowserWindow,
-	windowRepository: IWindowRepository
-) {
+export async function syncWindowBoundSession(mainWindow: BrowserWindow, windowRepository: IWindowRepository) {
 	const { x, y, width, height } = mainWindow.getBounds();
 	const model: WindowSessionModel = {
 		maximize: false,

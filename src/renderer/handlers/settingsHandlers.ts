@@ -10,10 +10,7 @@ export default function registerSettingsHandlers(
 ) {
 	// Init.
 	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue());
-	commandDispatcher.performApplySettings(
-		"programmatic",
-		settingsFacade.getSettingsValue()
-	);
+	commandDispatcher.performApplySettings("programmatic", settingsFacade.getSettingsValue());
 
 	// Bind.
 	bindCommandWithmenu(commandDispatcher);
@@ -22,49 +19,29 @@ export default function registerSettingsHandlers(
 }
 
 function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
-	document
-		.getElementById("file_menu_settings")
-		.addEventListener("click", () => {
-			commandDispatcher.performOpenSettings("menu");
-		});
+	document.getElementById("file_menu_settings").addEventListener("click", () => {
+		commandDispatcher.performOpenSettings("menu");
+	});
 }
 
-function bindCommandWithShortcut(
-	commandDispatcher: CommandDispatcher,
-	shortcutRegistry: ShortcutRegistry
-) {
-	shortcutRegistry.register("Ctrl+,", (e: KeyboardEvent) =>
-		commandDispatcher.performOpenSettings("shortcut")
-	);
+function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
+	shortcutRegistry.register("Ctrl+,", (e: KeyboardEvent) => commandDispatcher.performOpenSettings("shortcut"));
 }
 
-function bindCommandWithSettingsContainer(
-	commandDispatcher: CommandDispatcher,
-	settingsFacade: SettingsFacade
-) {
+function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher, settingsFacade: SettingsFacade) {
 	document.getElementById("settings-exit").addEventListener("click", () => {
 		commandDispatcher.performCloseSettings("button");
 	});
 
-	document
-		.getElementById("settings-apply-btn")
-		.addEventListener("click", () => {
-			commandDispatcher.performApplySettings(
-				"button",
-				settingsFacade.getChangeSet()
-			);
-		});
+	document.getElementById("settings-apply-btn").addEventListener("click", () => {
+		commandDispatcher.performApplySettings("button", settingsFacade.getChangeSet());
+	});
 
-	document
-		.getElementById("settings-close-btn")
-		.addEventListener("click", () => {
-			commandDispatcher.performCloseSettings("button");
-		});
+	document.getElementById("settings-close-btn").addEventListener("click", () => {
+		commandDispatcher.performCloseSettings("button");
+	});
 
-	const settingsMenus = [
-		document.getElementById("settings-menu-font"),
-		document.getElementById("settings-menu-theme"),
-	];
+	const settingsMenus = [document.getElementById("settings-menu-font"), document.getElementById("settings-menu-theme")];
 	const settingsContents = [
 		document.getElementById("settings-contents-font"),
 		document.getElementById("settings-contents-theme"),

@@ -18,10 +18,7 @@ describe("SideService.syncSideSession", () => {
 
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
-		fakeSideRepository = new FakeSideRepository(
-			sideSessionPath,
-			fakeFileManager
-		);
+		fakeSideRepository = new FakeSideRepository(sideSessionPath, fakeFileManager);
 		sideService = new SideService(fakeFileManager, fakeSideRepository);
 	});
 

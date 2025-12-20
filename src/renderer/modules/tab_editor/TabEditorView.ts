@@ -67,10 +67,7 @@ export default class TabEditorView {
 
 	getEditorFirstLine() {
 		const editorView = this.editor.ctx.get(editorViewCtx);
-		const firstLine = editorView.state.doc
-			.textBetween(0, editorView.state.doc.content.size)
-			.split("\n")[0]
-			.trim();
+		const firstLine = editorView.state.doc.textBetween(0, editorView.state.doc.content.size).split("\n")[0].trim();
 
 		return firstLine || "Untitled";
 	}
@@ -92,11 +89,7 @@ export default class TabEditorView {
 			const doc = parser(content);
 
 			if (doc) {
-				const tr = view.state.tr.replaceWith(
-					0,
-					view.state.doc.content.size,
-					doc.content
-				);
+				const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content);
 				view.dispatch(tr);
 			}
 		});
@@ -186,10 +179,7 @@ export default class TabEditorView {
 		return matches;
 	}
 
-	findAndSelect(
-		searchText: string,
-		direction: "up" | "down"
-	): { total: number; current: number } | null {
+	findAndSelect(searchText: string, direction: "up" | "down"): { total: number; current: number } | null {
 		const view = this.editor.ctx.get(editorViewCtx);
 		const state = view.state;
 		const currentPos = state.selection.from;
@@ -203,9 +193,7 @@ export default class TabEditorView {
 		// Find next/previous match based on current cursor position
 		// and wrap to first or last match with direction if none found after cursor.
 		if (direction === "down") {
-			targetIndex = this.searchResults.findIndex(
-				(match) => match.from > currentPos
-			);
+			targetIndex = this.searchResults.findIndex((match) => match.from > currentPos);
 			if (targetIndex === -1) {
 				targetIndex = 0;
 			}
@@ -224,26 +212,20 @@ export default class TabEditorView {
 		this.currentSearchIndex = targetIndex;
 		const match = this.searchResults[targetIndex];
 
-		const tr = state.tr.setSelection(
-			TextSelection.create(state.doc, match.from, match.to)
-		);
+		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to));
 
 		const searchHighlightPlugin = new Plugin({
 			key: this.searchHighlightKey,
 			state: {
 				init: () => DecorationSet.empty,
-				apply: (tr, old, _oldState, newState) =>
-					old.map(tr.mapping, newState.doc),
+				apply: (tr, old, _oldState, newState) => old.map(tr.mapping, newState.doc),
 			},
 			props: {
 				decorations: (state) => {
 					if (!this.searchResults.length) return null;
 					const decorations = this.searchResults.map((match, idx) =>
 						Decoration.inline(match.from, match.to, {
-							class:
-								idx === this.currentSearchIndex
-									? "search-highlight-current"
-									: "search-highlight",
+							class: idx === this.currentSearchIndex ? "search-highlight-current" : "search-highlight",
 						})
 					);
 					return DecorationSet.create(state.doc, decorations);
@@ -251,9 +233,7 @@ export default class TabEditorView {
 			},
 		});
 
-		const plugins = state.plugins.filter(
-			(p) => p.spec.key !== this.searchHighlightKey
-		);
+		const plugins = state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
 		const newState = state.reconfigure({
 			plugins: [...plugins, searchHighlightPlugin],
 		});
@@ -270,9 +250,7 @@ export default class TabEditorView {
 
 	clearSearch() {
 		const view = this.editor.ctx.get(editorViewCtx);
-		const plugins = view.state.plugins.filter(
-			(p) => p.spec.key !== this.searchHighlightKey
-		);
+		const plugins = view.state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
 		const newState = view.state.reconfigure({ plugins });
 		view.updateState(newState);
 
@@ -282,11 +260,7 @@ export default class TabEditorView {
 
 	replaceCurrent(searchText: string, replaceText: string): boolean {
 		if (!searchText) return false;
-		if (
-			this.currentSearchIndex < 0 ||
-			this.currentSearchIndex >= this.searchResults.length
-		)
-			return false;
+		if (this.currentSearchIndex < 0 || this.currentSearchIndex >= this.searchResults.length) return false;
 
 		let replaced = false;
 
@@ -317,10 +291,7 @@ export default class TabEditorView {
 			const serializer = ctx.get(serializerCtx);
 
 			const content = serializer(state.doc);
-			const regex = new RegExp(
-				searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-				"g"
-			);
+			const regex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
 			const newContent = content.replace(regex, () => {
 				replacedCount++;
 				return replaceText;
@@ -329,11 +300,7 @@ export default class TabEditorView {
 			if (newContent !== content) {
 				const newDoc = parser(newContent);
 				if (newDoc) {
-					const tr = state.tr.replaceWith(
-						0,
-						state.doc.content.size,
-						newDoc.content
-					);
+					const tr = state.tr.replaceWith(0, state.doc.content.size, newDoc.content);
 					view.dispatch(tr);
 				}
 

@@ -22,16 +22,9 @@ describe("SettingsService.syncSettingsSession", () => {
 
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
-		fakeSettingsRepository = new FakeSettingsRepository(
-			settingsSessionPath,
-			fakeFileManager
-		);
+		fakeSettingsRepository = new FakeSettingsRepository(settingsSessionPath, fakeFileManager);
 		fakeSettingsUtils = new FakeSettingsUtils(fakeFileManager);
-		settingsService = new SettingsService(
-			fakeFileManager,
-			fakeSettingsUtils,
-			fakeSettingsRepository
-		);
+		settingsService = new SettingsService(fakeFileManager, fakeSettingsUtils, fakeSettingsRepository);
 	});
 
 	test("a write session was received from the renderer for synchronization", async () => {
@@ -43,8 +36,6 @@ describe("SettingsService.syncSettingsSession", () => {
 
 		// Then.
 		const session = await fakeSettingsRepository.readSettingsSession();
-		expect(session.settingFontSessionModel.size).toBe(
-			copiedSettingsDto.settingFontDto.size
-		);
+		expect(session.settingFontSessionModel.size).toBe(copiedSettingsDto.settingFontDto.size);
 	});
 });

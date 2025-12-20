@@ -9,9 +9,7 @@ import IFileManager from "../contracts/IFileManager";
 
 @injectable()
 export default class TreeUtils implements ITreeUtils {
-	constructor(
-		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager
-	) {}
+	constructor(@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager) {}
 
 	/**
 	 * Gets the directory tree at the given path, scanning only one level deep.
@@ -97,11 +95,7 @@ export default class TreeUtils implements ITreeUtils {
 		return newTree;
 	}
 
-	private replaceNode(
-		root: TreeSessionModel,
-		targetPath: string,
-		newNode: TreeSessionModel
-	): TreeSessionModel | null {
+	private replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel | null {
 		if (root.path === targetPath) {
 			return newNode;
 		}

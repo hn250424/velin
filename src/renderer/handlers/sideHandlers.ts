@@ -43,9 +43,7 @@ export default function registerSideHandlers(sideState: SideState) {
 			open: sideState.isTreeOpen(),
 			width: sideState.getTreeWidth(),
 		};
-		const result = await window.rendererToMain.syncSideSessionFromRenderer(
-			sideDto
-		);
+		const result = await window.rendererToMain.syncSideSessionFromRenderer(sideDto);
 	}
 
 	// resize.

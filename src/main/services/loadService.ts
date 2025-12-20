@@ -45,27 +45,17 @@ export async function loadedRenderer(
 	const sideSession = await sideRepository.readSideSession();
 
 	const tabSession = await tabRepository.readTabSession();
-	const newTabSession = tabSession
-		? await tabUtils.syncSessionWithFs(tabSession)
-		: null;
+	const newTabSession = tabSession ? await tabUtils.syncSessionWithFs(tabSession) : null;
 	if (newTabSession) await tabRepository.writeTabSession(newTabSession);
 
 	const treeSession = await treeRepository.readTreeSession();
-	const newTreeSession = treeSession
-		? await treeUtils.syncWithFs(treeSession)
-		: null;
+	const newTreeSession = treeSession ? await treeUtils.syncWithFs(treeSession) : null;
 	if (newTreeSession) await treeRepository.writeTreeSession(newTreeSession);
 
-	const windowDto = windowSession
-		? windowUtils.toWindowDto(windowSession)
-		: null;
-	const settingsDto = settingsSession
-		? settingsUtils.toSettingsDto(settingsSession)
-		: null;
+	const windowDto = windowSession ? windowUtils.toWindowDto(windowSession) : null;
+	const settingsDto = settingsSession ? settingsUtils.toSettingsDto(settingsSession) : null;
 	const sideDto = sideSession ? (sideSession as SideDto) : null;
-	const tabDto = newTabSession
-		? await tabUtils.toTabEditorsDto(newTabSession)
-		: null;
+	const tabDto = newTabSession ? await tabUtils.toTabEditorsDto(newTabSession) : null;
 	const treeDto = newTreeSession ? (newTreeSession as TreeDto) : null;
 
 	mainWindow.webContents.send(

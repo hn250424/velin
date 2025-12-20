@@ -23,24 +23,12 @@ export default function registerTreeHandlers(
 	treeContextMenu: HTMLElement,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	const treeContextPasteButton = treeContextMenu.querySelector(
-		SELECTOR_TREE_CONTEXT_PASTE
-	) as HTMLElement;
+	const treeContextPasteButton = treeContextMenu.querySelector(SELECTOR_TREE_CONTEXT_PASTE) as HTMLElement;
 
 	bindTreeClickEvents(commandDispatcher, treeNodeContainer, treeFacade);
-	bindTreeContextmenuEvents(
-		treeNodeContainer,
-		treeContextMenu,
-		treeFacade,
-		treeContextPasteButton
-	);
+	bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeFacade, treeContextPasteButton);
 	bindCommandsWithContextmenu(commandDispatcher);
-	bindCommandsWithShortcut(
-		commandDispatcher,
-		shortcutRegistry,
-		focusManager,
-		treeFacade
-	);
+	bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, focusManager, treeFacade);
 	bindTreeMenuEvents(commandDispatcher, treeNodeContainer, treeFacade);
 
 	// Drag.
@@ -49,10 +37,7 @@ export default function registerTreeHandlers(
 	bindMouseUpEvents(treeFacade, treeNodeContainer, commandDispatcher);
 }
 
-function bindMouseDownEvents(
-	treeFacade: TreeFacade,
-	treeContainer: HTMLElement
-) {
+function bindMouseDownEvents(treeFacade: TreeFacade, treeContainer: HTMLElement) {
 	treeContainer.addEventListener("mousedown", (e) => {
 		let count = treeFacade.getSelectedIndices().length;
 		if (count === 0) {
@@ -97,12 +82,9 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 		const previousInsertWrapper = treeFacade.getInsertWrapper();
 
 		if (!wrapper) {
-			const _container = target.closest(
-				SELECTOR_TREE_NODE_CONTAINER
-			) as HTMLElement;
+			const _container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement;
 			if (!_container) {
-				if (previousInsertWrapper)
-					previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY);
+				if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY);
 
 				treeFacade.setInsertWrapper(null);
 				treeFacade.setInsertPath(""); // Set falsy empty string as flag since path-based logic must run if mouse up event completes properly.
@@ -114,19 +96,14 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 		}
 
 		if (previousInsertWrapper === wrapper) return; // Wrapper comparison faster than Path
-		if (previousInsertWrapper)
-			previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY);
+		if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY);
 
 		let viewModel;
 		if (!isContainer) {
 			const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
-			viewModel = treeFacade.getTreeViewModelByPath(
-				node.dataset[DATASET_ATTR_TREE_PATH]
-			);
+			viewModel = treeFacade.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH]);
 		} else {
-			viewModel = treeFacade.getTreeViewModelByPath(
-				wrapper.dataset[DATASET_ATTR_TREE_PATH]
-			);
+			viewModel = treeFacade.getTreeViewModelByPath(wrapper.dataset[DATASET_ATTR_TREE_PATH]);
 		}
 
 		if (!viewModel || !viewModel.directory) {
@@ -141,11 +118,7 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 	});
 }
 
-function bindMouseUpEvents(
-	treeFacade: TreeFacade,
-	treeContainer: HTMLElement,
-	commandDispatcher: CommandDispatcher
-) {
+function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, commandDispatcher: CommandDispatcher) {
 	document.addEventListener("mouseup", async (e: MouseEvent) => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false);
@@ -249,9 +222,7 @@ function bindTreeClickEvents(
 			treeFacade.clearSelectedIndices();
 			treeNode.classList.add(CLASS_SELECTED);
 			treeFacade.setLastSelectedIndexByPath(path);
-			treeFacade.addSelectedIndices(
-				treeFacade.getFlattenArrayIndexByPath(path)
-			);
+			treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path));
 
 			const viewModel = treeFacade.getTreeViewModelByPath(path);
 			if (viewModel.directory) {
@@ -270,9 +241,7 @@ function bindTreeContextmenuEvents(
 	treeContextPasteButton: HTMLElement
 ) {
 	treeNodeContainer.addEventListener("contextmenu", (e) => {
-		const treeNode = (e.target as HTMLElement).closest(
-			SELECTOR_TREE_NODE
-		) as HTMLElement;
+		const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement;
 		if (!treeNode) return;
 
 		treeContextMenu.classList.add(CLASS_SELECTED);
@@ -283,9 +252,7 @@ function bindTreeContextmenuEvents(
 		const viewModel = treeFacade.getTreeViewModelByPath(path);
 
 		const isPasteDisabled =
-			treeFacade.clipboardMode === "none" ||
-			!viewModel.directory ||
-			treeFacade.getSelectedIndices().length === 0;
+			treeFacade.clipboardMode === "none" || !viewModel.directory || treeFacade.getSelectedIndices().length === 0;
 
 		treeContextPasteButton.classList.toggle(CLASS_DEACTIVE, isPasteDisabled);
 
@@ -295,35 +262,25 @@ function bindTreeContextmenuEvents(
 }
 
 function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher) {
-	document
-		.getElementById("tree_context_cut")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performCut("context_menu");
-		});
+	document.getElementById("tree_context_cut").addEventListener("click", async () => {
+		await commandDispatcher.performCut("context_menu");
+	});
 
-	document
-		.getElementById("tree_context_copy")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performCopy("context_menu");
-		});
+	document.getElementById("tree_context_copy").addEventListener("click", async () => {
+		await commandDispatcher.performCopy("context_menu");
+	});
 
-	document
-		.getElementById("tree_context_paste")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performPaste("context_menu");
-		});
+	document.getElementById("tree_context_paste").addEventListener("click", async () => {
+		await commandDispatcher.performPaste("context_menu");
+	});
 
-	document
-		.getElementById("tree_context_rename")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performRename("context_menu");
-		});
+	document.getElementById("tree_context_rename").addEventListener("click", async () => {
+		await commandDispatcher.performRename("context_menu");
+	});
 
-	document
-		.getElementById("tree_context_delete")
-		.addEventListener("click", async () => {
-			await commandDispatcher.performDelete("context_menu");
-		});
+	document.getElementById("tree_context_delete").addEventListener("click", async () => {
+		await commandDispatcher.performDelete("context_menu");
+	});
 }
 
 function bindCommandsWithShortcut(
@@ -332,48 +289,19 @@ function bindCommandsWithShortcut(
 	focusManager: FocusManager,
 	treeFacade: TreeFacade
 ) {
-	shortcutRegistry.register("ARROWUP", (e: KeyboardEvent) =>
-		moveUpFocus(e, focusManager, treeFacade)
-	);
-	shortcutRegistry.register("ARROWDOWN", (e: KeyboardEvent) =>
-		moveDownFocus(e, focusManager, treeFacade)
-	);
-	shortcutRegistry.register("Shift+ARROWUP", (e: KeyboardEvent) =>
-		moveUpFocus(e, focusManager, treeFacade)
-	);
-	shortcutRegistry.register("Shift+ARROWDOWN", (e: KeyboardEvent) =>
-		moveDownFocus(e, focusManager, treeFacade)
-	);
+	shortcutRegistry.register("ARROWUP", (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade));
+	shortcutRegistry.register("ARROWDOWN", (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade));
+	shortcutRegistry.register("Shift+ARROWUP", (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade));
+	shortcutRegistry.register("Shift+ARROWDOWN", (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade));
 
-	shortcutRegistry.register(
-		"Ctrl+X",
-		async (e: KeyboardEvent) => await commandDispatcher.performCut("shortcut")
-	);
-	shortcutRegistry.register(
-		"Ctrl+C",
-		async (e: KeyboardEvent) => await commandDispatcher.performCopy("shortcut")
-	);
-	shortcutRegistry.register(
-		"Ctrl+V",
-		async (e: KeyboardEvent) => await commandDispatcher.performPaste("shortcut")
-	);
-	shortcutRegistry.register(
-		"F2",
-		async (e: KeyboardEvent) =>
-			await commandDispatcher.performRename("shortcut")
-	);
-	shortcutRegistry.register(
-		"DELETE",
-		async (e: KeyboardEvent) =>
-			await commandDispatcher.performDelete("shortcut")
-	);
+	shortcutRegistry.register("Ctrl+X", async (e: KeyboardEvent) => await commandDispatcher.performCut("shortcut"));
+	shortcutRegistry.register("Ctrl+C", async (e: KeyboardEvent) => await commandDispatcher.performCopy("shortcut"));
+	shortcutRegistry.register("Ctrl+V", async (e: KeyboardEvent) => await commandDispatcher.performPaste("shortcut"));
+	shortcutRegistry.register("F2", async (e: KeyboardEvent) => await commandDispatcher.performRename("shortcut"));
+	shortcutRegistry.register("DELETE", async (e: KeyboardEvent) => await commandDispatcher.performDelete("shortcut"));
 }
 
-function moveUpFocus(
-	e: KeyboardEvent,
-	focusManager: FocusManager,
-	treeFacade: TreeFacade
-) {
+function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return;
 
 	let lastIdx = treeFacade.lastSelectedIndex;
@@ -402,11 +330,7 @@ function moveUpFocus(
 	}
 }
 
-function moveDownFocus(
-	e: KeyboardEvent,
-	focusManager: FocusManager,
-	treeFacade: TreeFacade
-) {
+function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return;
 
 	let lastIdx = treeFacade.lastSelectedIndex;

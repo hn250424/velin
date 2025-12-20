@@ -18,15 +18,12 @@ export default class DeleteCommand implements ICommand {
 		const pathsToDelete: string[] = [];
 		const idsToDelete: number[] = [];
 		for (let i = 0; i < this.selectedIndices.length; i++) {
-			const viewModel = this.treeFacade.getTreeViewModelByIndex(
-				this.selectedIndices[i]
-			);
+			const viewModel = this.treeFacade.getTreeViewModelByIndex(this.selectedIndices[i]);
 			pathsToDelete.push(viewModel.path);
 			idsToDelete.push(...this.getIdsFromTreeViewModel(viewModel));
 		}
 
-		const response: Response<TrashMap[] | null> =
-			await window.rendererToMain.delete(pathsToDelete);
+		const response: Response<TrashMap[] | null> = await window.rendererToMain.delete(pathsToDelete);
 		if (!response.result) return;
 		this.trashMap = response.data;
 
@@ -39,9 +36,7 @@ export default class DeleteCommand implements ICommand {
 		const tabEditorDto = this.tabEditorFacade.getAllTabEditorData();
 		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto);
 
-		const treeDto = this.treeFacade.toTreeDto(
-			this.treeFacade.extractTreeViewModel()
-		);
+		const treeDto = this.treeFacade.toTreeDto(this.treeFacade.extractTreeViewModel());
 		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto);
 	}
 

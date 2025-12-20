@@ -44,14 +44,7 @@ import { debounce } from "./utils/debounce";
 import SettingsFacade from "./modules/settings/SettingsFacade";
 import SettingsViewModel from "./viewmodels/SettingsViewModel";
 
-type CommandSource =
-	| "shortcut"
-	| "menu"
-	| "element"
-	| "context_menu"
-	| "drag"
-	| "programmatic"
-	| "button";
+type CommandSource = "shortcut" | "menu" | "element" | "context_menu" | "drag" | "programmatic" | "button";
 
 /**
  * CommandDispatcher centrally manages and executes commands that involve side effects,
@@ -124,13 +117,7 @@ export default class CommandDispatcher {
 		const response: Response<TabEditorDto> = await window.rendererToMain.openFile(filePath);
 		if (response.result && response.data) {
 			const data = response.data;
-			await this.tabEditorFacade.addTab(
-				data.id,
-				data.filePath,
-				data.fileName,
-				data.content,
-				data.isBinary
-			);
+			await this.tabEditorFacade.addTab(data.id, data.filePath, data.fileName, data.content, data.isBinary);
 		}
 	}
 
@@ -156,8 +143,7 @@ export default class CommandDispatcher {
 			// Close existing tab.
 			const tabEditorsDto = this.tabEditorFacade.getAllTabEditorData();
 			const closeAllTabsResponse = await window.rendererToMain.closeAllTabs(tabEditorsDto);
-			if (closeAllTabsResponse.result)
-				this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data);
+			if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data);
 
 			const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data);
 			this.treeFacade.renderTreeData(responseViewModel);
@@ -226,8 +212,7 @@ export default class CommandDispatcher {
 		const data = this.tabEditorFacade.getActiveTabEditorData();
 		if (!data.isModified) return;
 		const response: Response<TabEditorDto> = await window.rendererToMain.save(data);
-		if (response.result && !response.data.isModified)
-			this.tabEditorFacade.applySaveResult(response.data);
+		if (response.result && !response.data.isModified) this.tabEditorFacade.applySaveResult(response.data);
 	}
 
 	async performSaveAs(source: CommandSource) {
@@ -408,9 +393,7 @@ export default class CommandDispatcher {
 
 		if (focus === "editor") {
 			if (source !== "shortcut") {
-				const editable = document.querySelector(
-					'#editor_container [contenteditable="true"]'
-				) as HTMLElement;
+				const editable = document.querySelector('#editor_container [contenteditable="true"]') as HTMLElement;
 				if (!editable) return;
 				editable.focus();
 
@@ -529,9 +512,7 @@ export default class CommandDispatcher {
 			const dir = window.utils.getDirName(prePath);
 			const newPath = window.utils.getJoinedPath(dir, newName);
 
-			const viewModel = this.treeFacade.getTreeViewModelByPath(
-				treeNode.dataset[DATASET_ATTR_TREE_PATH]
-			);
+			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]);
 
 			const cmd = new RenameCommand(
 				this.treeFacade,
@@ -594,8 +575,7 @@ export default class CommandDispatcher {
 			idx = this.treeFacade.findParentDirectoryIndex(idx);
 			viewModel = this.treeFacade.getTreeViewModelByIndex(idx);
 		} else {
-			if (!viewModel.expanded)
-				await this.performOpenDirectory("programmatic", this.treeFacade.getTreeNodeByIndex(idx));
+			if (!viewModel.expanded) await this.performOpenDirectory("programmatic", this.treeFacade.getTreeNodeByIndex(idx));
 		}
 
 		let parentContainer: HTMLElement;
@@ -632,13 +612,7 @@ export default class CommandDispatcher {
 
 			const name = input.value.trim();
 			if (name) {
-				const cmd = new CreateCommand(
-					this.treeFacade,
-					this.tabEditorFacade,
-					viewModel.path,
-					name,
-					directory
-				);
+				const cmd = new CreateCommand(this.treeFacade, this.tabEditorFacade, viewModel.path, name, directory);
 
 				try {
 					window.rendererToMain.setWatchSkipState(true);

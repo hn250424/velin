@@ -15,9 +15,7 @@ export default interface MainToRendererAPI {
 		) => void
 	) => void;
 	info: (callback: (version: string) => void) => void;
-	syncFromWatch: (
-		callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void
-	) => void;
+	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void;
 	onMaximizeWindow: (callback: () => void) => void;
 	onUnmaximizeWindow: (callback: () => void) => void;
 }

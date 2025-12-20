@@ -100,10 +100,7 @@ const treeSessionModel: TreeSessionModel = {
 	],
 };
 
-function traverse(
-	node: TreeSessionModel | TreeDto,
-	cb: (node: TreeSessionModel | TreeDto) => void
-) {
+function traverse(node: TreeSessionModel | TreeDto, cb: (node: TreeSessionModel | TreeDto) => void) {
 	cb(node);
 	for (const child of node.children ?? []) {
 		traverse(child, cb);
@@ -113,18 +110,14 @@ function traverse(
 function deepCopyTreeSessionModel(model: TreeSessionModel): TreeSessionModel {
 	return {
 		...model,
-		children: model.children
-			? model.children.map((child) => deepCopyTreeDto(child))
-			: [],
+		children: model.children ? model.children.map((child) => deepCopyTreeDto(child)) : [],
 	};
 }
 
 function deepCopyTreeDto(dto: TreeDto): TreeDto {
 	return {
 		...dto,
-		children: dto.children
-			? dto.children.map((child) => deepCopyTreeDto(child))
-			: [],
+		children: dto.children ? dto.children.map((child) => deepCopyTreeDto(child)) : [],
 	};
 }
 
@@ -133,15 +126,8 @@ describe("treeService.rename", () => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
-		treeService = new TreeService(
-			fakeFileManager,
-			fakeTreeUtils,
-			fakeTreeRepository
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
+		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
 	test("should sync renamed session including children nodes", async () => {
@@ -162,9 +148,7 @@ describe("treeService.rename", () => {
 		const session = await fakeTreeRepository.readTreeSession();
 		expect(path.normalize(session.path)).toBe(path.normalize(newRoot));
 		const checkPaths = (model: TreeSessionModel) => {
-			expect(
-				path.normalize(model.path).startsWith(path.normalize(newRoot))
-			).toBe(true);
+			expect(path.normalize(model.path).startsWith(path.normalize(newRoot))).toBe(true);
 			for (const child of model.children ?? []) {
 				checkPaths(child);
 			}
@@ -199,15 +183,8 @@ describe("treeService.paste", () => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
-		treeService = new TreeService(
-			fakeFileManager,
-			fakeTreeUtils,
-			fakeTreeRepository
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
+		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
 	test("should delete original file and copy to new path when clipboardMode is cut", async () => {
@@ -252,10 +229,7 @@ describe("treeService.paste", () => {
 		});
 
 		const originalCopy = fakeFileManager.copy.bind(fakeFileManager);
-		const failPath = path.join(
-			copiedTreeDto.path,
-			copiedTreeDto.children[0].children[0].children[0].name
-		);
+		const failPath = path.join(copiedTreeDto.path, copiedTreeDto.children[0].children[0].children[0].name);
 		fakeFileManager.copy = async (src: string, dest: string) => {
 			if (dest === failPath) {
 				throw new Error("Copy failed");
@@ -325,10 +299,7 @@ describe("treeService.paste", () => {
 		});
 
 		const originalCopy = fakeFileManager.copy.bind(fakeFileManager);
-		const failPath = path.join(
-			copiedTreeDto.path,
-			copiedTreeDto.children[0].children[0].children[0].name
-		);
+		const failPath = path.join(copiedTreeDto.path, copiedTreeDto.children[0].children[0].children[0].name);
 		fakeFileManager.copy = async (src: string, dest: string) => {
 			if (dest === failPath) {
 				throw new Error("Copy failed");
@@ -369,11 +340,7 @@ describe("treeService.paste", () => {
 		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
 
 		// When.
-		const response = await treeService.paste(
-			copiedTreeDto,
-			selectedDtos,
-			"copy"
-		);
+		const response = await treeService.paste(copiedTreeDto, selectedDtos, "copy");
 
 		// Then.
 		expect(response.result).toBe(true);
@@ -393,11 +360,7 @@ describe("treeService.paste", () => {
 		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
 
 		// When.
-		const response = await treeService.paste(
-			copiedTreeDto,
-			selectedDtos,
-			"cut"
-		);
+		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut");
 
 		// Then.
 		expect(response.result).toBe(true);
@@ -417,11 +380,7 @@ describe("treeService.paste", () => {
 		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
 
 		// When.
-		const response = await treeService.paste(
-			copiedTreeDto,
-			selectedDtos,
-			"cut"
-		);
+		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut");
 
 		// Then.
 		expect(response.result).toBe(true);
@@ -435,15 +394,8 @@ describe("treeService.create", () => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
-		treeService = new TreeService(
-			fakeFileManager,
-			fakeTreeUtils,
-			fakeTreeRepository
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
+		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
 	test("should create new file", async () => {
@@ -528,15 +480,8 @@ describe("treeService.syncTreeSessionFromRenderer", () => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
-		treeService = new TreeService(
-			fakeFileManager,
-			fakeTreeUtils,
-			fakeTreeRepository
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
+		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
 	test("a write session was received from the renderer for synchronization", async () => {
@@ -547,8 +492,7 @@ describe("treeService.syncTreeSessionFromRenderer", () => {
 		await treeService.syncTreeSessionFromRenderer(copiedDto);
 
 		// Then.
-		const session: TreeSessionModel =
-			await fakeTreeRepository.readTreeSession();
+		const session: TreeSessionModel = await fakeTreeRepository.readTreeSession();
 
 		const dtoPaths: string[] = [];
 		traverse(copiedDto, (node) => dtoPaths.push(path.normalize(node.path)));
@@ -565,15 +509,8 @@ describe("treeService.getSyncedTreeSession", () => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
-		fakeTreeRepository = new FakeTreeRepository(
-			treeSessionPath,
-			fakeFileManager
-		);
-		treeService = new TreeService(
-			fakeFileManager,
-			fakeTreeUtils,
-			fakeTreeRepository
-		);
+		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
+		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
 	test("should sync with file system and update tree session", async () => {
@@ -603,9 +540,7 @@ describe("treeService.getSyncedTreeSession", () => {
 
 		// // Then.
 		const session = await fakeTreeRepository.readTreeSession();
-		const hasNewFile = session.children?.some(
-			(child) => child.path === newFilePath
-		);
+		const hasNewFile = session.children?.some((child) => child.path === newFilePath);
 		expect(hasNewFile).toBe(true);
 	});
 
@@ -614,9 +549,7 @@ describe("treeService.getSyncedTreeSession", () => {
 		const copiedModel = deepCopyTreeDto(treeSessionModel);
 		const removedFilePath = copiedModel.children?.[0]?.path;
 		if (copiedModel.children && removedFilePath) {
-			copiedModel.children = copiedModel.children.filter(
-				(child) => child.path !== removedFilePath
-			);
+			copiedModel.children = copiedModel.children.filter((child) => child.path !== removedFilePath);
 		}
 		await fakeTreeRepository.setTreeSession(copiedModel);
 		traverse(copiedModel, (model) => {
@@ -633,9 +566,7 @@ describe("treeService.getSyncedTreeSession", () => {
 
 		// Then.
 		const session = await fakeTreeRepository.readTreeSession();
-		const hasRemovedFile = session.children?.some(
-			(child) => child.path === removedFilePath
-		);
+		const hasRemovedFile = session.children?.some((child) => child.path === removedFilePath);
 		expect(hasRemovedFile).toBe(false);
 	});
 });

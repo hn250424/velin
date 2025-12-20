@@ -43,11 +43,8 @@ export default class CreateCommand implements ICommand {
 			}
 
 			if (this.openedTabId !== null) {
-				const tabEditorViewModel =
-					this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId);
-				const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(
-					tabEditorViewModel.filePath
-				);
+				const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId);
+				const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath);
 				this.tabEditorFacade.removeTab(tabEditorView.getId());
 			}
 		} catch (error) {

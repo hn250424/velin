@@ -1,7 +1,4 @@
-import {
-	CLASS_TREE_NODE_TEXT,
-	SELECTOR_TREE_NODE_TEXT,
-} from "../constants/dom";
+import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom";
 import TreeFacade from "../modules/tree/TreeFacade";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
 import ICommand from "./ICommand";
@@ -18,10 +15,7 @@ export default class RenameCommand implements ICommand {
 	) {}
 
 	async execute() {
-		const response: Response<string> = await this.treeFacade.rename(
-			this.prePath,
-			this.newPath
-		);
+		const response: Response<string> = await this.treeFacade.rename(this.prePath, this.newPath);
 		if (!response.result) throw new Error("Rename failed");
 		this.newPath = response.data;
 

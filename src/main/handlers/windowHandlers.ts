@@ -2,15 +2,9 @@ import { BrowserWindow, ipcMain } from "electron";
 
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
 import IWindowRepository from "@main/modules/contracts/IWindowRepository";
-import {
-	syncWindowBoundSession,
-	syncWindowMaximizeSession,
-} from "../actions/windowActions";
+import { syncWindowBoundSession, syncWindowMaximizeSession } from "../actions/windowActions";
 
-export default function registerWindowHandlers(
-	mainWindow: BrowserWindow,
-	windowRepository: IWindowRepository
-) {
+export default function registerWindowHandlers(mainWindow: BrowserWindow, windowRepository: IWindowRepository) {
 	ipcMain.on(electronAPI.events.rendererToMain.requestMinimizeWindow, (e) => {
 		mainWindow.minimize();
 	});
@@ -24,14 +18,10 @@ export default function registerWindowHandlers(
 	});
 
 	mainWindow.on("maximize", () => {
-		mainWindow.webContents.send(
-			electronAPI.events.mainToRenderer.onMaximizeWindow
-		);
+		mainWindow.webContents.send(electronAPI.events.mainToRenderer.onMaximizeWindow);
 	});
 	mainWindow.on("unmaximize", () => {
-		mainWindow.webContents.send(
-			electronAPI.events.mainToRenderer.onUnmaximizeWindow
-		);
+		mainWindow.webContents.send(electronAPI.events.mainToRenderer.onUnmaximizeWindow);
 	});
 	mainWindow.on("resized", () => {
 		syncWindowBoundSession(mainWindow, windowRepository);

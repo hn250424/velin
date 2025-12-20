@@ -27,23 +27,8 @@ export default class TabEditorFacade {
 
 		for (let i = 0; i < tabs.length; i++) {
 			if (tabs[i].id === this.store.activeTabId)
-				await this.addTab(
-					tabs[i].id,
-					tabs[i].filePath,
-					tabs[i].fileName,
-					tabs[i].content,
-					tabs[i].isBinary,
-					true
-				);
-			else
-				await this.addTab(
-					tabs[i].id,
-					tabs[i].filePath,
-					tabs[i].fileName,
-					tabs[i].content,
-					tabs[i].isBinary,
-					false
-				);
+				await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, true);
+			else await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, false);
 		}
 	}
 
@@ -77,14 +62,7 @@ export default class TabEditorFacade {
 		}
 	}
 
-	async addTab(
-		id = 0,
-		filePath = "",
-		fileName = "",
-		content = "",
-		isBinary = false,
-		activate = true
-	) {
+	async addTab(id = 0, filePath = "", fileName = "", content = "", isBinary = false, activate = true) {
 		const vm: TabEditorViewModel = {
 			id: id,
 			isModified: false,
@@ -109,13 +87,8 @@ export default class TabEditorFacade {
 
 		let wasApplied = false;
 		for (let i = 0; i < this.renderer.tabEditorViews.length; i++) {
-			const data = this.getTabEditorViewModelById(
-				this.renderer.tabEditorViews[i].getId()
-			);
-			if (
-				(data.id === result.id || data.filePath === result.filePath) &&
-				result.isModified === false
-			) {
+			const data = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId());
+			if ((data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
 				const tv = this.renderer.tabEditorViews[i];
 				const vm = this.store.getTabEditorViewModelById(tv.getId());
 
@@ -188,9 +161,7 @@ export default class TabEditorFacade {
 			if (results[i]) this.removeTabAt(i);
 		}
 
-		const idx = this.renderer.tabEditorViews.findIndex(
-			(view) => view.getId() === this.activeTabId
-		);
+		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId);
 		if (idx === -1) this.setLastTabAsActive();
 		else this.activeTabIndex = idx;
 	}
@@ -200,9 +171,7 @@ export default class TabEditorFacade {
 			if (results[i]) this.removeTabAt(i);
 		}
 
-		const idx = this.renderer.tabEditorViews.findIndex(
-			(view) => view.getId() === this.activeTabId
-		);
+		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId);
 		if (idx === -1) this.setLastTabAsActive();
 		else this.activeTabIndex = idx;
 	}
@@ -212,9 +181,7 @@ export default class TabEditorFacade {
 			if (results[i]) this.removeTabAt(i);
 		}
 
-		const idx = this.renderer.tabEditorViews.findIndex(
-			(view) => view.getId() === this.activeTabId
-		);
+		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId);
 		if (idx === -1) this.setLastTabAsActive();
 		else this.activeTabIndex = idx;
 	}
@@ -231,15 +198,9 @@ export default class TabEditorFacade {
 
 	async rename(prePath: string, newPath: string, isDir: boolean) {
 		if (isDir) {
-			for (const [
-				filePath,
-				view,
-			] of this.renderer.pathToTabEditorViewMap.entries()) {
+			for (const [filePath, view] of this.renderer.pathToTabEditorViewMap.entries()) {
 				const relative = window.utils.getRelativePath(prePath, filePath);
-				if (
-					relative === "" ||
-					(!relative.startsWith("..") && !window.utils.isAbsolute(relative))
-				) {
+				if (relative === "" || (!relative.startsWith("..") && !window.utils.isAbsolute(relative))) {
 					const newFilePath = window.utils.getJoinedPath(newPath, relative);
 					const preData = this.getTabEditorDataByView(view);
 					const newData = { ...preData, filePath: newFilePath };
@@ -267,9 +228,7 @@ export default class TabEditorFacade {
 			this.renderer.setTabEditorViewByPath(viewModel.filePath, view);
 
 			view.tabSpan.title = viewModel.filePath;
-			view.tabSpan.textContent = viewModel.fileName
-				? viewModel.fileName
-				: "Untitled";
+			view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : "Untitled";
 
 			const dto = this.getAllTabEditorData();
 			await window.rendererToMain.syncTabSessionFromRenderer(dto);
@@ -286,25 +245,16 @@ export default class TabEditorFacade {
 		this.store.activeTabIndex = targetIndex;
 	}
 
-	moveTabEditorViewAndUpdateActiveIndex(
-		fromIndex: number,
-		toIndex: number
-	): void {
+	moveTabEditorViewAndUpdateActiveIndex(fromIndex: number, toIndex: number): void {
 		if (fromIndex === toIndex) return;
 
 		this.renderer.moveTabEditorView(fromIndex, toIndex);
 
 		if (this.store.activeTabIndex === fromIndex) {
 			this.store.activeTabIndex = toIndex;
-		} else if (
-			fromIndex < this.store.activeTabIndex &&
-			toIndex >= this.store.activeTabIndex
-		) {
+		} else if (fromIndex < this.store.activeTabIndex && toIndex >= this.store.activeTabIndex) {
 			this.store.activeTabIndex--;
-		} else if (
-			fromIndex > this.store.activeTabIndex &&
-			toIndex <= this.store.activeTabIndex
-		) {
+		} else if (fromIndex > this.store.activeTabIndex && toIndex <= this.store.activeTabIndex) {
 			this.store.activeTabIndex++;
 		}
 	}
@@ -347,9 +297,7 @@ export default class TabEditorFacade {
 	getAllTabEditorData(): TabEditorsDto {
 		return {
 			activatedId: this.store.activeTabId,
-			data: this.renderer.tabEditorViews.map((view) =>
-				this.getTabEditorDataByView(view)
-			),
+			data: this.renderer.tabEditorViews.map((view) => this.getTabEditorDataByView(view)),
 		};
 	}
 

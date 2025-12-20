@@ -3,10 +3,7 @@ import ClipboardMode from "@shared/types/ClipboardMode";
 import Response from "@shared/types/Response";
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
-import {
-	DATASET_ATTR_TREE_PATH,
-	SELECTOR_TREE_NODE,
-} from "../../constants/dom";
+import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE } from "../../constants/dom";
 import TreeViewModel from "../../viewmodels/TreeViewModel";
 import TreeRenderer from "./TreeRenderer";
 import TreeStore from "./TreeStore";
@@ -251,10 +248,7 @@ export default class TreeFacade {
 	}
 
 	async rename(preBase: string, newBase: string) {
-		const response: Response<string> = await window.rendererToMain.rename(
-			preBase,
-			newBase
-		);
+		const response: Response<string> = await window.rendererToMain.rename(preBase, newBase);
 		if (!response.result) return response;
 		newBase = response.data;
 
@@ -313,9 +307,7 @@ export default class TreeFacade {
 			if (parentIndex >= 0) {
 				const parent = this.store.flattenTreeArray[parentIndex];
 				if (parent.children) {
-					parent.children = parent.children.filter(
-						(child) => !toDelete.some((deleted) => deleted.path === child.path)
-					);
+					parent.children = parent.children.filter((child) => !toDelete.some((deleted) => deleted.path === child.path));
 				}
 			}
 

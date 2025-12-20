@@ -4,29 +4,19 @@ import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import TabService from "@main/services/TabService";
 
-export default function registerTabHandlers(
-	mainWindow: BrowserWindow,
-	tabService: TabService
-) {
-	ipcMain.handle(
-		electronAPI.events.rendererToMain.closeTab,
-		async (e, data: TabEditorDto) => {
-			const result = await tabService.closeTab(data, mainWindow);
-			return {
-				result: result,
-				data: undefined as void,
-			};
-		}
-	);
+export default function registerTabHandlers(mainWindow: BrowserWindow, tabService: TabService) {
+	ipcMain.handle(electronAPI.events.rendererToMain.closeTab, async (e, data: TabEditorDto) => {
+		const result = await tabService.closeTab(data, mainWindow);
+		return {
+			result: result,
+			data: undefined as void,
+		};
+	});
 
 	ipcMain.handle(
 		electronAPI.events.rendererToMain.closeTabsExcept,
 		async (e, exceptData: TabEditorDto, allData: TabEditorsDto) => {
-			const resultArr = await tabService.closeTabsExcept(
-				exceptData,
-				allData,
-				mainWindow
-			);
+			const resultArr = await tabService.closeTabsExcept(exceptData, allData, mainWindow);
 			return {
 				result: true,
 				data: resultArr,
@@ -37,11 +27,7 @@ export default function registerTabHandlers(
 	ipcMain.handle(
 		electronAPI.events.rendererToMain.closeTabsToRight,
 		async (e, referenceData: TabEditorDto, allData: TabEditorsDto) => {
-			const resultArr = await tabService.closeTabsToRight(
-				referenceData,
-				allData,
-				mainWindow
-			);
+			const resultArr = await tabService.closeTabsToRight(referenceData, allData, mainWindow);
 			return {
 				result: true,
 				data: resultArr,
@@ -49,21 +35,15 @@ export default function registerTabHandlers(
 		}
 	);
 
-	ipcMain.handle(
-		electronAPI.events.rendererToMain.closeAllTabs,
-		async (e, data: TabEditorsDto) => {
-			const resultArr = await tabService.closeAllTabs(data, mainWindow);
-			return {
-				result: true,
-				data: resultArr,
-			};
-		}
-	);
+	ipcMain.handle(electronAPI.events.rendererToMain.closeAllTabs, async (e, data: TabEditorsDto) => {
+		const resultArr = await tabService.closeAllTabs(data, mainWindow);
+		return {
+			result: true,
+			data: resultArr,
+		};
+	});
 
-	ipcMain.handle(
-		electronAPI.events.rendererToMain.syncTabSessionFromRenderer,
-		async (e, data: TabEditorsDto) => {
-			return await tabService.syncTabSession(data);
-		}
-	);
+	ipcMain.handle(electronAPI.events.rendererToMain.syncTabSessionFromRenderer, async (e, data: TabEditorsDto) => {
+		return await tabService.syncTabSession(data);
+	});
 }

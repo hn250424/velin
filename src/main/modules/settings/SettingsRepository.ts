@@ -5,10 +5,7 @@ import ISettingsRepository from "src/main/modules/contracts/ISettingsRepository"
 export default class SettingsRepository implements ISettingsRepository {
 	private session: SettingsSessionModel | null = null;
 
-	constructor(
-		private settingsSessionPath: string,
-		private fileManager: IFileManager
-	) {}
+	constructor(private settingsSessionPath: string, private fileManager: IFileManager) {}
 
 	async readSettingsSession(): Promise<SettingsSessionModel> {
 		if (this.session) return this.session;
@@ -24,9 +21,6 @@ export default class SettingsRepository implements ISettingsRepository {
 
 	async writeSettingsSession(model: SettingsSessionModel) {
 		this.session = model;
-		this.fileManager.write(
-			this.settingsSessionPath,
-			JSON.stringify(model, null, 4)
-		);
+		this.fileManager.write(this.settingsSessionPath, JSON.stringify(model, null, 4));
 	}
 }

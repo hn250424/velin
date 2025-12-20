@@ -33,10 +33,7 @@ export default class FakeFileManager implements IFileManager {
 		return Buffer.from(content, "utf8");
 	}
 
-	toStringFromBuffer(
-		buffer: Buffer,
-		encoding: BufferEncoding = "utf8"
-	): string {
+	toStringFromBuffer(buffer: Buffer, encoding: BufferEncoding = "utf8"): string {
 		return buffer.toString(encoding);
 	}
 
@@ -61,11 +58,7 @@ export default class FakeFileManager implements IFileManager {
 		return Array.from(immediateEntries);
 	}
 
-	async write(
-		path: string,
-		data: string,
-		encoding: BufferEncoding = "utf8"
-	): Promise<void> {
+	async write(path: string, data: string, encoding: BufferEncoding = "utf8"): Promise<void> {
 		this.savedFiles[path] = data;
 		this.pathExists[path] = true;
 	}
@@ -75,9 +68,7 @@ export default class FakeFileManager implements IFileManager {
 			throw new Error(`Cannot rename: Source file not found: ${oldPath}`);
 		}
 		if (newPath in this.savedFiles) {
-			throw new Error(
-				`Cannot rename: Destination file already exists: ${newPath}`
-			);
+			throw new Error(`Cannot rename: Destination file already exists: ${newPath}`);
 		}
 
 		this.savedFiles[newPath] = this.savedFiles[oldPath];
@@ -180,10 +171,7 @@ export default class FakeFileManager implements IFileManager {
 	//     return this.osTrashFiles
 	// }
 
-	getUniqueFileNames(
-		existingNames: Set<string>,
-		fileNames: string[]
-	): string[] {
+	getUniqueFileNames(existingNames: Set<string>, fileNames: string[]): string[] {
 		const results: string[] = [];
 		const reg = /^(.*?)-(\d+)$/;
 
@@ -220,8 +208,7 @@ export default class FakeFileManager implements IFileManager {
 			const byte = buffer[i];
 
 			if (byte === 0) return true;
-			if ((byte > 0 && byte < 0x09) || (byte > 0x0d && byte < 0x20))
-				suspicious++;
+			if ((byte > 0 && byte < 0x09) || (byte > 0x0d && byte < 0x20)) suspicious++;
 		}
 
 		return suspicious / len > 0.3;

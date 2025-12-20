@@ -19,8 +19,8 @@ $tree_top_min_height: 25px;
 
 // TODO: svg.
 #tree img {
-	filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%)
-		hue-rotate(180deg) brightness(90%) contrast(90%);
+	filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(90%)
+		contrast(90%);
 }
 
 #tree_top {

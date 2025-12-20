@@ -48,22 +48,10 @@ export default class FileWatcher {
 			},
 		});
 
-		this.watcher.on(
-			"add",
-			async (changedPath) => await this._process(changedPath)
-		);
-		this.watcher.on(
-			"addDir",
-			async (changedPath) => await this._process(changedPath)
-		);
-		this.watcher.on(
-			"unlink",
-			async (changedPath) => await this._process(changedPath)
-		);
-		this.watcher.on(
-			"unlinkDir",
-			async (changedPath) => await this._process(changedPath)
-		);
+		this.watcher.on("add", async (changedPath) => await this._process(changedPath));
+		this.watcher.on("addDir", async (changedPath) => await this._process(changedPath));
+		this.watcher.on("unlink", async (changedPath) => await this._process(changedPath));
+		this.watcher.on("unlinkDir", async (changedPath) => await this._process(changedPath));
 
 		this.watcher.on("error", (err) => {
 			console.error("[watcher error]", err);
@@ -74,27 +62,16 @@ export default class FileWatcher {
 		if (this.skip) return;
 
 		const tabSession = await this.tabRepository.readTabSession();
-		const newTabSession = tabSession
-			? await this.tabUtils.syncSessionWithFs(tabSession)
-			: null;
+		const newTabSession = tabSession ? await this.tabUtils.syncSessionWithFs(tabSession) : null;
 		if (newTabSession) await this.tabRepository.writeTabSession(newTabSession);
 
 		const treeSession = await this.treeRepository.readTreeSession();
-		const newTreeSession = treeSession
-			? await this.treeUtils.syncWithFs(treeSession)
-			: null;
-		if (newTreeSession)
-			await this.treeRepository.writeTreeSession(newTreeSession);
+		const newTreeSession = treeSession ? await this.treeUtils.syncWithFs(treeSession) : null;
+		if (newTreeSession) await this.treeRepository.writeTreeSession(newTreeSession);
 
-		const tabDto = newTabSession
-			? await this.tabUtils.toTabEditorsDto(newTabSession)
-			: null;
+		const tabDto = newTabSession ? await this.tabUtils.toTabEditorsDto(newTabSession) : null;
 		const treeDto = newTreeSession ? (newTreeSession as TreeDto) : null;
 
-		this.mainWindow.webContents.send(
-			electronAPI.events.mainToRenderer.syncFromWatch,
-			tabDto,
-			treeDto
-		);
+		this.mainWindow.webContents.send(electronAPI.events.mainToRenderer.syncFromWatch, tabDto, treeDto);
 	}
 }

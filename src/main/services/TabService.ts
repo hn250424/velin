@@ -18,22 +18,13 @@ export default class TabService {
 		@inject(DI_KEYS.TreeRepository)
 		private readonly treeRepository: ITreeRepository
 	) {}
-	async closeTab(
-		data: TabEditorDto,
-		mainWindow: BrowserWindow,
-		writeSession = true
-	) {
+	async closeTab(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
 		if (data.isModified) {
-			const confirm = await this.dialogManager.showConfirmDialog(
-				`Do you want to save ${data.fileName} file?`
-			);
+			const confirm = await this.dialogManager.showConfirmDialog(`Do you want to save ${data.fileName} file?`);
 
 			if (confirm) {
 				if (!data.filePath) {
-					const result = await this.dialogManager.showSaveDialog(
-						mainWindow,
-						data.fileName
-					);
+					const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
 
 					if (result.canceled || !result.filePath) {
 						return false;
@@ -53,9 +44,7 @@ export default class TabService {
 					activatedId: -1,
 					data: [],
 				};
-				const updatedData = tabSession.data.filter(
-					(session) => session.id !== data.id
-				);
+				const updatedData = tabSession.data.filter((session) => session.id !== data.id);
 				await this.tabRepository.writeTabSession({
 					activatedId: tabSession.activatedId,
 					data: updatedData,
@@ -69,11 +58,7 @@ export default class TabService {
 		return true;
 	}
 
-	async closeTabsExcept(
-		exceptData: TabEditorDto,
-		dto: TabEditorsDto,
-		mainWindow: BrowserWindow
-	): Promise<boolean[]> {
+	async closeTabsExcept(exceptData: TabEditorDto, dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
 		const sessionArr: TabSessionData[] = [];
 		const responseArr: boolean[] = [];
 
@@ -134,10 +119,7 @@ export default class TabService {
 		return responseArr;
 	}
 
-	async closeAllTabs(
-		dto: TabEditorsDto,
-		mainWindow: BrowserWindow
-	): Promise<boolean[]> {
+	async closeAllTabs(dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
 		const sessionArr = [];
 		const responseArr = [];
 

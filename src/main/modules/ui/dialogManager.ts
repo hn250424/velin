@@ -30,10 +30,7 @@ const dialogManager: IDialogManager = {
 		});
 	},
 
-	async showSaveDialog(
-		mainWindow: BrowserWindow,
-		fileName = ""
-	): Promise<Electron.SaveDialogReturnValue> {
+	async showSaveDialog(mainWindow: BrowserWindow, fileName = ""): Promise<Electron.SaveDialogReturnValue> {
 		return await dialog.showSaveDialog(mainWindow, {
 			title: "Save As",
 			defaultPath: fileName,

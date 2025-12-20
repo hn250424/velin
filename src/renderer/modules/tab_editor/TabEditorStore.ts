@@ -4,8 +4,7 @@ import { TabEditorDto } from "@shared/dto/TabEditorDto";
 
 @injectable()
 export default class TabEditorStore {
-	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> =
-		new Map();
+	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
 
 	private _activeTabId = -1;
 	private _activeTabIndex = -1;
@@ -18,8 +17,7 @@ export default class TabEditorStore {
 			filePath: dto.filePath,
 			fileName: dto.fileName,
 			isBinary: dto.isBinary,
-			initialContent: this._idToTabEditorViewModelMap.get(dto.id)
-				.initialContent,
+			initialContent: this._idToTabEditorViewModelMap.get(dto.id).initialContent,
 		};
 	}
 

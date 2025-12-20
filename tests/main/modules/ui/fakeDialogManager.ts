@@ -10,9 +10,7 @@ let fakeSaveDialogResult: Electron.SaveDialogReturnValue = {
 	canceled: false,
 	filePath: undefined,
 };
-export function setFakeSaveDialogResult(
-	result: Electron.SaveDialogReturnValue
-) {
+export function setFakeSaveDialogResult(result: Electron.SaveDialogReturnValue) {
 	fakeSaveDialogResult = result;
 }
 
@@ -20,9 +18,7 @@ let fakeOpenFileDialogResult: Electron.OpenDialogReturnValue = {
 	canceled: false,
 	filePaths: [],
 };
-export function setFakeOpenFileDialogResult(
-	result: Electron.OpenDialogReturnValue
-) {
+export function setFakeOpenFileDialogResult(result: Electron.OpenDialogReturnValue) {
 	fakeOpenFileDialogResult = result;
 }
 
@@ -30,9 +26,7 @@ let fakeOpenDirectoryDialogResult: Electron.OpenDialogReturnValue = {
 	canceled: false,
 	filePaths: [],
 };
-export function setFakeOpenDirectoryDialogResult(
-	result: Electron.OpenDialogReturnValue
-) {
+export function setFakeOpenDirectoryDialogResult(result: Electron.OpenDialogReturnValue) {
 	fakeOpenDirectoryDialogResult = result;
 }
 
@@ -49,10 +43,7 @@ const fakeDialogManager: IDialogManager = {
 		return fakeOpenDirectoryDialogResult;
 	},
 
-	async showSaveDialog(
-		mainWindow: BrowserWindow,
-		fileName: string = ""
-	): Promise<Electron.SaveDialogReturnValue> {
+	async showSaveDialog(mainWindow: BrowserWindow, fileName: string = ""): Promise<Electron.SaveDialogReturnValue> {
 		return fakeSaveDialogResult;
 	},
 };

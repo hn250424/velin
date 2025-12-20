@@ -1,7 +1,4 @@
-export function debounce<Func extends (...args: any[]) => void>(
-	func: Func,
-	wait: number
-): Func {
+export function debounce<Func extends (...args: any[]) => void>(func: Func, wait: number): Func {
 	let timeout: ReturnType<typeof setTimeout> | null = null;
 
 	// return function (this: any, ...args: any[]) {
