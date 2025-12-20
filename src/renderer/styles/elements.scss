@@ -1,3 +1,9 @@
+select,
 input:focus {
 	outline: none;
+}
+
+button:hover,
+select:hover {
+	cursor: pointer;
 }

@@ -200,9 +200,8 @@ function bindTreeClickEvents(
 		const target = e.target as HTMLElement;
 		const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement;
 		if (!treeNode) {
-			const isTreeNodeContainer = target.closest(
-				SELECTOR_TREE_NODE_CONTAINER
-			) as HTMLElement;
+			const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement;
+
 			if (isTreeNodeContainer) {
 				const selectedIndices = treeFacade.getSelectedIndices();
 				for (const i of selectedIndices) {

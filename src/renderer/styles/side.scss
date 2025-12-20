@@ -32,7 +32,6 @@ $risizer-size: 3px;
 	}
 
 	> button:hover img {
-		cursor: pointer;
 		@include button-selected;
 	}
 }

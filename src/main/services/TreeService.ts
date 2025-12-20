@@ -99,26 +99,6 @@ export default class TreeService {
 			}
 		};
 
-		// const sortData = async (parent: TreeDto, child: TreeDto): Promise<void> => {
-		//     if (!Array.isArray(child.children)) {
-		//         child.children = []
-		//     }
-
-		//     // Children first,
-		//     for (const grandChild of child.children) {
-		//         await sortData(child, grandChild)
-		//     }
-
-		//     const newPath = path.join(parent.path, child.name)
-		//     await this.fileManager.copy(child.path, newPath)
-		//     copiedPaths.push(newPath)
-
-		//     if (clipboardMode === 'cut') cutPaths.push(child.path)
-
-		//     child.path = newPath
-		//     child.indent = parent.indent + 1
-		// }
-
 		try {
 			for (const [index, dto] of selectedDtos.entries()) {
 				const uniqueName = uniqueNames[index];
@@ -129,11 +109,8 @@ export default class TreeService {
 				await this.fileManager.copy(oldPath, newPath);
 				copiedPaths.push(newPath);
 				if (clipboardMode === "cut") cutPaths.push(oldPath);
-
-				// await sortData(targetDto, child)
 				dto.path = newPath;
 				dto.indent = targetDto.indent + 1;
-				// updateTreeDto(dto, dto)
 				if (Array.isArray(dto.children)) {
 					for (const child of dto.children) {
 						updateTreeDto(dto, child);

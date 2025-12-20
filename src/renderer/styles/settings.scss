@@ -12,6 +12,7 @@ $settings-button-margin: gv.$button-margin;
 $setting-node-margin: 5px;
 $setting-node-label-width: 100px;
 $setting-node-input-width: 50px;
+$setting-node-select-width: 120px;
 
 #settings-overlay {
 	display: none;
@@ -49,7 +50,6 @@ $setting-node-input-width: 50px;
 }
 
 #settings-top button:hover {
-	cursor: pointer;
 	background: var(--window-icon-hover);
 }
 
@@ -81,7 +81,6 @@ $setting-node-input-width: 50px;
 }
 
 #settings-menu button:hover {
-	cursor: pointer;
 	background-color: var(--settings-menu-button-hover);
 }
 
@@ -115,8 +114,12 @@ $setting-node-input-width: 50px;
 }
 
 #settings-bottom button:hover {
-	cursor: pointer;
 	background-color: var(--overlay-surface-button-hover-bg);
+}
+
+.setting-node-disabled {
+	cursor: default;
+	background-color: gv.$disabled-bg-color;
 }
 
 .setting-node {
@@ -151,18 +154,8 @@ $setting-node-input-width: 50px;
 	}
 }
 
-// #settings-menu {
-//     background-color: aqua;
-// }
-// #settings-section {
-//     background-color: blue;
-// }
-// #settings-bottom {
-//     background-color: chocolate;
-// }
-// #settings-contents-theme {
-//     background-color: black;
-// }
-// #settings-contents-font {
-//     background-color: gray;
-// }
+.setting-node > select {
+	width: $setting-node-select-width;
+	text-align: center;
+	vertical-align: middle;
+}
