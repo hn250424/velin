@@ -9,7 +9,7 @@ export default class TabRepository implements ITabRepository {
 
 	constructor(private tabSessionPath: string, private fileManager: IFileManager) {}
 
-	async readTabSession(): Promise<TabSessionModel> {
+	async readTabSession(): Promise<TabSessionModel | null> {
 		if (this.session) return this.session;
 
 		try {
@@ -17,13 +17,16 @@ export default class TabRepository implements ITabRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			return null;
+			if (e?.code === "ENOENT"){
+				return null;
+			}
+			throw e;
 		}
 	}
 
 	async writeTabSession(tabSessionModel: TabSessionModel) {
 		this.session = tabSessionModel;
-		this.fileManager.write(this.tabSessionPath, JSON.stringify(tabSessionModel, null, 4));
+		this.fileManager.write(this.tabSessionPath, JSON.stringify(tabSessionModel, null, 2));
 	}
 
 	getTabSessionPath(): string {

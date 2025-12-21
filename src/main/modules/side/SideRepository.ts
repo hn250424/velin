@@ -7,7 +7,7 @@ export default class SideRepository implements ISideRepository {
 
 	constructor(private sideSessionPath: string, private fileManager: IFileManager) {}
 
-	async readSideSession(): Promise<SideSessionModel> {
+	async readSideSession(): Promise<SideSessionModel | null> {
 		if (this.session) return this.session;
 
 		try {
@@ -15,12 +15,15 @@ export default class SideRepository implements ISideRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			return null;
+			if (e?.code === "ENOENT"){
+				return null;
+			}
+			throw e;
 		}
 	}
 
 	async writeSideSession(model: SideSessionModel) {
 		this.session = model;
-		this.fileManager.write(this.sideSessionPath, JSON.stringify(model, null, 4));
+		this.fileManager.write(this.sideSessionPath, JSON.stringify(model, null, 2));
 	}
 }

@@ -15,7 +15,7 @@ export default class FakeTreeRepository implements ITreeRepository {
 	}
 
 	async writeTreeSession(treeSession: TreeSessionModel): Promise<void> {
-		await this.fakeFileManager.write(this.treeSessionPath, JSON.stringify(treeSession, null, 4));
+		await this.fakeFileManager.write(this.treeSessionPath, JSON.stringify(treeSession, null, 2));
 	}
 
 	async setTreeSession(treeSession: TreeSessionModel): Promise<void> {

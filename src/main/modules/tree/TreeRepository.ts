@@ -7,7 +7,7 @@ export default class TreeRepository implements ITreeRepository {
 
 	constructor(private treeSessionPath: string, private fileManager: IFileManager) {}
 
-	async readTreeSession(): Promise<TreeSessionModel> {
+	async readTreeSession(): Promise<TreeSessionModel | null> {
 		if (this.session) return this.session;
 
 		try {
@@ -15,12 +15,15 @@ export default class TreeRepository implements ITreeRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			return null;
+			if (e?.code === "ENOENT"){
+				return null;
+			}
+			throw e;
 		}
 	}
 
 	async writeTreeSession(treeSessionModel: TreeSessionModel) {
 		this.session = treeSessionModel;
-		this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSessionModel, null, 4));
+		this.fileManager.write(this.treeSessionPath, JSON.stringify(treeSessionModel, null, 2));
 	}
 }

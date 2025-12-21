@@ -15,7 +15,7 @@ export default class FakeSideRepository implements ISideRepository {
 	}
 
 	async writeSideSession(model: SideSessionModel): Promise<void> {
-		await this.fakeFileManager.write(this.sideSessionPath, JSON.stringify(model, null, 4));
+		await this.fakeFileManager.write(this.sideSessionPath, JSON.stringify(model, null, 2));
 	}
 
 	async setSideSession(model: SideSessionModel): Promise<void> {

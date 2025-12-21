@@ -15,7 +15,7 @@ export default class FakeSettingsRepository implements ISettingsRepository {
 	}
 
 	async writeSettingsSession(model: SettingsSessionModel): Promise<void> {
-		await this.fakeFileManager.write(this.settingsSessionPath, JSON.stringify(model, null, 4));
+		await this.fakeFileManager.write(this.settingsSessionPath, JSON.stringify(model, null, 2));
 	}
 
 	async setSettingsSession(model: SettingsSessionModel): Promise<void> {

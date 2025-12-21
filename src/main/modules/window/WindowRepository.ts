@@ -7,7 +7,7 @@ export default class WindowRepository implements IWindowRepository {
 
 	constructor(private sessionPath: string, private fileManager: IFileManager) {}
 
-	async readWindowSession(): Promise<WindowSessionModel> {
+	async readWindowSession(): Promise<WindowSessionModel | null> {
 		if (this.session) return this.session;
 
 		try {
@@ -15,12 +15,15 @@ export default class WindowRepository implements IWindowRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			return null;
+			if (e?.code === "ENOENT"){
+				return null;
+			}
+			throw e;
 		}
 	}
 
 	async writeWindowSession(model: WindowSessionModel) {
 		this.session = model;
-		this.fileManager.write(this.sessionPath, JSON.stringify(model, null, 4));
+		this.fileManager.write(this.sessionPath, JSON.stringify(model, null, 2));
 	}
 }

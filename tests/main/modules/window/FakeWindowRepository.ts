@@ -15,7 +15,7 @@ export default class FakeWindowRepository implements IWindowRepository {
 	}
 
 	async writeWindowSession(model: WindowSessionModel): Promise<void> {
-		await this.fakeFileManager.write(this.windowSessionPath, JSON.stringify(model, null, 4));
+		await this.fakeFileManager.write(this.windowSessionPath, JSON.stringify(model, null, 2));
 	}
 
 	async setWindowSession(model: WindowSessionModel): Promise<void> {
