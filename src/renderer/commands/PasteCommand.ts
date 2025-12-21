@@ -53,10 +53,14 @@ export default class PasteCommand implements ICommand {
 					const view = this.tabEditorFacade.getTabEditorViewByPath(oldPath);
 
 					if (view) {
-						view.tabDiv.title = newPath;
+						const newFileName = window.utils.getBaseName(newPath);
+						view.tabSpan.title = newPath;
+						view.tabSpan.textContent = newFileName;
+
 						const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
 						if (viewModel) {
 							viewModel.filePath = newPath;
+							viewModel.fileName = newFileName;
 						}
 					}
 
