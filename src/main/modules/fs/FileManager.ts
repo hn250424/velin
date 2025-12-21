@@ -1,6 +1,6 @@
 import fs from "fs";
 import fsExtra from "fs-extra";
-import path, { dirname } from "path";
+import path from "path";
 import { app } from "electron";
 import IFileManager from "@main/modules/contracts/IFileManager";
 import { injectable } from "inversify";
@@ -33,7 +33,7 @@ export default class FileManager implements IFileManager {
 
 	async read(path: string, encoding: BufferEncoding = "utf8"): Promise<string> {
 		const buffer = await this.getBuffer(path);
-		const content = this.toStringFromBuffer(buffer);
+		const content = this.toStringFromBuffer(buffer, encoding);
 		return content;
 	}
 
@@ -47,7 +47,7 @@ export default class FileManager implements IFileManager {
 
 	async rename(oldPath: string, newPath: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			fs.rename(oldPath, newPath, (err: any) => {
+			fs.rename(oldPath, newPath, (err: NodeJS.ErrnoException | null) => {
 				if (err) reject(err);
 				else resolve();
 			});
@@ -68,6 +68,7 @@ export default class FileManager implements IFileManager {
 
 	async moveToTrash(paths: string[]): Promise<TrashMap[] | null> {
 		await this.ensureTrashDir();
+
 		const trashDir = this.getTrashDir();
 		const movedFiles: TrashMap[] = [];
 
@@ -85,32 +86,25 @@ export default class FileManager implements IFileManager {
 
 			return movedFiles;
 		} catch (error) {
-			console.error("[delete] Failed to move file to trash:", error);
-
 			for (const { originalPath, trashPath } of movedFiles) {
 				try {
 					await this.copy(trashPath, originalPath);
 					await this.deletePermanently(trashPath);
 				} catch {
-					console.log(error);
+					// intentionally ignored
 				}
 			}
 
-			return null;
+			throw error;
 		}
 	}
 
 	async restoreFromTrash(trashMap: TrashMap[] | null): Promise<boolean> {
 		if (!trashMap) return false;
 
-		try {
-			for (const { originalPath, trashPath } of trashMap) {
-				await fsExtra.copy(trashPath, originalPath);
-				await fsExtra.remove(trashPath);
-			}
-		} catch (error) {
-			console.error("[undo_delete] Failed to restore files from trash:", error);
-			return false;
+		for (const { originalPath, trashPath } of trashMap) {
+			await fsExtra.copy(trashPath, originalPath);
+			await fsExtra.remove(trashPath);
 		}
 
 		return true;
@@ -119,14 +113,11 @@ export default class FileManager implements IFileManager {
 	async cleanTrash(): Promise<void> {
 		const trashDir = this.getTrashDir();
 
-		try {
-			const files = await fs.promises.readdir(trashDir);
-			for (const file of files) {
-				const filePath = path.join(trashDir, file);
-				await fs.promises.rm(filePath, { recursive: true, force: true });
-			}
-		} catch (error) {
-			console.error("[clearTrash] Failed to clear trash:", error);
+		const files = await fs.promises.readdir(trashDir);
+
+		for (const file of files) {
+			const filePath = path.join(trashDir, file);
+			await fs.promises.rm(filePath, { recursive: true, force: true });
 		}
 	}
 
@@ -135,16 +126,12 @@ export default class FileManager implements IFileManager {
 	}
 
 	async create(targetPath: string, directory: boolean): Promise<void> {
-		try {
-			if (directory) {
-				await fs.promises.mkdir(targetPath, { recursive: true });
-			} else {
-				const dirName = path.dirname(targetPath);
-				await fs.promises.mkdir(dirName, { recursive: true });
-				await fs.promises.writeFile(targetPath, "");
-			}
-		} catch (error) {
-			console.error("[create] Failed to create:", error);
+		if (directory) {
+			await fs.promises.mkdir(targetPath, { recursive: true });
+		} else {
+			const dirName = path.dirname(targetPath);
+			await fs.promises.mkdir(dirName, { recursive: true });
+			await fs.promises.writeFile(targetPath, "");
 		}
 	}
 

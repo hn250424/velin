@@ -92,32 +92,24 @@ export default class TreeService {
 		const existingNames = new Set(await this.fileManager.readDir(targetDir));
 		const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames);
 
-		const updateTreeDto = (parent: TreeDto, child: TreeDto): void => {
-			child.path = path.join(parent.path, child.name);
-			child.indent = parent.indent + 1;
-
-			if (Array.isArray(child.children)) {
-				for (const grandChild of child.children) {
-					updateTreeDto(child, grandChild);
-				}
-			}
-		};
-
 		try {
 			for (const [index, dto] of selectedDtos.entries()) {
-				const uniqueName = uniqueNames[index];
 				const oldPath = dto.path;
-				dto.name = uniqueName;
-
+				const uniqueName = uniqueNames[index];
 				const newPath = path.join(targetDir, uniqueName);
+
 				await this.fileManager.copy(oldPath, newPath);
-				copiedPaths.push(newPath);
-				if (clipboardMode === "cut") cutPaths.push(oldPath);
+
+				dto.name = uniqueName;
 				dto.path = newPath;
 				dto.indent = targetDto.indent + 1;
+
+				copiedPaths.push(newPath);
+				if (clipboardMode === "cut") cutPaths.push(oldPath);
+
 				if (Array.isArray(dto.children)) {
 					for (const child of dto.children) {
-						updateTreeDto(dto, child);
+						this._updateTreeDto(dto, child);
 					}
 				}
 			}
@@ -147,12 +139,31 @@ export default class TreeService {
 		}
 	}
 
+	private _updateTreeDto(parent: TreeDto, child: TreeDto) {
+		child.path = path.join(parent.path, child.name);
+		child.indent = parent.indent + 1;
+
+		if (Array.isArray(child.children)) {
+			for (const grandChild of child.children) {
+				this._updateTreeDto(child, grandChild);
+			}
+		}
+	}
+
 	async delete(arr: string[]): Promise<TrashMap[] | null> {
-		return await this.fileManager.moveToTrash(arr);
+		try {
+			return await this.fileManager.moveToTrash(arr);
+		} catch {
+			return null;
+		}
 	}
 
 	async undo_delete(trashMap: TrashMap[] | null): Promise<boolean> {
-		return await this.fileManager.restoreFromTrash(trashMap);
+		try {
+			return await this.fileManager.restoreFromTrash(trashMap);
+		} catch {
+			return false;
+		}
 	}
 
 	async deletePermanently(path: string): Promise<void> {
@@ -163,11 +174,10 @@ export default class TreeService {
 		const dir = path.dirname(targetPath);
 		const base = path.basename(targetPath);
 		const existingNames = new Set(await this.fileManager.readDir(dir));
-
 		const res = this.fileManager.getUniqueFileNames(existingNames, [base]);
 		const uniqueName = res[0];
-
 		const uniquePath = path.join(dir, uniqueName);
+
 		await this.fileManager.create(uniquePath, directory);
 	}
 
@@ -182,6 +192,7 @@ export default class TreeService {
 
 	async getSyncedTreeSession(): Promise<TreeDto | null> {
 		const session = await this.treeRepository.readTreeSession();
+
 		if (session) {
 			const newSession = await this.treeUtils.syncWithFs(session);
 			if (newSession) await this.treeRepository.writeTreeSession(newSession);
