@@ -138,22 +138,22 @@ describe("treeService.rename", () => {
 			fakeFileManager.setFilecontent(model.path, model.name);
 		});
 		await fakeTreeRepository.setTreeSession(copiedTreeSessionModel);
-		const oldRoot = copiedTreeSessionModel.path;
-		const newRoot = "src/fake/new";
+		const oldPath = copiedTreeSessionModel.children[0].path;
+		const newPath = path.join(path.dirname(oldPath), "renamed")
 
 		// When.
-		await treeService.rename(oldRoot, newRoot);
+		await treeService.rename(oldPath, newPath);
 
 		// Then.
 		const session = await fakeTreeRepository.readTreeSession();
-		expect(path.normalize(session.path)).toBe(path.normalize(newRoot));
+		expect(path.normalize(session.children[0].path)).toBe(path.normalize(newPath));
 		const checkPaths = (model: TreeSessionModel) => {
-			expect(path.normalize(model.path).startsWith(path.normalize(newRoot))).toBe(true);
+			expect(path.normalize(model.path).startsWith(path.normalize(newPath))).toBe(true);
 			for (const child of model.children ?? []) {
 				checkPaths(child);
 			}
 		};
-		checkPaths(session);
+		checkPaths(session.children[0]);
 	});
 
 	test("should append suffix with dash and number to avoid duplicate file names", async () => {

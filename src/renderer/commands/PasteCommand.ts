@@ -49,18 +49,20 @@ export default class PasteCommand implements ICommand {
 					isDir: selectedDtos[i].directory,
 				});
 
-				const view = this.tabEditorFacade.getTabEditorViewByPath(oldPath);
+				if (this.clipboardMode === "cut") {
+					const view = this.tabEditorFacade.getTabEditorViewByPath(oldPath);
 
-				if (view) {
-					view.tabDiv.title = newPath;
-					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
-					if (viewModel) {
-						viewModel.filePath = newPath;
+					if (view) {
+						view.tabDiv.title = newPath;
+						const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
+						if (viewModel) {
+							viewModel.filePath = newPath;
+						}
 					}
-				}
 
-				this.tabEditorFacade.deleteTabEditorViewByPath(oldPath);
-				this.tabEditorFacade.setTabEditorViewByPath(newPath, view);
+					this.tabEditorFacade.deleteTabEditorViewByPath(oldPath);
+					this.tabEditorFacade.setTabEditorViewByPath(newPath, view);
+				}
 			}
 
 			const newTreeSession = await window.rendererToMain.getSyncedTreeSession();

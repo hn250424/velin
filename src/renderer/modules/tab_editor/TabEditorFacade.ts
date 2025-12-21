@@ -15,8 +15,7 @@ export const BINARY_FILE_WARNING = `Can't read this file`;
 @injectable()
 export default class TabEditorFacade {
 	constructor(
-		@inject(DI_KEYS.TabEditorRenderer)
-		private readonly renderer: TabEditorRenderer,
+		@inject(DI_KEYS.TabEditorRenderer) private readonly renderer: TabEditorRenderer,
 		@inject(DI_KEYS.TabEditorStore) private readonly store: TabEditorStore,
 		@inject(DI_KEYS.TabDragManager) private readonly drag: TabDragManager
 	) {}
@@ -222,8 +221,6 @@ export default class TabEditorFacade {
 			viewModel.filePath = newPath;
 			viewModel.fileName = window.utils.getBaseName(newPath);
 
-			// this.pathToTabEditorViewMap.delete(prePath)
-			// this.pathToTabEditorViewMap.set(viewModel.filePath, view)
 			this.renderer.deleteTabEditorViewByPath(prePath);
 			this.renderer.setTabEditorViewByPath(viewModel.filePath, view);
 
@@ -475,5 +472,14 @@ export default class TabEditorFacade {
 
 	setInsertIndex(index: number) {
 		this.drag.setInsertIndex(index);
+	}
+
+	test() {
+		console.log(this.renderer._pathToTabEditorViewMap)
+		console.log(this.renderer._tabEditorViews)
+		console.log(this.store._idToTabEditorViewModelMap)
+
+
+
 	}
 }

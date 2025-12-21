@@ -13,7 +13,7 @@ export default class FakeTreeUtils implements ITreeUtils {
 		this.tree = tree;
 	}
 
-	async getDirectoryTree(dirPath: string, indent: number = 0): Promise<TreeDto | null> {
+	async getDirectoryTree(dirPath: string, indent = 0): Promise<TreeDto | null> {
 		if (!this.tree) return null;
 
 		const findNode = (node: TreeDto): TreeDto | null => {

@@ -199,7 +199,7 @@ export default class FakeFileManager implements IFileManager {
 		return results;
 	}
 
-	isBinaryContent(buffer: Buffer, sampleSize: number = 8000): boolean {
+	isBinaryContent(buffer: Buffer, sampleSize = 8000): boolean {
 		const len = Math.min(buffer.length, sampleSize);
 
 		let suspicious = 0;

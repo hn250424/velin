@@ -20,8 +20,8 @@ import { BINARY_FILE_WARNING } from "./TabEditorFacade";
 
 @injectable()
 export default class TabEditorRenderer {
-	private _tabEditorViews: TabEditorView[] = [];
-	private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
+	public _tabEditorViews: TabEditorView[] = [];
+	public _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
 
 	private ghostTab: HTMLElement | null;
 	private indicator: HTMLElement | null;

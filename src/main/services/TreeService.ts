@@ -14,52 +14,70 @@ export default class TreeService {
 	constructor(
 		@inject(DI_KEYS.FileManager) private readonly fileManager: IFileManager,
 		@inject(DI_KEYS.TreeUtils) private readonly treeUtils: ITreeUtils,
-		@inject(DI_KEYS.TreeRepository)
-		private readonly treeRepository: ITreeRepository
+		@inject(DI_KEYS.TreeRepository) private readonly treeRepository: ITreeRepository
 	) {}
 
 	async rename(prePath: string, newPath: string): Promise<Response<string>> {
-		function updateTreeSession(prePath: string, finalNewPath: string, node: TreeSessionModel): boolean {
-			if (prePath === node.path) {
-				const oldPath = node.path;
+		try {
+			const targetDir = path.dirname(newPath);
+			const existingNames = new Set(await this.fileManager.readDir(targetDir));
+			const requestedFileName = path.basename(newPath);
+			const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName]);
+			const finalNewPath = path.join(targetDir, uniqueFileName[0]);
 
-				const recursivelyUpdatePaths = (n: TreeSessionModel) => {
-					const relative = path.relative(oldPath, n.path);
-					n.path = path.join(finalNewPath, relative);
-					n.name = path.basename(n.path);
-					for (const child of n.children ?? []) {
-						recursivelyUpdatePaths(child);
-					}
-				};
-				recursivelyUpdatePaths(node);
-				return true;
-			} else {
-				for (const child of node.children ?? []) {
-					const found = updateTreeSession(prePath, finalNewPath, child);
-					if (found) return found;
-				}
-				return false;
+			const session = await this.treeRepository.readTreeSession();
+			if (!session) {
+				return { result: false, data: null };
+			}
+
+			const nodeToUpdate = this._findNodeByPath(session, prePath);
+
+			if (nodeToUpdate) {
+				await this.fileManager.rename(prePath, finalNewPath);
+
+				const oldPath = nodeToUpdate.path;
+				nodeToUpdate.path = finalNewPath;
+				nodeToUpdate.name = path.basename(finalNewPath);
+
+				this._recursivelyUpdateChildrenPaths(nodeToUpdate, oldPath);
+
+				await this.treeRepository.writeTreeSession(session);
+
+				return { result: true, data: finalNewPath };
+			}
+
+			return { result: false, data: null };
+		} catch (error) {
+			return { result: false, data: prePath };
+		}
+	}
+
+	private _findNodeByPath(node: TreeSessionModel | TreeDto, targetPath: string): TreeSessionModel | TreeDto | null {
+		if (path.normalize(node.path) === path.normalize(targetPath)) {
+			return node;
+		}
+		if (node.children) {
+			for (const child of node.children) {
+				const found = this._findNodeByPath(child, targetPath);
+				if (found) return found;
 			}
 		}
+		return null;
+	}
 
-		const targetDir = path.dirname(newPath);
-		const existingNames = new Set(await this.fileManager.readDir(targetDir));
-		const requestedFileName = path.basename(newPath);
+	private _recursivelyUpdateChildrenPaths(parentNode: TreeSessionModel | TreeDto, oldParentPath: string): void {
+		if (!parentNode.children) return;
 
-		const uniqueFileName = this.fileManager.getUniqueFileNames(existingNames, [requestedFileName]);
-		const finalNewPath = path.join(targetDir, uniqueFileName[0]);
+		for (const child of parentNode.children) {
+			const oldChildPath = child.path;
+			const childBaseName = path.basename(oldChildPath);
+			child.path = path.join(parentNode.path, childBaseName);
+			child.name = childBaseName;
 
-		const session: TreeSessionModel = await this.treeRepository.readTreeSession();
-		const updated = updateTreeSession(prePath, finalNewPath, session);
-		if (updated) {
-			await this.fileManager.rename(prePath, finalNewPath);
-			await this.treeRepository.writeTreeSession(session);
+			if (child.children && child.children.length > 0) {
+				this._recursivelyUpdateChildrenPaths(child, oldChildPath);
+			}
 		}
-
-		return {
-			result: updated,
-			data: finalNewPath,
-		};
 	}
 
 	async copy(src: string, dest: string) {

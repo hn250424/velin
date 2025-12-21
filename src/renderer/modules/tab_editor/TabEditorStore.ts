@@ -4,7 +4,7 @@ import { TabEditorDto } from "@shared/dto/TabEditorDto";
 
 @injectable()
 export default class TabEditorStore {
-	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
+	public _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
 
 	private _activeTabId = -1;
 	private _activeTabIndex = -1;
