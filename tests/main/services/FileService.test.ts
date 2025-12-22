@@ -219,13 +219,13 @@ describe("FileService.openDirectory", () => {
 		fakeTreeRepository.setTreeSession(copiedDto);
 
 		// When.
-		const response = await fileService.openDirectory(copiedDto.children[1]);
+		const response = await fileService.openDirectory(copiedDto.children[0]);
 
 		// Then.
-		expect(response.path).toBe(path.join(copiedDto.path, copiedDto.children[1].name));
+		expect(response.path).toBe(copiedDto.children[0].path);
 		const session = await fakeTreeRepository.readTreeSession();
-		expect(response.path).toBe(session.children[1].path);
-		expect(session.children[1].expanded).toBe(true);
+		expect(response.path).toBe(session.children[0].path);
+		expect(session.children[0].expanded).toBe(true);
 	});
 });
 

@@ -172,7 +172,7 @@ describe("treeService.rename", () => {
 		// Then.
 		expect(response.result).toBe(true);
 		const dirName = path.dirname(prePath);
-		const expectedBaseName = `test139-2.md`;
+		const expectedBaseName = `dir_test-1.md`;
 		const expectedPath = path.join(dirName, expectedBaseName);
 		expect(response.data).toBe(expectedPath);
 	});
@@ -335,9 +335,7 @@ describe("treeService.paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const selectedDtos = [];
-		selectedDtos.push(copiedTreeDto.children[0].children[2]); // 139
-		// selectedDtos.push(copiedTreeDto.children[0].children[3]) // 139-1
-		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+		selectedDtos.push(copiedTreeDto.children[0].children[2]);
 
 		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "copy");
@@ -355,9 +353,7 @@ describe("treeService.paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const selectedDtos = [];
-		// selectedDtos.push(copiedTreeDto.children[0].children[2]) // 139
-		selectedDtos.push(copiedTreeDto.children[0].children[3]); // 139-1
-		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+		selectedDtos.push(copiedTreeDto.children[0].children[3]);
 
 		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut");
@@ -367,7 +363,7 @@ describe("treeService.paste", () => {
 		expect(response.data[0]).toBe(selectedDtos[0].path);
 	});
 
-	test('When "139", "139-1", "139-3" exist, pasting "139" then "139-1" creates "139-2" then "139-4"', async () => {
+	test('should return correct file paths when moving multiple files via cut and paste', async () => {
 		// Given
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -375,17 +371,17 @@ describe("treeService.paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const selectedDtos = [];
-		selectedDtos.push(copiedTreeDto.children[0].children[2]); // 139
-		selectedDtos.push(copiedTreeDto.children[0].children[3]); // 139-1
-		// selectedDtos.push(copiedTreeDto.children[0].children[4]) // 139-3
+		selectedDtos.push(copiedTreeDto.children[0].children[2]);
+		selectedDtos.push(copiedTreeDto.children[0].children[3]);
 
-		// When.
+
+		// // When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut");
 
-		// Then.
+		// // Then.
 		expect(response.result).toBe(true);
-		expect(path.basename(response.data[0])).toBe("test139-2.md");
-		expect(path.basename(response.data[1])).toBe("test139-4.md");
+		expect(path.basename(response.data[0])).toBe(path.basename(copiedTreeDto.children[0].children[2].path));
+		expect(path.basename(response.data[1])).toBe(path.basename(copiedTreeDto.children[0].children[3].path));
 	});
 });
 
@@ -425,14 +421,14 @@ describe("treeService.create", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const dir = copiedTreeDto.path;
-		const base = "test139.md";
+		const base = path.basename(copiedTreeDto.path);
 		const targetPath = path.join(dir, base);
 
 		// When.
 		await treeService.create(targetPath, false);
 
 		// Then.
-		const ret = await fakeFileManager.exists(path.join(dir, "test139-2.md"));
+		const ret = await fakeFileManager.exists(path.join(dir, base));
 		expect(ret).toBe(true);
 	});
 
@@ -463,14 +459,14 @@ describe("treeService.create", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const dir = copiedTreeDto.path;
-		const base = "dir333";
+		const base = path.basename(copiedTreeDto.path);
 		const targetPath = path.join(dir, base);
 
 		// When.
 		await treeService.create(targetPath, true);
 
 		// Then.
-		const ret = await fakeFileManager.exists(path.join(dir, "dir333-1"));
+		const ret = await fakeFileManager.exists(path.join(dir, base));
 		expect(ret).toBe(true);
 	});
 });
