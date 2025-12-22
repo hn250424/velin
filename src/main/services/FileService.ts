@@ -10,6 +10,7 @@ import { TabSessionData } from "../models/TabSessionModel";
 import TreeDto from "@shared/dto/TreeDto";
 import ITreeUtils from "@main/modules/contracts/ITreeUtils";
 import IFileWatcher from "@main/modules/contracts/IFileWatcher";
+import TreeSessionModel from "@main/models/TreeSessionModel";
 
 export default class FileService {
 	constructor(
@@ -87,15 +88,15 @@ export default class FileService {
 			indent = dto.indent;
 		}
 
-		const fsTree = await this.treeUtils.getDirectoryTree(path, indent);
-		if (!fsTree) return null;
+		const tree = await this.treeUtils.getDirectoryTree(path, indent);
+		if (!tree) return null;
 
 		if (indent === 0) {
-			await this.treeRepository.writeTreeSession(fsTree);
+			await this.treeRepository.writeTreeSession(tree);
 			this.fileWatcher.watch(path);
 		} else {
 			const session = await this.treeRepository.readTreeSession();
-			const updatedSession = await this.treeUtils.getSessionModelWithFs(path, indent, fsTree.children, session);
+			const updatedSession = this._mergeTreeSessionWithFsTree(path, indent, tree.children, session);
 			await this.treeRepository.writeTreeSession(updatedSession);
 		}
 
@@ -103,10 +104,66 @@ export default class FileService {
 			path,
 			name: this.fileManager.getBasename(path),
 			indent,
-			directory: fsTree.directory,
-			expanded: fsTree.expanded,
-			children: fsTree?.children ?? [],
+			directory: tree.directory,
+			expanded: tree.expanded,
+			children: tree?.children ?? [],
 		};
+	}
+
+	/**
+	 * Creates a new tree session model based on the file system, and merges it with the previous session state.
+	 * @param dirPath - The directory path of the node to be updated.
+	 * @param indent - The indentation level of the node.
+	 * @param tree - The children of the node read from the file system.
+	 * @param session - The previous tree session state.
+	 * @returns A new, updated tree session model.
+	 */
+	private _mergeTreeSessionWithFsTree(
+		dirPath: string,
+		indent: number,
+		tree: TreeDto[] | null,
+		session: TreeSessionModel
+	): TreeSessionModel | null {
+		if (!session) {
+			return {
+				path: dirPath,
+				name: this.fileManager.getBasename(dirPath),
+				indent,
+				directory: true,
+				expanded: true,
+				children: tree?.map((child) => ({
+					...child,
+					children: null as null,
+				})),
+			};
+		}
+
+		const newNode: TreeSessionModel = {
+			path: dirPath,
+			name: this.fileManager.getBasename(dirPath),
+			indent,
+			directory: true,
+			expanded: true,
+			children: tree,
+		};
+
+		return this._replaceNode(session, dirPath, newNode) || session;
+	}
+
+	private _replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel | null {
+		if (root.path === targetPath) {
+			return newNode;
+		}
+
+		if (root.children) {
+			const newChildren = root.children.map((child) => {
+				return this._replaceNode(child, targetPath, newNode);
+			});
+
+			return { ...root, children: newChildren };
+		}
+
+		return root;
 	}
 
 	async save(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {

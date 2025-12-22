@@ -1,4 +1,3 @@
-import path from "path";
 import ITreeUtils from "@main/modules/contracts/ITreeUtils";
 import TreeDto from "@shared/dto/TreeDto";
 import TreeSessionModel from "@main/models/TreeSessionModel";
@@ -30,46 +29,6 @@ export default class FakeTreeUtils implements ITreeUtils {
 
 		const node = findNode(this.tree);
 		return node ? { ...node, indent } : null;
-	}
-
-	async getSessionModelWithFs(
-		dirPath: string,
-		indent: number,
-		fsChildren: TreeDto[] | null,
-		preTree: TreeSessionModel
-	): Promise<TreeSessionModel | null> {
-		const newNode: TreeSessionModel = {
-			path: dirPath,
-			name: path.basename(dirPath),
-			indent,
-			directory: true,
-			expanded: true,
-			children:
-				fsChildren?.map((child) => ({
-					...child,
-					children: null as null,
-				})) ?? null,
-		};
-
-		if (!preTree) {
-			return newNode;
-		}
-
-		const updatedTree = this.replaceNode(preTree, dirPath, newNode);
-		return updatedTree;
-	}
-
-	private replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel {
-		if (root.path === targetPath) {
-			return newNode;
-		}
-
-		if (root.children) {
-			const newChildren = root.children.map((child) => this.replaceNode(child, targetPath, newNode));
-			return { ...root, children: newChildren };
-		}
-
-		return root;
 	}
 
 	async syncWithFs(node: TreeSessionModel): Promise<TreeSessionModel | null> {

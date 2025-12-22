@@ -2,7 +2,7 @@ import ITreeUtils from "@main/modules/contracts/ITreeUtils";
 import TreeDto from "@shared/dto/TreeDto";
 import fs from "fs";
 import path from "path";
-import TreeSessionModel from "@main/models/TreeSessionModel";
+// import TreeSessionModel from "@main/models/TreeSessionModel";
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import IFileManager from "../contracts/IFileManager";
@@ -58,57 +58,6 @@ export default class TreeUtils implements ITreeUtils {
 			expanded: true,
 			children,
 		};
-	}
-
-	async getSessionModelWithFs(
-		dirPath: string,
-		indent: number,
-		fsChildren: TreeDto[] | null,
-		preTree: TreeSessionModel
-	): Promise<TreeSessionModel | null> {
-		if (!preTree) {
-			const newTree: TreeSessionModel = {
-				path: dirPath,
-				name: path.basename(dirPath),
-				indent,
-				directory: true,
-				expanded: true,
-				children: fsChildren?.map((child) => ({
-					...child,
-					children: null as null,
-				})),
-			};
-			// await this.writeTreeSession(newTree)
-			return newTree;
-		}
-
-		const newNode: TreeSessionModel = {
-			path: dirPath,
-			name: path.basename(dirPath),
-			indent,
-			directory: true,
-			expanded: true,
-			children: fsChildren,
-		};
-
-		const newTree = this.replaceNode(preTree, dirPath, newNode) || preTree;
-		return newTree;
-	}
-
-	private replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel | null {
-		if (root.path === targetPath) {
-			return newNode;
-		}
-
-		if (root.children) {
-			const newChildren = root.children.map((child) => {
-				return this.replaceNode(child, targetPath, newNode);
-			});
-
-			return { ...root, children: newChildren };
-		}
-
-		return root;
 	}
 
 	async syncWithFs(node: TreeDto): Promise<TreeDto | null> {
