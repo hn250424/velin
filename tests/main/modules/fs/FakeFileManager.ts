@@ -121,19 +121,14 @@ export default class FakeFileManager implements IFileManager {
 	async restoreFromTrash(trashMap: TrashMap[] | null): Promise<boolean> {
 		if (!trashMap) return false;
 
-		try {
-			for (const { originalPath, trashPath } of trashMap) {
-				const trashName = path.basename(trashPath);
-				const data = this.trashFiles[trashName];
-				if (!data) throw new Error(`Trash not found: ${trashName}`);
+		for (const { originalPath, trashPath } of trashMap) {
+			const trashName = path.basename(trashPath);
+			const data = this.trashFiles[trashName];
+			if (!data) throw new Error(`Trash not found: ${trashName}`);
 
-				this.savedFiles[originalPath] = data;
-				this.pathExists[originalPath] = true;
-				delete this.trashFiles[trashName];
-			}
-		} catch (error) {
-			console.error("[Fake undo_delete] Failed:", error);
-			return false;
+			this.savedFiles[originalPath] = data;
+			this.pathExists[originalPath] = true;
+			delete this.trashFiles[trashName];
 		}
 
 		return true;
@@ -144,10 +139,6 @@ export default class FakeFileManager implements IFileManager {
 	}
 
 	async deletePermanently(filePath: string): Promise<void> {
-		if (!(filePath in this.savedFiles)) {
-			throw new Error(`Cannot permanently delete: File not found: ${filePath}`);
-		}
-
 		this.osTrashFiles[filePath] = this.savedFiles[filePath];
 
 		delete this.savedFiles[filePath];

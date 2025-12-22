@@ -1,7 +1,7 @@
 import IDialogManager from "@main/modules/contracts/IDialogManager";
-import { dialog, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 
-let fakeConfirmResult: boolean = false;
+let fakeConfirmResult = false;
 export function setFakeConfirmResult(result: boolean) {
 	fakeConfirmResult = result;
 }
@@ -43,7 +43,7 @@ const fakeDialogManager: IDialogManager = {
 		return fakeOpenDirectoryDialogResult;
 	},
 
-	async showSaveDialog(mainWindow: BrowserWindow, fileName: string = ""): Promise<Electron.SaveDialogReturnValue> {
+	async showSaveDialog(mainWindow: BrowserWindow, fileName = ""): Promise<Electron.SaveDialogReturnValue> {
 		return fakeSaveDialogResult;
 	},
 };
