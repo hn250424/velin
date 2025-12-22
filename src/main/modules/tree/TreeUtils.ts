@@ -2,7 +2,6 @@ import ITreeUtils from "@main/modules/contracts/ITreeUtils";
 import TreeDto from "@shared/dto/TreeDto";
 import fs from "fs";
 import path from "path";
-// import TreeSessionModel from "@main/models/TreeSessionModel";
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import IFileManager from "../contracts/IFileManager";

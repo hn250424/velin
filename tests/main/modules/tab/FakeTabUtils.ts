@@ -1,30 +1,32 @@
 import { TabSessionModel } from "@main/models/TabSessionModel";
 import IFileManager from "@main/modules/contracts/IFileManager";
 import ITabUtils from "@main/modules/contracts/ITabUtils";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 export default class FakeTabUtils implements ITabUtils {
 	constructor(private fakeFileManager: IFileManager) {}
 
 	async syncSessionWithFs(session: TabSessionModel): Promise<TabSessionModel> {
-		if (!session) return { activatedId: -1, data: [] };
+		if (!session || !session.data.length) return { activatedId: -1, data: [] };
 
-		const syncedData = await Promise.all(
-			session.data.map(async (data) => {
-				const filePath = data.filePath ?? "";
-				try {
-					if (!filePath) throw new Error("No file path");
-					await this.fakeFileManager.exists(filePath);
-					return data;
-				} catch {
-					return { ...data, filePath: "" };
-				}
-			})
+		const results = await Promise.all(
+			session.data.map(async (data) => ({
+				data,
+				exists: await this.fakeFileManager.exists(data.filePath),
+			}))
 		);
 
+		const filteredData = results.filter((r) => r.exists).map((r) => r.data as TabEditorDto);
+		const isActivatedTabStillExists = filteredData.some((d) => d.id === session.activatedId);
+
+		let newActivatedId = session.activatedId;
+		if (!isActivatedTabStillExists) {
+			newActivatedId = filteredData.length > 0 ? filteredData[filteredData.length - 1].id : -1;
+		}
+
 		return {
-			activatedId: session.activatedId,
-			data: syncedData,
+			activatedId: newActivatedId,
+			data: filteredData,
 		};
 	}
 
