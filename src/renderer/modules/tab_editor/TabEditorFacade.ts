@@ -25,9 +25,11 @@ export default class TabEditorFacade {
 		const tabs = dto.data;
 
 		for (let i = 0; i < tabs.length; i++) {
-			if (tabs[i].id === this.store.activeTabId)
+			if (tabs[i].id === this.store.activeTabId) {
 				await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, true);
-			else await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, false);
+			} else {
+				await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, false);
+			}
 		}
 	}
 
@@ -73,6 +75,7 @@ export default class TabEditorFacade {
 
 		this.store.setTabEditorViewModelById(id, vm);
 		await this.renderer.createTabAndEditor(vm);
+		
 		if (activate) {
 			this.renderer.tabEditorViews[this.store.activeTabIndex]?.setDeactive();
 			this.store.activeTabIndex = this.renderer.tabEditorViews.length - 1;
@@ -472,14 +475,5 @@ export default class TabEditorFacade {
 
 	setInsertIndex(index: number) {
 		this.drag.setInsertIndex(index);
-	}
-
-	test() {
-		console.log(this.renderer._pathToTabEditorViewMap)
-		console.log(this.renderer._tabEditorViews)
-		console.log(this.store._idToTabEditorViewModelMap)
-
-
-
 	}
 }

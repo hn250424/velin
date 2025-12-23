@@ -147,7 +147,6 @@ export default class TreeRenderer {
 
 		const div = document.createElement("div");
 		div.classList.add(CLASS_TREE_GHOST);
-		// div.textContent = count >= 1 ? `${count} items` : `1 items`
 		div.textContent = `${count} items`;
 
 		this.ghostBox = div;

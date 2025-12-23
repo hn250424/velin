@@ -179,7 +179,6 @@ export default class TreeFacade {
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
 	}
 
-	//
 	isMouseDown(): boolean {
 		return this.drag.isMouseDown();
 	}
@@ -239,7 +238,6 @@ export default class TreeFacade {
 	setInsertPath(path: string) {
 		this.drag.setInsertPath(path);
 	}
-	//
 
 	loadFlattenArrayAndMaps(json: TreeViewModel) {
 		const arr = this.store.flattenTree(json);
@@ -262,14 +260,12 @@ export default class TreeFacade {
 				const treeNode = this.renderer.getTreeNodeByPath(node.path);
 				this.store.deleteFlattenArrayIndexByPath(node.path);
 				this.renderer.deleteTreeWrapperByPath(node.path);
-
 				const relative = window.utils.getRelativePath(preBase, node.path);
 				const newPath = window.utils.getJoinedPath(newBase, relative);
 				node.path = newPath;
 				node.name = window.utils.getBaseName(node.path);
 				treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath;
 				treeNode.title = newPath;
-
 				this.store.setFlattenArrayIndexByPath(newPath, idx);
 				this.renderer.setTreeWrapperByPath(newPath, treeWrapper);
 			} else {

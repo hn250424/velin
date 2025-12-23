@@ -78,11 +78,13 @@ export default class TreeStore {
 		}
 
 		for (let i = 1; i < this._flattenTreeArray.length; i++) {
-			const node = pathToNode.get(this._flattenTreeArray[i].path)!;
+			const node = pathToNode.get(this._flattenTreeArray[i].path);
+
 			for (let j = i - 1; j >= 0; j--) {
 				const possibleParent = this._flattenTreeArray[j];
+
 				if (possibleParent.indent === node.indent - 1) {
-					const parent = pathToNode.get(possibleParent.path)!;
+					const parent = pathToNode.get(possibleParent.path);
 					if (!parent.children) parent.children = [];
 					parent.children.push(node);
 					break;

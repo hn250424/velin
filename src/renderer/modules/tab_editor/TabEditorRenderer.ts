@@ -20,18 +20,18 @@ import { BINARY_FILE_WARNING } from "./TabEditorFacade";
 
 @injectable()
 export default class TabEditorRenderer {
-	public _tabEditorViews: TabEditorView[] = [];
-	public _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
+	private _tabEditorViews: TabEditorView[] = [];
+	private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
 
-	private ghostTab: HTMLElement | null;
-	private indicator: HTMLElement | null;
+	private _ghostTab: HTMLElement | null;
+	private _indicator: HTMLElement | null;
 
-	private tabContainer: HTMLElement;
-	private editorContainer: HTMLElement;
+	private _tabContainer: HTMLElement;
+	private _editorContainer: HTMLElement;
 
 	constructor() {
-		this.tabContainer = document.getElementById("tab_container");
-		this.editorContainer = document.getElementById("editor_container");
+		this._tabContainer = document.getElementById("tab_container");
+		this._editorContainer = document.getElementById("editor_container");
 	}
 
 	private createTabBox(fileName: string) {
@@ -56,20 +56,20 @@ export default class TabEditorRenderer {
 		const { div, span, button } = this.createTabBox(fileName);
 		div.dataset[DATASET_ATTR_TAB_ID] = id.toString();
 		span.title = filePath || "";
-		this.tabContainer.appendChild(div);
+		this._tabContainer.appendChild(div);
 
-		const editorBoxDiv = document.createElement("div");
-		editorBoxDiv.className = CLASS_EDITOR_BOX;
+		const editorBox = document.createElement("div");
+		editorBox.className = CLASS_EDITOR_BOX;
 
 		let editor = null;
 
 		if (isBinary) {
-			editorBoxDiv.innerText = BINARY_FILE_WARNING;
-			editorBoxDiv.classList.add(CLASS_BINARY);
+			editorBox.innerText = BINARY_FILE_WARNING;
+			editorBox.classList.add(CLASS_BINARY);
 		} else {
 			editor = await Editor.make()
 				.config((ctx) => {
-					ctx.set(rootCtx, editorBoxDiv);
+					ctx.set(rootCtx, editorBox);
 					nord(ctx);
 				})
 				.use(commonmark)
@@ -89,9 +89,9 @@ export default class TabEditorRenderer {
 			});
 		}
 
-		this.editorContainer.appendChild(editorBoxDiv);
+		this._editorContainer.appendChild(editorBox);
 
-		const tabEditorView = new TabEditorView(div, span, button, editorBoxDiv, editor);
+		const tabEditorView = new TabEditorView(div, span, button, editorBox, editor);
 
 		if (!isBinary) {
 			tabEditorView.observeEditor(
@@ -186,49 +186,43 @@ export default class TabEditorRenderer {
 	moveTabEditorView(fromIndex: number, toIndex: number) {
 		const view = this._tabEditorViews.splice(fromIndex, 1)[0];
 		this._tabEditorViews.splice(toIndex, 0, view);
-
-		this.tabContainer.removeChild(view.tabDiv);
-		const refNode = this.tabContainer.children[toIndex] ?? null;
-		this.tabContainer.insertBefore(view.tabDiv, refNode);
+		this._tabContainer.removeChild(view.tabBox);
+		const refNode = this._tabContainer.children[toIndex] ?? null;
+		this._tabContainer.insertBefore(view.tabBox, refNode);
 	}
 
 	createGhostBox(fileName: string) {
-		if (this.ghostTab) return this.ghostTab;
-
+		if (this._ghostTab) return this._ghostTab;
 		const { div, span, button } = this.createTabBox(fileName);
 		div.classList.add(CLASS_TAB_GHOST);
-
-		this.ghostTab = div;
-		document.body.appendChild(this.ghostTab);
-
+		this._ghostTab = div;
+		document.body.appendChild(this._ghostTab);
 		return div;
 	}
 
 	removeGhostBox() {
-		if (this.ghostTab) {
-			this.ghostTab.remove();
-			this.ghostTab = null;
+		if (this._ghostTab) {
+			this._ghostTab.remove();
+			this._ghostTab = null;
 		}
 	}
 
 	createIndicator() {
-		if (this.indicator) return this.indicator;
-
+		if (this._indicator) return this._indicator;
 		const _indicator = document.createElement("div");
 		_indicator.className = "tab-indicator";
-
-		this.indicator = _indicator;
-		return this.indicator;
+		this._indicator = _indicator;
+		return this._indicator;
 	}
 
 	removeIndicator() {
-		if (this.indicator) {
-			this.indicator.remove();
-			this.indicator = null;
+		if (this._indicator) {
+			this._indicator.remove();
+			this._indicator = null;
 		}
 	}
 
 	changeFontSize(size: number) {
-		this.editorContainer.style.fontSize = `${size}px`;
+		this._editorContainer.style.fontSize = `${size}px`;
 	}
 }

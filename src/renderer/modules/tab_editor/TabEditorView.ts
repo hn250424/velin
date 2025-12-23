@@ -8,10 +8,10 @@ import { Plugin, PluginKey } from "prosemirror-state";
 
 export default class TabEditorView {
 	private _editor: Editor;
-	private _tabDiv: HTMLElement;
+	private _tabBox: HTMLElement;
 	private _tabSpan: HTMLElement;
 	private _tabButton: HTMLElement;
-	private _editorBoxDiv: HTMLElement;
+	private _editorBox: HTMLElement;
 
 	private suppressInputEvent = false;
 
@@ -22,27 +22,27 @@ export default class TabEditorView {
 	private onEditorInputCallback?: () => void;
 
 	constructor(
-		tabDiv: HTMLElement,
+		tabBox: HTMLElement,
 		tabSpan: HTMLElement,
 		tabButton: HTMLElement,
-		editorBoxDiv: HTMLElement,
+		editorBox: HTMLElement,
 		editor: Editor
 	) {
-		this._tabDiv = tabDiv;
+		this._tabBox = tabBox;
 		this._tabSpan = tabSpan;
 		this._tabButton = tabButton;
-		this._editorBoxDiv = editorBoxDiv;
+		this._editorBox = editorBox;
 		this._editor = editor;
 	}
 
 	getId(): number {
-		return parseInt(this.tabDiv.dataset[DATASET_ATTR_TAB_ID], 10);
+		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID], 10);
 	}
 
 	observeEditor(onInput: () => void, onBlur: () => void) {
 		this.onEditorInputCallback = onInput;
 
-		this.editor.action((ctx) => {
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 
 			view.setProps({
@@ -66,7 +66,7 @@ export default class TabEditorView {
 	}
 
 	getEditorFirstLine() {
-		const editorView = this.editor.ctx.get(editorViewCtx);
+		const editorView = this._editor.ctx.get(editorViewCtx);
 		const firstLine = editorView.state.doc.textBetween(0, editorView.state.doc.content.size).split("\n")[0].trim();
 
 		return firstLine || "Untitled";
@@ -74,7 +74,7 @@ export default class TabEditorView {
 
 	getContent(): string {
 		let content = "";
-		this.editor.action((ctx) => {
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const serializer = ctx.get(serializerCtx);
 			content = serializer(view.state.doc);
@@ -83,7 +83,7 @@ export default class TabEditorView {
 	}
 
 	setContent(content: string): void {
-		this.editor.action((ctx) => {
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const parser = ctx.get(parserCtx);
 			const doc = parser(content);
@@ -96,7 +96,7 @@ export default class TabEditorView {
 	}
 
 	getSelection() {
-		return this.editor.action((ctx) => {
+		return this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const sel = view.state.selection;
 
@@ -108,19 +108,17 @@ export default class TabEditorView {
 	}
 
 	setSelection(sel: { anchor: number; head: number }) {
-		return this.editor.action((ctx) => {
+		return this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
-
 			const newSel = TextSelection.create(state.doc, sel.anchor, sel.head);
-
 			const tr = state.tr.setSelection(newSel);
 			view.dispatch(tr);
 		});
 	}
 
 	focus() {
-		this.editor.action((ctx) => {
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			view.focus();
 		});
@@ -128,19 +126,19 @@ export default class TabEditorView {
 
 	destroy() {
 		this._editor?.destroy();
-		this._editorBoxDiv.remove();
-		this._tabDiv.remove();
+		this._editorBox.remove();
+		this._tabBox.remove();
 	}
 
 	setActive() {
-		this.editorBoxDiv.classList.add(CLASS_SELECTED);
-		this.tabDiv.classList.add(CLASS_SELECTED);
+		this._editorBox.classList.add(CLASS_SELECTED);
+		this._tabBox.classList.add(CLASS_SELECTED);
 		this.focus();
 	}
 
 	setDeactive() {
-		this.editorBoxDiv.classList.remove(CLASS_SELECTED);
-		this.tabDiv.classList.remove(CLASS_SELECTED);
+		this._editorBox.classList.remove(CLASS_SELECTED);
+		this._tabBox.classList.remove(CLASS_SELECTED);
 	}
 
 	setTabSpanTextContent(text: string) {
@@ -152,7 +150,7 @@ export default class TabEditorView {
 	}
 
 	findMatches(searchText: string): { from: number; to: number }[] {
-		const view = this.editor.ctx.get(editorViewCtx);
+		const view = this._editor.ctx.get(editorViewCtx);
 		const { doc } = view.state;
 
 		const matches: { from: number; to: number }[] = [];
@@ -180,7 +178,7 @@ export default class TabEditorView {
 	}
 
 	findAndSelect(searchText: string, direction: "up" | "down"): { total: number; current: number } | null {
-		const view = this.editor.ctx.get(editorViewCtx);
+		const view = this._editor.ctx.get(editorViewCtx);
 		const state = view.state;
 		const currentPos = state.selection.from;
 
@@ -210,8 +208,8 @@ export default class TabEditorView {
 		}
 
 		this.currentSearchIndex = targetIndex;
-		const match = this.searchResults[targetIndex];
 
+		const match = this.searchResults[targetIndex];
 		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to));
 
 		const searchHighlightPlugin = new Plugin({
@@ -237,10 +235,9 @@ export default class TabEditorView {
 		const newState = state.reconfigure({
 			plugins: [...plugins, searchHighlightPlugin],
 		});
-		view.updateState(newState);
 
+		view.updateState(newState);
 		view.dispatch(tr);
-		// view.focus() // Retain focus in input.
 
 		return {
 			total: this.searchResults.length,
@@ -249,7 +246,7 @@ export default class TabEditorView {
 	}
 
 	clearSearch() {
-		const view = this.editor.ctx.get(editorViewCtx);
+		const view = this._editor.ctx.get(editorViewCtx);
 		const plugins = view.state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
 		const newState = view.state.reconfigure({ plugins });
 		view.updateState(newState);
@@ -264,7 +261,7 @@ export default class TabEditorView {
 
 		let replaced = false;
 
-		this.editor.action((ctx) => {
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
 			const match = this.searchResults[this.currentSearchIndex];
@@ -277,6 +274,7 @@ export default class TabEditorView {
 		if (replaced) {
 			this.markAsModified();
 		}
+
 		return replaced;
 	}
 
@@ -284,12 +282,12 @@ export default class TabEditorView {
 		if (!searchText) return 0;
 
 		let replacedCount = 0;
-		this.editor.action((ctx) => {
+
+		this._editor.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
 			const parser = ctx.get(parserCtx);
 			const serializer = ctx.get(serializerCtx);
-
 			const content = serializer(state.doc);
 			const regex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
 			const newContent = content.replace(regex, () => {
@@ -329,8 +327,8 @@ export default class TabEditorView {
 		return this._editor;
 	}
 
-	get tabDiv(): HTMLElement {
-		return this._tabDiv;
+	get tabBox(): HTMLElement {
+		return this._tabBox;
 	}
 
 	get tabSpan() {
@@ -341,7 +339,7 @@ export default class TabEditorView {
 		return this._tabButton;
 	}
 
-	get editorBoxDiv() {
-		return this._editorBoxDiv;
+	get editorBox() {
+		return this._editorBox;
 	}
 }
