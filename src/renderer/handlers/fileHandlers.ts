@@ -46,13 +46,7 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher, tabEditorFaca
 function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
 	shortcutRegistry.register("Ctrl+T", async (e: KeyboardEvent) => await commandDispatcher.performNewTab("shortcut"));
 	shortcutRegistry.register("Ctrl+O", async (e: KeyboardEvent) => await commandDispatcher.performOpenFile("shortcut"));
-	shortcutRegistry.register(
-		"Ctrl+Shift+O",
-		async (e: KeyboardEvent) => await commandDispatcher.performOpenDirectory("shortcut")
-	);
+	shortcutRegistry.register("Ctrl+Shift+O", async (e: KeyboardEvent) => await commandDispatcher.performOpenDirectory("shortcut"));
 	shortcutRegistry.register("Ctrl+S", async (e: KeyboardEvent) => await commandDispatcher.performSave("shortcut"));
-	shortcutRegistry.register(
-		"Ctrl+Shift+S",
-		async (e: KeyboardEvent) => await commandDispatcher.performSaveAs("shortcut")
-	);
+	shortcutRegistry.register("Ctrl+Shift+S", async (e: KeyboardEvent) => await commandDispatcher.performSaveAs("shortcut"));
 }

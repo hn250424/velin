@@ -172,6 +172,7 @@ function bindTreeClickEvents(
 
 		const target = e.target as HTMLElement;
 		const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement;
+
 		if (!treeNode) {
 			const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement;
 
@@ -324,6 +325,7 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
 			const div = treeFacade.getTreeNodeByIndex(i);
 			div.classList.remove(CLASS_SELECTED);
 		}
+
 		treeFacade.clearSelectedIndices();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
@@ -354,6 +356,7 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
 			const div = treeFacade.getTreeNodeByIndex(i);
 			div.classList.remove(CLASS_SELECTED);
 		}
+		
 		treeFacade.clearSelectedIndices();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);

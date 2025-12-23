@@ -2,7 +2,7 @@ import "@milkdown/theme-nord/style.css";
 
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import Response from "@shared/types/Response";
-import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, DATASET_ATTR_TREE_PATH, SELECTOR_TAB } from "../constants/dom";
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom";
 import CommandDispatcher from "../CommandDispatcher";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
@@ -69,8 +69,10 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 			const insertIndex = getInsertIndexFromMouseX(tabEditorFacade.getTabs(), e.clientX);
 			if (tabEditorFacade.getInsertIndex() === insertIndex) return;
 			tabEditorFacade.setInsertIndex(insertIndex);
+
 			const indicator = tabEditorFacade.createIndicator();
 			const tab = tabEditorFacade.getTabEditorViewByIndex(insertIndex);
+
 			if (tab) {
 				const tabRect = tab.tabDiv.getBoundingClientRect();
 				indicator.style.left = `${
@@ -78,6 +80,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 				}px`;
 			} else {
 				const lastTab = tabEditorFacade.getTabEditorViewByIndex(insertIndex - 1);
+
 				if (lastTab) {
 					const lastRect = lastTab.tabDiv.getBoundingClientRect();
 					indicator.style.left = `${
@@ -133,6 +136,7 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEdito
 	tabContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
 		const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement;
+		
 		if (tabDiv) {
 			if (target.tagName === "BUTTON") {
 				const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10);

@@ -58,10 +58,7 @@ function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
 
 function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
 	shortcutRegistry.register("Ctrl+Z", async (e: KeyboardEvent) => await commandDispatcher.performUndo("shortcut"));
-	shortcutRegistry.register(
-		"Ctrl+Shift+Z",
-		async (e: KeyboardEvent) => await commandDispatcher.performRedo("shortcut")
-	);
+	shortcutRegistry.register("Ctrl+Shift+Z", async (e: KeyboardEvent) => await commandDispatcher.performRedo("shortcut"));
 	shortcutRegistry.register("Ctrl+X", async (e: KeyboardEvent) => await commandDispatcher.performCut("shortcut"));
 	shortcutRegistry.register("Ctrl+C", async (e: KeyboardEvent) => await commandDispatcher.performCopy("shortcut"));
 	shortcutRegistry.register("Ctrl+V", async (e: KeyboardEvent) => await commandDispatcher.performPaste("shortcut"));

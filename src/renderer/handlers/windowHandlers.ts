@@ -21,7 +21,6 @@ export default function registerWindowHandlers(windowState: WindowState) {
 		window.rendererToMain.requestMinimizeWindow();
 	});
 
-	if (windowState.isWindowMaximize())
-		maximizeImg.src = new URL("../assets/icons/unmaximize.png", import.meta.url).toString();
+	if (windowState.isWindowMaximize()) maximizeImg.src = new URL("../assets/icons/unmaximize.png", import.meta.url).toString();
 	else maximizeImg.src = new URL("../assets/icons/maximize.png", import.meta.url).toString();
 }
