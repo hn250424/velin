@@ -58,8 +58,10 @@ export default class DeleteCommand implements ICommand {
 				this.getIdsFromTreeViewModel(child, arr);
 			}
 		}
+
 		const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(vm.path);
 		if (tabEditorView) arr.push(tabEditorView.getId());
+		
 		return arr;
 	}
 }

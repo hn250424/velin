@@ -389,7 +389,6 @@ export default class CommandDispatcher {
 	}
 
 	async performPaste(source: CommandSource) {
-		this.tabEditorFacade.test()
 		const focus = this.focusManager.getFocus();
 
 		if (focus === "editor") {
@@ -460,7 +459,6 @@ export default class CommandDispatcher {
 				window.rendererToMain.setWatchSkipState(false);
 			}
 
-			this.tabEditorFacade.test()
 			return;
 		}
 	}

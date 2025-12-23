@@ -82,26 +82,18 @@ export default class PasteCommand implements ICommand {
 		for (let i = this.undoInfos.length - 1; i >= 0; i--) {
 			const { src, dest, mode, isDir } = this.undoInfos[i];
 
-			try {
-				if (mode === "cut") {
-					await window.rendererToMain.copyTree(dest, src);
-				}
+			if (mode === "cut") await window.rendererToMain.copyTree(dest, src);
+			await window.rendererToMain.deletePermanently(dest);
 
-				await window.rendererToMain.deletePermanently(dest);
+			const view = this.tabEditorFacade.getTabEditorViewByPath(dest);
+			if (view) {
+				view.tabBox.title = src;
 
-				const view = this.tabEditorFacade.getTabEditorViewByPath(dest);
-				if (view) {
-					view.tabDiv.title = src;
-					const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
-					if (viewModel) {
-						viewModel.filePath = src;
-					}
+				const viewModel = this.tabEditorFacade.getTabEditorViewModelById(view.getId());
+				if (viewModel) viewModel.filePath = src;
 
-					this.tabEditorFacade.deleteTabEditorViewByPath(dest);
-					this.tabEditorFacade.setTabEditorViewByPath(src, view);
-				}
-			} catch (err) {
-				console.error("Undo failed:", err);
+				this.tabEditorFacade.deleteTabEditorViewByPath(dest);
+				this.tabEditorFacade.setTabEditorViewByPath(src, view);
 			}
 		}
 

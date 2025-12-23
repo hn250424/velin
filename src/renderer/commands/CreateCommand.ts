@@ -15,9 +15,9 @@ export default class CreateCommand implements ICommand {
 	) {}
 
 	async execute() {
-		const newPath = window.utils.getJoinedPath(this.parentPath, this.name);
-		this.createdPath = newPath;
-		await window.rendererToMain.create(newPath, this.isDirectory);
+		this.createdPath = window.utils.getJoinedPath(this.parentPath, this.name);
+		await window.rendererToMain.create(this.createdPath, this.isDirectory);
+
 		const newTreeSession = await window.rendererToMain.getSyncedTreeSession();
 		if (newTreeSession) {
 			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession);
@@ -27,28 +27,21 @@ export default class CreateCommand implements ICommand {
 	}
 
 	async undo() {
-		if (!this.createdPath) {
-			console.warn("Cannot undo: no created path stored");
-			return;
+		if (!this.createdPath) return;
+
+		await window.rendererToMain.delete([this.createdPath]);
+
+		const newTreeSession = await window.rendererToMain.getSyncedTreeSession();
+		if (newTreeSession) {
+			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession);
+			this.treeFacade.renderTreeData(viewModel);
+			this.treeFacade.loadFlattenArrayAndMaps(viewModel);
 		}
 
-		try {
-			await window.rendererToMain.delete([this.createdPath]);
-
-			const newTreeSession = await window.rendererToMain.getSyncedTreeSession();
-			if (newTreeSession) {
-				const viewModel = this.treeFacade.toTreeViewModel(newTreeSession);
-				this.treeFacade.renderTreeData(viewModel);
-				this.treeFacade.loadFlattenArrayAndMaps(viewModel);
-			}
-
-			if (this.openedTabId !== null) {
-				const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId);
-				const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath);
-				this.tabEditorFacade.removeTab(tabEditorView.getId());
-			}
-		} catch (error) {
-			console.error("Undo create failed:", error);
+		if (this.openedTabId !== null) {
+			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId);
+			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath);
+			this.tabEditorFacade.removeTab(tabEditorView.getId());
 		}
 	}
 
