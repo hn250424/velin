@@ -8,97 +8,13 @@ import FakeTreeUtils from "../modules/tree/FakeTreeUtils";
 import FakeTabRepository from "../modules/tab/FakeTabRepository";
 import FakeTreeRepository from "../modules/tree/FakeTreeRepository";
 
-import { tabSessionPath, treeSessionPath, treeDto } from "../data/test_data";
+import { tabSessionPath, treeSessionPath, treeDto, treeSessionModel } from "../data/test_data";
 
 let fakeFileManager: FakeFileManager;
 let fakeTreeUtils: FakeTreeUtils;
 let fakeTabRepository: FakeTabRepository;
 let fakeTreeRepository: FakeTreeRepository;
 let treeService: TreeService;
-
-const treeSessionModel: TreeSessionModel = {
-	path: "D:\\node-workspace\\velin\\test_file",
-	name: "test_file",
-	indent: 0,
-	directory: true,
-	expanded: true,
-	children: [
-		{
-			path: "D:\\node-workspace\\velin\\test_file\\dir333",
-			name: "dir333",
-			indent: 1,
-			directory: true,
-			expanded: true,
-			children: [
-				{
-					path: "D:\\node-workspace\\velin\\test_file\\dir333\\deep",
-					name: "deep",
-					indent: 2,
-					directory: true,
-					expanded: true,
-					children: [
-						{
-							path: "D:\\node-workspace\\velin\\test_file\\dir333\\deep\\14.md",
-							name: "14.md",
-							indent: 3,
-							directory: false,
-							expanded: false,
-							children: null,
-						},
-					],
-				},
-				{
-					path: "D:\\node-workspace\\velin\\test_file\\test139.md",
-					name: "test139.md",
-					indent: 1,
-					directory: false,
-					expanded: false,
-					children: null,
-				},
-				{
-					path: "D:\\node-workspace\\velin\\test_file\\test139-1.md",
-					name: "test139-1.md",
-					indent: 1,
-					directory: false,
-					expanded: false,
-					children: null,
-				},
-				{
-					path: "D:\\node-workspace\\velin\\test_file\\test139-3.md",
-					name: "test139-3.md",
-					indent: 1,
-					directory: false,
-					expanded: false,
-					children: null,
-				},
-			],
-		},
-		{
-			path: "D:\\node-workspace\\velin\\test_file\\test139.md",
-			name: "test139.md",
-			indent: 1,
-			directory: false,
-			expanded: false,
-			children: null,
-		},
-		{
-			path: "D:\\node-workspace\\velin\\test_file\\test139-1.md",
-			name: "test139-1.md",
-			indent: 1,
-			directory: false,
-			expanded: false,
-			children: null,
-		},
-		{
-			path: "D:\\node-workspace\\velin\\test_file\\test139-3.md",
-			name: "test139-3.md",
-			indent: 1,
-			directory: false,
-			expanded: false,
-			children: null,
-		},
-	],
-};
 
 function traverse(node: TreeSessionModel | TreeDto, cb: (node: TreeSessionModel | TreeDto) => void) {
 	cb(node);
@@ -121,7 +37,7 @@ function deepCopyTreeDto(dto: TreeDto): TreeDto {
 	};
 }
 
-describe("treeService.rename", () => {
+describe("Tree Service - rename", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
@@ -130,7 +46,7 @@ describe("treeService.rename", () => {
 		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
-	test("should sync renamed session including children nodes", async () => {
+	test("should rename a node and update its path along with all child nodes in the session", async () => {
 		// Given.
 		const copiedTreeSessionModel = deepCopyTreeSessionModel(treeSessionModel);
 		traverse(copiedTreeSessionModel, (model) => {
@@ -156,7 +72,7 @@ describe("treeService.rename", () => {
 		checkPaths(session.children[0]);
 	});
 
-	test("should append suffix with dash and number to avoid duplicate file names", async () => {
+	test("should append a numeric suffix to avoid duplicate file names during rename", async () => {
 		// Given.
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -178,7 +94,7 @@ describe("treeService.rename", () => {
 	});
 });
 
-describe("treeService.paste", () => {
+describe("Tree Service - paste", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
@@ -187,7 +103,7 @@ describe("treeService.paste", () => {
 		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
-	test("should delete original file and copy to new path when clipboardMode is cut", async () => {
+	test("should delete original files and copy to new path when clipboard mode is 'cut'", async () => {
 		// Given.
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -203,24 +119,20 @@ describe("treeService.paste", () => {
 
 		// Then.
 		expect(response.result).toBe(true);
-
 		for (const oldPath of originalPaths) {
 			const exists = await fakeFileManager.exists(oldPath);
 			expect(exists).toBe(false);
 		}
-
 		for (const pasted of childrenToPaste) {
 			const exists = await fakeFileManager.exists(pasted.path);
 			expect(exists).toBe(true);
-
 			const content = await fakeFileManager.read(pasted.path);
 			expect(content).toBe(pasted.name);
-
 			expect(pasted.indent).toBe(target.indent + 1);
 		}
 	});
 
-	test("should rollback all copied files when one fails", async () => {
+	test("should rollback all changes if any file operation fails during 'cut' paste", async () => {
 		// Given
 		const copiedTreeDto = { ...treeDto };
 		traverse(copiedTreeDto, (dto) => {
@@ -257,7 +169,7 @@ describe("treeService.paste", () => {
 		}
 	});
 
-	test("should copy files to new path without deleting original when clipboardMode is copy", async () => {
+	test("should copy files to new path without deleting originals when clipboard mode is 'copy'", async () => {
 		// Given.
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -273,31 +185,26 @@ describe("treeService.paste", () => {
 
 		// Then.
 		expect(response.result).toBe(true);
-
 		for (const oldPath of originalPaths) {
 			const exists = await fakeFileManager.exists(oldPath);
 			expect(exists).toBe(true);
 		}
-
 		for (const pasted of childrenToPaste) {
 			const exists = await fakeFileManager.exists(pasted.path);
 			expect(exists).toBe(true);
-
 			const content = await fakeFileManager.read(pasted.path);
 			expect(content).toBe(pasted.name);
-
 			expect(pasted.indent).toBe(target.indent + 1);
 		}
 	});
 
-	test("should rollback all copied files when one copy fails in copy mode", async () => {
+	test("should rollback all changes if any file operation fails during 'copy' paste", async () => {
 		// Given
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
 			fakeFileManager.setPathExistence(dto.path, true);
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
-
 		const originalCopy = fakeFileManager.copy.bind(fakeFileManager);
 		const failPath = path.join(copiedTreeDto.path, copiedTreeDto.children[0].children[0].children[0].name);
 		fakeFileManager.copy = async (src: string, dest: string) => {
@@ -306,7 +213,6 @@ describe("treeService.paste", () => {
 			}
 			return originalCopy(src, dest);
 		};
-
 		const target = copiedTreeDto;
 		const childrenToPaste = copiedTreeDto.children[0].children[0].children;
 		const originalPaths = childrenToPaste.map((c) => c.path);
@@ -327,7 +233,7 @@ describe("treeService.paste", () => {
 		}
 	});
 
-	test('When "139", "139-1", "139-3" exist, pasting "139" or "139-1" creates "139-2"', async () => {
+	test("should correctly handle name conflicts by appending numeric suffixes during copy", async () => {
 		// Given
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -345,7 +251,7 @@ describe("treeService.paste", () => {
 		expect(response.data[0]).toBe(selectedDtos[0].path);
 	});
 
-	test('When "139", "139-1", "139-3" exist, pasting "139" or "139-1" creates "139-2"', async () => {
+	test("should correctly handle name conflicts by appending numeric suffixes during cut", async () => {
 		// Given
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -363,7 +269,7 @@ describe("treeService.paste", () => {
 		expect(response.data[0]).toBe(selectedDtos[0].path);
 	});
 
-	test('should return correct file paths when moving multiple files via cut and paste', async () => {
+	test("should return correct new file paths when moving multiple files via 'cut' and paste", async () => {
 		// Given
 		const copiedTreeDto = deepCopyTreeDto(treeDto);
 		traverse(copiedTreeDto, (dto) => {
@@ -374,18 +280,17 @@ describe("treeService.paste", () => {
 		selectedDtos.push(copiedTreeDto.children[0].children[2]);
 		selectedDtos.push(copiedTreeDto.children[0].children[3]);
 
-
-		// // When.
+		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut");
 
-		// // Then.
+		// Then.
 		expect(response.result).toBe(true);
 		expect(path.basename(response.data[0])).toBe(path.basename(copiedTreeDto.children[0].children[2].path));
 		expect(path.basename(response.data[1])).toBe(path.basename(copiedTreeDto.children[0].children[3].path));
 	});
 });
 
-describe("treeService.create", () => {
+describe("Tree Service - create", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
@@ -394,7 +299,7 @@ describe("treeService.create", () => {
 		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
-	test("should create new file", async () => {
+	test("should create a new file at the specified path", async () => {
 		// Given
 		const copiedTreeDto = { ...treeDto };
 		traverse(copiedTreeDto, (dto) => {
@@ -402,7 +307,7 @@ describe("treeService.create", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const dir = copiedTreeDto.path;
-		const base = "test.md";
+		const base = path.basename(copiedTreeDto.path);
 		const targetPath = path.join(dir, base);
 
 		// When.
@@ -413,7 +318,7 @@ describe("treeService.create", () => {
 		expect(ret).toBe(true);
 	});
 
-	test("should create duplicated new file", async () => {
+	test("should create a new file named after the target directory if no base name is provided", async () => {
 		// Given
 		const copiedTreeDto = { ...treeDto };
 		traverse(copiedTreeDto, (dto) => {
@@ -432,7 +337,7 @@ describe("treeService.create", () => {
 		expect(ret).toBe(true);
 	});
 
-	test("should create new directory", async () => {
+	test("should create a new directory at the specified path", async () => {
 		// Given
 		const copiedTreeDto = { ...treeDto };
 		traverse(copiedTreeDto, (dto) => {
@@ -440,7 +345,7 @@ describe("treeService.create", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name);
 		});
 		const dir = copiedTreeDto.path;
-		const base = "test139";
+		const base = path.basename(copiedTreeDto.path);
 		const targetPath = path.join(dir, base);
 
 		// When.
@@ -451,7 +356,7 @@ describe("treeService.create", () => {
 		expect(ret).toBe(true);
 	});
 
-	test("should create duplicated new directory", async () => {
+	test("should create a new directory named after the target directory if no base name is provided", async () => {
 		// Given
 		const copiedTreeDto = { ...treeDto };
 		traverse(copiedTreeDto, (dto) => {
@@ -471,7 +376,7 @@ describe("treeService.create", () => {
 	});
 });
 
-describe("treeService.syncTreeSessionFromRenderer", () => {
+describe("Tree Service - syncTreeSessionFromRenderer", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
@@ -480,7 +385,7 @@ describe("treeService.syncTreeSessionFromRenderer", () => {
 		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
-	test("a write session was received from the renderer for synchronization", async () => {
+	test("should synchronize tree session from renderer and save it", async () => {
 		// Given.
 		const copiedDto = deepCopyTreeDto(treeDto);
 
@@ -489,18 +394,15 @@ describe("treeService.syncTreeSessionFromRenderer", () => {
 
 		// Then.
 		const session: TreeSessionModel = await fakeTreeRepository.readTreeSession();
-
 		const dtoPaths: string[] = [];
 		traverse(copiedDto, (node) => dtoPaths.push(path.normalize(node.path)));
-
 		const sessionPaths: string[] = [];
 		traverse(session, (node) => sessionPaths.push(path.normalize(node.path)));
-
 		expect(sessionPaths).toEqual(dtoPaths);
 	});
 });
 
-describe("treeService.getSyncedTreeSession", () => {
+describe("Tree Service - getSyncedTreeSession", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager);
@@ -509,7 +411,7 @@ describe("treeService.getSyncedTreeSession", () => {
 		treeService = new TreeService(fakeFileManager, fakeTreeUtils, fakeTreeRepository);
 	});
 
-	test("should sync with file system and update tree session", async () => {
+	test("should synchronize tree session with file system changes and add new files", async () => {
 		// Given.
 		const copiedModel = deepCopyTreeDto(treeSessionModel);
 		await fakeTreeRepository.setTreeSession(copiedModel);
@@ -531,16 +433,16 @@ describe("treeService.getSyncedTreeSession", () => {
 		});
 		fakeTreeUtils.setTree(copiedModel);
 
-		// // When.
+		// When.
 		await treeService.getSyncedTreeSession();
 
-		// // Then.
+		// Then.
 		const session = await fakeTreeRepository.readTreeSession();
 		const hasNewFile = session.children?.some((child) => child.path === newFilePath);
 		expect(hasNewFile).toBe(true);
 	});
 
-	test("should sync with file system and remove deleted file from tree session", async () => {
+	test("should synchronize tree session with file system changes and remove deleted files", async () => {
 		// Given.
 		const copiedModel = deepCopyTreeDto(treeSessionModel);
 		const removedFilePath = copiedModel.children?.[0]?.path;

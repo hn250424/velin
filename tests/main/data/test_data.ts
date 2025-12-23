@@ -1,3 +1,4 @@
+import TreeSessionModel from "@main/models/TreeSessionModel";
 import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import TreeDto from "@shared/dto/TreeDto";
 
@@ -71,6 +72,90 @@ export const tabEidtorsDto: TabEditorsDto = {
 };
 
 export const treeDto: TreeDto = {
+	path: "D:/workspace/root",
+	name: "root",
+	indent: 0,
+	directory: true,
+	expanded: true,
+	children: [
+		{
+			path: "D:/workspace/velin/dir",
+			name: "dir",
+			indent: 1,
+			directory: true,
+			expanded: true,
+			children: [
+				{
+					path: "D:/workspace/velin/dir/dir2",
+					name: "dir2",
+					indent: 2,
+					directory: true,
+					expanded: true,
+					children: [
+						{
+							path: "D:/workspace/velin/dir/dir2/dir2_test.md",
+							name: "dir2_test.md",
+							indent: 3,
+							directory: false,
+							expanded: false,
+							children: null,
+						},
+					],
+				},
+				{
+					path: "D:/workspace/velin/dir/dir_test.md",
+					name: "dir_test.md",
+					indent: 1,
+					directory: false,
+					expanded: false,
+					children: null,
+				},
+				{
+					path: "D:/workspace/velin/dir/dir_test-1.md",
+					name: "dir_test-1.md",
+					indent: 1,
+					directory: false,
+					expanded: false,
+					children: null,
+				},
+				{
+					path: "D:/workspace/velin/dir/dir_test-3.md",
+					name: "dir_test-3.md",
+					indent: 1,
+					directory: false,
+					expanded: false,
+					children: null,
+				},
+			],
+		},
+		{
+			path: "D:/workspace/velin/test.md",
+			name: "test.md",
+			indent: 1,
+			directory: false,
+			expanded: false,
+			children: null,
+		},
+		{
+			path: "D:/workspace/velin/test-1.md",
+			name: "test-1.md",
+			indent: 1,
+			directory: false,
+			expanded: false,
+			children: null,
+		},
+		{
+			path: "D:/workspace/velin/test-3.md",
+			name: "test-3.md",
+			indent: 1,
+			directory: false,
+			expanded: false,
+			children: null,
+		},
+	],
+};
+
+export const treeSessionModel: TreeSessionModel = {
 	path: "D:/workspace/root",
 	name: "root",
 	indent: 0,

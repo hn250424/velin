@@ -21,7 +21,7 @@ let fakeTabUtils: FakeTabUtils;
 let tabService: TabService;
 const fakeMainWindow = new FakeMainWindow();
 
-describe("tabService.closeTab", () => {
+describe("Tab Service - closeTab", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
@@ -29,7 +29,7 @@ describe("tabService.closeTab", () => {
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
-	test("should write when closeTab if data is modified", async () => {
+	test("should save and close tab if data is modified and user confirms save", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -50,7 +50,7 @@ describe("tabService.closeTab", () => {
 		expect(file).toBe(data.content);
 	});
 
-	test("should remove without saving if user cancels confirm on modified data", async () => {
+	test("should close tab without saving if user cancels save confirmation for modified data", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -69,7 +69,7 @@ describe("tabService.closeTab", () => {
 		expect(session.data.length).toBe(0);
 	});
 
-	test("should save to new path and remove session when closing modified data", async () => {
+	test("should save to new path, update session, and close tab when closing modified unsaved data", async () => {
 		// Given.
 		const data = { ...emptyFilePathTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -94,7 +94,7 @@ describe("tabService.closeTab", () => {
 		expect(file).toBe(data.content);
 	});
 
-	test("should remain in the program when save dialog is canceled during closeTab", async () => {
+	test("should keep tab open if user cancels save dialog when closing modified unsaved data", async () => {
 		// Given.
 		const data = { ...emptyFilePathTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -117,7 +117,7 @@ describe("tabService.closeTab", () => {
 		expect(session.data.length).toBe(1);
 	});
 
-	test("should just remove session when closeTab if data is not modified", async () => {
+	test("should close tab without saving if data is not modified", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -136,7 +136,7 @@ describe("tabService.closeTab", () => {
 	});
 });
 
-describe("tabService.closeTabsExcept", () => {
+describe("Tab Service - closeTabsExcept", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
@@ -144,7 +144,7 @@ describe("tabService.closeTabsExcept", () => {
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
-	test("should retain only selected tab and save others modified file", async () => {
+	test("should retain only selected tab and save other modified files if user confirms save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -172,7 +172,7 @@ describe("tabService.closeTabsExcept", () => {
 		expect(tabSession.data[0].filePath).toBe(exceptData.filePath);
 	});
 
-	test("should retain only the selected tab when user declines to save", async () => {
+	test("should retain only selected tab and discard changes in other tabs if user declines save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -199,7 +199,7 @@ describe("tabService.closeTabsExcept", () => {
 		expect(tabSession.data[0].filePath).toBe(exceptData.filePath);
 	});
 
-	test("should keep selected tab and tabs with canceled save dialog after confirm", async () => {
+	test("should retain selected tab and tabs with unsaved changes if user cancels save dialog", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -231,7 +231,7 @@ describe("tabService.closeTabsExcept", () => {
 	});
 });
 
-describe("tabService.closeTabsToRight", () => {
+describe("Tab Service - closeTabsToRight", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
@@ -239,7 +239,7 @@ describe("tabService.closeTabsToRight", () => {
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
-	test("should retain only the tabs to the left of the reference tab and save modified files", async () => {
+	test("should close tabs to the right of the reference tab and save modified ones if user confirms save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -267,7 +267,7 @@ describe("tabService.closeTabsToRight", () => {
 		expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(refData.filePath);
 	});
 
-	test("should retain only the tabs to the left of the reference tab when user decline to save", async () => {
+	test("should close tabs to the right of the reference tab and discard changes if user declines save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -294,7 +294,7 @@ describe("tabService.closeTabsToRight", () => {
 		expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(refData.filePath);
 	});
 
-	test("should retain left tabs and right tabs if user cancels save dialog after confirming to save", async () => {
+	test("should retain left tabs and unsaved right tabs if user cancels save dialog", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -326,7 +326,7 @@ describe("tabService.closeTabsToRight", () => {
 	});
 });
 
-describe("tabService.closeAllTabs", () => {
+describe("Tab Service - closeAllTabs", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
@@ -334,7 +334,7 @@ describe("tabService.closeAllTabs", () => {
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
-	test("should close all tabs and save modified files", async () => {
+	test("should close all tabs and save modified ones if user confirms save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -359,7 +359,7 @@ describe("tabService.closeAllTabs", () => {
 		expect(tabSession.data.length).toBe(0);
 	});
 
-	test("should close all tabs when user declines to save", async () => {
+	test("should close all tabs and discard modified ones if user declines save", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -383,7 +383,7 @@ describe("tabService.closeAllTabs", () => {
 		expect(tabSession.data.length).toBe(0);
 	});
 
-	test("should retain tab if user confirms save but cancels save dialog", async () => {
+	test("should retain unsaved tabs if user confirms save but cancels save dialog", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -412,7 +412,7 @@ describe("tabService.closeAllTabs", () => {
 	});
 });
 
-describe("tabService.syncTabSession", () => {
+describe("Tab Service - syncTabSession", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager();
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager);
@@ -420,7 +420,7 @@ describe("tabService.syncTabSession", () => {
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager);
 	});
 
-	test("a write session was received from the renderer for synchronization", async () => {
+	test("should synchronize tab session from renderer and save it", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 

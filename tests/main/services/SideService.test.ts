@@ -6,7 +6,7 @@ import FakeSideRepository from "../modules/side/FakeSideRepository";
 
 import { sideSessionPath } from "../data/test_data";
 
-describe("SideService.syncSideSession", () => {
+describe("Side Service - Sync Side Session", () => {
 	const sideDto: SideDto = {
 		open: true,
 		width: 150,
@@ -22,7 +22,7 @@ describe("SideService.syncSideSession", () => {
 		sideService = new SideService(fakeFileManager, fakeSideRepository);
 	});
 
-	test("a write session was received from the renderer for synchronization", async () => {
+	test("should synchronize side session from renderer and save it", async () => {
 		// Given.
 		const copiedSideDto = { ...sideDto };
 

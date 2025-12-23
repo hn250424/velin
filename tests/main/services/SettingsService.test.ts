@@ -7,7 +7,7 @@ import FakeSettingsUtils from "../modules/settings/FakeSettingsUtils";
 
 import { settingsSessionPath } from "../data/test_data";
 
-describe("SettingsService.syncSettingsSession", () => {
+describe("Settings Service - Sync Settings Session", () => {
 	const settingsDto: SettingsDto = {
 		settingFontDto: {
 			size: 16,
@@ -27,7 +27,7 @@ describe("SettingsService.syncSettingsSession", () => {
 		settingsService = new SettingsService(fakeFileManager, fakeSettingsUtils, fakeSettingsRepository);
 	});
 
-	test("a write session was received from the renderer for synchronization", async () => {
+	test("should synchronize settings session from renderer and save it", async () => {
 		// Given.
 		const copiedSettingsDto = { ...settingsDto };
 

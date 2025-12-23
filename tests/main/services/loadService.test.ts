@@ -26,7 +26,7 @@ import {
 	windowSessionPath,
 } from "../data/test_data";
 
-describe("loadService.loadedRenderer: ", () => {
+describe("Load Service - loadedRenderer", () => {
 	let fakeMainWindow: FakeMainWindow;
 	let fakeFileManager: FakeFileManager;
 	let fakeSideRepository: FakeSideRepository;
@@ -55,7 +55,7 @@ describe("loadService.loadedRenderer: ", () => {
 		fakeWindowUtils = new FakeWindowUtils();
 	});
 
-	test("loadedRenderer: normal", async () => {
+	test("should correctly load and send all session data to the renderer", async () => {
 		// Given.
 		const initialWindowSession: WindowSessionModel = {
 			maximize: false,
@@ -64,20 +64,16 @@ describe("loadService.loadedRenderer: ", () => {
 			x: 100,
 			y: 100,
 		};
-
 		const initialSettingsSession: SettingsSessionModel = {
 			settingFontSessionModel: {
 				size: 16,
 			},
-
 			settingThemeSessionModel: {},
 		};
-
 		const initialSideSession: SideSessionModel = {
 			open: true,
 			width: 150,
 		};
-
 		const initialTabSession: TabSessionModel = {
 			activatedId: 1,
 			data: [
@@ -85,7 +81,6 @@ describe("loadService.loadedRenderer: ", () => {
 				{ id: 1, filePath: "file2.txt" },
 			],
 		};
-
 		const initialTreeSession = {
 			path: "/project",
 			name: "project",
@@ -120,7 +115,6 @@ describe("loadService.loadedRenderer: ", () => {
 				},
 			],
 		};
-
 		fakeFileManager.setPathExistence(windowSessionPath, true);
 		fakeFileManager.setPathExistence(settingsSessionPath, true);
 		fakeFileManager.setPathExistence(sideSessionPath, true);
@@ -135,7 +129,6 @@ describe("loadService.loadedRenderer: ", () => {
 		fakeFileManager.setPathExistence("/project/src", true);
 		fakeFileManager.setPathExistence("/project/src/main.ts", true);
 		fakeTreeUtils.setTree(initialTreeSession);
-
 		await fakeWindowRepository.setWindowSession(initialWindowSession);
 		await fakeSettingsRepository.setSettingsSession(initialSettingsSession);
 		await fakeSideRepository.setSideSession(initialSideSession);
@@ -190,7 +183,7 @@ describe("loadService.loadedRenderer: ", () => {
 		expect(treeSentData).toEqual(initialTreeSession);
 	});
 
-	test("loadedRenderer: tabSession json file does not exist", async () => {
+	test("should handle missing tab session file gracefully and send default data", async () => {
 		// Given.
 		fakeFileManager.setPathExistence(TAB_SESSION_PATH, false);
 		fakeTabRepository.setTabSession(null);

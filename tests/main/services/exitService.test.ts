@@ -16,7 +16,7 @@ let fakeTabRepository: FakeTabRepository;
 let fakeTreeUtils: FakeTreeUtils;
 let fakeTreeRepository: FakeTreeRepository;
 
-describe("exitService.exit", () => {
+describe("Exit Service", () => {
 	beforeEach(() => {
 		fakeMainWindow = new FakeMainWindow();
 		fakeFileManager = new FakeFileManager();
@@ -25,7 +25,7 @@ describe("exitService.exit", () => {
 		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager);
 	});
 
-	test("test when user cancels confirm dialog", async () => {
+	test("should not close window if user cancels confirm dialog", async () => {
 		// Given.
 		const copiedTabEditorDto = { ...tabEidtorsDto };
 		const copiedTreeDto = { ...treeDto };
@@ -84,7 +84,7 @@ describe("exitService.exit", () => {
 		expect(treeSession).toEqual(copiedTreeDto);
 	});
 
-	test("test when user confirm dialog and cancels open dialog", async () => {
+	test("should save sessions and close window if user confirms dialog and cancels save file dialog", async () => {
 		// Given.
 		const copiedTabEditorDto = { ...tabEidtorsDto };
 		const copiedTreeDto = { ...treeDto };
@@ -133,7 +133,7 @@ describe("exitService.exit", () => {
 		expect(treeSession).toEqual(copiedTreeDto);
 	});
 
-	test("test when user confirm dialog and select file path", async () => {
+	test("should save sessions and close window if user confirms dialog and selects a file path", async () => {
 		// Given.
 		const copiedTabEditorDto = { ...tabEidtorsDto };
 		const copiedTreeDto = { ...treeDto };

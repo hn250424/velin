@@ -22,7 +22,6 @@ import {
 	tabEidtorsDto,
 	treeDto,
 } from "../data/test_data";
-import path from "path";
 
 let fakeFileManager: FakeFileManager;
 let fakeTabRepository: FakeTabRepository;
@@ -85,7 +84,7 @@ describe("FileService.openFile", () => {
 		);
 	});
 
-	test("should return false when the open dialog is canceled", async () => {
+	test("should return null if the open file dialog is canceled", async () => {
 		// Given.
 		setFakeOpenFileDialogResult({ canceled: true, filePaths: [] });
 
@@ -96,7 +95,7 @@ describe("FileService.openFile", () => {
 		expect(result).toBe(null);
 	});
 
-	test("should open a file and return its path and content", async () => {
+	test("should open a file, update tab session, and return its content", async () => {
 		// Given.
 		setFakeOpenFileDialogResult({ canceled: false, filePaths: ["openPath"] });
 		fakeFileManager.setFilecontent("openPath", "content");
@@ -120,7 +119,7 @@ describe("FileService.openFile", () => {
 		expect(session.data[2].filePath).toBe("openPath");
 	});
 
-	test("should return correct response when called with path arg", async () => {
+	test("should open a file by path, update tab session, and return its content", async () => {
 		// Given.
 		fakeFileManager.setFilecontent("testPath", "testContent");
 		fakeTabRepository.setTabSession({
@@ -161,7 +160,7 @@ describe("FileService.openDirectory", () => {
 		);
 	});
 
-	test("should return correctly updated root tree without dto", async () => {
+	test("should return the correctly updated root tree when opening a directory via dialog", async () => {
 		// Given.
 		const copiedDto = { ...treeDto };
 		fakeTreeUtils.setTree(copiedDto);
@@ -179,7 +178,7 @@ describe("FileService.openDirectory", () => {
 		expect(response.path).toEqual(session.path);
 	});
 
-	test("should return correctly updated children tree without dto", async () => {
+	test("should return the correctly updated child tree when opening a directory via dialog", async () => {
 		// Given.
 		const copiedDto = { ...treeDto };
 		fakeTreeUtils.setTree(copiedDto);
@@ -198,7 +197,7 @@ describe("FileService.openDirectory", () => {
 		expect(response.path).toBe(session.path);
 	});
 
-	test("should return the correctly updated root tree when opening the root dto", async () => {
+	test("should return the correctly updated root tree when opening a directory by DTO", async () => {
 		// Given.
 		const copiedDto = { ...treeDto };
 		fakeTreeUtils.setTree(copiedDto);
@@ -212,7 +211,7 @@ describe("FileService.openDirectory", () => {
 		expect(response.path).toEqual(session.path);
 	});
 
-	test("should return the correctly updated child tree and mark it as expanded when opening a child dto", async () => {
+	test("should return the correctly updated child tree and mark it as expanded when opening a child directory by DTO", async () => {
 		// Given.
 		const copiedDto = { ...treeDto };
 		fakeTreeUtils.setTree(copiedDto);
@@ -246,10 +245,9 @@ describe("FileService.save", () => {
 		);
 	});
 
-	test("Save with empty filePath and cancel dialog", async () => {
+	test("should return modified status true if file path is empty and save dialog is canceled", async () => {
 		// Given.
 		const data: TabEditorDto = { ...emptyFilePathTabEditorDto };
-
 		setFakeSaveDialogResult({
 			canceled: true,
 			filePath: "",
@@ -262,7 +260,7 @@ describe("FileService.save", () => {
 		expect(result.isModified).toBe(true);
 	});
 
-	test("Save with empty filePath and confirmed dialog", async () => {
+	test("should save new file and update tab session if file path is empty and save dialog is confirmed", async () => {
 		// Given.
 		const data: TabEditorDto = { ...emptyFilePathTabEditorDto };
 		setFakeSaveDialogResult({
@@ -286,7 +284,7 @@ describe("FileService.save", () => {
 		expect(tabSession.data[0].filePath).toBe(newFilePath);
 	});
 
-	test("Save with filePath", async () => {
+	test("should save existing file and update tab session if file path exists", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -324,7 +322,7 @@ describe("FileService.saveAs", () => {
 		);
 	});
 
-	test("should return false when SaveDialog is canceled", async () => {
+	test("should return null if save-as dialog is canceled", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		setFakeSaveDialogResult({
@@ -339,7 +337,7 @@ describe("FileService.saveAs", () => {
 		expect(response).toBe(null);
 	});
 
-	test("should save file and update tabSession when SaveDialog returns path", async () => {
+	test("should save file and update tab session if save-as dialog returns a path", async () => {
 		// Given.
 		const data = { ...defaultTabEditorDto };
 		setFakeSaveDialogResult({
@@ -382,7 +380,7 @@ describe("FileService.saveAll", () => {
 		);
 	});
 
-	test("test all cases with confirmed dialog", async () => {
+	test("should save all modified files when save dialog is confirmed for new files", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
@@ -413,7 +411,7 @@ describe("FileService.saveAll", () => {
 		expect(spy).toHaveBeenCalledTimes(3);
 	});
 
-	test("test all cases with cancel dialog", async () => {
+	test("should not save unsaved files if save dialog is canceled for new files", async () => {
 		// Given.
 		const copiedDto = { ...tabEidtorsDto };
 		fakeFileManager.setPathExistence(tabSessionPath, true);
