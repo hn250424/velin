@@ -14,6 +14,7 @@ export default class SettingsStore {
 		this._currentSettings = {
 			settingFontViewModel: {
 				size: 16,
+				family: "sans-serif",
 			},
 
 			settingThemeViewModel: {},
@@ -48,6 +49,9 @@ export default class SettingsStore {
 	private _setSettingFont(fontViewModel: SettingFontViewModel) {
 		this._currentSettings.settingFontViewModel.size =
 			fontViewModel?.size ?? this._currentSettings.settingFontViewModel.size;
+
+		this._currentSettings.settingFontViewModel.family =
+			fontViewModel.family ?? this._currentSettings.settingFontViewModel.family;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -68,6 +72,11 @@ export default class SettingsStore {
 					this._currentSettings.settingFontViewModel.size !== this._draftSettings.settingFontViewModel.size
 						? this._draftSettings.settingFontViewModel.size
 						: null,
+
+				family:
+					this._currentSettings.settingFontViewModel.family !== this._draftSettings.settingFontViewModel.family
+						? this._draftSettings.settingFontViewModel.family
+						: null,
 			},
 
 			settingThemeViewModel: {},
@@ -84,5 +93,9 @@ export default class SettingsStore {
 
 	onChangeFontSize(size: number) {
 		this._draftSettings.settingFontViewModel.size = size;
+	}
+
+	onChangeFontFamily(family: string) {
+		this._draftSettings.settingFontViewModel.family = family;
 	}
 }

@@ -11,7 +11,8 @@ $settings-button-margin: gv.$button-margin;
 
 $setting-node-margin: 5px;
 $setting-node-label-width: 100px;
-$setting-node-input-width: 50px;
+$setting-node-input-number-width: 50px;
+$setting-node-input-string-width: 120px;
 $setting-node-select-width: 120px;
 
 #settings-overlay {
@@ -140,18 +141,22 @@ $setting-node-select-width: 120px;
 }
 
 .setting-node > input {
-	width: $setting-node-input-width;
-
 	text-align: center;
 	vertical-align: middle;
 }
 
 .setting-node > input[type="number"] {
+	width: $setting-node-input-number-width;
+
 	&::-webkit-outer-spin-button,
 	&::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
 	}
+}
+
+.setting-node > input[type="string"] {
+	width: $setting-node-input-string-width;
 }
 
 .setting-node > select {

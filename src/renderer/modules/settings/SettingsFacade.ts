@@ -11,8 +11,7 @@ import SettingsViewModel, {
 injectable();
 export default class SettingsFacade {
 	constructor(
-		@inject(DI_KEYS.SettingsRenderer)
-		private readonly renderer: SettingsRenderer,
+		@inject(DI_KEYS.SettingsRenderer) private readonly renderer: SettingsRenderer,
 		@inject(DI_KEYS.SettingsStore) private readonly store: SettingsStore
 	) {
 		this._bindChangeEvents();
@@ -72,6 +71,10 @@ export default class SettingsFacade {
 				on: this.renderer.onChangeFontSize.bind(this.renderer),
 				update: this.store.onChangeFontSize.bind(this.store),
 			},
+			{
+				on: this.renderer.onChangeFontFamily.bind(this.renderer),
+				update: this.store.onChangeFontFamily.bind(this.store),
+			}
 			// {
 			//     on: this.renderer.onChangeTheme.bind(this.renderer),
 			//     update: this.store.setTheme.bind(this.store),

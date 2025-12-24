@@ -5,6 +5,7 @@ export default interface SettingsSessionModel {
 
 export interface SettingFontSessionModel {
 	size: number;
+	family: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

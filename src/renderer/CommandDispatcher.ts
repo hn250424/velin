@@ -731,11 +731,10 @@ export default class CommandDispatcher {
 	}
 
 	async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
-		const fontChangeSet = viewModel.settingFontViewModel;
+		const font = viewModel.settingFontViewModel;
 
-		if (fontChangeSet.size !== null) {
-			this.tabEditorFacade.changeFontSize(fontChangeSet.size);
-		}
+		font.size && this.tabEditorFacade.changeFontSize(font.size);
+		font.family && this.tabEditorFacade.changeFontFamily(font.family);
 
 		this.settingsFacade.applyChangeSet();
 

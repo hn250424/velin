@@ -225,4 +225,8 @@ export default class TabEditorRenderer {
 	changeFontSize(size: number) {
 		this._editorContainer.style.fontSize = `${size}px`;
 	}
+
+	changeFontFamily(family: string) {
+		this._editorContainer.style.fontFamily = family;
+	}
 }

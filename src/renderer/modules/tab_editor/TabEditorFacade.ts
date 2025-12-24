@@ -75,7 +75,7 @@ export default class TabEditorFacade {
 
 		this.store.setTabEditorViewModelById(id, vm);
 		await this.renderer.createTabAndEditor(vm);
-		
+
 		if (activate) {
 			this.renderer.tabEditorViews[this.store.activeTabIndex]?.setDeactive();
 			this.store.activeTabIndex = this.renderer.tabEditorViews.length - 1;
@@ -399,6 +399,10 @@ export default class TabEditorFacade {
 
 	changeFontSize(size: number) {
 		this.renderer.changeFontSize(size);
+	}
+
+	changeFontFamily(family: string) {
+		this.renderer.changeFontFamily(family);
 	}
 
 	isMouseDown(): boolean {

@@ -5,6 +5,7 @@ export default interface SettingsDto {
 
 export interface SettingFontDto {
 	size: number;
+	family: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
