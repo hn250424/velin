@@ -1,25 +1,20 @@
 import { defineConfig } from "vite";
-import { resolve } from "node:path";
+import path from "path";
 
 export default defineConfig({
+	base: "",
 	build: {
+		outDir: "dist/renderer",
 		rollupOptions: {
-			input: resolve(process.cwd(), "index.html"),
+			input: path.resolve(__dirname, "index.html")
 		},
 		emptyOutDir: true,
 	},
 	resolve: {
-		alias: [
-			{ find: "@shared", replacement: "/src/shared" },
-			{ find: "@services", replacement: "/src/main/services" },
-			{ find: "@contracts", replacement: "/src/main/contracts" },
-		],
+		alias: {
+			"@shared": path.resolve(__dirname, "src/shared"),
+			"@services": path.resolve(__dirname, "src/main/services"),
+			"@contracts": path.resolve(__dirname, "src/main/contracts"),
+		},
 	},
 });
-
-// build: {
-//     lib: {
-//         entry: 'src/renderer/renderer.ts',
-//         formats: ['es'],
-//     },
-// },

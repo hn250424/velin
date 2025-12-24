@@ -42,7 +42,7 @@ const createMainWindow = () => {
 		height: 600,
 		titleBarStyle: "hidden",
 		show: false,
-		icon: path.join(__dirname, "..", "shared", "logo", "logo"), // Icon for the app window.
+		icon: path.join(__dirname, "..", "shared", "logo", "logo_256"), // Icon for the app window.
 		webPreferences: {
 			preload: path.join(__dirname, "preload.js"),
 			sandbox: false,
@@ -58,16 +58,12 @@ const createMainWindow = () => {
 };
 
 const loadUrl = (mainWindow: BrowserWindow) => {
-	if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+	if (typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined') { // forge - dev
 		mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-	} else {
-		mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-		// const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-		// console.log('index.html path:', filePath)
-		// mainWindow.loadFile(filePath)
+		mainWindow.webContents.openDevTools({ mode: "detach" });
+	} else { // electron-builder - prod
+		mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
 	}
-
-	mainWindow.webContents.openDevTools({ mode: "detach" });
 };
 
 const createWindow = () => {

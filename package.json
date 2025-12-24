@@ -3,19 +3,59 @@
 	"productName": "velin",
 	"version": "1.0.0",
 	"description": "My Electron application description",
-	"main": ".vite/build/velin.mjs",
+	"main": "dist/main/main.js",
 	"scripts": {
 		"start": "electron-forge start",
-		"build": "vite build",
-		"package": "electron-forge package",
-		"make": "electron-forge make",
-		"publish": "electron-forge publish",
 		"lint": "eslint --ext .ts,.tsx .",
-		"test": "vitest"
+		"test": "vitest",
+		"build:renderer": "vite build --config vite.renderer.config.ts",
+		"build:main": "vite build --config vite.main.config.ts",
+		"build:preload": "vite build --config vite.preload.config.ts",
+		"build": "npm run build:renderer && npm run build:main && npm run build:preload",
+    "clean": "rimraf dist",
+    "prepackage": "node ./scripts/windows/prepackage.js",
+		"package": "npm run prepackage && npm run clean && npm run build && electron-builder"
 	},
 	"keywords": [],
 	"author": "hn250424",
 	"license": "MIT",
+	"build": {
+		"appId": "com.velin.app",
+		"productName": "Velin",
+		"directories": {
+			"output": "dist/installer"
+		},
+		"files": [
+			"dist/renderer/**/*",
+			"dist/main/**/*",
+			"src/shared/**/*",
+			"package.json"
+		],
+		"extraMetadata": {
+			"main": "dist/main/main.js"
+		},
+		"win": {
+			"icon": "src/shared/logo/logo_256.ico",
+			"target": [
+				"nsis"
+			]
+		},
+		"mac": {
+			"icon": "src/shared/logo/logo.png"
+		},
+		"linux": {
+			"icon": "src/shared/logo/logo.png"
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true,
+			"createDesktopShortcut": true,
+			"createStartMenuShortcut": true,
+			"installerIcon": "src/shared/logo/logo_256.ico",
+			"uninstallerIcon": "src/shared/logo/logo_256.ico",
+			"installerHeaderIcon": "src/shared/logo/logo_256.ico"
+		}
+	},
 	"devDependencies": {
 		"@electron-forge/cli": "^7.8.1",
 		"@electron-forge/maker-deb": "^7.8.1",
@@ -28,7 +68,9 @@
 		"@electron/fuses": "^1.8.0",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
+		"cross-env": "^10.1.0",
 		"electron": "36.4.0",
+		"electron-builder": "^26.0.12",
 		"eslint": "^8.57.1",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
