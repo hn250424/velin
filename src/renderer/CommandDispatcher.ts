@@ -1,6 +1,28 @@
 import { inject, injectable } from "inversify";
 import DI_KEYS from "./constants/di_keys";
+
 import Response from "@shared/types/Response";
+
+import TreeDto from "@shared/dto/TreeDto";
+import { TabEditorDto } from "@shared/dto/TabEditorDto";
+
+import FocusManager from "./modules/state/FocusManager";
+import FindReplaceState from "./modules/state/FindReplaceState";
+
+import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
+import TreeFacade from "./modules/tree/TreeFacade";
+import SettingsFacade from "./modules/settings/SettingsFacade";
+
+import TreeViewModel from "./viewmodels/TreeViewModel";
+import SettingsViewModel from "./viewmodels/SettingsViewModel";
+
+import ICommand from "./commands/ICommand";
+import RenameCommand from "./commands/RenameCommand";
+import DeleteCommand from "./commands/DeleteCommand";
+import PasteCommand from "./commands/PasteCommand";
+import CreateCommand from "./commands/CreateCommand";
+
+import { debounce } from "./utils/debounce";
 import { sleep } from "./utils/sleep";
 
 import {
@@ -24,25 +46,6 @@ import {
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
 } from "./constants/dom";
-
-import TreeDto from "@shared/dto/TreeDto";
-
-import FocusManager from "./modules/state/FocusManager";
-import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
-import TreeFacade from "./modules/tree/TreeFacade";
-
-import TreeViewModel from "./viewmodels/TreeViewModel";
-import { TabEditorDto } from "@shared/dto/TabEditorDto";
-import RenameCommand from "./commands/RenameCommand";
-import ICommand from "./commands/ICommand";
-import DeleteCommand from "./commands/DeleteCommand";
-import PasteCommand from "./commands/PasteCommand";
-import FindReplaceState from "./modules/state/FindReplaceState";
-import CreateCommand from "./commands/CreateCommand";
-
-import { debounce } from "./utils/debounce";
-import SettingsFacade from "./modules/settings/SettingsFacade";
-import SettingsViewModel from "./viewmodels/SettingsViewModel";
 
 type CommandSource = "shortcut" | "menu" | "element" | "context_menu" | "drag" | "programmatic" | "button";
 
@@ -88,7 +91,6 @@ export default class CommandDispatcher {
 		this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement;
 		this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement;
 		this.findInfo = document.getElementById(ID_FIND_INFO);
-
 		this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY);
 
 		this.findInput.addEventListener(
@@ -107,7 +109,6 @@ export default class CommandDispatcher {
 	async performOpenFile(source: CommandSource, filePath?: string) {
 		if (filePath) {
 			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(filePath);
-
 			if (tabEditorView) {
 				this.tabEditorFacade.activateTabEditorById(tabEditorView.getId());
 				return;
@@ -162,29 +163,9 @@ export default class CommandDispatcher {
 		const nodeType = treeDiv.querySelector(SELECTOR_TREE_NODE_TYPE) as HTMLImageElement;
 		const treeDivChildren = maybeChildren as HTMLElement;
 
-		function updateUI(viewModel: TreeViewModel, expanded: boolean) {
-			viewModel.expanded = expanded;
-
-			openStatus.src = expanded
-				? new URL("./assets/icons/expanded.png", import.meta.url).toString()
-				: new URL("./assets/icons/not_expanded.png", import.meta.url).toString();
-
-			nodeType.src = expanded
-				? new URL("./assets/icons/opened_folder.png", import.meta.url).toString()
-				: new URL("./assets/icons/folder.png", import.meta.url).toString();
-
-			if (expanded) treeDivChildren.classList.add(CLASS_EXPANDED);
-			else treeDivChildren.classList.remove(CLASS_EXPANDED);
-		}
-
-		const syncFlattenTreeArray = (viewModel: TreeViewModel, expanded: boolean) => {
-			if (expanded) this.treeFacade.expandNode(viewModel);
-			else this.treeFacade.collapseNode(viewModel);
-		};
-
 		if (viewModel.expanded) {
-			updateUI(viewModel, false);
-			syncFlattenTreeArray(viewModel, false);
+			this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, false);
+			this._syncFlattenTreeArray(viewModel, false);
 			return;
 		}
 
@@ -192,8 +173,8 @@ export default class CommandDispatcher {
 			if (treeDivChildren.children.length === 0) {
 				this.treeFacade.renderTreeData(viewModel, treeDivChildren);
 			}
-			updateUI(viewModel, true);
-			syncFlattenTreeArray(viewModel, true);
+			this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, true);
+			this._syncFlattenTreeArray(viewModel, true);
 			return;
 		}
 
@@ -204,8 +185,34 @@ export default class CommandDispatcher {
 
 		viewModel.children = responseTreeData.children;
 		this.treeFacade.renderTreeData(responseTreeData, treeDivChildren);
-		updateUI(viewModel, true);
-		syncFlattenTreeArray(viewModel, true);
+		this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, true);
+		this._syncFlattenTreeArray(viewModel, true);
+	}
+
+	private _updateUI(
+		openStatus: HTMLImageElement,
+		nodeType: HTMLImageElement,
+		children: HTMLElement,
+		viewModel: TreeViewModel,
+		expanded: boolean
+	) {
+		viewModel.expanded = expanded;
+
+		openStatus.src = expanded
+			? new URL("./assets/icons/expanded.png", import.meta.url).toString()
+			: new URL("./assets/icons/not_expanded.png", import.meta.url).toString();
+
+		nodeType.src = expanded
+			? new URL("./assets/icons/opened_folder.png", import.meta.url).toString()
+			: new URL("./assets/icons/folder.png", import.meta.url).toString();
+
+		if (expanded) children.classList.add(CLASS_EXPANDED);
+		else children.classList.remove(CLASS_EXPANDED);
+	}
+
+	private _syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
+		if (expanded) this.treeFacade.expandNode(viewModel);
+		else this.treeFacade.collapseNode(viewModel);
 	}
 
 	async performSave(source: CommandSource) {
@@ -220,7 +227,7 @@ export default class CommandDispatcher {
 		const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data);
 		if (response.result && response.data) {
 			const wasApplied = this.tabEditorFacade.applySaveResult(response.data);
-			if (!wasApplied)
+			if (!wasApplied) {
 				await this.tabEditorFacade.addTab(
 					response.data.id,
 					response.data.filePath,
@@ -229,6 +236,7 @@ export default class CommandDispatcher {
 					response.data.isBinary,
 					true
 				);
+			}
 		}
 	}
 
@@ -425,8 +433,8 @@ export default class CommandDispatcher {
 			else if (source === "drag") targetIndex = this.treeFacade.selectedDragIndex;
 
 			if (targetIndex === -1) return;
-			let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex);
 
+			let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex);
 			if (!targetViewModel.directory) {
 				targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex);
 				targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex);
@@ -497,6 +505,7 @@ export default class CommandDispatcher {
 			else if (e.key === "Escape") cancelRename();
 		};
 		const onBlur = () => finishRename();
+
 		treeInput.addEventListener("keydown", onKeyDown);
 		treeInput.addEventListener("blur", onBlur);
 
@@ -511,7 +520,6 @@ export default class CommandDispatcher {
 			const newName = treeInput.value.trim();
 			const dir = window.utils.getDirName(prePath);
 			const newPath = window.utils.getJoinedPath(dir, newName);
-
 			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]);
 
 			const cmd = new RenameCommand(
@@ -552,6 +560,7 @@ export default class CommandDispatcher {
 		if (focus !== "tree") return;
 
 		const selectedIndices = this.treeFacade.getSelectedIndices();
+
 		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices);
 
 		try {
@@ -620,29 +629,29 @@ export default class CommandDispatcher {
 					this.undoStack.push(cmd);
 					this.redoStack.length = 0;
 
-					// TODO
 					const filePath = window.utils.getJoinedPath(viewModel.path, name);
 					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath);
 					this.treeFacade.lastSelectedIndex = createdIdx;
 					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx);
 					createdNode.classList.add(CLASS_FOCUSED);
+
 					const selectedIndices = this.treeFacade.getSelectedIndices();
 					for (const i of selectedIndices) {
 						const div = this.treeFacade.getTreeNodeByIndex(i);
 						div.classList.remove(CLASS_SELECTED);
 					}
+
 					this.treeFacade.clearSelectedIndices();
 					createdNode.classList.add(CLASS_SELECTED);
 					this.treeFacade.addSelectedIndices(createdIdx);
 
 					if (!directory) {
 						await this.performOpenFile("programmatic", filePath);
-
 						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath);
 						cmd.setOpenedTabId(createdTabView.getId());
 					}
 				} catch (error) {
-					console.error("Create failed:", error);
+					// intentionally empty
 				} finally {
 					await sleep(300);
 					window.rendererToMain.setWatchSkipState(false);
@@ -711,7 +720,6 @@ export default class CommandDispatcher {
 
 	performCloseFindReplaceBox(source: CommandSource) {
 		this.focusManager.setFocus(null);
-
 		this.findAndReplaceContainer.style.display = "none";
 
 		const activeView = this.tabEditorFacade.getActiveTabEditorView();
@@ -765,11 +773,8 @@ export default class CommandDispatcher {
 			const activateElement = document.activeElement;
 
 			if (activateElement === this.findInput) {
-				if (this.findReplaceState.getDirectionUp()) {
-					this.performFind(source, "up");
-				} else {
-					this.performFind(source, "down");
-				}
+				if (this.findReplaceState.getDirectionUp()) this.performFind(source, "up");
+				else this.performFind(source, "down");
 			} else if (activateElement === this.replaceInput) {
 				this.performReplace(source);
 			}
