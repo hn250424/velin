@@ -237,23 +237,22 @@ export default class TabEditorRenderer {
 		};
 
 		// Font sizes
-		setVar('--text-sm', `${baseSize * scale.sm}px`);
-		setVar('--text-base', `${baseSize * scale.base}px`);
-		setVar('--text-xl', `${baseSize * scale.xl}px`);
-		setVar('--text-2xl', `${baseSize * scale.xl_2}px`);
-		setVar('--text-3xl', `${baseSize * scale.xl_3}px`);
+		setVar("--text-sm", `${baseSize * scale.sm}px`);
+		setVar("--text-base", `${baseSize * scale.base}px`);
+		setVar("--text-xl", `${baseSize * scale.xl}px`);
+		setVar("--text-2xl", `${baseSize * scale.xl_2}px`);
+		setVar("--text-3xl", `${baseSize * scale.xl_3}px`);
 
 		// Line heights
-		const lineHeight = '1.5';
-		setVar('--text-sm-line-height', lineHeight);
-		setVar('--text-base-line-height', lineHeight);
-		setVar('--text-xl-line-height', lineHeight);
-		setVar('--text-2xl-line-height', lineHeight);
-		setVar('--text-3xl-line-height', lineHeight);
+		setVar("--text-sm-line-height", (1.25 / 0.875).toString());
+		setVar("--text-base-line-height", "1.5");
+		setVar("--text-xl-line-height", (1.75 / 1.25).toString());
+		setVar("--text-2xl-line-height", (2 / 1.5).toString());
+		setVar("--text-3xl-line-height", (2.25 / 0.875).toString());
 
 		// Etc
-		setVar('--spacing', `${baseSize * scale.spacing}px`);
-		setVar('--radius-lg', `${baseSize * scale.radiusLg}px`);
+		setVar("--spacing", `${baseSize * scale.spacing}px`);
+		setVar("--radius-lg", `${baseSize * scale.radiusLg}px`);
 	}
 
 	changeFontFamily(family: string) {
