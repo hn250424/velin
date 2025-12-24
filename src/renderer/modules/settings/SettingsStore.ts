@@ -13,7 +13,7 @@ export default class SettingsStore {
 	constructor() {
 		this._currentSettings = {
 			settingFontViewModel: {
-				size: 16,
+				size: 12,
 				family: "sans-serif",
 			},
 

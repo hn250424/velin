@@ -222,8 +222,38 @@ export default class TabEditorRenderer {
 		}
 	}
 
-	changeFontSize(size: number) {
-		this._editorContainer.style.fontSize = `${size}px`;
+	changeFontSize(baseSize: number) {
+		const container = this._editorContainer;
+		const setVar = (name: string, value: string) => container.style.setProperty(name, value);
+
+		const scale = {
+			spacing: 0.25,
+			radiusLg: 0.5,
+			sm: 0.875,
+			base: 1.0,
+			xl: 1.25,
+			xl_2: 1.5,
+			xl_3: 1.875,
+		};
+
+		// Font sizes
+		setVar('--text-sm', `${baseSize * scale.sm}px`);
+		setVar('--text-base', `${baseSize * scale.base}px`);
+		setVar('--text-xl', `${baseSize * scale.xl}px`);
+		setVar('--text-2xl', `${baseSize * scale.xl_2}px`);
+		setVar('--text-3xl', `${baseSize * scale.xl_3}px`);
+
+		// Line heights
+		const lineHeight = '1.5';
+		setVar('--text-sm-line-height', lineHeight);
+		setVar('--text-base-line-height', lineHeight);
+		setVar('--text-xl-line-height', lineHeight);
+		setVar('--text-2xl-line-height', lineHeight);
+		setVar('--text-3xl-line-height', lineHeight);
+
+		// Etc
+		setVar('--spacing', `${baseSize * scale.spacing}px`);
+		setVar('--radius-lg', `${baseSize * scale.radiusLg}px`);
 	}
 
 	changeFontFamily(family: string) {
