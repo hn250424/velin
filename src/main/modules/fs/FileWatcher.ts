@@ -43,8 +43,11 @@ export default class FileWatcher {
 			},
 			ignored: (filePath: string) => {
 				const base = path.basename(filePath);
-				return base.startsWith(".");
-				// return base.startsWith('.') || base === 'node_modules'
+				return (
+					base.startsWith(".") ||
+					base === "desktop.ini" ||
+					base === "Thumbs.db"
+				);
 			},
 		});
 
