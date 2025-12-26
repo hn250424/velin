@@ -1,24 +1,30 @@
 {
-	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": {
-			"@main/*": ["src/main/*"],
-			"@shared/*": ["src/shared/*"],
-			"@services/*": ["src/main/services/*"],
-			"@modules_contracts/*": ["src/main/modules/contracts/*"]
-		},
-		"target": "ESNext",
-		"module": "es2020",
-		"allowJs": true,
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"noImplicitAny": true,
-		"sourceMap": true,
-		"outDir": "dist",
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-	},
-	"include": ["src", "src/preload.d.ts", "tests"]
+  "compilerOptions": {
+    /* Base Options */
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+
+    /* Decorators */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "files": [],
+  "include": [],
+  "references": [{ "path": "./packages/app" }, { "path": "./packages/site" }]
 }

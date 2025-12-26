@@ -1,91 +1,33 @@
 {
-	"name": "velin",
-	"productName": "velin",
-	"version": "1.0.0",
-	"description": "My Electron application description",
-	"main": "dist/main/main.js",
+	"name": "velin-monorepo",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
 	"scripts": {
-		"start": "electron-forge start",
-		"lint": "eslint --ext .ts,.tsx .",
-		"test": "vitest",
-		"build:renderer": "vite build --config vite.renderer.config.ts",
-		"build:main": "vite build --config vite.main.config.ts",
-		"build:preload": "vite build --config vite.preload.config.ts",
-		"build": "npm run build:renderer && npm run build:main && npm run build:preload",
-    "clean": "rimraf dist",
-    "prepackage": "node ./scripts/windows/prepackage.js",
-		"package": "npm run prepackage && npm run clean && npm run build && electron-builder"
-	},
-	"keywords": [],
-	"author": "hn250424",
-	"license": "MIT",
-	"build": {
-		"appId": "com.velin.app",
-		"productName": "Velin",
-		"directories": {
-			"output": "dist/installer"
-		},
-		"files": [
-			"dist/renderer/**/*",
-			"dist/main/**/*",
-			"src/shared/**/*",
-			"package.json"
-		],
-		"extraMetadata": {
-			"main": "dist/main/main.js"
-		},
-		"win": {
-			"icon": "src/shared/logo/logo_256.ico",
-			"target": [
-				"nsis"
-			]
-		},
-		"mac": {
-			"icon": "src/shared/logo/logo.png"
-		},
-		"linux": {
-			"icon": "src/shared/logo/logo.png"
-		},
-		"nsis": {
-			"oneClick": false,
-			"allowToChangeInstallationDirectory": true,
-			"createDesktopShortcut": true,
-			"createStartMenuShortcut": true,
-			"installerIcon": "src/shared/logo/logo_256.ico",
-			"uninstallerIcon": "src/shared/logo/logo_256.ico",
-			"installerHeaderIcon": "src/shared/logo/logo_256.ico"
-		}
+		"app:start": "npm run start --workspace=packages/app",
+		"app:test": "npm run test --workspace=packages/app",
+		"app:lint": "npm run lint --workspace=packages/app",
+		"app:build:renderer": "npm run build:renderer --workspace=packages/app",
+		"app:build:main": "npm run build:main --workspace=packages/app",
+		"app:build:preload": "npm run build:preload --workspace=packages/app",
+		"app:build": "npm run build --workspace=packages/app",
+		"app:kill": "npm run kill --workspace=packages/app",
+		"app:clean": "npm run clean --workspace=packages/app",
+		"app:package": "npm run package --workspace=packages/app",
+		"site:dev": "npm run dev --workspace=packages/site",
+		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"devDependencies": {
-		"@electron-forge/cli": "^7.8.1",
-		"@electron-forge/maker-deb": "^7.8.1",
-		"@electron-forge/maker-rpm": "^7.8.1",
-		"@electron-forge/maker-squirrel": "^7.8.1",
-		"@electron-forge/maker-zip": "^7.8.1",
-		"@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
-		"@electron-forge/plugin-fuses": "^7.8.1",
-		"@electron-forge/plugin-vite": "^7.8.1",
-		"@electron/fuses": "^1.8.0",
+		"@types/node": "^25.0.3",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
-		"cross-env": "^10.1.0",
-		"electron": "36.4.0",
-		"electron-builder": "^26.0.12",
 		"eslint": "^8.57.1",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
-		"sass-embedded": "^1.89.1",
 		"ts-node": "^10.9.2",
 		"typescript": "~4.5.4",
 		"vite": "^5.4.19",
 		"vitest": "^3.2.4"
-	},
-	"dependencies": {
-		"@milkdown/crepe": "^7.12.1",
-		"@milkdown/theme-nord": "^7.12.1",
-		"chokidar": "^4.0.3",
-		"electron-squirrel-startup": "^1.0.1",
-		"inversify": "^7.5.2",
-		"reflect-metadata": "^0.2.2"
 	}
 }
