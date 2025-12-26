@@ -17,6 +17,7 @@
 		"app:package": "npm run package --workspace=packages/app",
 		"site:dev": "npm run dev --workspace=packages/site",
 		"site:build": "npm run build --workspace=packages/site",
+		"site:deploy": "npm run deploy --workspace=packages/site",
 		"site:preview": "npm run preview --workspace=packages/site",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
