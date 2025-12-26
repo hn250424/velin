@@ -16,6 +16,8 @@
 		"app:clean": "npm run clean --workspace=packages/app",
 		"app:package": "npm run package --workspace=packages/app",
 		"site:dev": "npm run dev --workspace=packages/site",
+		"site:build": "npm run build --workspace=packages/site",
+		"site:preview": "npm run preview --workspace=packages/site",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"devDependencies": {
@@ -26,7 +28,7 @@
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
 		"ts-node": "^10.9.2",
-		"typescript": "~4.5.4",
+		"typescript": "^5.9.3",
 		"vite": "^5.4.19",
 		"vitest": "^3.2.4"
 	}

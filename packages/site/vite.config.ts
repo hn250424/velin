@@ -1,0 +1,10 @@
+import { defineConfig } from "vite";
+import path from "path";
+
+export default defineConfig({
+	base: "/velin-site/",
+	build: {
+		outDir: "docs",
+		emptyOutDir: true,
+	},
+});
