@@ -1,4 +1,4 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $window_width: 100px;
 $window_gap: 5px;
@@ -15,18 +15,18 @@ $menu_container_horizontal_margin: 10px;
 
 #title {
 	width: 100%;
-	height: gv.$title_height;
+	height: dimensions.$title_height;
 	flex-shrink: 0;
 
 	background-color: var(--title-bg);
 }
 
 #logo {
-	margin-left: gv.$icon_horizontal_margin;
-	margin-right: gv.$icon_horizontal_margin;
+	margin-left: dimensions.$icon_horizontal_margin;
+	margin-right: dimensions.$icon_horizontal_margin;
 
-	width: gv.$icon_size;
-	height: gv.$icon_size;
+	width: dimensions.$icon_size;
+	height: dimensions.$icon_size;
 }
 
 #logo > img {
@@ -38,10 +38,10 @@ $menu_container_horizontal_margin: 10px;
 
 #window {
 	width: $window_width;
-	border-radius: gv.$window_icon_border_radius;
+	border-radius: dimensions.$window_icon_border_radius;
 
 	margin-left: auto;
-	margin-right: gv.$icon_horizontal_margin;
+	margin-right: dimensions.$icon_horizontal_margin;
 
 	display: flex;
 	justify-content: space-between;
@@ -50,8 +50,8 @@ $menu_container_horizontal_margin: 10px;
 }
 
 #window button {
-	width: gv.$icon_size;
-	height: gv.$icon_size;
+	width: dimensions.$icon_size;
+	height: dimensions.$icon_size;
 
 	display: flex;
 	justify-content: center;
@@ -59,8 +59,8 @@ $menu_container_horizontal_margin: 10px;
 }
 
 #window img {
-	width: gv.$icon_size * 0.7;
-	height: gv.$icon_size * 0.7;
+	width: dimensions.$icon_size * 0.7;
+	height: dimensions.$icon_size * 0.7;
 }
 
 #window button:hover {

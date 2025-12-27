@@ -1,13 +1,13 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $settings-menu-width: 110px;
 $settings-menu-button-width: 100px;
 $settings-menu-button-height: 24px;
 $settings-menu-gap: 5px;
 
-$settings-button-width: gv.$button-width;
-$settings-button-height: gv.$button-height;
-$settings-button-margin: gv.$button-margin;
+$settings-button-width: dimensions.$button-width;
+$settings-button-height: dimensions.$button-height;
+$settings-button-margin: dimensions.$button-margin;
 
 $setting-node-margin: 5px;
 $setting-node-label-width: 100px;
@@ -30,7 +30,7 @@ $setting-node-select-width: 120px;
 }
 
 #settings-top {
-	height: gv.$title_height;
+	height: dimensions.$title_height;
 
 	display: flex;
 	justify-content: end;
@@ -40,14 +40,14 @@ $setting-node-select-width: 120px;
 }
 
 #settings-top img {
-	width: gv.$icon_size * 0.7;
-	height: gv.$icon_size * 0.7;
+	width: dimensions.$icon_size * 0.7;
+	height: dimensions.$icon_size * 0.7;
 }
 
 #settings-top button {
-	width: gv.$icon_size;
-	height: gv.$icon_size;
-	margin-right: gv.$icon_horizontal_margin;
+	width: dimensions.$icon_size;
+	height: dimensions.$icon_size;
+	margin-right: dimensions.$icon_horizontal_margin;
 }
 
 #settings-top button:hover {
@@ -120,7 +120,7 @@ $setting-node-select-width: 120px;
 
 .setting-node-disabled {
 	cursor: default;
-	background-color: gv.$disabled-bg-color;
+	background-color: var(--disabled-bg);
 }
 
 .setting-node {

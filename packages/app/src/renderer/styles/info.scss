@@ -1,4 +1,4 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $space: 4px;
 
@@ -15,7 +15,7 @@ $space: 4px;
 }
 
 #info-top {
-	height: gv.$title_height;
+	height: dimensions.$title_height;
 	background-color: var(--title-bg);
 }
 
@@ -41,9 +41,9 @@ $space: 4px;
 }
 
 #info-button {
-	width: gv.$button-width;
-	height: gv.$button-height;
-	margin: gv.$button-margin;
+	width: dimensions.$button-width;
+	height: dimensions.$button-height;
+	margin: dimensions.$button-margin;
 	background-color: var(--overlay-surface-button-bg);
 }
 

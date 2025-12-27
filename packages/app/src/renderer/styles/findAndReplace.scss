@@ -1,4 +1,4 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $row_height: 24px;
 
@@ -67,6 +67,10 @@ $info_horizontal_padding: 4px;
 	display: flex;
 }
 
+#find > span:hover {
+	cursor: default;
+}
+
 #replace {
 	display: none;
 }
@@ -78,8 +82,8 @@ $info_horizontal_padding: 4px;
 
 #find > button,
 #replace > button {
-	width: gv.$icon_size;
-	height: gv.$icon_size;
+	width: dimensions.$icon_size;
+	height: dimensions.$icon_size;
 }
 
 .search-highlight {

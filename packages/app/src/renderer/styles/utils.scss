@@ -1,4 +1,4 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $dropdown_min_width: 150px;
 $dropdown_padding: 5px;
@@ -65,7 +65,7 @@ $tooltip_border_radius: 4px;
 
 .deactive,
 .not_implemented {
-	color: var(--not-implemented) !important;
+	color: var(--deactive) !important;
 	cursor: default !important;
 }
 
@@ -138,7 +138,7 @@ $tooltip_border_radius: 4px;
 .overlay-surface {
 	min-width: 200px;
 	min-height: 100px;
-	border-radius: gv.$window_icon_border_radius;
+	border-radius: dimensions.$window_icon_border_radius;
 	box-shadow: 0 4px 16px rgb(0, 0, 0, 0.3);
 	background-color: var(--overlay-surface-bg);
 }

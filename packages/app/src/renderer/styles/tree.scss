@@ -1,4 +1,4 @@
-@use "./variables.scss" as gv;
+@use "./dimensions.scss" as dimensions;
 
 $scrollbar-size: 8px;
 $tree_horizontal_margin: 5px;
@@ -46,8 +46,8 @@ $tree_top_min_height: 25px;
 }
 
 #tree_top_icons img {
-	width: gv.$tree_icon_size;
-	height: gv.$tree_icon_size;
+	width: dimensions.$tree_icon_size;
+	height: dimensions.$tree_icon_size;
 	margin-right: $tree_horizontal_margin;
 }
 
@@ -58,7 +58,7 @@ $tree_top_min_height: 25px;
 
 #tree_node_container {
 	flex: 1;
-	overflow: scroll;
+	overflow: overlay;
 	border: 1px solid transparent;
 
 	&::-webkit-scrollbar {
@@ -127,8 +127,8 @@ $tree_top_min_height: 25px;
 
 .tree_node_open,
 .tree_node_type {
-	width: gv.$tree_icon_size;
-	height: gv.$tree_icon_size;
+	width: dimensions.$tree_icon_size;
+	height: dimensions.$tree_icon_size;
 
 	text-align: center;
 	flex-shrink: 0;

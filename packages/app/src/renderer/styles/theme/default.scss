@@ -1,70 +1,77 @@
-@use "../variables.scss" as gv;
+@use "../colors.scss" as colors;
+@use "../dimensions.scss" as dimensions;
 
-// $major: gv.$grey-4;
-// $secondary: gv.$grey-3;
-$accent: gv.$blue-3;
+$primary: colors.$grey-3;
+$primary-emphasis: colors.$grey-4;
+$primary-muted: colors.$grey-2;
 
-$active: gv.$grey-3;
-$deactive: gv.$grey-2;
+$sub: colors.$grey-1;
+
+$ref: colors.$grey-5;
+$deactive: colors.$grey-6;
+$accent: colors.$red-2;
 
 $theme-default: (
-	--app-bg: #{gv.$grey-1},
+	--app-bg: $sub,
 	--app-font: black,
 
 	--overlay-surface-bg: white,
 
-	--overlay-surface-button-bg: #{gv.$grey-1},
+	--overlay-surface-button-bg: $sub,
 	--overlay-surface-button-hover-bg: white,
 
-	--title-bg: #{gv.$blue-3},
-	--side-menu-bg: #{gv.$grey-2},
-	--side-resizer: #{$accent},
+	--title-bg: $primary,
+	--side-menu-bg: $primary,
+	--side-resizer: $accent,
 
-	--menu-item-hover: #{gv.$blue-2},
-	--window-icon-hover: #{gv.$blue-2},
+	--menu-item-hover: $primary-emphasis,
+	--window-icon-hover: $primary-emphasis,
 
-	--find-replace-container-bg: #{gv.$grey-2},
+	--find-replace-container-bg: $primary,
 	--find-replace-input: white,
-	--find-replace-button-hover: #{gv.$grey-3},
+	--find-replace-button-hover: $primary-emphasis,
 
-	--tooltip-bg: #{gv.$grey-6},
+	--tooltip-bg: colors.$grey-6,
 	--tooltip-font: white,
 
-	--shortcut-font: #{gv.$grey-3},
-	--not-implemented: #{gv.$grey-3},
+	--shortcut-font: $ref,
+	--deactive: $deactive,
+	--not-implemented: $deactive,
 
-	--dropdown-border: #{gv.$grey-1},
-	--dropdown-item-hover: #{gv.$grey-1},
-	--dropdown-divider: #{gv.$grey-2},
+	--dropdown-border: $sub,
+	--dropdown-item-hover: $sub,
+	--dropdown-divider: $primary-muted,
 
-	--search-highlight: #{gv.$yellow-1},
-	--search-highlight-current: #{gv.$yellow-3},
+	--search-highlight: colors.$yellow-1,
+	--search-highlight-current: colors.$yellow-3,
 
-	--scrollbar-thumb: #{gv.$grey-2},
-	--scrollbar-thumb-hover: #{gv.$grey-3},
+	--scrollbar-thumb: $primary-emphasis,
+	--scrollbar-thumb-hover: $accent,
 
-	--tab-bg: #{gv.$grey-2},
-	--tab-ghost-bg: #{gv.$grey-1},
+	--tab-bg: $primary-muted,
+	--tab-ghost-bg: $sub,
 	--tab-selected: white,
 	--tab-btn-bg: transparent,
-	--tab-btn-hover-bg: #{gv.$grey-3},
+	--tab-btn-hover-bg: $primary,
 	--tab-btn-hover-font: black,
-	--tab-indicator: #{$accent},
+	--tab-indicator: $accent,
 
-	--tree-node-cut: #{gv.$grey-4},
-	--tree-node-focused: #{$accent},
-	--tree-node-selected: #{gv.$grey-2},
-	--tree-node-hover: #{gv.$grey-2},
-	--tree-ghost-bg: #{gv.$grey-5},
-	--tree-top-icon-hover: #{gv.$grey-2},
-	--tree_wrapper-drag-overlay: #{gv.$grey-2},
+	--tree-node-cut: $ref,
+	--tree-node-focused: $accent,
+	--tree-node-selected: $primary-muted,
+	--tree-node-hover: $primary-muted,
+	--tree-ghost-bg: $primary-emphasis,
+	--tree-top-icon-hover: #{colors.$grey-2},
+	--tree_wrapper-drag-overlay: #{colors.$grey-2},
 
-	--settings-menu-container: #{gv.$grey-2},
-	--settings-menu-button-bg: #{gv.$grey-1},
+	--settings-menu-container: $sub,
+	--settings-menu-button-bg: $primary-muted,
 	--settings-menu-button-hover: white,
 	--settings-menu-button-selected: white,
 	--settings-contents: white,
-	--setting-node-border-color: #ccc,
+	--setting-node-border-color: $ref,
 
-	--warning-color: #{gv.$red-3},
+	--warning-color: $accent,
+
+	--disabled-bg: $ref,
 );
