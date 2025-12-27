@@ -55,8 +55,8 @@ export default class DeleteCommand implements ICommand {
 	}
 
 	private getIdsFromTreeViewModel(vm: TreeViewModel, arr: number[] = []) {
-		if (vm.directory) {
-			for (const child of vm.children!) {
+		if (vm.directory && vm.children) {
+			for (const child of vm.children) {
 				this.getIdsFromTreeViewModel(child, arr);
 			}
 		}
