@@ -24,6 +24,8 @@ export default class DeleteCommand implements ICommand {
 			idsToDelete.push(...this.getIdsFromTreeViewModel(viewModel));
 		}
 
+		pathsToDelete.sort((a, b) => b.localeCompare(a));
+
 		const response: Response<TrashMap[] | null> = await window.rendererToMain.delete(pathsToDelete);
 		if (!response.result) return;
 		this.trashMap = response.data;
