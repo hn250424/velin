@@ -45,8 +45,8 @@ function bindMouseDownEvents(treeFacade: TreeFacade, treeContainer: HTMLElement)
 			const node = target.closest(SELECTOR_TREE_NODE) as HTMLElement;
 			if (!node) return;
 
-			const path = node.dataset[DATASET_ATTR_TREE_PATH];
-			const idx = treeFacade.getFlattenArrayIndexByPath(path);
+			const path = node.dataset[DATASET_ATTR_TREE_PATH]!;
+			const idx = treeFacade.getFlattenArrayIndexByPath(path)!;
 			treeFacade.addSelectedIndices(idx);
 			count = 1;
 		}
@@ -242,8 +242,17 @@ function bindTreeContextmenuEvents(
 	treeContextPasteButton: HTMLElement
 ) {
 	treeNodeContainer!.addEventListener("contextmenu", (e) => {
+		const contextTreeIndex = treeFacade.contextTreeIndex;
+		if (contextTreeIndex !== -1) {
+			const _treeNode = treeFacade.getTreeNodeByIndex(contextTreeIndex);
+			_treeNode.classList.remove(CLASS_FOCUSED);
+		}
+
 		const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement;
-		if (!treeNode) return;
+		if (!treeNode) {
+			treeFacade.contextTreeIndex = -1;
+			return;
+		}
 
 		treeContextMenu.classList.add(CLASS_SELECTED);
 		treeContextMenu.style.left = `${e.clientX}px`;
