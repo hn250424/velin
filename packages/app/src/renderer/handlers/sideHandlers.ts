@@ -5,6 +5,8 @@ import { CLASS_SELECTED } from "../constants/dom";
 export default function registerSideHandlers(sideState: SideState) {
 	let isDragging = false;
 	let animationFrameId: number | null = null;
+	let dragStartX: number;
+	let initialTreeWidth: number;
 
 	const minWidth = 100;
 	const maxWidth = 500;
@@ -53,6 +55,8 @@ export default function registerSideHandlers(sideState: SideState) {
 		}
 
 		isDragging = true;
+		dragStartX = e.clientX;
+		initialTreeWidth = tree.offsetWidth;
 		document.body.style.cursor = "ew-resize";
 		document.body.style.userSelect = "none";
 	});
@@ -65,11 +69,11 @@ export default function registerSideHandlers(sideState: SideState) {
 		}
 
 		animationFrameId = requestAnimationFrame(() => {
-			const sideRect = side.getBoundingClientRect();
-			const offsetX = e.clientX - sideRect.left;
-			const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth);
+			const deltaX = e.clientX - dragStartX;
+			const newWidth = initialTreeWidth + deltaX;
+			const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
 
-			tree.style.width = `${newWidth}px`;
+			tree.style.width = `${clampedWidth}px`;
 		});
 	});
 
@@ -77,19 +81,19 @@ export default function registerSideHandlers(sideState: SideState) {
 		if (!isDragging) return;
 
 		isDragging = false;
-		document.body.style.cursor = "default";
-		document.body.style.userSelect = "auto";
+		document.body.style.cursor = "";
+		document.body.style.userSelect = "";
 
 		if (animationFrameId) {
 			cancelAnimationFrame(animationFrameId);
 			animationFrameId = null;
 		}
 
-		const sideRect = side.getBoundingClientRect();
-		const offsetX = e.clientX - sideRect.left;
-		const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth);
+		const deltaX = e.clientX - dragStartX;
+		const newWidth = initialTreeWidth + deltaX;
+		const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
 
-		sideState.setTreeSidth(newWidth);
+		sideState.setTreeWidth(clampedWidth);
 		syncSession();
 	});
 }
