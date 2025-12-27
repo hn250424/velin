@@ -41,7 +41,7 @@ export default function registerLoadHandlers(
 
 			if (sideDto) {
 				sideState.setTreeOpenState(sideDto.open);
-				sideState.setTreeSidth(sideDto.width);
+				sideState.setTreeWidth(sideDto.width);
 			}
 
 			if (tabs) {

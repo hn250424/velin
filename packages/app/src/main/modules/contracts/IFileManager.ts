@@ -1,4 +1,4 @@
-import TrashMap from "@shared/types/TrashMap";
+import type TrashMap from "@shared/types/TrashMap";
 
 export default interface IFileManager {
 	exists(path: string): Promise<boolean>;

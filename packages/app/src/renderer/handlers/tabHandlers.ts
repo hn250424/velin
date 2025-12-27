@@ -67,7 +67,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 		throttle((e: MouseEvent) => {
 			if (!tabEditorFacade.isDrag()) return;
 
-			const insertIndex = getInsertIndexFromMouseX(tabEditorFacade.getTabs(), e.clientX);
+			const insertIndex = getInsertIndexFromMouseX(tabEditorFacade.getTabs()!, e.clientX);
 			if (tabEditorFacade.getInsertIndex() === insertIndex) return;
 			tabEditorFacade.setInsertIndex(insertIndex);
 
@@ -75,7 +75,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 			const tab = tabEditorFacade.getTabEditorViewByIndex(insertIndex);
 
 			if (tab) {
-				const tabRect = tab.tabDiv.getBoundingClientRect();
+				const tabRect = tab.tabBox.getBoundingClientRect();
 				indicator.style.left = `${
 					tabRect.left - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft
 				}px`;
@@ -83,7 +83,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 				const lastTab = tabEditorFacade.getTabEditorViewByIndex(insertIndex - 1);
 
 				if (lastTab) {
-					const lastRect = lastTab.tabDiv.getBoundingClientRect();
+					const lastRect = lastTab.tabBox.getBoundingClientRect();
 					indicator.style.left = `${
 						lastRect.right - tabContainer.getBoundingClientRect().left + tabContainer.scrollLeft
 					}px`;
@@ -136,16 +136,16 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
 	tabContainer!.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
-		const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement;
+		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement;
 
-		if (tabDiv) {
+		if (tabBox) {
 			if (target.tagName === "BUTTON") {
-				const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID]!, 10);
+				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!, 10);
 				const data = tabEditorFacade.getTabEditorDataById(id);
 				const response: Response<void> = await window.rendererToMain.closeTab(data);
 				if (response.result) tabEditorFacade.removeTab(data.id);
 			} else if (target.tagName === "SPAN") {
-				const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]!;
+				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!;
 				tabEditorFacade.activateTabEditorById(parseInt(id, 10));
 			}
 		}

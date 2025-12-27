@@ -3,6 +3,19 @@ import started from "electron-squirrel-startup";
 import path from "node:path";
 import { fileURLToPath } from "url";
 
+import type IFileManager from "./modules/contracts/IFileManager";
+import type ITreeRepository from "./modules/contracts/ITreeRepository";
+import type ITabRepository from "./modules/contracts/ITabRepository";
+import type ITreeUtils from "./modules/contracts/ITreeUtils";
+import type IDialogManager from "./modules/contracts/IDialogManager";
+import type ITabUtils from "./modules/contracts/ITabUtils";
+import type IFileWatcher from "./modules/contracts/IFileWatcher";
+import type ISideRepository from "./modules/contracts/ISideRepository";
+import type IWindowRepository from "./modules/contracts/IWindowRepository";
+import type IWindowUtils from "./modules/contracts/IWindowUtils";
+import type ISettingsRepository from "./modules/contracts/ISettingsRepository";
+import type ISettingsUtils from "./modules/contracts/ISettingsUtils";
+
 import registerFileHandlers from "./handlers/fileHandlers";
 import registerLoadHandlers from "./handlers/loadHandlers";
 import registerWindowHandlers from "./handlers/windowHandlers";
@@ -10,28 +23,18 @@ import registerExitHandlers from "./handlers/exitHandlers";
 import registerEditHandlers from "./handlers/editHandlers";
 import registerTabHandlers from "./handlers/tabHandlers";
 import registerTreeHandlers from "./handlers/treeHandlers";
-import DI_KEYS from "./constants/di_keys";
-import IFileManager from "./modules/contracts/IFileManager";
-import ITreeRepository from "./modules/contracts/ITreeRepository";
-import ITabRepository from "./modules/contracts/ITabRepository";
-import ITreeUtils from "./modules/contracts/ITreeUtils";
-import IDialogManager from "./modules/contracts/IDialogManager";
-import ITabUtils from "./modules/contracts/ITabUtils";
-import DIContainer from "./DiContainer";
-import IFileWatcher from "./modules/contracts/IFileWatcher";
 import registerWatchHandlers from "./handlers/watchHandlers";
+import registerSideHandlers from "./handlers/sideHandlers";
+import registerSettingsHandlers from "./handlers/settingsHandlers";
+
 import FileService from "./services/FileService";
 import TabService from "./services/TabService";
 import TreeService from "./services/TreeService";
-import ISideRepository from "./modules/contracts/ISideRepository";
 import SideService from "./services/SideService";
-import registerSideHandlers from "./handlers/sideHandlers";
-import IWindowRepository from "./modules/contracts/IWindowRepository";
-import IWindowUtils from "./modules/contracts/IWindowUtils";
-import registerSettingsHandlers from "./handlers/settingsHandlers";
-import ISettingsRepository from "./modules/contracts/ISettingsRepository";
 import SettingsService from "./services/SettingsService";
-import ISettingsUtils from "./modules/contracts/ISettingsUtils";
+
+import DI_KEYS from "./constants/di_keys";
+import DIContainer from "./DiContainer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

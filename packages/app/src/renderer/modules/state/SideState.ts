@@ -14,7 +14,7 @@ export default class SideState {
 		return this._treeWidth;
 	}
 
-	setTreeSidth(width: number) {
+	setTreeWidth(width: number) {
 		this._treeWidth = width;
 	}
 }
