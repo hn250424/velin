@@ -1,12 +1,13 @@
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto} from "@shared/dto/TreeDto";
+import type { WindowDto } from "@shared/dto/WindowDto";
+import type { SettingsDto } from "@shared/dto/SettingsDto";
+import type { SideDto } from "@shared/dto/SideDto";
+
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
 import TreeFacade from "../modules/tree/TreeFacade";
-import SideDto from "@shared/dto/SideDto";
 import SideState from "../modules/state/SideState";
 import WindowState from "../modules/state/WindowState";
-import WindowDto from "@shared/dto/WindowDto";
-import SettingsDto from "@shared/dto/SettingsDto";
 import SettingsFacade from "../modules/settings/SettingsFacade";
 
 export default function registerLoadHandlers(
@@ -59,7 +60,7 @@ export default function registerLoadHandlers(
 	);
 
 	window.mainToRenderer.info((version: string) => {
-		document.querySelector("#info-version > span").textContent = version;
+		document.querySelector("#info-version > span")!.textContent = version;
 
 		infoDone = true;
 		finish();

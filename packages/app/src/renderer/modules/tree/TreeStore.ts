@@ -1,7 +1,8 @@
+import type ClipboardMode from "@shared/types/ClipboardMode";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
+
 import { injectable } from "inversify";
-import TreeDto from "@shared/dto/TreeDto";
-import TreeViewModel from "../../viewmodels/TreeViewModel";
-import ClipboardMode from "@shared/types/ClipboardMode";
 
 @injectable()
 export default class TreeStore {
@@ -33,7 +34,7 @@ export default class TreeStore {
 			indent: viewModel.indent,
 			directory: viewModel.directory,
 			expanded: viewModel.expanded,
-			children: viewModel.children ? viewModel.children.map((child) => this.toTreeDto(child)) : null,
+			children: viewModel.children ? viewModel.children.map((child: any) => this.toTreeDto(child)) : null,
 		};
 	}
 
@@ -78,13 +79,13 @@ export default class TreeStore {
 		}
 
 		for (let i = 1; i < this._flattenTreeArray.length; i++) {
-			const node = pathToNode.get(this._flattenTreeArray[i].path);
+			const node = pathToNode.get(this._flattenTreeArray[i].path)!;
 
 			for (let j = i - 1; j >= 0; j--) {
 				const possibleParent = this._flattenTreeArray[j];
 
 				if (possibleParent.indent === node.indent - 1) {
-					const parent = pathToNode.get(possibleParent.path);
+					const parent = pathToNode.get(possibleParent.path)!;
 					if (!parent.children) parent.children = [];
 					parent.children.push(node);
 					break;
@@ -148,7 +149,7 @@ export default class TreeStore {
 	}
 
 	getTreeViewModelByPath(path: string) {
-		const idx = this._pathToFlattenArrayIndexMap.get(path);
+		const idx = this._pathToFlattenArrayIndexMap.get(path)!;
 		return this._flattenTreeArray[idx];
 	}
 

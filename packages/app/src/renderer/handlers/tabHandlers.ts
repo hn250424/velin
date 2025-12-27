@@ -1,7 +1,8 @@
 import "@milkdown/theme-nord/style.css";
 
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import Response from "@shared/types/Response";
+import type Response from "@shared/types/Response";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom";
 import CommandDispatcher from "../CommandDispatcher";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
@@ -27,12 +28,12 @@ export default function registerTabHandlers(
 }
 
 function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
-	tabContainer.addEventListener("mousedown", (e) => {
+	tabContainer!.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement;
 		const tab = target.closest(SELECTOR_TAB) as HTMLElement;
 		if (!tab) return;
-		const id = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10);
-		const viewModel = tabEditorFacade.getTabEditorViewModelById(id);
+		const id = parseInt(tab.dataset[DATASET_ATTR_TAB_ID]!, 10);
+		const viewModel = tabEditorFacade.getTabEditorViewModelById(id)!;
 		tabEditorFacade.setDragTargetTabName(viewModel.fileName);
 		tabEditorFacade.setDragTargetTabId(id);
 		tabEditorFacade.setTargetElement(tab);
@@ -43,7 +44,7 @@ function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 }
 
 function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
-	document.addEventListener("mousemove", (e: MouseEvent) => {
+	document!.addEventListener("mousemove", (e: MouseEvent) => {
 		if (!tabEditorFacade.isMouseDown()) return;
 
 		if (!tabEditorFacade.isDrag()) {
@@ -61,7 +62,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 		div.style.top = `${e.clientY + 5}px`;
 	});
 
-	document.addEventListener(
+	document!.addEventListener(
 		"mousemove",
 		throttle((e: MouseEvent) => {
 			if (!tabEditorFacade.isDrag()) return;
@@ -97,7 +98,7 @@ function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 }
 
 function bindMouseUpEvents(tabEditorFacade: TabEditorFacade) {
-	document.addEventListener("mouseup", async (e: MouseEvent) => {
+	document!.addEventListener("mouseup", async (e: MouseEvent) => {
 		if (!tabEditorFacade.isDrag()) {
 			tabEditorFacade.setMouseDown(false);
 			return;
@@ -133,18 +134,18 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 }
 
 function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
-	tabContainer.addEventListener("click", async (e) => {
+	tabContainer!.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
 		const tabDiv = target.closest(SELECTOR_TAB) as HTMLElement;
-		
+
 		if (tabDiv) {
 			if (target.tagName === "BUTTON") {
-				const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID], 10);
+				const id = parseInt(tabDiv.dataset[DATASET_ATTR_TAB_ID]!, 10);
 				const data = tabEditorFacade.getTabEditorDataById(id);
 				const response: Response<void> = await window.rendererToMain.closeTab(data);
 				if (response.result) tabEditorFacade.removeTab(data.id);
 			} else if (target.tagName === "SPAN") {
-				const id = tabDiv.dataset[DATASET_ATTR_TAB_ID];
+				const id = tabDiv.dataset[DATASET_ATTR_TAB_ID]!;
 				tabEditorFacade.activateTabEditorById(parseInt(id, 10));
 			}
 		}
@@ -156,37 +157,37 @@ function bindTabContextmenuEvents(
 	tabEditorFacade: TabEditorFacade,
 	tabContextMenu: HTMLElement
 ) {
-	tabContainer.addEventListener("contextmenu", (e) => {
+	tabContainer!.addEventListener("contextmenu", (e) => {
 		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement;
 		if (!tab) return;
 
 		tabContextMenu.classList.add(CLASS_SELECTED);
 		tabContextMenu.style.left = `${e.clientX}px`;
 		tabContextMenu.style.top = `${e.clientY}px`;
-		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID], 10);
+		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID]!, 10);
 	});
 }
 
 function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorFacade: TabEditorFacade) {
-	document.getElementById("tab_context_close").addEventListener("click", async () => {
+	document.getElementById("tab_context_close")!.addEventListener("click", async () => {
 		await commandDispatcher.performCloseTab("context_menu", tabEditorFacade.contextTabId);
 	});
 
-	document.getElementById("tab_context_close_others").addEventListener("click", async () => {
+	document.getElementById("tab_context_close_others")!.addEventListener("click", async () => {
 		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId);
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData);
 		if (response.result) tabEditorFacade.removeTabsExcept(response.data);
 	});
 
-	document.getElementById("tab_context_close_right").addEventListener("click", async () => {
+	document.getElementById("tab_context_close_right")!.addEventListener("click", async () => {
 		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId);
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData);
 		if (response.result) tabEditorFacade.removeTabsToRight(response.data);
 	});
 
-	document.getElementById("tab_context_close_all").addEventListener("click", async () => {
+	document.getElementById("tab_context_close_all")!.addEventListener("click", async () => {
 		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData();
 		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data);
 		if (response.result) tabEditorFacade.removeAllTabs(response.data);

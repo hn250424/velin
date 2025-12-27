@@ -1,4 +1,4 @@
-export default interface TabEditorViewModel {
+export interface TabEditorViewModel {
 	id: number;
 	isModified: boolean;
 	isBinary: boolean;

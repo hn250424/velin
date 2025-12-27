@@ -1,6 +1,9 @@
 import "./index.scss";
 import "@milkdown/theme-nord/style.css";
 
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
+
 import registerEditHandlers from "./handlers/editHandlers";
 import registerExitHandlers from "./handlers/exitHandlers";
 import registerFileHandlers from "./handlers/fileHandlers";
@@ -16,28 +19,30 @@ import registerHelpHandlers from "./handlers/helpHandlers";
 
 import FocusManager from "./modules/state/FocusManager";
 import ShortcutRegistry from "./modules/input/ShortcutRegistry";
-import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
-import TreeFacade from "./modules/tree/TreeFacade";
-import diContainer from "./diContainer";
-import DI_KEYS from "./constants/di_keys";
-import CommandDispatcher from "./CommandDispatcher";
-import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constants/dom";
 import WindowState from "./modules/state/WindowState";
 import ZoomManager from "./modules/layout/ZoomManager";
 import FindReplaceState from "./modules/state/FindReplaceState";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
 import SideState from "./modules/state/SideState";
+
+import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
+import TreeFacade from "./modules/tree/TreeFacade";
 import SettingsFacade from "./modules/settings/SettingsFacade";
 
+import DI_KEYS from "./constants/di_keys";
+import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constants/dom";
+
+import diContainer from "./diContainer";
+
+import CommandDispatcher from "./CommandDispatcher";
+
 window.addEventListener("DOMContentLoaded", () => {
-	const title = document.getElementById("title");
-	const tabContainer = document.getElementById("tab_container");
-	const tabContextMenu = document.getElementById("tab_context_menu");
-	const treeContextMenu = document.getElementById("tree_context_menu");
-	const menuContainer = document.getElementById("menu_container");
+	const title = document.getElementById("title") as HTMLElement;
+	const tabContainer = document.getElementById("tab_container") as HTMLElement;
+	const tabContextMenu = document.getElementById("tab_context_menu") as HTMLElement;
+	const treeContextMenu = document.getElementById("tree_context_menu") as HTMLElement;
+	const menuContainer = document.getElementById("menu_container") as HTMLElement;
 	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu_container .menu_item");
-	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER);
+	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER) as HTMLElement;
 
 	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager);
 	const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState);

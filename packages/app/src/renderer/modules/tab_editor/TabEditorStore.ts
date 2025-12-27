@@ -1,6 +1,6 @@
+import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel";
+import type { TabEditorDto } from "@shared/dto/TabEditorDto";
 import { injectable } from "inversify";
-import TabEditorViewModel from "../../viewmodels/TabEditorViewModel";
-import { TabEditorDto } from "@shared/dto/TabEditorDto";
 
 @injectable()
 export default class TabEditorStore {
@@ -17,7 +17,7 @@ export default class TabEditorStore {
 			filePath: dto.filePath,
 			fileName: dto.fileName,
 			isBinary: dto.isBinary,
-			initialContent: this._idToTabEditorViewModelMap.get(dto.id).initialContent,
+			initialContent: this._idToTabEditorViewModelMap.get(dto.id)!.initialContent,
 		};
 	}
 

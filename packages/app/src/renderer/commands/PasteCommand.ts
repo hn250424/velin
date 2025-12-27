@@ -1,9 +1,10 @@
-import ICommand from "./ICommand";
-import TreeFacade from "../modules/tree/TreeFacade";
+import type ICommand from "./ICommand";
+import type { TreeViewModel } from "../viewmodels/TreeViewModel";
+import type ClipboardMode from "@shared/types/ClipboardMode";
+import type Response from "@shared/types/Response";
+
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
-import TreeViewModel from "../viewmodels/TreeViewModel";
-import ClipboardMode from "@shared/types/ClipboardMode";
-import Response from "@shared/types/Response";
+import TreeFacade from "../modules/tree/TreeFacade";
 
 type UndoInfo = {
 	src: string;
@@ -65,7 +66,7 @@ export default class PasteCommand implements ICommand {
 					}
 
 					this.tabEditorFacade.deleteTabEditorViewByPath(oldPath);
-					this.tabEditorFacade.setTabEditorViewByPath(newPath, view);
+					if (view) this.tabEditorFacade.setTabEditorViewByPath(newPath, view);
 				}
 			}
 

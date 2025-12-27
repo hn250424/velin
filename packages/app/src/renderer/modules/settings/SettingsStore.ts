@@ -1,8 +1,6 @@
-import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
-import SettingsViewModel, {
-	SettingFontViewModel,
-	SettingThemeViewModel,
-} from "@renderer/viewmodels/SettingsViewModel";
+import type { SettingsDto, SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
+import type { SettingsViewModel, SettingFontViewModel, SettingThemeViewModel } from "@renderer/viewmodels/SettingsViewModel";
+
 import { injectable } from "inversify";
 
 @injectable()
@@ -20,7 +18,7 @@ export default class SettingsStore {
 			settingThemeViewModel: {},
 		};
 
-		this.resetChangeSet();
+		this._draftSettings = JSON.parse(JSON.stringify(this._currentSettings));
 	}
 
 	toSettingsViewModel(dto: SettingsDto): SettingsViewModel {
@@ -71,12 +69,12 @@ export default class SettingsStore {
 				size:
 					this._currentSettings.settingFontViewModel.size !== this._draftSettings.settingFontViewModel.size
 						? this._draftSettings.settingFontViewModel.size
-						: null,
+						: 12,
 
 				family:
 					this._currentSettings.settingFontViewModel.family !== this._draftSettings.settingFontViewModel.family
 						? this._draftSettings.settingFontViewModel.family
-						: null,
+						: "sans-serif",
 			},
 
 			settingThemeViewModel: {},

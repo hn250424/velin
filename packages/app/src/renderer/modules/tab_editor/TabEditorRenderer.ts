@@ -1,3 +1,5 @@
+import type { TabEditorViewModel } from "@renderer/viewmodels/TabEditorViewModel";
+
 import { Editor, editorViewCtx, parserCtx, rootCtx } from "@milkdown/kit/core";
 import { history } from "@milkdown/kit/plugin/history";
 import { commonmark } from "@milkdown/kit/preset/commonmark";
@@ -15,7 +17,6 @@ import {
 	CLASS_BINARY,
 } from "../../constants/dom";
 import TabEditorView from "./TabEditorView";
-import TabEditorViewModel from "@renderer/viewmodels/TabEditorViewModel";
 import { BINARY_FILE_WARNING } from "./TabEditorFacade";
 
 @injectable()
@@ -23,15 +24,15 @@ export default class TabEditorRenderer {
 	private _tabEditorViews: TabEditorView[] = [];
 	private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map();
 
-	private _ghostTab: HTMLElement | null;
-	private _indicator: HTMLElement | null;
+	private _ghostTab: HTMLElement | null = null;
+	private _indicator: HTMLElement | null = null;
 
 	private _tabContainer: HTMLElement;
 	private _editorContainer: HTMLElement;
 
 	constructor() {
-		this._tabContainer = document.getElementById("tab_container");
-		this._editorContainer = document.getElementById("editor_container");
+		this._tabContainer = document.getElementById("tab_container") as HTMLElement;
+		this._editorContainer = document.getElementById("editor_container") as HTMLElement;
 	}
 
 	private createTabBox(fileName: string) {
@@ -154,7 +155,7 @@ export default class TabEditorRenderer {
 	}
 
 	undo(index: number) {
-		this._tabEditorViews[index].editor.action((ctx) => {
+		this._tabEditorViews[index].editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const { state, dispatch } = view;
 			undo(state, dispatch);
@@ -162,7 +163,7 @@ export default class TabEditorRenderer {
 	}
 
 	redo(index: number) {
-		this._tabEditorViews[index].editor.action((ctx) => {
+		this._tabEditorViews[index].editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const { state, dispatch } = view;
 			redo(state, dispatch);
@@ -170,7 +171,7 @@ export default class TabEditorRenderer {
 	}
 
 	paste(index: number, text: string) {
-		this._tabEditorViews[index].editor.action((ctx) => {
+		this._tabEditorViews[index].editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const { state, dispatch } = view;
 			view.focus();

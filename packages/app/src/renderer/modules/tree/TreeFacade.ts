@@ -1,10 +1,11 @@
-import TreeDto from "@shared/dto/TreeDto";
-import ClipboardMode from "@shared/types/ClipboardMode";
-import Response from "@shared/types/Response";
+import type ClipboardMode from "@shared/types/ClipboardMode";
+import type Response from "@shared/types/Response";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
+
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE } from "../../constants/dom";
-import TreeViewModel from "../../viewmodels/TreeViewModel";
 import TreeRenderer from "./TreeRenderer";
 import TreeStore from "./TreeStore";
 import TreeDragManager from "./TreeDragManager";
@@ -70,7 +71,7 @@ export default class TreeFacade {
 	}
 
 	setLastSelectedIndexByPath(path: string) {
-		this.store.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path);
+		this.store.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path)!;
 	}
 
 	removeLastSelectedIndex() {
@@ -86,7 +87,7 @@ export default class TreeFacade {
 	}
 
 	setContextTreeIndexByPath(path: string) {
-		this.store.contextTreeIndex = this.store.getFlattenArrayIndexByPath(path);
+		this.store.contextTreeIndex = this.store.getFlattenArrayIndexByPath(path)!;
 	}
 
 	removeContextTreeIndex() {
@@ -98,7 +99,7 @@ export default class TreeFacade {
 	}
 
 	setSelectedDragIndexByPath(path: string) {
-		this.store.selectedDragIndex = this.store.getFlattenArrayIndexByPath(path);
+		this.store.selectedDragIndex = this.store.getFlattenArrayIndexByPath(path)!;
 	}
 
 	addSelectedIndices(index: number) {
@@ -175,7 +176,7 @@ export default class TreeFacade {
 	}
 
 	getTreeNodeByIndex(index: number) {
-		const wrapper = this.getTreeWrapperByIndex(index);
+		const wrapper = this.getTreeWrapperByIndex(index)!;
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
 	}
 
@@ -250,13 +251,13 @@ export default class TreeFacade {
 		if (!response.result) return response;
 		newBase = response.data;
 
-		const start = this.store.getFlattenArrayIndexByPath(preBase);
+		const start = this.store.getFlattenArrayIndexByPath(preBase)!;
 
 		for (let i = start; i < this.store.flattenTreeArray.length; i++) {
 			const node = this.getTreeViewModelByIndex(i);
 			if (node.path.startsWith(preBase)) {
-				const treeWrapper = this.renderer.getTreeWrapperByPath(node.path);
-				const idx = this.store.getFlattenArrayIndexByPath(node.path);
+				const treeWrapper = this.renderer.getTreeWrapperByPath(node.path)!;
+				const idx = this.store.getFlattenArrayIndexByPath(node.path)!;
 				const treeNode = this.renderer.getTreeNodeByPath(node.path);
 				this.store.deleteFlattenArrayIndexByPath(node.path);
 				this.renderer.deleteTreeWrapperByPath(node.path);
@@ -303,7 +304,7 @@ export default class TreeFacade {
 			if (parentIndex >= 0) {
 				const parent = this.store.flattenTreeArray[parentIndex];
 				if (parent.children) {
-					parent.children = parent.children.filter((child) => !toDelete.some((deleted) => deleted.path === child.path));
+					parent.children = parent.children.filter((child: any) => !toDelete.some((deleted) => deleted.path === child.path));
 				}
 			}
 

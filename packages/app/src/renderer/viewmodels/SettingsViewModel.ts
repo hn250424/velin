@@ -1,4 +1,4 @@
-export default interface SettingsViewModel {
+export interface SettingsViewModel {
 	settingFontViewModel: SettingFontViewModel;
 	settingThemeViewModel: SettingThemeViewModel;
 }

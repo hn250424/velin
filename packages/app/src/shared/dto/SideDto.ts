@@ -1,4 +1,4 @@
-export default interface SideDto {
+export interface SideDto {
 	open: boolean;
 	width: number;
 }

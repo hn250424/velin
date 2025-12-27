@@ -7,51 +7,51 @@ export default function registerEditHandlers(commandDispatcher: CommandDispatche
 }
 
 function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
-	document.getElementById("edit_menu_undo").addEventListener("click", async () => {
+	document.getElementById("edit_menu_undo")!.addEventListener("click", async () => {
 		await commandDispatcher.performUndo("menu");
 	});
 
-	document.getElementById("edit_menu_redo").addEventListener("click", async () => {
+	document.getElementById("edit_menu_redo")!.addEventListener("click", async () => {
 		await commandDispatcher.performRedo("menu");
 	});
 
-	document.getElementById("edit_menu_cut").addEventListener("click", async () => {
+	document.getElementById("edit_menu_cut")!.addEventListener("click", async () => {
 		await commandDispatcher.performCut("menu");
 	});
 
-	document.getElementById("edit_menu_copy").addEventListener("click", async () => {
+	document.getElementById("edit_menu_copy")!.addEventListener("click", async () => {
 		await commandDispatcher.performCopy("menu");
 	});
 
-	document.getElementById("edit_menu_paste").addEventListener("click", async () => {
+	document.getElementById("edit_menu_paste")!.addEventListener("click", async () => {
 		await commandDispatcher.performPaste("menu");
 	});
 
-	document.getElementById("edit_menu_find").addEventListener("click", async () => {
+	document.getElementById("edit_menu_find")!.addEventListener("click", async () => {
 		commandDispatcher.toggleFindReplaceBox("menu", false);
 	});
 
-	document.getElementById("edit_menu_replace").addEventListener("click", async () => {
+	document.getElementById("edit_menu_replace")!.addEventListener("click", async () => {
 		commandDispatcher.toggleFindReplaceBox("menu", true);
 	});
 
-	document.getElementById("find_up").addEventListener("click", async () => {
+	document.getElementById("find_up")!.addEventListener("click", async () => {
 		commandDispatcher.performFind("menu", "up");
 	});
 
-	document.getElementById("find_down").addEventListener("click", async () => {
+	document.getElementById("find_down")!.addEventListener("click", async () => {
 		commandDispatcher.performFind("menu", "down");
 	});
 
-	document.getElementById("find_close").addEventListener("click", async () => {
+	document.getElementById("find_close")!.addEventListener("click", async () => {
 		commandDispatcher.performCloseFindReplaceBox("menu");
 	});
 
-	document.getElementById("replace_current").addEventListener("click", async () => {
+	document.getElementById("replace_current")!.addEventListener("click", async () => {
 		commandDispatcher.performReplace("menu");
 	});
 
-	document.getElementById("replace_all").addEventListener("click", async () => {
+	document.getElementById("replace_all")!.addEventListener("click", async () => {
 		commandDispatcher.performReplaceAll("menu");
 	});
 }

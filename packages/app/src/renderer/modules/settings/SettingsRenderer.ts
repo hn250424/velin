@@ -1,8 +1,5 @@
+import type { SettingsViewModel, SettingFontViewModel, SettingThemeViewModel } from "@renderer/viewmodels/SettingsViewModel";
 import { injectable } from "inversify";
-import SettingsViewModel, {
-	SettingFontViewModel,
-	SettingThemeViewModel,
-} from "@renderer/viewmodels/SettingsViewModel";
 
 @injectable()
 export default class SettingsRenderer {
@@ -15,13 +12,13 @@ export default class SettingsRenderer {
 	private _fontFamilyInput: HTMLInputElement;
 
 	constructor() {
-		this._settingsOverlay = document.getElementById("settings-overlay");
+		this._settingsOverlay = document.getElementById("settings-overlay") as HTMLElement;
 
-		this._fontSizeDiv = document.getElementById("setting-node-font-size");
-		this._fontSizeInput = this._fontSizeDiv.querySelector("input");
+		this._fontSizeDiv = document.getElementById("setting-node-font-size") as HTMLElement;
+		this._fontSizeInput = this._fontSizeDiv.querySelector("input") as HTMLInputElement;
 
-		this._fontFamilyDiv = document.getElementById("setting-node-font-family");
-		this._fontFamilyInput = this._fontFamilyDiv.querySelector("input");
+		this._fontFamilyDiv = document.getElementById("setting-node-font-family") as HTMLElement;
+		this._fontFamilyInput = this._fontFamilyDiv.querySelector("input") as HTMLInputElement;
 	}
 
 	openSettings() {

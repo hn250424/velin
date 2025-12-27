@@ -1,4 +1,4 @@
-export default interface TreeViewModel {
+export interface TreeViewModel {
 	path: string;
 	name: string;
 	indent: number;

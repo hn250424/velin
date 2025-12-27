@@ -1,6 +1,6 @@
+import type { SideDto } from "@shared/dto/SideDto";
 import SideState from "../modules/state/SideState";
 import { CLASS_SELECTED } from "../constants/dom";
-import SideDto from "@shared/dto/SideDto";
 
 export default function registerSideHandlers(sideState: SideState) {
 	let isDragging = false;
@@ -9,13 +9,13 @@ export default function registerSideHandlers(sideState: SideState) {
 	const minWidth = 100;
 	const maxWidth = 500;
 
-	const side = document.getElementById("side");
+	const side = document.getElementById("side") as HTMLElement;
 
-	const treeToggle = document.getElementById("treeToggle");
-	const tree = document.getElementById("tree");
-	const resizer = document.getElementById("side_resizer");
+	const treeToggle = document.getElementById("treeToggle") as HTMLElement;
+	const tree = document.getElementById("tree") as HTMLElement;
+	const resizer = document.getElementById("side_resizer") as HTMLElement;
 
-	const settingsBtn = document.getElementById("settingsBtn");
+	const settingsBtn = document.getElementById("settingsBtn") as HTMLElement;
 
 	processTreeOpenState();
 

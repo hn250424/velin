@@ -1,3 +1,5 @@
+import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
+
 import { injectable } from "inversify";
 import {
 	CLASS_EXPANDED,
@@ -12,7 +14,6 @@ import {
 	DATASET_ATTR_TREE_PATH,
 	SELECTOR_TREE_NODE,
 } from "../../constants/dom";
-import TreeViewModel from "../../viewmodels/TreeViewModel";
 
 @injectable()
 export default class TreeRenderer {
@@ -24,8 +25,8 @@ export default class TreeRenderer {
 	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map();
 
 	constructor() {
-		this._tree_node_container = document.getElementById("tree_node_container");
-		this._tree_top_name = document.getElementById("tree_top_name");
+		this._tree_node_container = document.getElementById("tree_node_container") as HTMLElement;
+		this._tree_top_name = document.getElementById("tree_top_name") as HTMLElement;
 	}
 
 	clean(container: HTMLElement) {
@@ -167,7 +168,7 @@ export default class TreeRenderer {
 	}
 
 	getTreeNodeByPath(path: string) {
-		const wrapper = this._pathToTreeWrapperMap.get(path);
+		const wrapper = this._pathToTreeWrapperMap.get(path)!;
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
 	}
 

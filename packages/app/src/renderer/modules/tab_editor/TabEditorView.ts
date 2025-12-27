@@ -7,7 +7,7 @@ import { Decoration, DecorationSet } from "prosemirror-view";
 import { Plugin, PluginKey } from "prosemirror-state";
 
 export default class TabEditorView {
-	private _editor: Editor;
+	private _editor: Editor | null;
 	private _tabBox: HTMLElement;
 	private _tabSpan: HTMLElement;
 	private _tabButton: HTMLElement;
@@ -26,7 +26,7 @@ export default class TabEditorView {
 		tabSpan: HTMLElement,
 		tabButton: HTMLElement,
 		editorBox: HTMLElement,
-		editor: Editor
+		editor: Editor | null,
 	) {
 		this._tabBox = tabBox;
 		this._tabSpan = tabSpan;
@@ -36,13 +36,13 @@ export default class TabEditorView {
 	}
 
 	getId(): number {
-		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID], 10);
+		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID]!, 10);
 	}
 
 	observeEditor(onInput: () => void, onBlur: () => void) {
 		this.onEditorInputCallback = onInput;
 
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 
 			view.setProps({
@@ -66,7 +66,7 @@ export default class TabEditorView {
 	}
 
 	getEditorFirstLine() {
-		const editorView = this._editor.ctx.get(editorViewCtx);
+		const editorView = this._editor!.ctx.get(editorViewCtx);
 		const firstLine = editorView.state.doc.textBetween(0, editorView.state.doc.content.size).split("\n")[0].trim();
 
 		return firstLine || "Untitled";
@@ -74,7 +74,7 @@ export default class TabEditorView {
 
 	getContent(): string {
 		let content = "";
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const serializer = ctx.get(serializerCtx);
 			content = serializer(view.state.doc);
@@ -83,7 +83,7 @@ export default class TabEditorView {
 	}
 
 	setContent(content: string): void {
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const parser = ctx.get(parserCtx);
 			const doc = parser(content);
@@ -96,7 +96,7 @@ export default class TabEditorView {
 	}
 
 	getSelection() {
-		return this._editor.action((ctx) => {
+		return this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const sel = view.state.selection;
 
@@ -108,7 +108,7 @@ export default class TabEditorView {
 	}
 
 	setSelection(sel: { anchor: number; head: number }) {
-		return this._editor.action((ctx) => {
+		return this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
 			const newSel = TextSelection.create(state.doc, sel.anchor, sel.head);
@@ -118,7 +118,7 @@ export default class TabEditorView {
 	}
 
 	focus() {
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			view.focus();
 		});
@@ -150,7 +150,7 @@ export default class TabEditorView {
 	}
 
 	findMatches(searchText: string): { from: number; to: number }[] {
-		const view = this._editor.ctx.get(editorViewCtx);
+		const view = this._editor!.ctx.get(editorViewCtx);
 		const { doc } = view.state;
 
 		const matches: { from: number; to: number }[] = [];
@@ -178,7 +178,7 @@ export default class TabEditorView {
 	}
 
 	findAndSelect(searchText: string, direction: "up" | "down"): { total: number; current: number } | null {
-		const view = this._editor.ctx.get(editorViewCtx);
+		const view = this._editor!.ctx.get(editorViewCtx);
 		const state = view.state;
 		const currentPos = state.selection.from;
 
@@ -246,7 +246,7 @@ export default class TabEditorView {
 	}
 
 	clearSearch() {
-		const view = this._editor.ctx.get(editorViewCtx);
+		const view = this._editor!.ctx.get(editorViewCtx);
 		const plugins = view.state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
 		const newState = view.state.reconfigure({ plugins });
 		view.updateState(newState);
@@ -261,7 +261,7 @@ export default class TabEditorView {
 
 		let replaced = false;
 
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
 			const match = this.searchResults[this.currentSearchIndex];
@@ -283,7 +283,7 @@ export default class TabEditorView {
 
 		let replacedCount = 0;
 
-		this._editor.action((ctx) => {
+		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
 			const parser = ctx.get(parserCtx);
@@ -323,7 +323,7 @@ export default class TabEditorView {
 		return this.suppressInputEvent;
 	}
 
-	get editor(): Editor {
+	get editor(): Editor | null {
 		return this._editor;
 	}
 

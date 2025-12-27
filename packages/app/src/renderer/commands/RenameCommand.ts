@@ -1,8 +1,9 @@
+import type Response from "@shared/types/Response";
+import type ICommand from "./ICommand";
+
 import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom";
 import TreeFacade from "../modules/tree/TreeFacade";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
-import ICommand from "./ICommand";
-import Response from "@shared/types/Response";
 
 export default class RenameCommand implements ICommand {
 	constructor(
@@ -25,7 +26,7 @@ export default class RenameCommand implements ICommand {
 		newSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis");
 		newSpan.textContent = newBaseName;
 
-		this.treeNode.replaceChild(newSpan, this.treeNode.querySelector("input"));
+		this.treeNode.replaceChild(newSpan, this.treeNode.querySelector("input") as HTMLInputElement);
 
 		await this.tabEditorFacade.rename(this.prePath, this.newPath, this.isDir);
 	}

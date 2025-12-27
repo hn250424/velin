@@ -89,7 +89,7 @@ export default class TabDragManager {
 		this._targetTabName = name;
 	}
 
-	getInsertIndex(): number | null {
+	getInsertIndex(): number {
 		return this._insertIndex;
 	}
 

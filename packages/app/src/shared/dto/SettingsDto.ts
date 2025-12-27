@@ -1,4 +1,4 @@
-export default interface SettingsDto {
+export interface SettingsDto {
 	settingFontDto: SettingFontDto;
 	settingThemeDto: SettingThemeDto;
 }

@@ -1,4 +1,4 @@
-export default interface TreeDto {
+export interface TreeDto {
 	path: string;
 	name: string;
 	indent: number;

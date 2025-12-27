@@ -1,12 +1,13 @@
-import ICommand from "./ICommand";
+import type ICommand from "./ICommand";
+import type TrashMap from "@shared/types/TrashMap";
+import type Response from "@shared/types/Response";
+import type { TreeViewModel} from "../viewmodels/TreeViewModel";
+
 import TreeFacade from "../modules/tree/TreeFacade";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
-import TrashMap from "@shared/types/TrashMap";
-import Response from "@shared/types/Response";
-import TreeViewModel from "../viewmodels/TreeViewModel";
 
 export default class DeleteCommand implements ICommand {
-	private trashMap: TrashMap[] | null;
+	private trashMap: TrashMap[] | null = null;
 
 	constructor(
 		private treeFacade: TreeFacade,
@@ -36,7 +37,8 @@ export default class DeleteCommand implements ICommand {
 		const tabEditorDto = this.tabEditorFacade.getAllTabEditorData();
 		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto);
 
-		const treeDto = this.treeFacade.toTreeDto(this.treeFacade.extractTreeViewModel());
+		const vm = this.treeFacade.extractTreeViewModel();
+		const treeDto = vm ? this.treeFacade.toTreeDto(vm) : null;
 		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto);
 	}
 
@@ -54,14 +56,14 @@ export default class DeleteCommand implements ICommand {
 
 	private getIdsFromTreeViewModel(vm: TreeViewModel, arr: number[] = []) {
 		if (vm.directory) {
-			for (const child of vm.children) {
+			for (const child of vm.children!) {
 				this.getIdsFromTreeViewModel(child, arr);
 			}
 		}
 
 		const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(vm.path);
 		if (tabEditorView) arr.push(tabEditorView.getId());
-		
+
 		return arr;
 	}
 }

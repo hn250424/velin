@@ -1,10 +1,14 @@
+import type ICommand from "./commands/ICommand";
+
+import type Response from "@shared/types/Response";
+import type { TreeViewModel } from "./viewmodels/TreeViewModel";
+
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { TabEditorDto } from "@shared/dto/TabEditorDto";
+import type { SettingsViewModel } from "./viewmodels/SettingsViewModel";
+
 import { inject, injectable } from "inversify";
 import DI_KEYS from "./constants/di_keys";
-
-import Response from "@shared/types/Response";
-
-import TreeDto from "@shared/dto/TreeDto";
-import { TabEditorDto } from "@shared/dto/TabEditorDto";
 
 import FocusManager from "./modules/state/FocusManager";
 import FindReplaceState from "./modules/state/FindReplaceState";
@@ -13,10 +17,6 @@ import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
 import TreeFacade from "./modules/tree/TreeFacade";
 import SettingsFacade from "./modules/settings/SettingsFacade";
 
-import TreeViewModel from "./viewmodels/TreeViewModel";
-import SettingsViewModel from "./viewmodels/SettingsViewModel";
-
-import ICommand from "./commands/ICommand";
 import RenameCommand from "./commands/RenameCommand";
 import DeleteCommand from "./commands/DeleteCommand";
 import PasteCommand from "./commands/PasteCommand";
@@ -74,9 +74,9 @@ export default class CommandDispatcher {
 	private findInfo: HTMLElement;
 
 	private helpInfoOverlay: HTMLElement;
-	private helpInfoContainer: HTMLElement;
-	private helpInfoContent: HTMLElement;
-	private helpInfoButton: HTMLElement;
+	// private helpInfoContainer: HTMLElement;
+	// private helpInfoContent: HTMLElement;
+	// private helpInfoButton: HTMLElement;
 
 	constructor(
 		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
@@ -85,13 +85,13 @@ export default class CommandDispatcher {
 		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
 		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
 	) {
-		this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER);
-		this.findBox = document.getElementById(ID_FIND);
-		this.replaceBox = document.getElementById(ID_REPLACE);
+		this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER) as HTMLElement;
+		this.findBox = document.getElementById(ID_FIND) as HTMLElement;
+		this.replaceBox = document.getElementById(ID_REPLACE) as HTMLElement;
 		this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement;
 		this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement;
-		this.findInfo = document.getElementById(ID_FIND_INFO);
-		this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY);
+		this.findInfo = document.getElementById(ID_FIND_INFO) as HTMLElement;
+		this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY) as HTMLElement;
 
 		this.findInput.addEventListener(
 			"input",
@@ -154,7 +154,7 @@ export default class CommandDispatcher {
 		}
 
 		// When click directory in tree area.
-		const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH];
+		const dirPath = treeDiv.dataset[DATASET_ATTR_TREE_PATH]!;
 		const viewModel = this.treeFacade.getTreeViewModelByPath(dirPath);
 		const maybeChildren = treeDiv.nextElementSibling;
 		if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return;
@@ -330,7 +330,7 @@ export default class CommandDispatcher {
 			const selectedIndices = this.treeFacade.getSelectedIndices();
 
 			for (const idx of selectedIndices) {
-				this.treeFacade.getTreeWrapperByIndex(idx).classList.add(CLASS_CUT);
+				this.treeFacade.getTreeWrapperByIndex(idx)!.classList.add(CLASS_CUT);
 				this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path);
 				const viewModel = this.treeFacade.getTreeViewModelByIndex(idx);
 
@@ -434,9 +434,9 @@ export default class CommandDispatcher {
 
 			if (targetIndex === -1) return;
 
-			let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex);
+			let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex!);
 			if (!targetViewModel.directory) {
-				targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex);
+				targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex!);
 				targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex);
 			}
 
@@ -516,11 +516,11 @@ export default class CommandDispatcher {
 			treeInput.removeEventListener("keydown", onKeyDown);
 			treeInput.removeEventListener("blur", onBlur);
 
-			const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH];
+			const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]!;
 			const newName = treeInput.value.trim();
 			const dir = window.utils.getDirName(prePath);
 			const newPath = window.utils.getJoinedPath(dir, newName);
-			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]);
+			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]!);
 
 			const cmd = new RenameCommand(
 				this.treeFacade,
@@ -591,7 +591,7 @@ export default class CommandDispatcher {
 		if (idx === 0) {
 			parentContainer = treeNodeContainer;
 		} else {
-			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx);
+			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!;
 			parentContainer = parentWrapper.querySelector(".tree_node_children") as HTMLElement;
 		}
 
@@ -630,7 +630,7 @@ export default class CommandDispatcher {
 					this.redoStack.length = 0;
 
 					const filePath = window.utils.getJoinedPath(viewModel.path, name);
-					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath);
+					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)!;
 					this.treeFacade.lastSelectedIndex = createdIdx;
 					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx);
 					createdNode.classList.add(CLASS_FOCUSED);
@@ -647,7 +647,7 @@ export default class CommandDispatcher {
 
 					if (!directory) {
 						await this.performOpenFile("programmatic", filePath);
-						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath);
+						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!;
 						cmd.setOpenedTabId(createdTabView.getId());
 					}
 				} catch (error) {

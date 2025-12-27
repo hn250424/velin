@@ -1,3 +1,3 @@
-export default interface WindowDto {
+export interface WindowDto {
 	maximize: boolean;
 }

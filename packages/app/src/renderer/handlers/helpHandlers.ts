@@ -7,11 +7,11 @@ export default function registerHelpHandlers(commandDispatcher: CommandDispatche
 }
 
 function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
-	document.getElementById("help-information").addEventListener("click", async () => {
+	document.getElementById("help-information")!.addEventListener("click", async () => {
 		commandDispatcher.performShowInformation("menu");
 	});
 
-	document.getElementById("info-button").addEventListener("click", () => {
+	document.getElementById("info-button")!.addEventListener("click", () => {
 		commandDispatcher.performHideInformation("menu");
 	});
 }

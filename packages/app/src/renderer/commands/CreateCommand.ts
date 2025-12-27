@@ -1,6 +1,6 @@
+import type ICommand from "./ICommand";
 import TreeFacade from "../modules/tree/TreeFacade";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
-import ICommand from "./ICommand";
 
 export default class CreateCommand implements ICommand {
 	private createdPath = "";
@@ -39,8 +39,8 @@ export default class CreateCommand implements ICommand {
 		}
 
 		if (this.openedTabId !== null) {
-			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId);
-			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath);
+			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)!;
+			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)!;
 			this.tabEditorFacade.removeTab(tabEditorView.getId());
 		}
 	}

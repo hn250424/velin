@@ -1,9 +1,10 @@
 import "@milkdown/theme-nord/style.css";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel";
+
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import { NOT_MODIFIED_TEXT } from "../../constants/dom";
-import TabEditorViewModel from "../../viewmodels/TabEditorViewModel";
 import TabEditorRenderer from "./TabEditorRenderer";
 import TabEditorStore from "./TabEditorStore";
 import TabEditorView from "./TabEditorView";
@@ -48,8 +49,8 @@ export default class TabEditorFacade {
 			const dto = map.get(id);
 
 			if (dto) {
-				const viewModel = this.store.getTabEditorViewModelById(id);
-				if (dto.filePath !== viewModel.filePath) {
+				const viewModel = this.store.getTabEditorViewModelById(id)!;
+				if ((dto.filePath !== viewModel.filePath)) {
 					viewModel.filePath = dto.filePath;
 					viewModel.fileName = dto.fileName;
 
@@ -90,9 +91,9 @@ export default class TabEditorFacade {
 		let wasApplied = false;
 		for (let i = 0; i < this.renderer.tabEditorViews.length; i++) {
 			const data = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId());
-			if ((data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
+			if (data && (data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
 				const tv = this.renderer.tabEditorViews[i];
-				const vm = this.store.getTabEditorViewModelById(tv.getId());
+				const vm = this.store.getTabEditorViewModelById(tv.getId())!;
 
 				vm.initialContent = result.content;
 
@@ -124,7 +125,7 @@ export default class TabEditorFacade {
 	private removeTabAt(index: number) {
 		const view = this.renderer.getTabEditorViewByIndex(index);
 		const id = view.getId();
-		const viewModel = this.store.getTabEditorViewModelById(id);
+		const viewModel = this.store.getTabEditorViewModelById(id)!;
 
 		this.renderer.deleteTabEditorViewByPath(viewModel.filePath);
 		this.store.deleteTabEditorViewModelById(id);
@@ -219,8 +220,8 @@ export default class TabEditorFacade {
 			const dto = this.getAllTabEditorData();
 			await window.rendererToMain.syncTabSessionFromRenderer(dto);
 		} else {
-			const view = this.getTabEditorViewByPath(prePath);
-			const viewModel = this.getTabEditorViewModelById(view.getId());
+			const view = this.getTabEditorViewByPath(prePath)!;
+			const viewModel = this.getTabEditorViewModelById(view.getId())!;
 			viewModel.filePath = newPath;
 			viewModel.fileName = window.utils.getBaseName(newPath);
 
@@ -261,7 +262,7 @@ export default class TabEditorFacade {
 
 	private resolveFileNameByView(view: TabEditorView): string {
 		const id = view.getId();
-		const data = this.getTabEditorViewModelById(id);
+		const data = this.getTabEditorViewModelById(id)!;
 
 		if (!data.fileName) return view.getEditorFirstLine();
 		else return data.fileName;
@@ -269,7 +270,7 @@ export default class TabEditorFacade {
 
 	private getTabEditorDataByView(view: TabEditorView): TabEditorDto {
 		const id = view.getId();
-		const data = this.getTabEditorViewModelById(id);
+		const data = this.getTabEditorViewModelById(id)!;
 
 		return {
 			id: data.id,
@@ -282,9 +283,8 @@ export default class TabEditorFacade {
 	}
 
 	getTabEditorDataById(id: number): TabEditorDto {
-		const viewModel = this.store.getTabEditorViewModelById(id);
-		const view = this.renderer.getTabEditorViewByPath(viewModel.filePath);
-		if (!view) return null;
+		const viewModel = this.store.getTabEditorViewModelById(id)!;
+		const view = this.renderer.getTabEditorViewByPath(viewModel.filePath)!;
 		return this.getTabEditorDataByView(view);
 	}
 
@@ -473,7 +473,7 @@ export default class TabEditorFacade {
 		this.drag.setDragTargetTabName(name);
 	}
 
-	getInsertIndex(): number | null {
+	getInsertIndex(): number {
 		return this.drag.getInsertIndex();
 	}
 

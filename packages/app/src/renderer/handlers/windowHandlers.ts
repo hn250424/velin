@@ -1,8 +1,8 @@
 import WindowState from "../modules/state/WindowState";
 
 export default function registerWindowHandlers(windowState: WindowState) {
-	const maximizeBtn = document.getElementById("maximizeWindow") as HTMLImageElement | null;
-	const maximizeImg = maximizeBtn?.querySelector("img") as HTMLImageElement | null;
+	const maximizeBtn = document.getElementById("maximizeWindow") as HTMLImageElement;
+	const maximizeImg = maximizeBtn?.querySelector("img") as HTMLImageElement;
 
 	window.mainToRenderer.onMaximizeWindow(() => {
 		maximizeImg.src = new URL("../assets/icons/unmaximize.png", import.meta.url).toString();
@@ -17,7 +17,7 @@ export default function registerWindowHandlers(windowState: WindowState) {
 		if (windowState.isWindowMaximize()) window.rendererToMain.requestUnmaximizeWindow();
 		else window.rendererToMain.requestMaximizeWindow();
 	});
-	document.getElementById("minimizeWindow").addEventListener("click", () => {
+	document.getElementById("minimizeWindow")!.addEventListener("click", () => {
 		window.rendererToMain.requestMinimizeWindow();
 	});
 

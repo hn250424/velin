@@ -1,12 +1,19 @@
+import type { SettingsDto, SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
+import type {
+	SettingsViewModel,
+	SettingFontViewModel,
+	SettingThemeViewModel,
+} from "@renderer/viewmodels/SettingsViewModel";
+
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
 import SettingsStore from "./SettingsStore";
 import SettingsRenderer from "./SettingsRenderer";
-import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
-import SettingsViewModel, {
-	SettingFontViewModel,
-	SettingThemeViewModel,
-} from "@renderer/viewmodels/SettingsViewModel";
+
+type Binding<T> = {
+	on: (callback: (value: T) => void) => void;
+	update: (value: T) => void;
+};
 
 injectable();
 export default class SettingsFacade {
@@ -66,7 +73,7 @@ export default class SettingsFacade {
 	}
 
 	private _bindChangeEvents() {
-		const bindings = [
+		const bindings: Binding<any>[] = [
 			{
 				on: this.renderer.onChangeFontSize.bind(this.renderer),
 				update: this.store.onChangeFontSize.bind(this.store),
@@ -74,7 +81,7 @@ export default class SettingsFacade {
 			{
 				on: this.renderer.onChangeFontFamily.bind(this.renderer),
 				update: this.store.onChangeFontFamily.bind(this.store),
-			}
+			},
 			// {
 			//     on: this.renderer.onChangeTheme.bind(this.renderer),
 			//     update: this.store.setTheme.bind(this.store),
