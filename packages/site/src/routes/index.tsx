@@ -1,0 +1,27 @@
+import type { RouteConfig } from "./RouteConfig";
+
+import { DefaultLayout } from "../layouts";
+
+import { Home } from "../pages/home";
+import { Download } from "../pages/download";
+
+const routes: RouteConfig[] = [
+	{
+		path: "/",
+		element: (
+			<DefaultLayout>
+				<Home />
+			</DefaultLayout>
+		),
+	},
+	{
+		path: "/download",
+		element: (
+			<DefaultLayout>
+				<Download />
+			</DefaultLayout>
+		),
+	},
+];
+
+export default routes;

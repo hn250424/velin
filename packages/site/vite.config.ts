@@ -7,4 +7,9 @@ export default defineConfig({
 		outDir: "docs",
 		emptyOutDir: true,
 	},
+	resolve: {
+		alias: {
+			"@styles": path.resolve(__dirname, "src/styles"),
+		},
+	},
 });

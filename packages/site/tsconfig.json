@@ -4,7 +4,11 @@
     "composite": true,
     "baseUrl": ".",
 		"moduleResolution": "node",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+		"jsx": "react-jsx"
   },
+	"paths": {
+		"@styles/*": ["src/styles/*"],
+	},
   "include": ["src"]
 }
