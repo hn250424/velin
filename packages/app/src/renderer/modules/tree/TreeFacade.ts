@@ -5,7 +5,7 @@ import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
 
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
-import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE } from "../../constants/dom";
+import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE, CLASS_FOCUSED, CLASS_SELECTED } from "../../constants/dom";
 import TreeRenderer from "./TreeRenderer";
 import TreeStore from "./TreeStore";
 import TreeDragManager from "./TreeDragManager";
@@ -58,10 +58,7 @@ export default class TreeFacade {
 		return this.store.getTreeViewModelByPath(path);
 	}
 
-	isAnyTreeNodeSelected(): boolean {
-		return this.store.lastSelectedIndex > 0;
-	}
-
+	//
 	get lastSelectedIndex() {
 		return this.store.lastSelectedIndex;
 	}
@@ -78,6 +75,7 @@ export default class TreeFacade {
 		this.store.lastSelectedIndex = -1;
 	}
 
+	//
 	get contextTreeIndex() {
 		return this.store.contextTreeIndex;
 	}
@@ -94,6 +92,7 @@ export default class TreeFacade {
 		this.store.removeContextTreeIndex();
 	}
 
+	//
 	get selectedDragIndex() {
 		return this.store.selectedDragIndex;
 	}
@@ -114,6 +113,7 @@ export default class TreeFacade {
 		this.store.clearSelectedIndices();
 	}
 
+	//
 	addClipboardPaths(path: string) {
 		this.store.addClipboardPaths(path);
 	}
@@ -134,8 +134,31 @@ export default class TreeFacade {
 		this.store.clipboardMode = mode;
 	}
 
+	//
 	clean(container: HTMLElement) {
 		this.renderer.clean(container);
+	}
+
+	removeTreeFocus() {
+		const idx = this.lastSelectedIndex;
+		if (idx < 0) return;
+
+		if (idx === 0) {
+			this.renderer.removeContainerFocus();
+		} else {
+			const treeNode = this.getTreeNodeByIndex(idx);
+			treeNode.classList.remove(CLASS_FOCUSED);
+		}
+	}
+
+	clearTreeSelected() {
+		const selectedIndices = this.getSelectedIndices();
+		for (const i of selectedIndices) {
+			const div = this.getTreeNodeByIndex(i);
+			div.classList.remove(CLASS_SELECTED);
+		}
+
+		this.clearSelectedIndices();
 	}
 
 	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
@@ -154,6 +177,7 @@ export default class TreeFacade {
 		this.renderer.removeGhostBox();
 	}
 
+	//
 	clearPathToTreeWrapperMap() {
 		this.renderer.clearPathToTreeWrapperMap();
 	}
@@ -180,6 +204,7 @@ export default class TreeFacade {
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement;
 	}
 
+	//
 	isMouseDown(): boolean {
 		return this.drag.isMouseDown();
 	}
@@ -216,6 +241,7 @@ export default class TreeFacade {
 		return this.drag.getStartPosition_y();
 	}
 
+	//
 	getDragTreeCount() {
 		return this.drag.getDragTreeCount();
 	}
@@ -224,6 +250,7 @@ export default class TreeFacade {
 		this.drag.setDragTreeCount(count);
 	}
 
+	//
 	getInsertWrapper() {
 		return this.drag.getInsertWrapper();
 	}
@@ -240,6 +267,7 @@ export default class TreeFacade {
 		this.drag.setInsertPath(path);
 	}
 
+	//
 	loadFlattenArrayAndMaps(json: TreeViewModel) {
 		const arr = this.store.flattenTree(json);
 		this.store.setFlattenTree(arr);

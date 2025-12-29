@@ -47,6 +47,7 @@ function bindMouseDownEvents(treeFacade: TreeFacade, treeContainer: HTMLElement)
 
 			const path = node.dataset[DATASET_ATTR_TREE_PATH]!;
 			const idx = treeFacade.getFlattenArrayIndexByPath(path)!;
+			treeFacade.lastSelectedIndex = idx;
 			treeFacade.addSelectedIndices(idx);
 			count = 1;
 		}
@@ -164,7 +165,8 @@ function bindTreeClickEvents(
 	treeFacade: TreeFacade
 ) {
 	treeNodeContainer!.addEventListener("click", async (e) => {
-		if (treeFacade.isAnyTreeNodeSelected()) {
+		console.log(treeFacade.lastSelectedIndex)
+		if (treeFacade.lastSelectedIndex > 0) {
 			const _idx = treeFacade.lastSelectedIndex;
 			const _treeNode = treeFacade.getTreeNodeByIndex(_idx);
 			_treeNode.classList.remove(CLASS_FOCUSED);
@@ -177,14 +179,7 @@ function bindTreeClickEvents(
 			const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement;
 
 			if (isTreeNodeContainer) {
-				const selectedIndices = treeFacade.getSelectedIndices();
-				for (const i of selectedIndices) {
-					const div = treeFacade.getTreeNodeByIndex(i);
-					div.classList.remove(CLASS_SELECTED);
-				}
-
-				treeFacade.clearSelectedIndices();
-
+				treeFacade.clearTreeSelected();
 				treeNodeContainer.classList.add(CLASS_FOCUSED);
 				treeFacade.lastSelectedIndex = 0;
 			}
@@ -197,7 +192,7 @@ function bindTreeClickEvents(
 		treeNode.classList.add(CLASS_FOCUSED);
 		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!;
 
-		if (e.shiftKey && treeFacade.isAnyTreeNodeSelected()) {
+		if (e.shiftKey && treeFacade.lastSelectedIndex > 0) {
 			const startIndex = treeFacade.lastSelectedIndex!;
 			const endIndex = treeFacade.getFlattenArrayIndexByPath(path)!;
 			treeFacade.setLastSelectedIndexByPath(path);
@@ -214,13 +209,8 @@ function bindTreeClickEvents(
 			treeFacade.setLastSelectedIndexByPath(path);
 			treeFacade.addSelectedIndices(index);
 		} else {
-			const selectedIndices = treeFacade.getSelectedIndices();
-			for (const i of selectedIndices) {
-				const div = treeFacade.getTreeNodeByIndex(i);
-				div.classList.remove(CLASS_SELECTED);
-			}
+			treeFacade.clearTreeSelected();
 
-			treeFacade.clearSelectedIndices();
 			treeNode.classList.add(CLASS_SELECTED);
 			treeFacade.setLastSelectedIndexByPath(path);
 			treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path)!);
@@ -329,13 +319,7 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
 	} else {
-		const selectedIndices = treeFacade.getSelectedIndices();
-		for (const i of selectedIndices) {
-			const div = treeFacade.getTreeNodeByIndex(i);
-			div.classList.remove(CLASS_SELECTED);
-		}
-
-		treeFacade.clearSelectedIndices();
+		treeFacade.clearTreeSelected();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
 	}
@@ -360,13 +344,7 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
 	} else {
-		const selectedIndices = treeFacade.getSelectedIndices();
-		for (const i of selectedIndices) {
-			const div = treeFacade.getTreeNodeByIndex(i);
-			div.classList.remove(CLASS_SELECTED);
-		}
-
-		treeFacade.clearSelectedIndices();
+		treeFacade.clearTreeSelected();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
 	}

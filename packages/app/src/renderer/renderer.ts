@@ -134,7 +134,7 @@ function bindDocumentMousedownEvnet(
 		const target = e.target as HTMLElement;
 		const isInTreeContextMenu = !!target.closest("#tree_context_menu");
 		const isInTabContextMenu = !!target.closest("#tab_context_menu");
-		const isInTree = !!target.closest("#tree");
+		const isInTreeNodeContainer = !!target.closest("#tree_node_container");
 		const isInMenuItem = !!target.closest(".menu_item");
 
 		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED));
@@ -142,17 +142,11 @@ function bindDocumentMousedownEvnet(
 		if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED);
 		trackRelevantFocus(e.target as HTMLElement, focusManager);
 
-		if (!isInTabContextMenu) {
-			tabEditorFacade.removeContextTabId();
-		}
-
-		if (!isInTreeContextMenu && !isInTree) {
-			const idx = treeFacade.lastSelectedIndex;
-			if (idx < 0) return;
-
-			const treeNode = treeFacade.getTreeNodeByIndex(idx);
-			treeNode.classList.remove(CLASS_FOCUSED);
+		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId();
+		if (!isInTreeContextMenu && !isInTreeNodeContainer) {
+			treeFacade.removeTreeFocus();
 			treeFacade.removeLastSelectedIndex();
+			treeFacade.clearTreeSelected();
 		}
 	});
 }

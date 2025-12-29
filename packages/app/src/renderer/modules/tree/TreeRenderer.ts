@@ -2,6 +2,7 @@ import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
 
 import { injectable } from "inversify";
 import {
+	CLASS_FOCUSED,
 	CLASS_EXPANDED,
 	CLASS_TREE_GHOST,
 	CLASS_TREE_NODE,
@@ -33,6 +34,10 @@ export default class TreeRenderer {
 		while (container.firstChild) {
 			container.removeChild(container.firstChild);
 		}
+	}
+
+	removeContainerFocus() {
+		this._tree_node_container.classList.remove(CLASS_FOCUSED);
 	}
 
 	// Each DOM element with class `tree_node` has a dataset attribute for its path.

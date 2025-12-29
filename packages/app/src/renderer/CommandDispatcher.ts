@@ -629,21 +629,17 @@ export default class CommandDispatcher {
 					this.undoStack.push(cmd);
 					this.redoStack.length = 0;
 
+					this.treeFacade.clearTreeSelected();
+
 					const filePath = window.utils.getJoinedPath(viewModel.path, name);
+
 					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)!;
+					this.treeFacade.addSelectedIndices(createdIdx);
 					this.treeFacade.lastSelectedIndex = createdIdx;
+
 					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx);
 					createdNode.classList.add(CLASS_FOCUSED);
-
-					const selectedIndices = this.treeFacade.getSelectedIndices();
-					for (const i of selectedIndices) {
-						const div = this.treeFacade.getTreeNodeByIndex(i);
-						div.classList.remove(CLASS_SELECTED);
-					}
-
-					this.treeFacade.clearSelectedIndices();
 					createdNode.classList.add(CLASS_SELECTED);
-					this.treeFacade.addSelectedIndices(createdIdx);
 
 					if (!directory) {
 						await this.performOpenFile("programmatic", filePath);
