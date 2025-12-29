@@ -1,12 +1,12 @@
+import type ClipboardMode from "@shared/types/ClipboardMode";
+import type TrashMap from "@shared/types/TrashMap";
+import type { RendererToMainAPI } from "@shared/preload";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { SideDto } from "@shared/dto/SideDto";
+import type { SettingsDto } from "@shared/dto/SettingsDto";
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
 import { ipcRenderer } from "electron";
-import { RendererToMainAPI } from "@shared/preload";
-import TreeDto from "@shared/dto/TreeDto";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import ClipboardMode from "@shared/types/ClipboardMode";
-import TrashMap from "@shared/types/TrashMap";
-import SideDto from "@shared/dto/SideDto";
-import SettingsDto from "@shared/dto/SettingsDto";
 
 const rendererToMain: RendererToMainAPI = {
 	loadedRenderer: () => {

@@ -9,33 +9,22 @@ $risizer-size: 3px;
 	user-select: none;
 }
 
-@mixin button-selected {
-	// filter: invert(67%) sepia(39%) saturate(7474%) hue-rotate(188deg) brightness(102%) contrast(96%);
-}
-
-#side_menu_container {
-	height: 100%;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
-
-	background-color: var(--side-menu-bg);
-
-	> button.selected img {
-		@include button-selected;
+#view_menu_file_tree.selected {
+		& .checkbox {
+		position: relative;
 	}
 
-	> button:hover img {
-		@include button-selected;
+	& .checkbox::after {
+		content: "";
+		position: absolute;
+		left: 4px;
+		top: 1px;
+		width: 6px;
+		height: 10px;
+		border-right: 2px solid var(--app-font-color);
+		border-bottom: 2px solid var(--app-font-color);
+		transform: rotate(45deg);
 	}
-}
-
-#side_menu_container img {
-	width: 15px;
-	height: 15px;
-	margin: 5px 5px;
 }
 
 #side_resizer {

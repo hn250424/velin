@@ -5,15 +5,13 @@ import { CLASS_SELECTED } from "../constants/dom";
 export default function registerSideHandlers(sideState: SideState) {
 	let isDragging = false;
 	let animationFrameId: number | null = null;
-	let dragStartX: number;
-	let initialTreeWidth: number;
 
 	const minWidth = 100;
 	const maxWidth = 500;
 
 	const side = document.getElementById("side") as HTMLElement;
 
-	const treeToggle = document.getElementById("treeToggle") as HTMLElement;
+	const treeToggle = document.querySelector("#view_menu_file_tree") as HTMLElement;
 	const tree = document.getElementById("tree") as HTMLElement;
 	const resizer = document.getElementById("side_resizer") as HTMLElement;
 
@@ -50,13 +48,9 @@ export default function registerSideHandlers(sideState: SideState) {
 
 	// resize.
 	resizer.addEventListener("mousedown", (e) => {
-		if (!sideState.isTreeOpen()) {
-			sideState.setTreeOpenState(true);
-		}
+		if (!sideState.isTreeOpen()) return;
 
 		isDragging = true;
-		dragStartX = e.clientX;
-		initialTreeWidth = tree.offsetWidth;
 		document.body.style.cursor = "ew-resize";
 		document.body.style.userSelect = "none";
 	});
@@ -69,11 +63,11 @@ export default function registerSideHandlers(sideState: SideState) {
 		}
 
 		animationFrameId = requestAnimationFrame(() => {
-			const deltaX = e.clientX - dragStartX;
-			const newWidth = initialTreeWidth + deltaX;
-			const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+			const sideRect = side.getBoundingClientRect();
+			const offsetX = e.clientX - sideRect.left;
+			const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth);
 
-			tree.style.width = `${clampedWidth}px`;
+			tree.style.width = `${newWidth}px`;
 		});
 	});
 
@@ -89,11 +83,11 @@ export default function registerSideHandlers(sideState: SideState) {
 			animationFrameId = null;
 		}
 
-		const deltaX = e.clientX - dragStartX;
-		const newWidth = initialTreeWidth + deltaX;
-		const clampedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+		const sideRect = side.getBoundingClientRect();
+		const offsetX = e.clientX - sideRect.left;
+		const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth);
 
-		sideState.setTreeWidth(clampedWidth);
+		sideState.setTreeWidth(newWidth);
 		syncSession();
 	});
 }

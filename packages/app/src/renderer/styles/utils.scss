@@ -1,6 +1,6 @@
 @use "./dimensions.scss" as dimensions;
 
-$dropdown_min_width: 150px;
+$dropdown_min_width: 200px;
 $dropdown_padding: 5px;
 $dropdown_item_padding: 5px 10px;
 
@@ -31,7 +31,6 @@ $tooltip_border_radius: 4px;
 
 .dropdown_item {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 
 	padding: $dropdown_item_padding;
@@ -48,6 +47,19 @@ $tooltip_border_radius: 4px;
 	height: 1px;
 	margin: 1px;
 	background-color: var(--dropdown-divider);
+}
+
+.checkbox {
+	width: 12px;
+	height: 12px;
+	margin-right: 12px;
+}
+
+.dropdown_item > .text {
+	flex: 1;
+
+	display: flex;
+	justify-content: space-between;
 }
 
 .shortcut {
