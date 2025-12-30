@@ -5,7 +5,7 @@ import "./App.scss";
 const App = () => {
 	return (
 		<div id="app-container">
-			<Router basename="/velin-site/">
+			<Router basename="/velin/">
 				<Routes>
 					{routes.map((route) => (
 						<Route key={route.path} path={route.path} element={route.element} />

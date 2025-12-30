@@ -5,7 +5,7 @@ export const Home = () => {
 		<>
 			<div className="home-page">
 				<section className="preview">
-					<img src={`${import.meta.env.BASE_URL}preview/preview_crop.png`} />
+					<img src={`${import.meta.env.BASE_URL}preview/preview.png`} />
 				</section>
 				<section className="introduction">
 					<h2 className="introduction-title">

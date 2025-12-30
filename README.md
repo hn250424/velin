@@ -2,7 +2,7 @@
 
 A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
-![Preview](./preview/preview_2.gif)
+![Preview](./preview/preview.png)
 
 ## Note
 
@@ -13,7 +13,7 @@ A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
 ## Donwloads
 
-Downloads are available at the site below.
+**Download** the latest version from the [release page](https://github.com/hn250424/velin/releases/latest)
 
 ## Site
 
