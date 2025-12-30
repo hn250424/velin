@@ -44,19 +44,23 @@ $setting-node-select-width: 120px;
 }
 
 #settings-top button {
-	width: dimensions.$title_height;
-	height: dimensions.$title_height;
+	width: dimensions.$title_button_width;
+	height: dimensions.$title_button_height;
 }
 
+// should be of equal width and height
 #settings-top svg {
-	width: 100%;
-	height: 100%;
+	width: dimensions.$title_button_height;
+	height: dimensions.$title_button_height;
 	padding: 10px;
 }
 
-#settings-top svg:hover {
+#settings-top button:hover {
 	background: var(--warning-color);
-	color: var(--hover-foreground-color);
+
+	& svg {
+		color: var(--hover-foreground-color);
+	}
 }
 
 #settings-section {

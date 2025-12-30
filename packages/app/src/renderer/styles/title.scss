@@ -40,14 +40,15 @@ $menu_container_horizontal_margin: 10px;
 }
 
 #window button {
-	width: dimensions.$title_height;
-	height: dimensions.$title_height;
+	width: dimensions.$title_button_width;
+	height: dimensions.$title_button_height;
 }
 
+// should be of equal width and height
 #window img,
 #window svg {
-	width: 100%;
-	height: 100%;
+	width: dimensions.$title_button_height;
+	height: dimensions.$title_button_height;
 	padding: 10px;
 }
 
@@ -55,9 +56,12 @@ $menu_container_horizontal_margin: 10px;
 	background: var(--window-icon-hover);
 }
 
-#title_exit > svg:hover {
+#title_exit:hover {
 	background: var(--warning-color);
-	color: var(--hover-foreground-color);
+
+	& svg {
+		color: var(--hover-foreground-color);
+	}
 }
 
 #menu_container {
