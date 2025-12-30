@@ -91,5 +91,6 @@ typings/
 # Electron-Forge
 out/
 dist/
+docs/
 
 TODO.txt
