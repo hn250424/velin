@@ -4,7 +4,10 @@ export const Download = () => {
 	return (
 		<>
 			<div className="download-page">
-				<a className="download-box" href={`${import.meta.env.BASE_URL}downloads/windows/0/Velin Setup 0.1.0.exe`}>
+				<a
+					className="download-box"
+					href="https://github.com/hn250424/velin/releases/download/v0.1.0/Velin.Setup.0.1.0.exe"
+				>
 					<img src={`${import.meta.env.BASE_URL}logo/windows.png`} alt="Windows" />
 					<div className="text">
 						<span className="platform">Windows 64-bit</span>
