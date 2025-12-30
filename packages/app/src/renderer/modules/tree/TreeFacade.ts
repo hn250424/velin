@@ -5,7 +5,7 @@ import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
 
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
-import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE, CLASS_FOCUSED, CLASS_SELECTED } from "../../constants/dom";
+import { DATASET_ATTR_TREE_PATH, SELECTOR_TREE_NODE, CLASS_FOCUSED, CLASS_SELECTED, CLASS_CUT } from "../../constants/dom";
 import TreeRenderer from "./TreeRenderer";
 import TreeStore from "./TreeStore";
 import TreeDragManager from "./TreeDragManager";
@@ -123,7 +123,14 @@ export default class TreeFacade {
 	}
 
 	clearClipboardPaths() {
+		const paths = this.store.getClipboardPaths();
+		for (const path of paths) {
+			const wrapper = this.getTreeWrapperByPath(path);
+			wrapper?.classList.remove(CLASS_CUT)
+		}
+
 		this.store.clearClipboardPaths();
+
 	}
 
 	get clipboardMode() {

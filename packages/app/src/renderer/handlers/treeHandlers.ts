@@ -165,7 +165,6 @@ function bindTreeClickEvents(
 	treeFacade: TreeFacade
 ) {
 	treeNodeContainer!.addEventListener("click", async (e) => {
-		console.log(treeFacade.lastSelectedIndex)
 		if (treeFacade.lastSelectedIndex > 0) {
 			const _idx = treeFacade.lastSelectedIndex;
 			const _treeNode = treeFacade.getTreeNodeByIndex(_idx);
