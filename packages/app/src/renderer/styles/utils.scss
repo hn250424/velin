@@ -129,10 +129,6 @@ $tooltip_border_radius: 4px;
 	opacity: 1;
 }
 
-// .icon-grey {
-//     filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(90%) contrast(90%);
-// }
-
 .overlay {
 	position: fixed;
 
@@ -153,4 +149,8 @@ $tooltip_border_radius: 4px;
 	border-radius: dimensions.$window_icon_border_radius;
 	box-shadow: 0 4px 16px rgb(0, 0, 0, 0.3);
 	background-color: var(--overlay-surface-bg);
+}
+
+.svg-close {
+	color: var(--close-btn);
 }

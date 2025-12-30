@@ -31,12 +31,11 @@ $setting-node-select-width: 120px;
 
 #settings-top {
 	height: dimensions.$title_height;
+	background-color: var(--title-bg);
 
 	display: flex;
 	justify-content: end;
 	align-items: center;
-
-	background-color: var(--title-bg);
 }
 
 #settings-top img {
@@ -45,13 +44,19 @@ $setting-node-select-width: 120px;
 }
 
 #settings-top button {
-	width: dimensions.$icon_size;
-	height: dimensions.$icon_size;
-	margin-right: dimensions.$icon_horizontal_margin;
+	width: dimensions.$title_height;
+	height: dimensions.$title_height;
 }
 
-#settings-top button:hover {
-	background: var(--window-icon-hover);
+#settings-top svg {
+	width: 100%;
+	height: 100%;
+	padding: 10px;
+}
+
+#settings-top svg:hover {
+	background: var(--warning-color);
+	color: var(--hover-foreground-color);
 }
 
 #settings-section {

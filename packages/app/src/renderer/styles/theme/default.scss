@@ -11,6 +11,8 @@ $ref: colors.$grey-5;
 $deactive: colors.$grey-6;
 $accent: colors.$red-2;
 
+$warning-color: colors.$red-3;
+
 $theme-default: (
 	--app-bg: $sub,
 	--app-font-color: black,
@@ -19,6 +21,8 @@ $theme-default: (
 
 	--overlay-surface-button-bg: $sub,
 	--overlay-surface-button-hover-bg: white,
+
+	--close-btn: colors.$grey-7,
 
 	--title-bg: $primary,
 	--side-menu-bg: $primary,
@@ -71,7 +75,8 @@ $theme-default: (
 	--settings-contents: white,
 	--setting-node-border-color: $ref,
 
-	--warning-color: $accent,
+	--warning-color: $warning-color,
+	--hover-foreground-color: white,
 
 	--disabled-bg: $ref,
 );
