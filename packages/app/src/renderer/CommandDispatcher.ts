@@ -9,6 +9,8 @@ import type { SettingsViewModel } from "./viewmodels/SettingsViewModel";
 
 import { inject, injectable } from "inversify";
 import DI_KEYS from "./constants/di_keys";
+import folderSvg from "./assets/icons/folder.svg?raw";
+import openedFolderSvg from "./assets/icons/opened_folder.svg?raw";
 
 import FocusManager from "./modules/state/FocusManager";
 import FindReplaceState from "./modules/state/FindReplaceState";
@@ -32,7 +34,6 @@ import {
 	SELECTOR_TREE_NODE_TEXT,
 	DATASET_ATTR_TAB_ID,
 	DATASET_ATTR_TREE_PATH,
-	SELECTOR_TREE_NODE_OPEN,
 	CLASS_TREE_NODE_INPUT,
 	CLASS_SELECTED,
 	CLASS_CUT,
@@ -159,12 +160,11 @@ export default class CommandDispatcher {
 		const maybeChildren = treeDiv.nextElementSibling;
 		if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return;
 
-		const openStatus = treeDiv.querySelector(SELECTOR_TREE_NODE_OPEN) as HTMLImageElement;
-		const nodeType = treeDiv.querySelector(SELECTOR_TREE_NODE_TYPE) as HTMLImageElement;
+		const nodeType = treeDiv.querySelector(SELECTOR_TREE_NODE_TYPE) as HTMLElement;
 		const treeDivChildren = maybeChildren as HTMLElement;
 
 		if (viewModel.expanded) {
-			this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, false);
+			this._updateUI(nodeType, treeDivChildren, viewModel, false);
 			this._syncFlattenTreeArray(viewModel, false);
 			return;
 		}
@@ -173,7 +173,7 @@ export default class CommandDispatcher {
 			if (treeDivChildren.children.length === 0) {
 				this.treeFacade.renderTreeData(viewModel, treeDivChildren);
 			}
-			this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, true);
+			this._updateUI(nodeType, treeDivChildren, viewModel, true);
 			this._syncFlattenTreeArray(viewModel, true);
 			return;
 		}
@@ -185,26 +185,22 @@ export default class CommandDispatcher {
 
 		viewModel.children = responseTreeData.children;
 		this.treeFacade.renderTreeData(responseTreeData, treeDivChildren);
-		this._updateUI(openStatus, nodeType, treeDivChildren, viewModel, true);
+		this._updateUI(nodeType, treeDivChildren, viewModel, true);
 		this._syncFlattenTreeArray(viewModel, true);
 	}
 
 	private _updateUI(
-		openStatus: HTMLImageElement,
-		nodeType: HTMLImageElement,
+		nodeType: HTMLElement,
 		children: HTMLElement,
 		viewModel: TreeViewModel,
 		expanded: boolean
 	) {
 		viewModel.expanded = expanded;
 
-		openStatus.src = expanded
-			? new URL("./assets/icons/expanded.png", import.meta.url).toString()
-			: new URL("./assets/icons/not_expanded.png", import.meta.url).toString();
-
-		nodeType.src = expanded
-			? new URL("./assets/icons/opened_folder.png", import.meta.url).toString()
-			: new URL("./assets/icons/folder.png", import.meta.url).toString();
+		nodeType.innerHTML = expanded ? openedFolderSvg : folderSvg;
+		// nodeType.src = expanded
+		// 	? new URL("./assets/icons/opened_folder.png", import.meta.url).toString()
+		// 	: new URL("./assets/icons/folder.png", import.meta.url).toString();
 
 		if (expanded) children.classList.add(CLASS_EXPANDED);
 		else children.classList.remove(CLASS_EXPANDED);

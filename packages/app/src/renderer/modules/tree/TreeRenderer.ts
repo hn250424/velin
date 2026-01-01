@@ -1,6 +1,10 @@
 import type { TreeViewModel } from "../../viewmodels/TreeViewModel";
 
 import { injectable } from "inversify";
+
+import fileSvg from "../../assets/icons/file.svg?raw";
+import folderSvg from "../../assets/icons/folder.svg?raw";
+import openedFolderSvg from "../../assets/icons/opened_folder.svg?raw";
 import {
 	CLASS_FOCUSED,
 	CLASS_EXPANDED,
@@ -9,7 +13,6 @@ import {
 	CLASS_TREE_NODE_CHILDREN,
 	CLASS_TREE_NODE_TYPE,
 	CLASS_TREE_NODE_INPUT,
-	CLASS_TREE_NODE_OPEN,
 	CLASS_TREE_NODE_TEXT,
 	CLASS_TREE_NODE_WRAPPER,
 	DATASET_ATTR_TREE_PATH,
@@ -67,24 +70,19 @@ export default class TreeRenderer {
 		box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path;
 		box.title = viewModel.path;
 
-		const openStatus = document.createElement("img");
-		openStatus.classList.add(CLASS_TREE_NODE_OPEN);
-		if (viewModel.directory)
-			openStatus.src = viewModel.expanded
-				? new URL("../../assets/icons/expanded.png", import.meta.url).toString()
-				: new URL("../../assets/icons/not_expanded.png", import.meta.url).toString();
-		else openStatus.classList.add("file");
-
-		const nodeType = document.createElement("img");
+		const nodeType = document.createElement("div");
 		nodeType.classList.add(CLASS_TREE_NODE_TYPE);
 
 		if (!viewModel.directory) {
-			nodeType.src = new URL("../../assets/icons/file.png", import.meta.url).toString();
+			nodeType.classList.add("file");
+			nodeType.innerHTML = fileSvg
 		} else {
+			nodeType.classList.add("folder");
+
 			if (viewModel.expanded) {
-				nodeType.src = new URL("../../assets/icons/opened_folder.png", import.meta.url).toString();
+				nodeType.innerHTML = openedFolderSvg
 			} else {
-				nodeType.src = new URL("../../assets/icons/folder.png", import.meta.url).toString();
+				nodeType.innerHTML = folderSvg
 			}
 		}
 
@@ -97,7 +95,7 @@ export default class TreeRenderer {
 		if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED);
 		else childrenContainer.classList.remove(CLASS_EXPANDED);
 
-		box.appendChild(openStatus);
+		// box.appendChild(openStatus);
 		box.appendChild(nodeType);
 		box.appendChild(text);
 
@@ -121,23 +119,22 @@ export default class TreeRenderer {
 		box.classList.add("tree_node_temp");
 		box.style.paddingLeft = `${indent * 16}px`;
 
-		const openStatus = document.createElement("img");
-		openStatus.classList.add(CLASS_TREE_NODE_OPEN);
-		if (directory) openStatus.src = new URL("../../assets/icons/not_expanded.png", import.meta.url).toString();
-		else openStatus.classList.add("file");
-
-		const nodeType = document.createElement("img");
+		const nodeType = document.createElement("div");
 		nodeType.classList.add(CLASS_TREE_NODE_TYPE);
-		nodeType.src = directory
-			? new URL("../../assets/icons/folder.png", import.meta.url).toString()
-			: new URL("../../assets/icons/file.png", import.meta.url).toString();
+
+		if(directory) {
+			nodeType.classList.add("folder");
+			nodeType.innerHTML = folderSvg;
+		} else {
+			nodeType.classList.add("file");
+			nodeType.innerHTML = fileSvg;
+		}
 
 		const input = document.createElement("input");
 		input.type = "text";
 		input.value = "";
 		input.classList.add(CLASS_TREE_NODE_INPUT);
 
-		box.appendChild(openStatus);
 		box.appendChild(nodeType);
 		box.appendChild(input);
 

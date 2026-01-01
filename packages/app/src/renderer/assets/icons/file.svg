@@ -1,0 +1,13 @@
+<svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5 5 L65 5 L85 25 L85 105 L5 105 Z"
+        fill="white"
+        stroke="black"
+        stroke-width="2"/>
+  <path d="M65 5 L65 25 L85 25"
+        fill="none"
+        stroke="black"
+        stroke-width="2"/>
+  <line x1="20" y1="45" x2="70" y2="45" stroke="black" stroke-width="1.5"/>
+  <line x1="20" y1="60" x2="70" y2="60" stroke="black" stroke-width="1.5"/>
+  <line x1="20" y1="75" x2="55" y2="75" stroke="black" stroke-width="1.5"/>
+</svg>

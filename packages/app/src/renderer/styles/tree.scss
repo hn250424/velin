@@ -17,12 +17,6 @@ $tree_top_min_height: 25px;
 	overflow: hidden;
 }
 
-// TODO: svg.
-#tree img {
-	filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(90%)
-		contrast(90%);
-}
-
 #tree_top {
 	display: flex;
 	justify-content: space-between;
@@ -45,7 +39,7 @@ $tree_top_min_height: 25px;
 	position: relative;
 }
 
-#tree_top_icons img {
+#tree_top_icons svg {
 	width: dimensions.$tree_icon_size;
 	height: dimensions.$tree_icon_size;
 	margin-right: $tree_horizontal_margin;
@@ -90,6 +84,7 @@ $tree_top_min_height: 25px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	min-width: 100px;
+	margin: 0 $tree_horizontal_margin;
 }
 
 .tree_node_wrapper.cut {
@@ -102,6 +97,7 @@ $tree_top_min_height: 25px;
 	display: flex;
 	align-items: center;
 	border: 1px solid transparent;
+	gap: 2px;
 }
 
 .tree_node_temp > input {
@@ -125,7 +121,6 @@ $tree_top_min_height: 25px;
 	margin-left: 1px;
 }
 
-.tree_node_open,
 .tree_node_type {
 	width: dimensions.$tree_icon_size;
 	height: dimensions.$tree_icon_size;
@@ -133,10 +128,6 @@ $tree_top_min_height: 25px;
 	text-align: center;
 	flex-shrink: 0;
 	/* prevent icon from shrinking on resize */
-}
-
-.tree_node_open.file {
-	visibility: hidden;
 }
 
 .tree_node_input {

@@ -51,9 +51,6 @@ export const SELECTOR_TREE_NODE_TEXT = `.${CLASS_TREE_NODE_TEXT}`;
 export const CLASS_TREE_NODE_INPUT = "tree_node_input";
 export const SELECTOR_TREE_NODE_INPUT = `.${CLASS_TREE_NODE_INPUT}`;
 
-export const CLASS_TREE_NODE_OPEN = "tree_node_open";
-export const SELECTOR_TREE_NODE_OPEN = `.${CLASS_TREE_NODE_OPEN}`;
-
 export const CLASS_TREE_NODE_TYPE = "tree_node_type";
 export const SELECTOR_TREE_NODE_TYPE = `.${CLASS_TREE_NODE_TYPE}`;
 
