@@ -1,15 +1,18 @@
 import WindowState from "../modules/state/WindowState";
 
+import maximizeSvg from "../assets/icons/maximize.svg?raw"
+import unmaximizeSvg from "../assets/icons/unmaximize.svg?raw"
+
 export default function registerWindowHandlers(windowState: WindowState) {
-	const maximizeBtn = document.getElementById("maximizeWindow") as HTMLImageElement;
-	const maximizeImg = maximizeBtn?.querySelector("img") as HTMLImageElement;
+	const maximizeBtn = document.getElementById("maximizeWindow") as HTMLElement;
+	const minimizeBtn = document.getElementById("minimizeWindow") as HTMLElement;
 
 	window.mainToRenderer.onMaximizeWindow(() => {
-		maximizeImg.src = new URL("../assets/icons/unmaximize.png", import.meta.url).toString();
+		maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg;
 		windowState.setWindowMaximizeState(true);
 	});
 	window.mainToRenderer.onUnmaximizeWindow(() => {
-		maximizeImg.src = new URL("../assets/icons/maximize.png", import.meta.url).toString();
+		maximizeBtn.querySelector("svg")!.outerHTML = maximizeSvg;
 		windowState.setWindowMaximizeState(false);
 	});
 
@@ -17,10 +20,10 @@ export default function registerWindowHandlers(windowState: WindowState) {
 		if (windowState.isWindowMaximize()) window.rendererToMain.requestUnmaximizeWindow();
 		else window.rendererToMain.requestMaximizeWindow();
 	});
-	document.getElementById("minimizeWindow")!.addEventListener("click", () => {
+	minimizeBtn.addEventListener("click", () => {
 		window.rendererToMain.requestMinimizeWindow();
 	});
 
-	if (windowState.isWindowMaximize()) maximizeImg.src = new URL("../assets/icons/unmaximize.png", import.meta.url).toString();
-	else maximizeImg.src = new URL("../assets/icons/maximize.png", import.meta.url).toString();
+	if (windowState.isWindowMaximize()) maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg;
+	else maximizeBtn.querySelector("svg")!.outerHTML = maximizeSvg;
 }

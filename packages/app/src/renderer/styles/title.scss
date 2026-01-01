@@ -45,14 +45,14 @@ $menu_container_horizontal_margin: 10px;
 }
 
 // should be of equal width and height
-#window img,
 #window svg {
 	width: dimensions.$title_button_height;
 	height: dimensions.$title_button_height;
 	padding: 10px;
 }
 
-#window img:hover {
+#minimizeWindow:hover,
+#maximizeWindow:hover {
 	background: var(--window-icon-hover);
 }
 
