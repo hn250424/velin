@@ -75,9 +75,6 @@ export default class CommandDispatcher {
 	private findInfo: HTMLElement;
 
 	private helpInfoOverlay: HTMLElement;
-	// private helpInfoContainer: HTMLElement;
-	// private helpInfoContent: HTMLElement;
-	// private helpInfoButton: HTMLElement;
 
 	constructor(
 		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
@@ -198,9 +195,6 @@ export default class CommandDispatcher {
 		viewModel.expanded = expanded;
 
 		nodeType.innerHTML = expanded ? openedFolderSvg : folderSvg;
-		// nodeType.src = expanded
-		// 	? new URL("./assets/icons/opened_folder.png", import.meta.url).toString()
-		// 	: new URL("./assets/icons/folder.png", import.meta.url).toString();
 
 		if (expanded) children.classList.add(CLASS_EXPANDED);
 		else children.classList.remove(CLASS_EXPANDED);
@@ -481,8 +475,8 @@ export default class CommandDispatcher {
 		treeInput.value = treeSpan.textContent ?? "";
 		treeInput.classList.add(CLASS_TREE_NODE_INPUT);
 
+		treeNode.classList.remove(CLASS_FOCUSED);
 		treeNode.replaceChild(treeInput, treeSpan);
-
 		treeInput.focus();
 
 		// Except ext name.

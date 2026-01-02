@@ -95,7 +95,6 @@ export default class TreeRenderer {
 		if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED);
 		else childrenContainer.classList.remove(CLASS_EXPANDED);
 
-		// box.appendChild(openStatus);
 		box.appendChild(nodeType);
 		box.appendChild(text);
 
