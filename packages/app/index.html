@@ -10,8 +10,8 @@
 			<div id="settings-container" class="overlay-surface">
 				<div id="settings-top">
 					<button id="settings-exit" class="tooltip-btn">
-						<svg class="svg-close" viewBox="0 0 24 24" width="16" height="16">
-							<path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+						<svg xmlns="http://www.w3.org/2000/svg" class="svg-close" viewBox="0 0 24 24" width="16" height="16">
+							<path d="M6 6L18 18M18 6L6 18" stroke="black" stroke-width="1" stroke-linecap="round" />
 						</svg>
 						<span class="tooltip tooltip-bottom">Close</span>
 					</button>
@@ -57,16 +57,34 @@
 				<input id="find_input" type="text" />
 
 				<button id="find_up" class="tooltip-btn">
-					<img src="src/renderer//assets/icons/find_up.png" />
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+						<path
+							d="M12 19V5M5 12L12 5L19 12"
+							stroke="black"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</svg>
 					<span class="tooltip tooltip-bottom">Find up</span>
 				</button>
 				<button id="find_down" class="tooltip-btn">
-					<img src="src/renderer/assets/icons/find_down.png" />
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+						<path
+							d="M12 5V19M5 12L12 19L19 12"
+							stroke="black"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</svg>
 					<span class="tooltip tooltip-bottom">Find down</span>
 				</button>
 				<button id="find_close" class="tooltip-btn">
-					<svg viewBox="0 0 24 24" width="16" height="16">
-						<path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					<svg xmlns="http://www.w3.org/2000/svg" class="svg-close" viewBox="0 0 24 24" width="16" height="16">
+						<path d="M6 6L18 18M18 6L6 18" stroke="black" stroke-width="2" stroke-linecap="round" />
 					</svg>
 					<span class="tooltip tooltip-bottom">Close</span>
 				</button>
@@ -78,11 +96,29 @@
 				<input id="replace_input" type="text" />
 
 				<button id="replace_current" class="tooltip-btn">
-					<img src="src/renderer/assets/icons/replace.png" />
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+						<path
+							d="M7 19V5H13C15.2091 5 17 6.79086 17 9C17 11.2091 15.2091 13 13 13H7M13 13L17 19"
+							stroke="black"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</svg>
 					<span class="tooltip tooltip-bottom">Replace (Enter)</span>
 				</button>
 				<button id="replace_all" class="tooltip-btn">
-					<img src="src/renderer/assets/icons/replace_all.png" />
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+						<path
+							d="M5 19L12 5L19 19M7 14H17"
+							stroke="black"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</svg>
 					<span class="tooltip tooltip-bottom">Replace All (Ctrl+Alt+Enter)</span>
 				</button>
 
@@ -287,8 +323,8 @@
 						<span class="tooltip tooltip-bottom">Maximize</span>
 					</button>
 					<button id="title_exit" class="tooltip-btn exit">
-						<svg class="svg-close" viewBox="0 0 24 24" width="16" height="16">
-							<path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+						<svg xmlns="http://www.w3.org/2000/svg" class="svg-close" viewBox="0 0 24 24" width="16" height="16">
+							<path d="M6 6L18 18M18 6L6 18" stroke="black" stroke-width="2" stroke-linecap="round" />
 						</svg>
 						<span class="tooltip tooltip-bottom">Close</span>
 					</button>
