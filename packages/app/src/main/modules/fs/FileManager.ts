@@ -1,10 +1,12 @@
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type TrashMap from "@shared/types/TrashMap";
+
 import fs from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
+
 import { app } from "electron";
-import IFileManager from "@main/modules/contracts/IFileManager";
 import { injectable } from "inversify";
-import TrashMap from "@shared/types/TrashMap";
 
 @injectable()
 export default class FileManager implements IFileManager {

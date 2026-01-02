@@ -1,8 +1,10 @@
-import FileService from "@main/services/FileService";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
+
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
 import { BrowserWindow, ipcMain } from "electron";
+
+import FileService from "@main/services/FileService";
 
 export default function registerFileHandlers(mainWindow: BrowserWindow, fileService: FileService) {
 	ipcMain.handle(electronAPI.events.rendererToMain.newTab, async () => {

@@ -1,14 +1,15 @@
+import type TreeSessionModel from "../models/TreeSessionModel";
+import type ITreeRepository from "../modules/contracts/ITreeRepository";
+import type IFileManager from "../modules/contracts/IFileManager";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type TrashMap from "@shared/types/TrashMap";
+import type ClipboardMode from "@shared/types/ClipboardMode";
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
+import type Response from "@shared/types/Response";
+
 import { inject } from "inversify";
 import path from "path";
 import DI_KEYS from "../constants/di_keys";
-import TreeSessionModel from "../models/TreeSessionModel";
-import ITreeRepository from "../modules/contracts/ITreeRepository";
-import IFileManager from "../modules/contracts/IFileManager";
-import TreeDto from "@shared/dto/TreeDto";
-import TrashMap from "@shared/types/TrashMap";
-import ClipboardMode from "@shared/types/ClipboardMode";
-import ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import Response from "@shared/types/Response";
 
 export default class TreeService {
 	constructor(
@@ -27,7 +28,7 @@ export default class TreeService {
 
 			const session = await this.treeRepository.readTreeSession();
 			if (!session) {
-				return { result: false, data: null };
+				return { result: false, data: "" };
 			}
 
 			const nodeToUpdate = this._findNodeByPath(session, prePath);
@@ -46,7 +47,7 @@ export default class TreeService {
 				return { result: true, data: finalNewPath };
 			}
 
-			return { result: false, data: null };
+			return { result: false, data: "" };
 		} catch (error) {
 			return { result: false, data: prePath };
 		}

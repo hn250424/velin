@@ -20,11 +20,9 @@ export default class RenameCommand implements ICommand {
 		if (!response.result) throw new Error("Rename failed");
 		this.newPath = response.data;
 
-		const newBaseName = window.utils.getBaseName(this.newPath);
-
 		const newSpan = document.createElement("span");
 		newSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis");
-		newSpan.textContent = newBaseName;
+		newSpan.textContent = window.utils.getBaseName(this.newPath);
 
 		this.treeNode.replaceChild(newSpan, this.treeNode.querySelector("input") as HTMLInputElement);
 

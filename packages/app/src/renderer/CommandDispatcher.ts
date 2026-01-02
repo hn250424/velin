@@ -510,6 +510,16 @@ export default class CommandDispatcher {
 			const newName = treeInput.value.trim();
 			const dir = window.utils.getDirName(prePath);
 			const newPath = window.utils.getJoinedPath(dir, newName);
+
+			// Skip unique name generation for unchanged rename (unlike create or paste)
+			if (prePath === newPath) {
+				const restoreSpan = document.createElement("span");
+				restoreSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis");
+				restoreSpan.textContent = window.utils.getBaseName(newPath);
+				treeNode.replaceChild(restoreSpan, treeInput);
+				return;
+			}
+
 			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]!);
 
 			const cmd = new RenameCommand(

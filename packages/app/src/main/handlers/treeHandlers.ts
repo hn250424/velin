@@ -1,8 +1,10 @@
 import type { TreeDto } from "@shared/dto/TreeDto";
 import type TrashMap from "@shared/types/TrashMap";
 import type ClipboardMode from "@shared/types/ClipboardMode";
+
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
 import { BrowserWindow, ipcMain } from "electron";
+
 import TreeService from "@main/services/TreeService";
 
 export default function registerTreeHandlers(mainWindow: BrowserWindow, treeService: TreeService) {
