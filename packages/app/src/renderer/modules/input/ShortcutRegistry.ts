@@ -20,7 +20,10 @@ export default class ShortcutRegistry {
 			// Prevent the default browser behavior only when the focus is NOT inside the editor.
 			// This avoids interfering with native editor shortcuts (like copy/paste),
 			// while ensuring custom shortcuts work properly in other UI areas (e.g., sidebar, tree view).
-			if (this.focusManager.getFocus() !== "editor") e.preventDefault();
+			const focus = this.focusManager.getFocus();
+			if (focus !== "editor" && focus !== "find_replace") {
+				e.preventDefault();
+			}
 
 			handler(e);
 		}
