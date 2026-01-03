@@ -1,14 +1,15 @@
-import { FSWatcher, watch } from "chokidar";
-import { BrowserWindow } from "electron";
-import { injectable } from "inversify";
+import type { FSWatcher } from "chokidar";
+import type IFileManager from "../contracts/IFileManager";
+import type ITabUtils from "../contracts/ITabUtils";
+import type ITreeUtils from "../contracts/ITreeUtils";
+import type ITabRepository from "../contracts/ITabRepository";
+import type ITreeRepository from "../contracts/ITreeRepository";
+import type { TreeDto } from "@shared/dto/TreeDto";
 import path from "path";
-import IFileManager from "../contracts/IFileManager";
-import ITabUtils from "../contracts/ITabUtils";
-import ITreeUtils from "../contracts/ITreeUtils";
-import ITabRepository from "../contracts/ITabRepository";
-import ITreeRepository from "../contracts/ITreeRepository";
+import { BrowserWindow } from "electron";
+import { watch } from "chokidar";
+import { injectable } from "inversify";
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import TreeDto from "@shared/dto/TreeDto";
 
 @injectable()
 export default class FileWatcher {

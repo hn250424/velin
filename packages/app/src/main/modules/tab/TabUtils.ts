@@ -1,9 +1,9 @@
-import { TabSessionModel } from "@main/models/TabSessionModel";
+import type IFileManager from "../contracts/IFileManager";
+import type ITabUtils from "../contracts/ITabUtils";
+import type { TabSessionModel } from "@main/models/TabSessionModel";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
-import IFileManager from "../contracts/IFileManager";
-import ITabUtils from "../contracts/ITabUtils";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 @injectable()
 export default class TabUtils implements ITabUtils {

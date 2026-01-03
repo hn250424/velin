@@ -1,12 +1,12 @@
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ITabRepository from "@main/modules/contracts/ITabRepository";
+import type IDialogManager from "@main/modules/contracts/IDialogManager";
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import type TreeSessionModel from "../models/TreeSessionModel";
+import type { TabSessionData } from "../models/TabSessionModel";
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
 import { BrowserWindow } from "electron";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ITabRepository from "@main/modules/contracts/ITabRepository";
-import IDialogManager from "@main/modules/contracts/IDialogManager";
-import { TabSessionModel, TabSessionData } from "../models/TabSessionModel";
-import TreeDto from "@shared/dto/TreeDto";
-import ITreeRepository from "@main/modules/contracts/ITreeRepository";
-import TreeSessionModel from "../models/TreeSessionModel";
 
 export default async function exit(
 	mainWindow: BrowserWindow,

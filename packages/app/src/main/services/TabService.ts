@@ -1,12 +1,12 @@
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type IDialogManager from "../modules/contracts/IDialogManager";
+import type IFileManager from "../modules/contracts/IFileManager";
+import type ITabRepository from "../modules/contracts/ITabRepository";
+import type { TabSessionData } from "../models/TabSessionModel";
+import type ITabUtils from "@main/modules/contracts/ITabUtils";
 import { BrowserWindow } from "electron";
 import { inject } from "inversify";
 import DI_KEYS from "../constants/di_keys";
-import IDialogManager from "../modules/contracts/IDialogManager";
-import IFileManager from "../modules/contracts/IFileManager";
-import ITabRepository from "../modules/contracts/ITabRepository";
-import { TabSessionData } from "../models/TabSessionModel";
-import ITabUtils from "@main/modules/contracts/ITabUtils";
 
 export default class TabService {
 	constructor(

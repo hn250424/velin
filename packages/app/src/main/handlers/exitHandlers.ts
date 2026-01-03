@@ -1,12 +1,12 @@
-import exit from "@services/exitService";
-import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
+import type IDialogManager from "@main/modules/contracts/IDialogManager";
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ITabRepository from "@main/modules/contracts/ITabRepository";
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
 import { BrowserWindow, ipcMain } from "electron";
-import IDialogManager from "@main/modules/contracts/IDialogManager";
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ITabRepository from "@main/modules/contracts/ITabRepository";
-import ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
+import exit from "@services/exitService";
 
 export default function registerExitHandlers(
 	mainWindow: BrowserWindow,

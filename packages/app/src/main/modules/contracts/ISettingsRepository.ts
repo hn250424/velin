@@ -1,4 +1,4 @@
-import SettingsSessionModel from "@main/models/SettingsSessionModel";
+import type { SettingsSessionModel } from "@main/models/SettingsSessionModel";
 
 export default interface ISettingsRepository {
 	readSettingsSession(): Promise<SettingsSessionModel | null>;

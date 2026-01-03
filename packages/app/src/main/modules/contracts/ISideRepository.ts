@@ -1,4 +1,4 @@
-import SideSessionModel from "@main/models/SideSessionModel";
+import type SideSessionModel from "@main/models/SideSessionModel";
 
 export default interface ISideRepository {
 	readSideSession(): Promise<SideSessionModel | null>;

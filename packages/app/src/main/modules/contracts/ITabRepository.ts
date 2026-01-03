@@ -1,4 +1,4 @@
-import { TabSessionModel } from "@main/models/TabSessionModel";
+import type { TabSessionModel } from "@main/models/TabSessionModel";
 
 export default interface ITabRepository {
 	readTabSession(): Promise<TabSessionModel | null>;

@@ -1,6 +1,6 @@
+import type { UtilsAPI } from "@shared/preload";
 import { webFrame } from "electron";
-import * as path from "path";
-import { UtilsAPI } from "@shared/preload";
+import path from "path";
 
 const utils: UtilsAPI = {
 	setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),

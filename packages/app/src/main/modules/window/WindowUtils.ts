@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
-import IWindowUtils from "../contracts/IWindowUtils";
-import { WindowSessionModel } from "@main/models/WindowSessionModel";
-import WindowDto from "@shared/dto/WindowDto";
+import type IWindowUtils from "../contracts/IWindowUtils";
+import type { WindowSessionModel } from "@main/models/WindowSessionModel";
+import type { WindowDto } from "@shared/dto/WindowDto";
 
 @injectable()
 export default class WindowUtils implements IWindowUtils {

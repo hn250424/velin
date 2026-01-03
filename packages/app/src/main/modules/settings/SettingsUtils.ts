@@ -1,12 +1,13 @@
-import { inject, injectable } from "inversify";
-import DI_KEYS from "../../constants/di_keys";
-import IFileManager from "../contracts/IFileManager";
-import ISettingsUtils from "../contracts/ISettingsUtils";
-import SettingsSessionModel, {
+import type IFileManager from "../contracts/IFileManager";
+import type ISettingsUtils from "../contracts/ISettingsUtils";
+import type { SettingsDto, SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
+import type {
+	SettingsSessionModel,
 	SettingFontSessionModel,
 	SettingThemeSessionModel,
 } from "@main/models/SettingsSessionModel";
-import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto";
+import { inject, injectable } from "inversify";
+import DI_KEYS from "../../constants/di_keys";
 
 @injectable()
 export default class SettingsUtils implements ISettingsUtils {

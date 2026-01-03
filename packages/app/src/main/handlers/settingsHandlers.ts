@@ -1,7 +1,6 @@
+import type { SettingsDto } from "@shared/dto/SettingsDto";
 import { BrowserWindow, ipcMain } from "electron";
-
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import SettingsDto from "@shared/dto/SettingsDto";
 import SettingsService from "@main/services/SettingsService";
 
 export default function registerSettingsHandlers(mainWindow: BrowserWindow, settingsService: SettingsService) {

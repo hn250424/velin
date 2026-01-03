@@ -1,11 +1,11 @@
+import type { MainToRendererAPI } from "@shared/preload";
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { SideDto } from "@shared/dto/SideDto";
+import type { WindowDto } from "@shared/dto/WindowDto";
+import type { SettingsDto } from "@shared/dto/SettingsDto";
 import { ipcRenderer } from "electron";
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import { MainToRendererAPI } from "@shared/preload";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
-import SideDto from "@shared/dto/SideDto";
-import WindowDto from "@shared/dto/WindowDto";
-import SettingsDto from "@shared/dto/SettingsDto";
 
 const mainToRenderer: MainToRendererAPI = {
 	session: (

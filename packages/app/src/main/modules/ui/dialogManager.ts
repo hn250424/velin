@@ -1,4 +1,4 @@
-import IDialogManager from "@main/modules/contracts/IDialogManager";
+import type IDialogManager from "@main/modules/contracts/IDialogManager";
 import { dialog, BrowserWindow } from "electron";
 
 const dialogManager: IDialogManager = {

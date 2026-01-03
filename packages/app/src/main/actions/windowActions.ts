@@ -1,6 +1,6 @@
+import type { WindowSessionModel, WindowBoundsModel } from "@main/models/WindowSessionModel";
+import type IWindowRepository from "@main/modules/contracts/IWindowRepository";
 import { BrowserWindow, screen } from "electron";
-import { WindowSessionModel, WindowBoundsModel } from "@main/models/WindowSessionModel";
-import IWindowRepository from "@main/modules/contracts/IWindowRepository";
 
 export function getBoundsByWindowSession(session: WindowSessionModel | null): WindowBoundsModel {
 	const { width: screenW, height: screenH } = screen.getPrimaryDisplay().workAreaSize;

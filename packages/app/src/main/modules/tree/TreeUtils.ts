@@ -1,10 +1,10 @@
-import ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import TreeDto from "@shared/dto/TreeDto";
+import type IFileManager from "../contracts/IFileManager";
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
+import type { TreeDto} from "@shared/dto/TreeDto";
 import fs from "fs";
 import path from "path";
 import { inject, injectable } from "inversify";
 import DI_KEYS from "../../constants/di_keys";
-import IFileManager from "../contracts/IFileManager";
 
 @injectable()
 export default class TreeUtils implements ITreeUtils {
@@ -78,7 +78,7 @@ export default class TreeUtils implements ITreeUtils {
 
 		const updatedChildren: TreeDto[] = [];
 
-		for (const child of current.children ?? []) {
+		for (const child of current?.children ?? []) {
 			const sessionChild = sessionMap.get(child.path);
 			const merged = await this.syncWithFs(sessionChild ?? child);
 			if (merged) updatedChildren.push(merged);

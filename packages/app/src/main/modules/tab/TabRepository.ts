@@ -1,13 +1,16 @@
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ITabRepository from "@main/modules/contracts/ITabRepository";
-import { TabSessionModel } from "../../models/TabSessionModel";
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ITabRepository from "@main/modules/contracts/ITabRepository";
+import type { TabSessionModel } from "../../models/TabSessionModel";
 import { injectable } from "inversify";
 
 @injectable()
 export default class TabRepository implements ITabRepository {
 	private session: TabSessionModel | null = null;
 
-	constructor(private tabSessionPath: string, private fileManager: IFileManager) {}
+	constructor(
+		private tabSessionPath: string,
+		private fileManager: IFileManager
+	) {}
 
 	async readTabSession(): Promise<TabSessionModel | null> {
 		if (this.session) return this.session;
@@ -17,7 +20,7 @@ export default class TabRepository implements ITabRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			if (e?.code === "ENOENT"){
+			if (e instanceof Error && "code" in e && e.code === "ENOENT") {
 				return null;
 			}
 			throw e;

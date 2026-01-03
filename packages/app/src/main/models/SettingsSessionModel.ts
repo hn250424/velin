@@ -1,4 +1,4 @@
-export default interface SettingsSessionModel {
+export interface SettingsSessionModel {
 	settingFontSessionModel: SettingFontSessionModel;
 	settingThemeSessionModel: SettingThemeSessionModel;
 }

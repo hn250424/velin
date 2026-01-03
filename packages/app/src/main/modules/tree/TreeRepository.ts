@@ -1,6 +1,6 @@
-import TreeSessionModel from "@main/models/TreeSessionModel";
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import type TreeSessionModel from "@main/models/TreeSessionModel";
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
 
 export default class TreeRepository implements ITreeRepository {
 	private session: TreeSessionModel | null = null;
@@ -15,7 +15,11 @@ export default class TreeRepository implements ITreeRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			if (e?.code === "ENOENT"){
+	if (
+			e instanceof Error &&
+				"code" in e &&
+				e.code === "ENOENT"
+			) {
 				return null;
 			}
 			throw e;

@@ -1,16 +1,16 @@
-import ITreeRepository from "@main/modules/contracts/ITreeRepository";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type IFileManager from "../modules/contracts/IFileManager";
+import type IFileWatcher from "@main/modules/contracts/IFileWatcher";
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
+import type IDialogManager from "../modules/contracts/IDialogManager";
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import type ITabRepository from "../modules/contracts/ITabRepository";
+import type TreeSessionModel from "@main/models/TreeSessionModel";
+import type { TabSessionData } from "../models/TabSessionModel";
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
+import type { TreeDto } from "@shared/dto/TreeDto";
 import { BrowserWindow } from "electron";
 import { inject } from "inversify";
 import DI_KEYS from "../constants/di_keys";
-import IDialogManager from "../modules/contracts/IDialogManager";
-import IFileManager from "../modules/contracts/IFileManager";
-import ITabRepository from "../modules/contracts/ITabRepository";
-import { TabSessionData } from "../models/TabSessionModel";
-import TreeDto from "@shared/dto/TreeDto";
-import ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import IFileWatcher from "@main/modules/contracts/IFileWatcher";
-import TreeSessionModel from "@main/models/TreeSessionModel";
 
 export default class FileService {
 	constructor(
@@ -35,7 +35,7 @@ export default class FileService {
 		return id;
 	}
 
-	async openFile(filePath?: string): Promise<TabEditorDto> {
+	async openFile(filePath?: string): Promise<TabEditorDto | null> {
 		if (!filePath) {
 			const result = await this.dialogManager.showOpenFileDialog();
 			if (result.canceled || result.filePaths.length === 0) {
@@ -97,7 +97,7 @@ export default class FileService {
 		} else {
 			const session = await this.treeRepository.readTreeSession();
 			const updatedSession = this._mergeTreeSessionWithFsTree(path, indent, tree.children, session);
-			await this.treeRepository.writeTreeSession(updatedSession);
+			if (updatedSession) await this.treeRepository.writeTreeSession(updatedSession);
 		}
 
 		return {
@@ -122,7 +122,7 @@ export default class FileService {
 		dirPath: string,
 		indent: number,
 		tree: TreeDto[] | null,
-		session: TreeSessionModel
+		session: TreeSessionModel | null
 	): TreeSessionModel | null {
 		if (!session) {
 			return {
@@ -131,10 +131,10 @@ export default class FileService {
 				indent,
 				directory: true,
 				expanded: true,
-				children: tree?.map((child) => ({
+				children: tree ? tree.map((child) => ({
 					...child,
 					children: null as null,
-				})),
+				})) : null,
 			};
 		}
 
@@ -150,7 +150,7 @@ export default class FileService {
 		return this._replaceNode(session, dirPath, newNode) || session;
 	}
 
-	private _replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel | null {
+	private _replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel {
 		if (root.path === targetPath) {
 			return newNode;
 		}
@@ -202,7 +202,7 @@ export default class FileService {
 		}
 	}
 
-	async saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto> {
+	async saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto | null> {
 		const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
 
 		if (result.canceled || !result.filePath) {

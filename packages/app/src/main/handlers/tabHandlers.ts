@@ -1,7 +1,6 @@
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import { BrowserWindow, ipcMain } from "electron";
-
 import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import TabService from "@main/services/TabService";
 
 export default function registerTabHandlers(mainWindow: BrowserWindow, tabService: TabService) {

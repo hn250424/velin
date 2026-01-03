@@ -16,7 +16,7 @@ export default function registerFileHandlers(mainWindow: BrowserWindow, fileServ
 	});
 
 	ipcMain.handle(electronAPI.events.rendererToMain.openFile, async (e, filePath?: string) => {
-		const data: TabEditorDto = await fileService.openFile(filePath);
+		const data = await fileService.openFile(filePath);
 		return {
 			result: true,
 			data: data,
@@ -40,7 +40,7 @@ export default function registerFileHandlers(mainWindow: BrowserWindow, fileServ
 	});
 
 	ipcMain.handle(electronAPI.events.rendererToMain.saveAs, async (e, data: TabEditorDto) => {
-		const tabEditorData: TabEditorDto = await fileService.saveAs(data, mainWindow);
+		const tabEditorData = await fileService.saveAs(data, mainWindow);
 		return {
 			result: true,
 			data: tabEditorData,

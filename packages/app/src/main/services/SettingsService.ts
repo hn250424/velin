@@ -1,9 +1,9 @@
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
+import type ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
+import type { SettingsDto } from "@shared/dto/SettingsDto";
 import { inject } from "inversify";
 import DI_KEYS from "../constants/di_keys";
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
-import SettingsDto from "@shared/dto/SettingsDto";
-import ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
 
 export default class SettingsService {
 	constructor(

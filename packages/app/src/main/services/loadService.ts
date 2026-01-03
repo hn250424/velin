@@ -1,19 +1,19 @@
-import ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import ITreeRepository from "@main/modules/contracts/ITreeRepository";
-import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
-import TreeDto from "@shared/dto/TreeDto";
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
+import type IFileManager from "../modules/contracts/IFileManager";
+import type ITabRepository from "../modules/contracts/ITabRepository";
+import type ITabUtils from "../modules/contracts/ITabUtils";
+import type IFileWatcher from "@main/modules/contracts/IFileWatcher";
+import type ISideRepository from "@main/modules/contracts/ISideRepository";
+import type IWindowRepository from "@main/modules/contracts/IWindowRepository";
+import type IWindowUtils from "@main/modules/contracts/IWindowUtils";
+import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
+import type ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
+import type { TreeDto } from "@shared/dto/TreeDto";
+import type { SideDto } from "@shared/dto/SideDto";
 import { app, BrowserWindow } from "electron";
-import IFileManager from "../modules/contracts/IFileManager";
-import ITabRepository from "../modules/contracts/ITabRepository";
-import ITabUtils from "../modules/contracts/ITabUtils";
-import IFileWatcher from "@main/modules/contracts/IFileWatcher";
-import ISideRepository from "@main/modules/contracts/ISideRepository";
-import SideDto from "@shared/dto/SideDto";
-import IWindowRepository from "@main/modules/contracts/IWindowRepository";
+import { electronAPI } from "@shared/constants/electronAPI/electronAPI";
 import { getBoundsByWindowSession } from "../actions/windowActions";
-import IWindowUtils from "@main/modules/contracts/IWindowUtils";
-import ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
-import ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
 
 export async function loadedRenderer(
 	mainWindow: BrowserWindow,

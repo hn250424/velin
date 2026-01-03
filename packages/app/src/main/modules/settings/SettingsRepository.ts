@@ -1,11 +1,14 @@
-import SettingsSessionModel from "@main/models/SettingsSessionModel";
-import IFileManager from "@main/modules/contracts/IFileManager";
-import ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
+import type { SettingsSessionModel } from "@main/models/SettingsSessionModel";
+import type IFileManager from "@main/modules/contracts/IFileManager";
+import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
 
 export default class SettingsRepository implements ISettingsRepository {
 	private session: SettingsSessionModel | null = null;
 
-	constructor(private settingsSessionPath: string, private fileManager: IFileManager) {}
+	constructor(
+		private settingsSessionPath: string,
+		private fileManager: IFileManager
+	) {}
 
 	async readSettingsSession(): Promise<SettingsSessionModel | null> {
 		if (this.session) return this.session;
@@ -15,7 +18,7 @@ export default class SettingsRepository implements ISettingsRepository {
 			this.session = JSON.parse(json);
 			return this.session;
 		} catch (e) {
-			if (e?.code === "ENOENT"){
+			if (e instanceof Error && "code" in e && e.code === "ENOENT") {
 				return null;
 			}
 			throw e;
