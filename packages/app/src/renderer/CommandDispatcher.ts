@@ -693,14 +693,22 @@ export default class CommandDispatcher {
 	performReplace(source: CommandSource) {
 		const findInput = this.findInput.value;
 		const replaceInput = this.replaceInput.value;
-
 		const view = this.tabEditorFacade.getActiveTabEditorView();
-		const ret = view.replaceCurrent(findInput, replaceInput);
 
-		if (ret) {
-			const direction = this.findReplaceState.getDirectionUp() ? "up" : "down";
-			view.findAndSelect(findInput, direction);
+		const replaced = view.replaceCurrent(findInput, replaceInput);
+		if (!replaced) return;
+
+		const result = view.findAndSelect(
+			findInput,
+			this.findReplaceState.getDirectionUp() ? "up" : "down"
+		);
+
+		if (!result) {
+			this.findInfo.textContent = "0 of 0";
+			return;
 		}
+
+		this.findInfo.textContent = `${result.current} of ${result.total}`;
 	}
 
 	performReplaceAll(source: CommandSource) {
