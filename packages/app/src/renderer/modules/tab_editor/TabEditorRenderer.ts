@@ -15,6 +15,12 @@ import {
 	NOT_MODIFIED_TEXT,
 	CLASS_TAB_GHOST,
 	CLASS_BINARY,
+	ID_FIND_REPLACE_CONTAINER,
+	ID_FIND,
+	ID_REPLACE,
+	ID_FIND_INPUT,
+	ID_REPLACE_INPUT,
+	ID_FIND_INFO,
 } from "../../constants/dom";
 import TabEditorView from "./TabEditorView";
 import { BINARY_FILE_WARNING } from "./TabEditorFacade";
@@ -30,9 +36,23 @@ export default class TabEditorRenderer {
 	private _tabContainer: HTMLElement;
 	private _editorContainer: HTMLElement;
 
+	private readonly _findAndReplaceContainer: HTMLElement;
+	private readonly _findBox: HTMLElement;
+	private readonly _replaceBox: HTMLElement;
+	private readonly _findInput: HTMLInputElement;
+	private readonly _replaceInput: HTMLInputElement;
+	private readonly _findInfo: HTMLElement;
+
 	constructor() {
 		this._tabContainer = document.getElementById("tab_container") as HTMLElement;
 		this._editorContainer = document.getElementById("editor_container") as HTMLElement;
+
+		this._findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER) as HTMLElement;
+		this._findBox = document.getElementById(ID_FIND) as HTMLElement;
+		this._replaceBox = document.getElementById(ID_REPLACE) as HTMLElement;
+		this._findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement;
+		this._replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement;
+		this._findInfo = document.getElementById(ID_FIND_INFO) as HTMLElement;
 	}
 
 	private createTabBox(fileName: string) {
@@ -258,5 +278,29 @@ export default class TabEditorRenderer {
 
 	changeFontFamily(family: string) {
 		this._editorContainer.style.fontFamily = family;
+	}
+
+	get findAndReplaceContainer() {
+		return this._findAndReplaceContainer;
+	}
+
+	get findBox() {
+		return this._findBox;
+	}
+
+	get replaceBox() {
+		return this._replaceBox;
+	}
+
+	get findInput() {
+		return this._findInput;
+	}
+
+	get replaceInput() {
+		return this._replaceInput;
+	}
+
+	get findInfo() {
+		return this._findInfo;
 	}
 }

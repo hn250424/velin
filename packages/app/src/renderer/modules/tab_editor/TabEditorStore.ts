@@ -4,11 +4,15 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class TabEditorStore {
-	public _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
+	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
 
 	private _activeTabId = -1;
 	private _activeTabIndex = -1;
 	private _contextTabId = -1;
+
+	private _findReploceOpen = false;
+	private _findDirection: "up" | "down" = "down";
+	private _searchText = "";
 
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
 		return {
@@ -63,5 +67,29 @@ export default class TabEditorStore {
 
 	deleteTabEditorViewModelById(id: number) {
 		this._idToTabEditorViewModelMap.delete(id);
+	}
+
+	get findReploceOpen() {
+		return this._findReploceOpen;
+	}
+
+	set findReplaceOpen(open: boolean) {
+		this._findReploceOpen = open;
+	}
+
+	get findDirection() {
+		return this._findDirection;
+	}
+
+	set findDirection(direction: "up" | "down") {
+		this._findDirection = direction;
+	}
+
+	get searchText() {
+		return this._searchText;
+	}
+
+	set searchText(text: string) {
+		this._searchText = text;
 	}
 }

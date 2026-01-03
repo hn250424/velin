@@ -21,7 +21,6 @@ import FocusManager from "./modules/state/FocusManager";
 import ShortcutRegistry from "./modules/input/ShortcutRegistry";
 import WindowState from "./modules/state/WindowState";
 import ZoomManager from "./modules/layout/ZoomManager";
-import FindReplaceState from "./modules/state/FindReplaceState";
 import SideState from "./modules/state/SideState";
 
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
@@ -45,7 +44,6 @@ window.addEventListener("DOMContentLoaded", () => {
 	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER) as HTMLElement;
 
 	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager);
-	const findReplaceState = diContainer.get<FindReplaceState>(DI_KEYS.FindReplaceState);
 	const sideState = diContainer.get<SideState>(DI_KEYS.SideState);
 	const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState);
 	const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager);

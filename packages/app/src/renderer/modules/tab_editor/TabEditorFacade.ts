@@ -3,6 +3,9 @@ import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel";
 
 import { inject, injectable } from "inversify";
+import { editorViewCtx } from "@milkdown/kit/core";
+import { TextSelection } from "prosemirror-state";
+
 import DI_KEYS from "../../constants/di_keys";
 import { NOT_MODIFIED_TEXT } from "../../constants/dom";
 import TabEditorRenderer from "./TabEditorRenderer";
@@ -50,7 +53,7 @@ export default class TabEditorFacade {
 
 			if (dto) {
 				const viewModel = this.store.getTabEditorViewModelById(id)!;
-				if ((dto.filePath !== viewModel.filePath)) {
+				if (dto.filePath !== viewModel.filePath) {
 					viewModel.filePath = dto.filePath;
 					viewModel.fileName = dto.fileName;
 
@@ -82,6 +85,10 @@ export default class TabEditorFacade {
 			this.store.activeTabIndex = this.renderer.tabEditorViews.length - 1;
 			this.renderer.tabEditorViews[this.store.activeTabIndex].setActive();
 			this.activeTabId = id;
+
+			if (this.store.findReplaceOpen && this.store.searchText) {
+				this.findAndSelect();
+			}
 		}
 	}
 
@@ -147,8 +154,18 @@ export default class TabEditorFacade {
 					this.store.activeTabIndex = Math.max(0, this.activeTabIndex - 1);
 
 					if (views.length > 0) {
-						views[this.store.activeTabIndex].setActive();
-						this.store.activeTabId = views[this.store.activeTabIndex].getId();
+						const view = views[this.store.activeTabIndex];
+						view.setActive();
+						this.store.activeTabId = view.getId();
+
+						if (this.store.findReplaceOpen && this.store.searchText) {
+							// this.findAndSelect();
+							if (view.searchState?.query === this.searchText) {
+								this.restoreSearchResult(view);
+							} else {
+								this.findAndSelect();
+							}
+						}
 					} else {
 						this.store.activeTabId = -1;
 					}
@@ -196,7 +213,18 @@ export default class TabEditorFacade {
 		this.store.activeTabIndex = lastIdx;
 		this.store.activeTabId = lastIdx >= 0 ? views[lastIdx].getId() : -1;
 
-		views[lastIdx]?.setActive();
+		const view = views[lastIdx];
+		if (view) {
+			view.setActive();
+			if (this.store.findReplaceOpen && this.store.searchText) {
+				// this.findAndSelect();
+				if (view.searchState?.query === this.searchText) {
+					this.restoreSearchResult(view);
+				} else {
+					this.findAndSelect();
+				}
+			}
+		}
 	}
 
 	async rename(prePath: string, newPath: string, isDir: boolean) {
@@ -244,6 +272,19 @@ export default class TabEditorFacade {
 
 		this.store.activeTabId = id;
 		this.store.activeTabIndex = targetIndex;
+
+		console.log(this.findReplaceOpen);
+		console.log(this.searchText);
+
+		if (this.findReplaceOpen && this.searchText) {
+			// this.findAndSelect();
+			const view = this.getActiveTabEditorView();
+			if (view.searchState?.query === this.searchText) {
+				this.restoreSearchResult(view);
+			} else {
+				this.findAndSelect();
+			}
+		}
 	}
 
 	moveTabEditorViewAndUpdateActiveIndex(fromIndex: number, toIndex: number): void {
@@ -301,6 +342,77 @@ export default class TabEditorFacade {
 		};
 	}
 
+	findAndSelect(direction: "up" | "down" = this.findDirection) {
+		const searchText = this.findInput.value;
+		const tabEditorView = this.getActiveTabEditorView();
+
+		const editor = tabEditorView.editor;
+		const view = editor!.ctx.get(editorViewCtx);
+		const state = view.state;
+		const currentPos = state.selection.from;
+
+		const matches = tabEditorView.findMatches(searchText);
+		if (!matches.length) {
+			tabEditorView.clearSearch();
+			this.searchText = "";
+			return null;
+		}
+
+		let targetIndex = -1;
+
+		if (direction === "down") {
+			targetIndex = matches.findIndex((match) => match.from > currentPos);
+			if (targetIndex === -1) targetIndex = 0;
+		} else {
+			for (let i = matches.length - 1; i >= 0; i--) {
+				if (matches[i].to <= currentPos) {
+					targetIndex = i;
+					break;
+				}
+			}
+			if (targetIndex === -1) targetIndex = matches.length - 1;
+		}
+
+		tabEditorView.updateSearchState({
+			query: searchText,
+			matches: matches,
+			currentIndex: targetIndex,
+		});
+
+		const match = matches[targetIndex];
+		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to));
+		view.dispatch(tr);
+
+		tabEditorView.applySearchHighlight(view);
+
+		if (matches.length >= 1) {
+			this.findInfo.textContent = `${targetIndex + 1} of ${matches.length}`;
+		} else {
+			this.findInfo.textContent = `No results`;
+		}
+
+		this.searchText = searchText;
+		this.findDirection = direction;
+	}
+
+	restoreSearchResult(tabEditorView: TabEditorView) {
+		if (!tabEditorView.searchState) return;
+
+		const { matches, currentIndex } = tabEditorView.searchState;
+
+		const editor = tabEditorView.editor;
+		const view = editor!.ctx.get(editorViewCtx);
+		const state = view.state;
+
+		const match = matches[currentIndex];
+		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to));
+		view.dispatch(tr);
+
+		tabEditorView.applySearchHighlight(view);
+
+		this.findInfo.textContent = `${currentIndex + 1} of ${matches.length}`;
+	}
+
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
 		return this.store.toTabEditorViewModel(dto);
 	}
@@ -339,6 +451,30 @@ export default class TabEditorFacade {
 
 	removeContextTabId() {
 		this.store.removeContextTabId();
+	}
+
+	get findReplaceOpen() {
+		return this.store.findReploceOpen;
+	}
+
+	set findReplaceOpen(open: boolean) {
+		this.store.findReplaceOpen = open;
+	}
+
+	get findDirection() {
+		return this.store.findDirection;
+	}
+
+	set findDirection(direction: "up" | "down") {
+		this.store.findDirection = direction;
+	}
+
+	get searchText() {
+		return this.store.searchText;
+	}
+
+	set searchText(text: string) {
+		this.store.searchText = text;
 	}
 
 	getActiveTabEditorView(): TabEditorView {
@@ -479,5 +615,29 @@ export default class TabEditorFacade {
 
 	setInsertIndex(index: number) {
 		this.drag.setInsertIndex(index);
+	}
+
+	get findAndReplaceContainer() {
+		return this.renderer.findAndReplaceContainer;
+	}
+
+	get findBox() {
+		return this.renderer.findBox;
+	}
+
+	get replaceBox() {
+		return this.renderer.replaceBox;
+	}
+
+	get findInput() {
+		return this.renderer.findInput;
+	}
+
+	get replaceInput() {
+		return this.renderer.replaceInput;
+	}
+
+	get findInfo() {
+		return this.renderer.findInfo;
 	}
 }

@@ -12,8 +12,8 @@ type SearchMatch = {
 };
 
 type SearchState = {
-	query: string;
-	results: SearchMatch[];
+	query: string,
+	matches: SearchMatch[];
 	currentIndex: number;
 };
 
@@ -26,10 +26,10 @@ export default class TabEditorView {
 
 	private suppressInputEvent = false;
 
-	private searchState: SearchState | null = null;
-	private searchHighlightKey = new PluginKey("searchHighlight");
+	private _searchState: SearchState | null = null;
+	private _searchHighlightKey = new PluginKey("searchHighlight");
 
-	private onEditorInputCallback?: () => void;
+	private _onEditorInputCallback?: () => void;
 
 	constructor(
 		tabBox: HTMLElement,
@@ -50,7 +50,7 @@ export default class TabEditorView {
 	}
 
 	observeEditor(onInput: () => void, onBlur: () => void) {
-		this.onEditorInputCallback = onInput;
+		this._onEditorInputCallback = onInput;
 
 		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
@@ -159,52 +159,7 @@ export default class TabEditorView {
 		this._tabButton.textContent = text;
 	}
 
-	findAndSelect(searchText: string, direction: "up" | "down"): { total: number; current: number } | null {
-		const view = this._editor!.ctx.get(editorViewCtx);
-		const state = view.state;
-		const currentPos = state.selection.from;
-
-		const results = this.findMatches(searchText);
-
-		if (!results.length) {
-			this.clearSearch();
-			return null;
-		}
-
-		let targetIndex = -1;
-
-		if (direction === "down") {
-			targetIndex = results.findIndex((match) => match.from > currentPos);
-			if (targetIndex === -1) targetIndex = 0;
-		} else {
-			for (let i = results.length - 1; i >= 0; i--) {
-				if (results[i].to <= currentPos) {
-					targetIndex = i;
-					break;
-				}
-			}
-			if (targetIndex === -1) targetIndex = results.length - 1;
-		}
-
-		this.searchState = {
-			query: searchText,
-			results,
-			currentIndex: targetIndex,
-		};
-
-		const match = results[targetIndex];
-		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to));
-		view.dispatch(tr);
-
-		this.applySearchHighlight(view);
-
-		return {
-			total: results.length,
-			current: targetIndex + 1,
-		};
-	}
-
-	private findMatches(searchText: string): SearchMatch[] {
+	findMatches(searchText: string): SearchMatch[] {
 		const view = this._editor!.ctx.get(editorViewCtx);
 		const { doc } = view.state;
 
@@ -232,22 +187,49 @@ export default class TabEditorView {
 		return matches;
 	}
 
-	private applySearchHighlight(view: EditorView) {
+	getNextTargetIndex(matches: SearchMatch[], direction: "up" | "down") {
+		const view = this._editor!.ctx.get(editorViewCtx);
+		const state = view.state;
+		const currentPos = state.selection.from;
+
+		let targetIndex = -1;
+
+		if (direction === "down") {
+			targetIndex = matches.findIndex((match) => match.from > currentPos);
+			if (targetIndex === -1) targetIndex = 0;
+		} else {
+			for (let i = matches.length - 1; i >= 0; i--) {
+				if (matches[i].to <= currentPos) {
+					targetIndex = i;
+					break;
+				}
+			}
+			if (targetIndex === -1) targetIndex = matches.length - 1;
+		}
+
+		return targetIndex;
+	}
+
+	updateSearchState(state: SearchState) {
+		this._searchState = state;
+	}
+
+	applySearchHighlight(view: EditorView) {
 		const state = view.state;
 
 		const searchHighlightPlugin = new Plugin({
-			key: this.searchHighlightKey,
+			key: this._searchHighlightKey,
 			state: {
 				init: () => DecorationSet.empty,
 				apply: (tr, old, _oldState, newState) => old.map(tr.mapping, newState.doc),
 			},
 			props: {
 				decorations: () => {
-					if (!this.searchState?.results.length) return null;
+					if (!this._searchState?.matches.length) return null;
 
-					const decorations = this.searchState?.results.map((match, idx) =>
+					const decorations = this._searchState?.matches.map((match, idx) =>
 						Decoration.inline(match.from, match.to, {
-							class: idx === this.searchState?.currentIndex ? "search-highlight-current" : "search-highlight",
+							class: idx === this._searchState?.currentIndex ? "search-highlight-current" : "search-highlight",
 						})
 					);
 
@@ -256,7 +238,7 @@ export default class TabEditorView {
 			},
 		});
 
-		const plugins = state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
+		const plugins = state.plugins.filter((p) => p.spec.key !== this._searchHighlightKey);
 
 		const newState = state.reconfigure({
 			plugins: [...plugins, searchHighlightPlugin],
@@ -266,17 +248,17 @@ export default class TabEditorView {
 	}
 
 	replaceCurrent(searchText: string, replaceText: string): boolean {
-		if (!this.searchState) return false;
+		if (!this._searchState) return false;
 
-		const { results, currentIndex } = this.searchState;
-		if (currentIndex < 0 || currentIndex >= results.length) return false;
+		const { matches, currentIndex } = this._searchState;
+		if (currentIndex < 0 || currentIndex >= matches.length) return false;
 
 		let replaced = false;
 
 		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
-			const { from, to } = results[currentIndex];
+			const { from, to } = matches[currentIndex];
 
 			let tr = state.tr.replaceWith(from, to, state.schema.text(replaceText));
 
@@ -323,17 +305,21 @@ export default class TabEditorView {
 	}
 
 	markAsModified() {
-		if (this.onEditorInputCallback) {
-			this.onEditorInputCallback();
+		if (this._onEditorInputCallback) {
+			this._onEditorInputCallback();
 		}
 	}
 
 	clearSearch() {
 		const view = this._editor!.ctx.get(editorViewCtx);
-		const plugins = view.state.plugins.filter((p) => p.spec.key !== this.searchHighlightKey);
+		const plugins = view.state.plugins.filter((p) => p.spec.key !== this._searchHighlightKey);
 		const newState = view.state.reconfigure({ plugins });
 		view.updateState(newState);
-		this.searchState = null;
+		this._searchState = null;
+	}
+
+	get searchState() {
+		return this._searchState;
 	}
 
 	setSuppressInputEvent(value: boolean) {

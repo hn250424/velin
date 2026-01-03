@@ -6,7 +6,6 @@ import CommandDispatcher from "./CommandDispatcher";
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
 import TreeFacade from "./modules/tree/TreeFacade";
 import ShortcutRegistry from "./modules/input/ShortcutRegistry";
-import FindReplaceState from "./modules/state/FindReplaceState";
 import TabDragManager from "./modules/tab_editor/TabDragManager";
 import TreeDragManager from "./modules/tree/TreeDragManager";
 import SideState from "./modules/state/SideState";
@@ -23,7 +22,6 @@ import SettingsRenderer from "./modules/settings/SettingsRenderer";
 const diContainer = new Container();
 
 diContainer.bind(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope();
-diContainer.bind(DI_KEYS.FindReplaceState).to(FindReplaceState).inSingletonScope();
 diContainer.bind(DI_KEYS.SideState).to(SideState).inSingletonScope();
 diContainer.bind(DI_KEYS.WindowState).to(WindowState).inSingletonScope();
 

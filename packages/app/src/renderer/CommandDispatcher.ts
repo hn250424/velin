@@ -8,12 +8,12 @@ import type { TabEditorDto } from "@shared/dto/TabEditorDto";
 import type { SettingsViewModel } from "./viewmodels/SettingsViewModel";
 
 import { inject, injectable } from "inversify";
+
 import DI_KEYS from "./constants/di_keys";
 import folderSvg from "./assets/icons/folder.svg?raw";
 import openedFolderSvg from "./assets/icons/opened_folder.svg?raw";
 
 import FocusManager from "./modules/state/FocusManager";
-import FindReplaceState from "./modules/state/FindReplaceState";
 
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
 import TreeFacade from "./modules/tree/TreeFacade";
@@ -32,17 +32,10 @@ import {
 	CLASS_TREE_NODE_CHILDREN,
 	CLASS_TREE_NODE_TEXT,
 	SELECTOR_TREE_NODE_TEXT,
-	DATASET_ATTR_TAB_ID,
 	DATASET_ATTR_TREE_PATH,
 	CLASS_TREE_NODE_INPUT,
 	CLASS_SELECTED,
 	CLASS_CUT,
-	ID_FIND_REPLACE_CONTAINER,
-	ID_FIND,
-	ID_REPLACE,
-	ID_FIND_INPUT,
-	ID_REPLACE_INPUT,
-	ID_FIND_INFO,
 	ID_HELP_INFO_OVERLAY,
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
@@ -67,34 +60,20 @@ export default class CommandDispatcher {
 	private undoStack: ICommand[] = [];
 	private redoStack: ICommand[] = [];
 
-	private findAndReplaceContainer: HTMLElement;
-	private findBox: HTMLElement;
-	private replaceBox: HTMLElement;
-	private findInput: HTMLInputElement;
-	private replaceInput: HTMLInputElement;
-	private findInfo: HTMLElement;
-
 	private helpInfoOverlay: HTMLElement;
 
 	constructor(
 		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
-		@inject(DI_KEYS.FindReplaceState) private readonly findReplaceState: FindReplaceState,
 		@inject(DI_KEYS.SettingsFacade) private readonly settingsFacade: SettingsFacade,
 		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
 		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
 	) {
-		this.findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER) as HTMLElement;
-		this.findBox = document.getElementById(ID_FIND) as HTMLElement;
-		this.replaceBox = document.getElementById(ID_REPLACE) as HTMLElement;
-		this.findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement;
-		this.replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement;
-		this.findInfo = document.getElementById(ID_FIND_INFO) as HTMLElement;
 		this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY) as HTMLElement;
 
-		this.findInput.addEventListener(
+		this.tabEditorFacade.findInput.addEventListener(
 			"input",
 			debounce(() => {
-				this.performFind("programmatic", this.findReplaceState.getDirectionUp() ? "up" : "down");
+				this.performFind("programmatic", this.tabEditorFacade.findDirection);
 			}, 300)
 		);
 	}
@@ -186,12 +165,7 @@ export default class CommandDispatcher {
 		this._syncFlattenTreeArray(viewModel, true);
 	}
 
-	private _updateUI(
-		nodeType: HTMLElement,
-		children: HTMLElement,
-		viewModel: TreeViewModel,
-		expanded: boolean
-	) {
+	private _updateUI(nodeType: HTMLElement, children: HTMLElement, viewModel: TreeViewModel, expanded: boolean) {
 		viewModel.expanded = expanded;
 
 		nodeType.innerHTML = expanded ? openedFolderSvg : folderSvg;
@@ -558,7 +532,7 @@ export default class CommandDispatcher {
 	async performDelete(source: CommandSource) {
 		const focus = this.focusManager.getFocus();
 		if (focus !== "tree") return;
-
+ 
 		const selectedIndices = this.treeFacade.getSelectedIndices();
 
 		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices);
@@ -668,55 +642,37 @@ export default class CommandDispatcher {
 	toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
 		this.focusManager.setFocus("find_replace");
 
-		this.findAndReplaceContainer.style.display = "flex";
-		this.replaceBox.style.display = showReplace ? "flex" : "none";
+		this.tabEditorFacade.findAndReplaceContainer.style.display = "flex";
+		this.tabEditorFacade.replaceBox.style.display = showReplace ? "flex" : "none";
+		this.tabEditorFacade.findReplaceOpen = true;
 
-		if (showReplace) this.replaceInput.focus();
-		else this.findInput.focus();
+		if (showReplace) this.tabEditorFacade.replaceInput.focus();
+		else this.tabEditorFacade.findInput.focus();
 
-		if (this.findReplaceState.getDirectionUp()) this.performFind("programmatic", "up");
-		else this.performFind("programmatic", "down");
+		this.performFind("programmatic", this.tabEditorFacade.findDirection);
 	}
 
 	performFind(source: CommandSource, direction: "up" | "down") {
-		const input = this.findInput.value;
-		const view = this.tabEditorFacade.getActiveTabEditorView();
-
-		const result = view.findAndSelect(input, direction);
-		if (result) this.findInfo.textContent = `${result.current} of ${result.total}`;
-		else this.findInfo.textContent = "No results";
-
-		const bDirect = direction === "up";
-		this.findReplaceState.setDirectionUp(bDirect);
+		this.tabEditorFacade.findAndSelect(direction);
 	}
 
 	performReplace(source: CommandSource) {
-		const findInput = this.findInput.value;
-		const replaceInput = this.replaceInput.value;
+		const findInput = this.tabEditorFacade.findInput.value;
+		const replaceInput = this.tabEditorFacade.replaceInput.value;
 		const view = this.tabEditorFacade.getActiveTabEditorView();
 
 		const replaced = view.replaceCurrent(findInput, replaceInput);
 		if (!replaced) return;
 
-		const result = view.findAndSelect(
-			findInput,
-			this.findReplaceState.getDirectionUp() ? "up" : "down"
-		);
-
-		if (!result) {
-			this.findInfo.textContent = "0 of 0";
-			return;
-		}
-
-		this.findInfo.textContent = `${result.current} of ${result.total}`;
+		this.tabEditorFacade.findAndSelect();
 	}
 
 	performReplaceAll(source: CommandSource) {
 		const focus = this.focusManager.getFocus();
 		if (focus !== "find_replace") return;
 
-		const findInput = this.findInput.value;
-		const replaceInput = this.replaceInput.value;
+		const findInput = this.tabEditorFacade.findInput.value;
+		const replaceInput = this.tabEditorFacade.replaceInput.value;
 
 		const view = this.tabEditorFacade.getActiveTabEditorView();
 		view.replaceAll(findInput, replaceInput);
@@ -724,10 +680,13 @@ export default class CommandDispatcher {
 
 	performCloseFindReplaceBox(source: CommandSource) {
 		this.focusManager.setFocus(null);
-		this.findAndReplaceContainer.style.display = "none";
+		this.tabEditorFacade.findAndReplaceContainer.style.display = "none";
 
 		const activeView = this.tabEditorFacade.getActiveTabEditorView();
 		if (activeView) activeView.clearSearch();
+
+		this.tabEditorFacade.findReplaceOpen = false;
+		this.tabEditorFacade.searchText = "";
 	}
 
 	performOpenSettings(source: CommandSource) {
@@ -775,10 +734,9 @@ export default class CommandDispatcher {
 		if (focus === "find_replace") {
 			const activateElement = document.activeElement;
 
-			if (activateElement === this.findInput) {
-				if (this.findReplaceState.getDirectionUp()) this.performFind(source, "up");
-				else this.performFind(source, "down");
-			} else if (activateElement === this.replaceInput) {
+			if (activateElement === this.tabEditorFacade.findInput) {
+				this.performFind(source, this.tabEditorFacade.findDirection);
+			} else if (activateElement === this.tabEditorFacade.replaceInput) {
 				this.performReplace(source);
 			}
 
