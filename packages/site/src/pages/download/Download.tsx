@@ -19,7 +19,7 @@ export const Download = () => {
 					<ul>
 						<li>This program is currently in beta testing.</li>
 						<li>Auto-saving is not implemented.</li>
-						<li>Only one theme and font available.</li>
+						<li>Only one theme available.</li>
 						<li>Currently runs only on Windows 10/11 (64-bit).</li>
 					</ul>
 				</div>
