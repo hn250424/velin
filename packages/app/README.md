@@ -8,7 +8,7 @@ A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
 - This program is currently in beta testing.
 - Auto-saving is not implemented.
-- Only one theme and font available.
+- Only one theme available.
 - Currently runs only on Windows 10/11 (64-bit).
 
 ## Download
