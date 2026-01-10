@@ -10,15 +10,13 @@ header {
 }
 
 header > nav {
-	height: 50px;
-
 	display: flex;
 	align-items: center;
 	gap: 40px;
 }
 
 header > nav > a {
-	font-size: 2rem;
+	font-size: 1.2rem;
 }
 
 header > nav > a:hover {

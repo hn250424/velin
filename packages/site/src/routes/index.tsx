@@ -15,6 +15,14 @@ const routes: RouteConfig[] = [
 		),
 	},
 	{
+		path: "/home",
+		element: (
+			<DefaultLayout>
+				<Home />
+			</DefaultLayout>
+		),
+	},
+	{
 		path: "/download",
 		element: (
 			<DefaultLayout>
