@@ -4,6 +4,7 @@ import { DefaultLayout } from "../layouts";
 
 import { Home } from "../pages/home";
 import { Download } from "../pages/download";
+import { About } from "../pages/about";
 
 const routes: RouteConfig[] = [
 	{
@@ -27,6 +28,14 @@ const routes: RouteConfig[] = [
 		element: (
 			<DefaultLayout>
 				<Download />
+			</DefaultLayout>
+		),
+	},
+	{
+		path: "/about",
+		element: (
+			<DefaultLayout>
+				<About />
 			</DefaultLayout>
 		),
 	},
