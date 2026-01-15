@@ -82,13 +82,13 @@ export default class TabEditorFacade {
 
 		if (activate) {
 			this.renderer.tabEditorViews[this.store.activeTabIndex]?.setDeactive();
-			this.store.activeTabIndex = this.renderer.tabEditorViews.length - 1;
-			this.renderer.tabEditorViews[this.store.activeTabIndex].setActive();
+
+			this.activeTabIndex = this.renderer.tabEditorViews.length - 1;
 			this.activeTabId = id;
 
-			if (this.store.findReplaceOpen && this.store.searchText) {
-				this.findAndSelect();
-			}
+			const newActiveTabEditorView = this.renderer.tabEditorViews[this.store.activeTabIndex];
+			newActiveTabEditorView.setActive();
+			this._processFindAndSelect(newActiveTabEditorView);
 		}
 	}
 
@@ -157,15 +157,7 @@ export default class TabEditorFacade {
 						const view = views[this.store.activeTabIndex];
 						view.setActive();
 						this.store.activeTabId = view.getId();
-
-						if (this.store.findReplaceOpen && this.store.searchText) {
-							// this.findAndSelect();
-							if (view.searchState?.query === this.searchText) {
-								this.restoreSearchResult(view);
-							} else {
-								this.findAndSelect();
-							}
-						}
+						this._processFindAndSelect(view);
 					} else {
 						this.store.activeTabId = -1;
 					}
@@ -216,14 +208,7 @@ export default class TabEditorFacade {
 		const view = views[lastIdx];
 		if (view) {
 			view.setActive();
-			if (this.store.findReplaceOpen && this.store.searchText) {
-				// this.findAndSelect();
-				if (view.searchState?.query === this.searchText) {
-					this.restoreSearchResult(view);
-				} else {
-					this.findAndSelect();
-				}
-			}
+			this._processFindAndSelect(view);
 		}
 	}
 
@@ -273,18 +258,8 @@ export default class TabEditorFacade {
 		this.store.activeTabId = id;
 		this.store.activeTabIndex = targetIndex;
 
-		console.log(this.findReplaceOpen);
-		console.log(this.searchText);
-
-		if (this.findReplaceOpen && this.searchText) {
-			// this.findAndSelect();
-			const view = this.getActiveTabEditorView();
-			if (view.searchState?.query === this.searchText) {
-				this.restoreSearchResult(view);
-			} else {
-				this.findAndSelect();
-			}
-		}
+		const view = this.getActiveTabEditorView();
+		this._processFindAndSelect(view);
 	}
 
 	moveTabEditorViewAndUpdateActiveIndex(fromIndex: number, toIndex: number): void {
@@ -343,8 +318,8 @@ export default class TabEditorFacade {
 	}
 
 	findAndSelect(direction: "up" | "down" = this.findDirection) {
-		const searchText = this.findInput.value;
 		const tabEditorView = this.getActiveTabEditorView();
+		const searchText = this.findInput.value;
 
 		const editor = tabEditorView.editor;
 		const view = editor!.ctx.get(editorViewCtx);
@@ -354,7 +329,7 @@ export default class TabEditorFacade {
 		const matches = tabEditorView.findMatches(searchText);
 		if (!matches.length) {
 			tabEditorView.clearSearch();
-			this.searchText = "";
+			this.findInfo.textContent = `No results`;
 			return null;
 		}
 
@@ -391,7 +366,6 @@ export default class TabEditorFacade {
 			this.findInfo.textContent = `No results`;
 		}
 
-		this.searchText = searchText;
 		this.findDirection = direction;
 	}
 
@@ -411,6 +385,16 @@ export default class TabEditorFacade {
 		tabEditorView.applySearchHighlight(view);
 
 		this.findInfo.textContent = `${currentIndex + 1} of ${matches.length}`;
+	}
+
+	private _processFindAndSelect(view: TabEditorView) {
+		if (this.findReplaceOpen && this.searchText) {
+			if (view.searchState?.query === this.searchText) {
+				this.restoreSearchResult(view);
+			} else {
+				this.findAndSelect();
+			}
+		}
 	}
 
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
@@ -470,11 +454,7 @@ export default class TabEditorFacade {
 	}
 
 	get searchText() {
-		return this.store.searchText;
-	}
-
-	set searchText(text: string) {
-		this.store.searchText = text;
+		return this.findInput.value;
 	}
 
 	getActiveTabEditorView(): TabEditorView {

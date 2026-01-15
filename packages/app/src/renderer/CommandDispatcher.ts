@@ -210,6 +210,8 @@ export default class CommandDispatcher {
 
 		const response: Response<void> = await window.rendererToMain.closeTab(data);
 		if (response.result) this.tabEditorFacade.removeTab(data.id);
+
+		if (this.tabEditorFacade.activeTabId === -1) this.performCloseFindReplaceBox("programmatic");
 	}
 
 	async performUndo(source: CommandSource) {
@@ -532,7 +534,7 @@ export default class CommandDispatcher {
 	async performDelete(source: CommandSource) {
 		const focus = this.focusManager.getFocus();
 		if (focus !== "tree") return;
- 
+
 		const selectedIndices = this.treeFacade.getSelectedIndices();
 
 		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices);
@@ -640,6 +642,8 @@ export default class CommandDispatcher {
 	}
 
 	toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
+		if (this.tabEditorFacade.activeTabId === -1) return;
+
 		this.focusManager.setFocus("find_replace");
 
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "flex";
@@ -686,7 +690,6 @@ export default class CommandDispatcher {
 		if (activeView) activeView.clearSearch();
 
 		this.tabEditorFacade.findReplaceOpen = false;
-		this.tabEditorFacade.searchText = "";
 	}
 
 	performOpenSettings(source: CommandSource) {

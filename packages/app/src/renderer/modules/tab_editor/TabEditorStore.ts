@@ -12,7 +12,6 @@ export default class TabEditorStore {
 
 	private _findReploceOpen = false;
 	private _findDirection: "up" | "down" = "down";
-	private _searchText = "";
 
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
 		return {
@@ -83,13 +82,5 @@ export default class TabEditorStore {
 
 	set findDirection(direction: "up" | "down") {
 		this._findDirection = direction;
-	}
-
-	get searchText() {
-		return this._searchText;
-	}
-
-	set searchText(text: string) {
-		this._searchText = text;
 	}
 }

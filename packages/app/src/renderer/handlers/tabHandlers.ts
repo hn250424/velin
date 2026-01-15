@@ -16,7 +16,7 @@ export default function registerTabHandlers(
 	tabContextMenu: HTMLElement,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTabClickEvents(tabContainer, tabEditorFacade);
+	bindTabClickEvents(commandDispatcher, tabContainer, tabEditorFacade);
 	bindTabContextmenuEvents(tabContainer, tabEditorFacade, tabContextMenu);
 	bindCommandsWithContextmenu(commandDispatcher, tabEditorFacade);
 	bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorFacade);
@@ -133,7 +133,7 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 	return tabs.length;
 }
 
-function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
+function bindTabClickEvents(commandDispatcher: CommandDispatcher, tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
 	tabContainer!.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
 		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement;
@@ -141,9 +141,7 @@ function bindTabClickEvents(tabContainer: HTMLElement, tabEditorFacade: TabEdito
 		if (tabBox) {
 			if (target.tagName === "BUTTON") {
 				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!, 10);
-				const data = tabEditorFacade.getTabEditorDataById(id);
-				const response: Response<void> = await window.rendererToMain.closeTab(data);
-				if (response.result) tabEditorFacade.removeTab(data.id);
+				await commandDispatcher.performCloseTab("button", id);
 			} else if (target.tagName === "SPAN") {
 				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!;
 				tabEditorFacade.activateTabEditorById(parseInt(id, 10));

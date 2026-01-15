@@ -24,7 +24,7 @@ export default class TabEditorView {
 	private _tabButton: HTMLElement;
 	private _editorBox: HTMLElement;
 
-	private suppressInputEvent = false;
+	private _suppressInputEvent = false;
 
 	private _searchState: SearchState | null = null;
 	private _searchHighlightKey = new PluginKey("searchHighlight");
@@ -61,7 +61,7 @@ export default class TabEditorView {
 					view.updateState(newState);
 
 					if (tr.docChanged) {
-						if (this.suppressInputEvent) return;
+						if (this._suppressInputEvent) return;
 						onInput();
 					}
 				},
@@ -187,29 +187,6 @@ export default class TabEditorView {
 		return matches;
 	}
 
-	getNextTargetIndex(matches: SearchMatch[], direction: "up" | "down") {
-		const view = this._editor!.ctx.get(editorViewCtx);
-		const state = view.state;
-		const currentPos = state.selection.from;
-
-		let targetIndex = -1;
-
-		if (direction === "down") {
-			targetIndex = matches.findIndex((match) => match.from > currentPos);
-			if (targetIndex === -1) targetIndex = 0;
-		} else {
-			for (let i = matches.length - 1; i >= 0; i--) {
-				if (matches[i].to <= currentPos) {
-					targetIndex = i;
-					break;
-				}
-			}
-			if (targetIndex === -1) targetIndex = matches.length - 1;
-		}
-
-		return targetIndex;
-	}
-
 	updateSearchState(state: SearchState) {
 		this._searchState = state;
 	}
@@ -323,11 +300,11 @@ export default class TabEditorView {
 	}
 
 	setSuppressInputEvent(value: boolean) {
-		this.suppressInputEvent = value;
+		this._suppressInputEvent = value;
 	}
 
 	shouldSuppressInputEvent(): boolean {
-		return this.suppressInputEvent;
+		return this._suppressInputEvent;
 	}
 
 	get editor(): Editor | null {
