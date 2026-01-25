@@ -38,6 +38,7 @@ export default class FileWatcher {
 		this.watcher = watch(dirPath, {
 			persistent: true,
 			ignoreInitial: true,
+			ignorePermissionErrors: true,
 			awaitWriteFinish: {
 				stabilityThreshold: 200,
 				pollInterval: 100,

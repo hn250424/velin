@@ -108,6 +108,9 @@ function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: Tr
 			treeFacade.clearPathToTreeWrapperMap(); // Must clear map manually before renderTreeData (no built-in clear).
 			treeFacade.renderTreeData(viewModel);
 
+			treeFacade.removeLastSelectedIndex();
+			treeFacade.clearSelectedIndices();
+			treeFacade.clearClipboardPaths();
 			treeFacade.loadFlattenArrayAndMaps(viewModel);
 		}
 	});

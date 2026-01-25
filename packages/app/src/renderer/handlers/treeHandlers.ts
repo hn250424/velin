@@ -302,7 +302,7 @@ function bindCommandsWithShortcut(
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return;
-	console.log('lastindex--', treeFacade.lastSelectedIndex)
+	
 	let lastIdx = treeFacade.lastSelectedIndex;
 	if (lastIdx <= 0) return;
 
