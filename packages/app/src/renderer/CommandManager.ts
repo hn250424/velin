@@ -44,7 +44,7 @@ import {
 type CommandSource = "shortcut" | "menu" | "element" | "context_menu" | "drag" | "programmatic" | "button";
 
 /**
- * CommandDispatcher centrally manages and executes commands that involve side effects,
+ * CommandManager centrally manages and executes commands that involve side effects,
  * state changes, or require Undo/Redo support.
  *
  * - Commands triggered via multiple UI input sources (keyboard shortcuts, menus, etc.)
@@ -56,7 +56,7 @@ type CommandSource = "shortcut" | "menu" | "element" | "context_menu" | "drag" |
  * - Local UI-only operations without side effects can remain in their event handlers.
  */
 @injectable()
-export default class CommandDispatcher {
+export default class CommandManager {
 	private undoStack: ICommand[] = [];
 	private redoStack: ICommand[] = [];
 

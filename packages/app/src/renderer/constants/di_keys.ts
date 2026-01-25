@@ -21,7 +21,7 @@ const DI_KEYS = {
 	SettingsRenderer: Symbol("SettingsRenderer"),
 	SettingsStore: Symbol("SettingsStore"),
 
-	CommandDispatcher: Symbol("CommandDispatcher"),
+	CommandManager: Symbol("CommandManager"),
 };
 
 export default DI_KEYS;

@@ -1,44 +1,44 @@
-import CommandDispatcher from "../CommandDispatcher";
+import CommandManager from "../CommandManager";
 import { CLASS_SELECTED } from "../constants/dom";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
 import SettingsFacade from "../modules/settings/SettingsFacade";
 
 export default function registerSettingsHandlers(
-	commandDispatcher: CommandDispatcher,
+	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	settingsFacade: SettingsFacade
 ) {
 	// Init.
 	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue());
-	commandDispatcher.performApplySettings("programmatic", settingsFacade.getSettingsValue());
+	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue());
 
 	// Bind.
-	bindCommandWithmenu(commandDispatcher);
-	bindCommandWithShortcut(commandDispatcher, shortcutRegistry);
-	bindCommandWithSettingsContainer(commandDispatcher, settingsFacade);
+	bindCommandWithmenu(commandManager);
+	bindCommandWithShortcut(commandManager, shortcutRegistry);
+	bindCommandWithSettingsContainer(commandManager, settingsFacade);
 }
 
-function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
+function bindCommandWithmenu(commandManager: CommandManager) {
 	document.getElementById("file_menu_settings")!.addEventListener("click", () => {
-		commandDispatcher.performOpenSettings("menu");
+		commandManager.performOpenSettings("menu");
 	});
 }
 
-function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("Ctrl+,", (e: KeyboardEvent) => commandDispatcher.performOpenSettings("shortcut"));
+function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+	shortcutRegistry.register("Ctrl+,", (e: KeyboardEvent) => commandManager.performOpenSettings("shortcut"));
 }
 
-function bindCommandWithSettingsContainer(commandDispatcher: CommandDispatcher, settingsFacade: SettingsFacade) {
+function bindCommandWithSettingsContainer(commandManager: CommandManager, settingsFacade: SettingsFacade) {
 	document.getElementById("settings-exit")!.addEventListener("click", () => {
-		commandDispatcher.performCloseSettings("button");
+		commandManager.performCloseSettings("button");
 	});
 
 	document.getElementById("settings-apply-btn")!.addEventListener("click", () => {
-		commandDispatcher.performApplySettings("button", settingsFacade.getChangeSet());
+		commandManager.performApplySettings("button", settingsFacade.getChangeSet());
 	});
 
 	document.getElementById("settings-close-btn")!.addEventListener("click", () => {
-		commandDispatcher.performCloseSettings("button");
+		commandManager.performCloseSettings("button");
 	});
 
 	const settingsMenus = [document.getElementById("settings-menu-font"), document.getElementById("settings-menu-theme")];

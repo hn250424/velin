@@ -1,21 +1,21 @@
-import CommandDispatcher from "../CommandDispatcher";
+import CommandManager from "../CommandManager";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
 
-export default function registerHelpHandlers(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
-	bindCommandWithmenu(commandDispatcher);
-	bindCommandWithShortcut(commandDispatcher, shortcutRegistry);
+export default function registerHelpHandlers(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+	bindCommandWithmenu(commandManager);
+	bindCommandWithShortcut(commandManager, shortcutRegistry);
 }
 
-function bindCommandWithmenu(commandDispatcher: CommandDispatcher) {
+function bindCommandWithmenu(commandManager: CommandManager) {
 	document.getElementById("help-information")!.addEventListener("click", async () => {
-		commandDispatcher.performShowInformation("menu");
+		commandManager.performShowInformation("menu");
 	});
 
 	document.getElementById("info-button")!.addEventListener("click", () => {
-		commandDispatcher.performHideInformation("menu");
+		commandManager.performHideInformation("menu");
 	});
 }
 
-function bindCommandWithShortcut(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("F1", async (e: KeyboardEvent) => commandDispatcher.performShowInformation("shortcut"));
+function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+	shortcutRegistry.register("F1", async (e: KeyboardEvent) => commandManager.performShowInformation("shortcut"));
 }

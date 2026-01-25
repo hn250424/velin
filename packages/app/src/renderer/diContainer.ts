@@ -2,7 +2,7 @@ import "reflect-metadata";
 import DI_KEYS from "./constants/di_keys";
 import { Container } from "inversify";
 import FocusManager from "./modules/state/FocusManager";
-import CommandDispatcher from "./CommandDispatcher";
+import CommandManager from "./CommandManager";
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
 import TreeFacade from "./modules/tree/TreeFacade";
 import ShortcutRegistry from "./modules/input/ShortcutRegistry";
@@ -43,6 +43,6 @@ diContainer.bind(DI_KEYS.SettingsFacade).to(SettingsFacade).inSingletonScope();
 diContainer.bind(DI_KEYS.SettingsRenderer).to(SettingsRenderer).inSingletonScope();
 diContainer.bind(DI_KEYS.SettingsStore).to(SettingsStore).inSingletonScope();
 
-diContainer.bind(DI_KEYS.CommandDispatcher).to(CommandDispatcher).inSingletonScope();
+diContainer.bind(DI_KEYS.CommandManager).to(CommandManager).inSingletonScope();
 
 export default diContainer;

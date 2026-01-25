@@ -32,7 +32,7 @@ import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constan
 
 import diContainer from "./diContainer";
 
-import CommandDispatcher from "./CommandDispatcher";
+import CommandManager from "./CommandManager";
 
 window.addEventListener("DOMContentLoaded", () => {
 	const title = document.getElementById("title") as HTMLElement;
@@ -53,22 +53,22 @@ window.addEventListener("DOMContentLoaded", () => {
 	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade);
 	const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade);
 
-	const commandDispatcher = diContainer.get<CommandDispatcher>(DI_KEYS.CommandDispatcher);
+	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager);
 
-	registerFileHandlers(commandDispatcher, tabEditorFacade, shortcutRegistry);
+	registerFileHandlers(commandManager, tabEditorFacade, shortcutRegistry);
 	registerExitHandlers(tabEditorFacade, treeFacade);
-	registerEditHandlers(commandDispatcher, shortcutRegistry);
+	registerEditHandlers(commandManager, shortcutRegistry);
 	registerViewHandlers(shortcutRegistry, zoomManager);
-	registerTabHandlers(commandDispatcher, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry);
+	registerTabHandlers(commandManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry);
 	registerTreeHandlers(
-		commandDispatcher,
+		commandManager,
 		focusManager,
 		treeNodeContainer,
 		treeFacade,
 		treeContextMenu,
 		shortcutRegistry
 	);
-	registerHelpHandlers(commandDispatcher, shortcutRegistry);
+	registerHelpHandlers(commandManager, shortcutRegistry);
 	registerMenuHandlers(menuItems);
 
 	registerLoadHandlers(windowState, settingsFacade, sideState, tabEditorFacade, treeFacade, () => {
@@ -76,13 +76,13 @@ window.addEventListener("DOMContentLoaded", () => {
 		registerWindowHandlers(windowState);
 		registerSideHandlers(sideState);
 
-		registerSettingsHandlers(commandDispatcher, shortcutRegistry, settingsFacade);
+		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade);
 	});
 
 	bindSyncEventFromWatch(tabEditorFacade, treeFacade);
 	bindDocumentClickEvent(tabContextMenu, treeContextMenu);
 	bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade);
-	bindShortcutEvent(commandDispatcher, shortcutRegistry);
+	bindShortcutEvent(commandManager, shortcutRegistry);
 	document.addEventListener("keydown", (e) => {
 		shortcutRegistry.handleKeyEvent(e);
 	});
@@ -152,9 +152,9 @@ function bindDocumentMousedownEvnet(
 	});
 }
 
-function bindShortcutEvent(commandDispatcher: CommandDispatcher, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("ESC", async (e: KeyboardEvent) => await commandDispatcher.performESC("shortcut"));
-	shortcutRegistry.register("ENTER", async (e: KeyboardEvent) => await commandDispatcher.performENTER(e, "shortcut"));
+function bindShortcutEvent(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+	shortcutRegistry.register("ESC", async (e: KeyboardEvent) => await commandManager.performESC("shortcut"));
+	shortcutRegistry.register("ENTER", async (e: KeyboardEvent) => await commandManager.performENTER(e, "shortcut"));
 }
 
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {

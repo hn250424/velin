@@ -4,22 +4,22 @@ import type Response from "@shared/types/Response";
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom";
-import CommandDispatcher from "../CommandDispatcher";
+import CommandManager from "../CommandManager";
 import ShortcutRegistry from "../modules/input/ShortcutRegistry";
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
 import { throttle } from "../utils/throttle";
 
 export default function registerTabHandlers(
-	commandDispatcher: CommandDispatcher,
+	commandManager: CommandManager,
 	tabContainer: HTMLElement,
 	tabEditorFacade: TabEditorFacade,
 	tabContextMenu: HTMLElement,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTabClickEvents(commandDispatcher, tabContainer, tabEditorFacade);
+	bindTabClickEvents(commandManager, tabContainer, tabEditorFacade);
 	bindTabContextmenuEvents(tabContainer, tabEditorFacade, tabContextMenu);
-	bindCommandsWithContextmenu(commandDispatcher, tabEditorFacade);
-	bindCommandsWithShortcut(commandDispatcher, shortcutRegistry, tabEditorFacade);
+	bindCommandsWithContextmenu(commandManager, tabEditorFacade);
+	bindCommandsWithShortcut(commandManager, shortcutRegistry, tabEditorFacade);
 
 	// Drag.
 	bindMouseDownEvents(tabEditorFacade, tabContainer);
@@ -133,7 +133,7 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 	return tabs.length;
 }
 
-function bindTabClickEvents(commandDispatcher: CommandDispatcher, tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
+function bindTabClickEvents(commandManager: CommandManager, tabContainer: HTMLElement, tabEditorFacade: TabEditorFacade) {
 	tabContainer!.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement;
 		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement;
@@ -141,7 +141,7 @@ function bindTabClickEvents(commandDispatcher: CommandDispatcher, tabContainer: 
 		if (tabBox) {
 			if (target.tagName === "BUTTON") {
 				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!, 10);
-				await commandDispatcher.performCloseTab("button", id);
+				await commandManager.performCloseTab("button", id);
 			} else if (target.tagName === "SPAN") {
 				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!;
 				tabEditorFacade.activateTabEditorById(parseInt(id, 10));
@@ -166,9 +166,9 @@ function bindTabContextmenuEvents(
 	});
 }
 
-function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEditorFacade: TabEditorFacade) {
+function bindCommandsWithContextmenu(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
 	document.getElementById("tab_context_close")!.addEventListener("click", async () => {
-		await commandDispatcher.performCloseTab("context_menu", tabEditorFacade.contextTabId);
+		await commandManager.performCloseTab("context_menu", tabEditorFacade.contextTabId);
 	});
 
 	document.getElementById("tab_context_close_others")!.addEventListener("click", async () => {
@@ -193,12 +193,12 @@ function bindCommandsWithContextmenu(commandDispatcher: CommandDispatcher, tabEd
 }
 
 function bindCommandsWithShortcut(
-	commandDispatcher: CommandDispatcher,
+	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	tabEditorFacade: TabEditorFacade
 ) {
 	shortcutRegistry.register(
 		"Ctrl+W",
-		async (e: KeyboardEvent) => await commandDispatcher.performCloseTab("shortcut", tabEditorFacade.activeTabId)
+		async (e: KeyboardEvent) => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
 	);
 }
