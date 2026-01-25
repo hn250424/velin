@@ -95,15 +95,6 @@ $padding-top-binary-warning: 40px;
 
 .tab > button:hover {
 	background-color: var(--tab-btn-hover-bg);
-	color: transparent;
-}
-
-.tab > button:hover::after {
-	content: "×";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 	color: var(--tab-btn-hover-font);
 }
 
