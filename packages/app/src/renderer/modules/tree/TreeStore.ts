@@ -217,7 +217,6 @@ export default class TreeStore {
 	}
 
 	clearSelectedIndices() {
-		this._lastSelectedIndex = -1;
 		this._selectedIndices.clear();
 	}
 

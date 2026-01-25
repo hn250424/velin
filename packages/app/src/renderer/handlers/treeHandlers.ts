@@ -210,16 +210,16 @@ function bindTreeClickEvents(
 		} else {
 			treeFacade.clearTreeSelected();
 
-			treeNode.classList.add(CLASS_SELECTED);
-			treeFacade.setLastSelectedIndexByPath(path);
-			treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path)!);
-
 			const viewModel = treeFacade.getTreeViewModelByPath(path);
 			if (viewModel.directory) {
 				await commandDispatcher.performOpenDirectory("element", treeNode);
 			} else {
 				await commandDispatcher.performOpenFile("element", path);
 			}
+
+			treeNode.classList.add(CLASS_SELECTED);
+			treeFacade.setLastSelectedIndexByPath(path);
+			treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path)!);
 		}
 	});
 }
@@ -302,7 +302,7 @@ function bindCommandsWithShortcut(
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return;
-
+	console.log('lastindex--', treeFacade.lastSelectedIndex)
 	let lastIdx = treeFacade.lastSelectedIndex;
 	if (lastIdx <= 0) return;
 
@@ -317,10 +317,12 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
 	if (e.shiftKey) {
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
+		treeFacade.lastSelectedIndex = lastIdx;
 	} else {
 		treeFacade.clearTreeSelected();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
+		treeFacade.lastSelectedIndex = lastIdx;
 	}
 }
 
@@ -342,9 +344,11 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
 	if (e.shiftKey) {
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
+		treeFacade.lastSelectedIndex = lastIdx;
 	} else {
 		treeFacade.clearTreeSelected();
 		newTreeNode.classList.add(CLASS_SELECTED);
 		treeFacade.addSelectedIndices(lastIdx);
+		treeFacade.lastSelectedIndex = lastIdx;
 	}
 }

@@ -69,6 +69,7 @@ export default class TreeRenderer {
 		box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`;
 		box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path;
 		box.title = viewModel.path;
+		box.tabIndex = -1;
 
 		const nodeType = document.createElement("div");
 		nodeType.classList.add(CLASS_TREE_NODE_TYPE);

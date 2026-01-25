@@ -64,11 +64,13 @@ export default class TreeFacade {
 	}
 
 	set lastSelectedIndex(index: number) {
+		const treeNode = this.getTreeNodeByIndex(index);
+		treeNode.focus();
 		this.store.lastSelectedIndex = index;
 	}
 
 	setLastSelectedIndexByPath(path: string) {
-		this.store.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path)!;
+		this.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path)!;
 	}
 
 	removeLastSelectedIndex() {
