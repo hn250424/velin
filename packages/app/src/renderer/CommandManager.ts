@@ -752,10 +752,14 @@ export default class CommandManager {
 
 			if (viewModel.directory) {
 				const treeNode = this.treeFacade.getTreeNodeByIndex(idx);
-				this.performOpenDirectory("programmatic", treeNode);
+				await this.performOpenDirectory("programmatic", treeNode);
 			} else {
-				this.performOpenFile("programmatic", viewModel.path);
+				await this.performOpenFile("programmatic", viewModel.path);
 			}
+
+			// Re-focus the tree node to reclaim focus lost to the editor during the opening process.
+			const treeNode = this.treeFacade.getTreeNodeByIndex(idx);
+			treeNode.focus();
 
 			return;
 		}
