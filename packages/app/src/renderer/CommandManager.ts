@@ -619,6 +619,7 @@ export default class CommandManager {
 
 					if (!directory) {
 						await this.performOpenFile("programmatic", filePath);
+						this.focusManager.setFocus("editor");
 						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!;
 						cmd.setOpenedTabId(createdTabView.getId());
 					}

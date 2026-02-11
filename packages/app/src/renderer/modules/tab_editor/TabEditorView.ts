@@ -1,10 +1,12 @@
+import "@milkdown/theme-nord/style.css";
 import { serializerCtx } from "@milkdown/core";
 import { Editor, editorViewCtx, parserCtx } from "@milkdown/kit/core";
-import "@milkdown/theme-nord/style.css";
-import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from "../../constants/dom";
-import { TextSelection } from "prosemirror-state";
+
+import { TextSelection, Selection } from "prosemirror-state";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { Plugin, PluginKey } from "prosemirror-state";
+
+import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from "../../constants/dom";
 
 type SearchMatch = {
 	from: number;
@@ -12,7 +14,7 @@ type SearchMatch = {
 };
 
 type SearchState = {
-	query: string,
+	query: string;
 	matches: SearchMatch[];
 	currentIndex: number;
 };
@@ -121,9 +123,19 @@ export default class TabEditorView {
 		return this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx);
 			const state = view.state;
-			const newSel = TextSelection.create(state.doc, sel.anchor, sel.head);
-			const tr = state.tr.setSelection(newSel);
-			view.dispatch(tr);
+
+			const maxPos = state.doc.content.size;
+			const safeAnchor = Math.max(0, Math.min(sel.anchor, maxPos));
+
+			try {
+				const resolvedPos = state.doc.resolve(safeAnchor);
+				const newSel = Selection.near(resolvedPos);
+
+				const tr = state.tr.setSelection(newSel);
+				view.dispatch(tr);
+			} catch (e) {
+				console.warn("Selection placement failed:", e);
+			}
 		});
 	}
 

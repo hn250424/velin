@@ -106,7 +106,10 @@ export default class TabEditorFacade {
 
 				tv.setSuppressInputEvent(true);
 				const selection = tv.getSelection();
-				tv.setContent(result.content);
+
+				// Prevents cursor jumping and content normalization issues after save.
+				// tv.setContent(result.content);
+				
 				tv.setSelection(selection);
 				tv.setSuppressInputEvent(false);
 
