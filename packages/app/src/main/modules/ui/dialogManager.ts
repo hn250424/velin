@@ -1,5 +1,5 @@
-import type IDialogManager from "@main/modules/contracts/IDialogManager";
-import { dialog, BrowserWindow } from "electron";
+import type IDialogManager from "@main/modules/contracts/IDialogManager"
+import { dialog, BrowserWindow } from "electron"
 
 const dialogManager: IDialogManager = {
 	async showConfirmDialog(message: string): Promise<boolean> {
@@ -9,8 +9,8 @@ const dialogManager: IDialogManager = {
 			defaultId: 0,
 			cancelId: 1,
 			message: message,
-		});
-		return result.response === 0;
+		})
+		return result.response === 0
 	},
 
 	async showOpenFileDialog() {
@@ -20,14 +20,14 @@ const dialogManager: IDialogManager = {
 			//     { name: 'Markdown', extensions: ['md', 'markdown'] }
 			// ],
 			properties: ["openFile"],
-		});
+		})
 	},
 
 	async showOpenDirectoryDialog() {
 		return await dialog.showOpenDialog({
 			title: "Open Directory",
 			properties: ["openDirectory"],
-		});
+		})
 	},
 
 	async showSaveDialog(mainWindow: BrowserWindow, fileName = ""): Promise<Electron.SaveDialogReturnValue> {
@@ -35,8 +35,8 @@ const dialogManager: IDialogManager = {
 			title: "Save As",
 			defaultPath: fileName,
 			filters: [{ name: "Markdown", extensions: ["md", "markdown"] }],
-		});
+		})
 	},
-};
+}
 
-export default dialogManager;
+export default dialogManager

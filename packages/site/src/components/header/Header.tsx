@@ -1,5 +1,5 @@
-import "./Header.scss";
-import { Link } from "react-router-dom";
+import "./Header.scss"
+import { Link } from "react-router-dom"
 
 export const Header = () => {
 	return (
@@ -16,4 +16,4 @@ export const Header = () => {
 			</header>
 		</>
 	)
-};
+}

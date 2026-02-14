@@ -1,7 +1,7 @@
-import { vi } from "vitest";
+import { vi } from "vitest"
 
 vi.mock("electron", async () => {
-	const actual = await vi.importActual<any>("electron");
+	const actual = await vi.importActual<any>("electron")
 	return {
 		...actual,
 		app: {
@@ -12,5 +12,5 @@ vi.mock("electron", async () => {
 				workAreaSize: { width: 1920, height: 1080 },
 			})),
 		},
-	};
-});
+	}
+})

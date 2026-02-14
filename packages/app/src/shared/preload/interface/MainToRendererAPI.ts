@@ -1,8 +1,8 @@
-import SideDto from "@shared/dto/SideDto";
-import TreeDto from "../../dto/TreeDto";
-import { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import WindowDto from "@shared/dto/WindowDto";
-import SettingsDto from "@shared/dto/SettingsDto";
+import type { SideDto } from "@shared/dto/SideDto"
+import type { TreeDto } from "../../dto/TreeDto"
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto"
+import type { WindowDto } from "@shared/dto/WindowDto"
+import type { SettingsDto } from "@shared/dto/SettingsDto"
 
 export default interface MainToRendererAPI {
 	session: (
@@ -13,9 +13,9 @@ export default interface MainToRendererAPI {
 			tabEditorsDto: TabEditorsDto,
 			treeDto: TreeDto
 		) => void
-	) => void;
-	info: (callback: (version: string) => void) => void;
-	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void;
-	onMaximizeWindow: (callback: () => void) => void;
-	onUnmaximizeWindow: (callback: () => void) => void;
+	) => void
+	info: (callback: (version: string) => void) => void
+	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void
+	onMaximizeWindow: (callback: () => void) => void
+	onUnmaximizeWindow: (callback: () => void) => void
 }

@@ -20,6 +20,6 @@ const DI_KEYS = {
 	TreeService: Symbol("TreeService"),
 	SideService: Symbol("SideService"),
 	SettingsService: Symbol("SettingsService"),
-};
+}
 
-export default DI_KEYS;
+export default DI_KEYS

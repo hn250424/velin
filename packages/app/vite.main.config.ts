@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import { builtinModules } from "module";
-import path from "path";
+import { defineConfig } from "vite"
+import { builtinModules } from "module"
+import path from "path"
 
 export default defineConfig({
 	build: {
@@ -32,4 +32,4 @@ export default defineConfig({
 			"@modules_contracts": path.resolve(__dirname, "src/main/modules/contracts"),
 		},
 	},
-});
+})

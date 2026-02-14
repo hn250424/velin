@@ -1,4 +1,4 @@
-import "./Download.scss";
+import "./Download.scss"
 
 export const Download = () => {
 	return (
@@ -25,5 +25,5 @@ export const Download = () => {
 				</div>
 			</div>
 		</>
-	);
-};
+	)
+}

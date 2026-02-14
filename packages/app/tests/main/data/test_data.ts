@@ -1,19 +1,19 @@
-import TreeSessionModel from "@main/models/TreeSessionModel";
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import TreeDto from "@shared/dto/TreeDto";
+import TreeSessionModel from "@main/models/TreeSessionModel"
+import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+import TreeDto from "@shared/dto/TreeDto"
 
-export const tabSessionPath = "/fake/path/tabSession.json";
-export const treeSessionPath = "/fake/path/treeSession.json";
-export const sideSessionPath = "/fake/path/sideSession.json";
-export const settingsSessionPath = "/fake/path/settingsSession.json";
-export const windowSessionPath = "/fake/path/windowSession.json";
+export const tabSessionPath = "/fake/path/tabSession.json"
+export const treeSessionPath = "/fake/path/treeSession.json"
+export const sideSessionPath = "/fake/path/sideSession.json"
+export const settingsSessionPath = "/fake/path/settingsSession.json"
+export const windowSessionPath = "/fake/path/windowSession.json"
 
-const preFilePath = "preFilePath";
-export const newFilePath = "newFilePath";
-const preFileName = "preFileName";
-const newFileName = "newFileName";
-const preFileContent = "preFileContent";
-const newFileContent = "newFileContent";
+const preFilePath = "preFilePath"
+export const newFilePath = "newFilePath"
+const preFileName = "preFileName"
+const newFileName = "newFileName"
+const preFileContent = "preFileContent"
+const newFileContent = "newFileContent"
 
 export const emptyFilePathTabEditorDto: TabEditorDto = {
 	id: 0,
@@ -22,7 +22,7 @@ export const emptyFilePathTabEditorDto: TabEditorDto = {
 	fileName: preFileName,
 	content: preFileContent,
 	isBinary: false,
-};
+}
 
 export const defaultTabEditorDto: TabEditorDto = {
 	id: 0,
@@ -31,7 +31,7 @@ export const defaultTabEditorDto: TabEditorDto = {
 	fileName: preFileName,
 	content: preFileContent,
 	isBinary: false,
-};
+}
 
 export const tabEidtorsDto: TabEditorsDto = {
 	activatedId: 1,
@@ -69,7 +69,7 @@ export const tabEidtorsDto: TabEditorsDto = {
 			isBinary: false,
 		},
 	],
-};
+}
 
 export const treeDto: TreeDto = {
 	path: "D:/workspace/root",
@@ -153,7 +153,7 @@ export const treeDto: TreeDto = {
 			children: null,
 		},
 	],
-};
+}
 
 export const treeSessionModel: TreeSessionModel = {
 	path: "D:/workspace/root",
@@ -237,4 +237,4 @@ export const treeSessionModel: TreeSessionModel = {
 			children: null,
 		},
 	],
-};
+}

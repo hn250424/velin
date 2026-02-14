@@ -6,4 +6,4 @@ export const utilsEvents = {
 	getRelativePath: "getRelativePath",
 	isAbsolute: "isAbsolute",
 	pathSep: "pathSep",
-} as const;
+} as const

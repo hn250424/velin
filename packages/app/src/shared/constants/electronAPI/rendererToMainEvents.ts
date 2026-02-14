@@ -39,4 +39,4 @@ export const rendererToMainEvents = {
 	getSyncedTreeSession: "getSyncedTreeSession",
 
 	setWatchSkipState: "setWatchSkipState",
-} as const;
+} as const

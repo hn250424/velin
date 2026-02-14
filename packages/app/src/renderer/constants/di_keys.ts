@@ -22,6 +22,6 @@ const DI_KEYS = {
 	SettingsStore: Symbol("SettingsStore"),
 
 	CommandManager: Symbol("CommandManager"),
-};
+}
 
-export default DI_KEYS;
+export default DI_KEYS

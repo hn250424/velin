@@ -1,16 +1,16 @@
-import type IFileManager from "../modules/contracts/IFileManager";
-import type IFileWatcher from "@main/modules/contracts/IFileWatcher";
-import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import type IDialogManager from "../modules/contracts/IDialogManager";
-import type ITreeRepository from "@main/modules/contracts/ITreeRepository";
-import type ITabRepository from "../modules/contracts/ITabRepository";
-import type TreeSessionModel from "@main/models/TreeSessionModel";
-import type { TabSessionData } from "../models/TabSessionModel";
-import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto";
-import type { TreeDto } from "@shared/dto/TreeDto";
-import { BrowserWindow } from "electron";
-import { inject } from "inversify";
-import DI_KEYS from "../constants/di_keys";
+import type IFileManager from "../modules/contracts/IFileManager"
+import type IFileWatcher from "@main/modules/contracts/IFileWatcher"
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils"
+import type IDialogManager from "../modules/contracts/IDialogManager"
+import type ITreeRepository from "@main/modules/contracts/ITreeRepository"
+import type ITabRepository from "../modules/contracts/ITabRepository"
+import type TreeSessionModel from "@main/models/TreeSessionModel"
+import type { TabSessionData } from "../models/TabSessionModel"
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+import type { TreeDto } from "@shared/dto/TreeDto"
+import { BrowserWindow } from "electron"
+import { inject } from "inversify"
+import DI_KEYS from "../constants/di_keys"
 
 export default class FileService {
 	constructor(
@@ -26,39 +26,39 @@ export default class FileService {
 		const model = (await this.tabRepository.readTabSession()) ?? {
 			activatedId: -1,
 			data: [],
-		};
+		}
 
-		const data = model.data;
-		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-		data.push({ id: id, filePath: "" });
-		await this.tabRepository.writeTabSession(model);
-		return id;
+		const data = model.data
+		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0
+		data.push({ id: id, filePath: "" })
+		await this.tabRepository.writeTabSession(model)
+		return id
 	}
 
 	async openFile(filePath?: string): Promise<TabEditorDto | null> {
 		if (!filePath) {
-			const result = await this.dialogManager.showOpenFileDialog();
+			const result = await this.dialogManager.showOpenFileDialog()
 			if (result.canceled || result.filePaths.length === 0) {
-				return null;
+				return null
 			}
-			filePath = result.filePaths[0];
+			filePath = result.filePaths[0]
 		}
 
-		const fileName = this.fileManager.getBasename(filePath);
-		const buffer = await this.fileManager.getBuffer(filePath);
-		const isBinary = this.fileManager.isBinaryContent(buffer);
-		const content = this.fileManager.toStringFromBuffer(buffer);
+		const fileName = this.fileManager.getBasename(filePath)
+		const buffer = await this.fileManager.getBuffer(filePath)
+		const isBinary = this.fileManager.isBinaryContent(buffer)
+		const content = this.fileManager.toStringFromBuffer(buffer)
 
 		const model = (await this.tabRepository.readTabSession()) ?? {
 			activatedId: -1,
 			data: [],
-		};
+		}
 
-		const data = model.data;
-		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0;
-		data.push({ id: id, filePath: filePath });
-		model.activatedId = id;
-		await this.tabRepository.writeTabSession(model);
+		const data = model.data
+		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0
+		data.push({ id: id, filePath: filePath })
+		model.activatedId = id
+		await this.tabRepository.writeTabSession(model)
 
 		return {
 			id: id,
@@ -67,37 +67,37 @@ export default class FileService {
 			fileName: fileName,
 			content: content,
 			isBinary: isBinary,
-		};
+		}
 	}
 
 	async openDirectory(dto?: TreeDto): Promise<TreeDto | null> {
-		let path;
-		let indent;
+		let path
+		let indent
 
 		if (!dto || !dto.path) {
-			const result = await this.dialogManager.showOpenDirectoryDialog();
+			const result = await this.dialogManager.showOpenDirectoryDialog()
 
 			if (result.canceled || result.filePaths.length === 0) {
-				return null;
+				return null
 			}
 
-			path = result.filePaths[0];
-			indent = 0;
+			path = result.filePaths[0]
+			indent = 0
 		} else {
-			path = dto.path;
-			indent = dto.indent;
+			path = dto.path
+			indent = dto.indent
 		}
 
-		const tree = await this.treeUtils.getDirectoryTree(path, indent);
-		if (!tree) return null;
+		const tree = await this.treeUtils.getDirectoryTree(path, indent)
+		if (!tree) return null
 
 		if (indent === 0) {
-			await this.treeRepository.writeTreeSession(tree);
-			this.fileWatcher.watch(path);
+			await this.treeRepository.writeTreeSession(tree)
+			this.fileWatcher.watch(path)
 		} else {
-			const session = await this.treeRepository.readTreeSession();
-			const updatedSession = this._mergeTreeSessionWithFsTree(path, indent, tree.children, session);
-			if (updatedSession) await this.treeRepository.writeTreeSession(updatedSession);
+			const session = await this.treeRepository.readTreeSession()
+			const updatedSession = this._mergeTreeSessionWithFsTree(path, indent, tree.children, session)
+			if (updatedSession) await this.treeRepository.writeTreeSession(updatedSession)
 		}
 
 		return {
@@ -107,7 +107,7 @@ export default class FileService {
 			directory: tree.directory,
 			expanded: tree.expanded,
 			children: tree?.children ?? [],
-		};
+		}
 	}
 
 	/**
@@ -131,11 +131,13 @@ export default class FileService {
 				indent,
 				directory: true,
 				expanded: true,
-				children: tree ? tree.map((child) => ({
-					...child,
-					children: null as null,
-				})) : null,
-			};
+				children: tree
+					? tree.map((child) => ({
+							...child,
+							children: null as null,
+						}))
+					: null,
+			}
 		}
 
 		const newNode: TreeSessionModel = {
@@ -145,80 +147,80 @@ export default class FileService {
 			directory: true,
 			expanded: true,
 			children: tree,
-		};
+		}
 
-		return this._replaceNode(session, dirPath, newNode) || session;
+		return this._replaceNode(session, dirPath, newNode) || session
 	}
 
 	private _replaceNode(root: TreeSessionModel, targetPath: string, newNode: TreeSessionModel): TreeSessionModel {
 		if (root.path === targetPath) {
-			return newNode;
+			return newNode
 		}
 
 		if (root.children) {
 			const newChildren = root.children.map((child) => {
-				return this._replaceNode(child, targetPath, newNode);
-			});
+				return this._replaceNode(child, targetPath, newNode)
+			})
 
-			return { ...root, children: newChildren };
+			return { ...root, children: newChildren }
 		}
 
-		return root;
+		return root
 	}
 
 	async save(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
 		if (!data.filePath) {
-			const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
+			const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
 			if (result.canceled || !result.filePath) {
-				return data;
+				return data
 			} else {
-				await this.fileManager.write(result.filePath, data.content);
+				await this.fileManager.write(result.filePath, data.content)
 
 				const tabSession = (await this.tabRepository.readTabSession()) ?? {
 					activatedId: -1,
 					data: [],
-				};
+				}
 
-				const session = tabSession.data.find((s) => s.id === data.id);
-				if (session) session.filePath = result.filePath;
-				if (writeSession) await this.tabRepository.writeTabSession(tabSession);
+				const session = tabSession.data.find((s) => s.id === data.id)
+				if (session) session.filePath = result.filePath
+				if (writeSession) await this.tabRepository.writeTabSession(tabSession)
 
 				return {
 					...data,
 					isModified: false,
 					filePath: result.filePath,
 					fileName: this.fileManager.getBasename(result.filePath),
-				};
+				}
 			}
 		} else {
-			await this.fileManager.write(data.filePath, data.content);
+			await this.fileManager.write(data.filePath, data.content)
 			return {
 				...data,
 				isModified: false,
 				filePath: data.filePath,
 				fileName: this.fileManager.getBasename(data.filePath),
-			};
+			}
 		}
 	}
 
 	async saveAs(data: TabEditorDto, mainWindow: BrowserWindow): Promise<TabEditorDto | null> {
-		const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName);
+		const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
 		if (result.canceled || !result.filePath) {
-			return null;
+			return null
 		} else {
-			await this.fileManager.write(result.filePath, data.content);
+			await this.fileManager.write(result.filePath, data.content)
 
 			const model = (await this.tabRepository.readTabSession()) ?? {
 				activatedId: -1,
 				data: [],
-			};
-			const arr = model.data;
-			const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0;
-			arr.push({ id: id, filePath: result.filePath });
-			model.data = arr;
-			this.tabRepository.writeTabSession(model);
+			}
+			const arr = model.data
+			const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
+			arr.push({ id: id, filePath: result.filePath })
+			model.data = arr
+			this.tabRepository.writeTabSession(model)
 
 			return {
 				id: id,
@@ -227,19 +229,19 @@ export default class FileService {
 				fileName: this.fileManager.getBasename(result.filePath),
 				content: data.content,
 				isBinary: data.isBinary,
-			};
+			}
 		}
 	}
 
 	async saveAll(dto: TabEditorsDto, mainWindow: BrowserWindow) {
-		const sessionArr: TabSessionData[] = [];
-		const responseArr: TabEditorDto[] = [];
+		const sessionArr: TabSessionData[] = []
+		const responseArr: TabEditorDto[] = []
 
 		for (const tab of dto.data) {
-			const { id, isModified, filePath, fileName, content, isBinary } = tab;
+			const { id, isModified, filePath, fileName, content, isBinary } = tab
 
 			if (!isModified) {
-				sessionArr.push({ id: id, filePath: filePath });
+				sessionArr.push({ id: id, filePath: filePath })
 				responseArr.push({
 					id: id,
 					isModified: false,
@@ -247,23 +249,23 @@ export default class FileService {
 					fileName: fileName,
 					content: content,
 					isBinary: isBinary,
-				});
-				continue;
+				})
+				continue
 			}
 
-			const result = await this.save(tab, mainWindow, false);
-			sessionArr.push({ id: result.id, filePath: result.filePath });
-			responseArr.push(result);
+			const result = await this.save(tab, mainWindow, false)
+			sessionArr.push({ id: result.id, filePath: result.filePath })
+			responseArr.push(result)
 		}
 
 		await this.tabRepository.writeTabSession({
 			activatedId: dto.activatedId,
 			data: sessionArr,
-		});
+		})
 
 		return {
 			activatedId: dto.activatedId,
 			data: responseArr,
-		};
+		}
 	}
 }

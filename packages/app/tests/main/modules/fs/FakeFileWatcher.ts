@@ -1,4 +1,4 @@
-import IFileWatcher from "@main/modules/contracts/IFileWatcher";
+import IFileWatcher from "@main/modules/contracts/IFileWatcher"
 
 export default class FakeFileWatcher implements IFileWatcher {
 	setSkipState(_: boolean): void {

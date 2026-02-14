@@ -1,51 +1,51 @@
-import IDialogManager from "@main/modules/contracts/IDialogManager";
-import { BrowserWindow } from "electron";
+import IDialogManager from "@main/modules/contracts/IDialogManager"
+import { BrowserWindow } from "electron"
 
-let fakeConfirmResult = false;
+let fakeConfirmResult = false
 export function setFakeConfirmResult(result: boolean) {
-	fakeConfirmResult = result;
+	fakeConfirmResult = result
 }
 
 let fakeSaveDialogResult: Electron.SaveDialogReturnValue = {
 	canceled: false,
 	filePath: undefined,
-};
+}
 export function setFakeSaveDialogResult(result: Electron.SaveDialogReturnValue) {
-	fakeSaveDialogResult = result;
+	fakeSaveDialogResult = result
 }
 
 let fakeOpenFileDialogResult: Electron.OpenDialogReturnValue = {
 	canceled: false,
 	filePaths: [],
-};
+}
 export function setFakeOpenFileDialogResult(result: Electron.OpenDialogReturnValue) {
-	fakeOpenFileDialogResult = result;
+	fakeOpenFileDialogResult = result
 }
 
 let fakeOpenDirectoryDialogResult: Electron.OpenDialogReturnValue = {
 	canceled: false,
 	filePaths: [],
-};
+}
 export function setFakeOpenDirectoryDialogResult(result: Electron.OpenDialogReturnValue) {
-	fakeOpenDirectoryDialogResult = result;
+	fakeOpenDirectoryDialogResult = result
 }
 
 const fakeDialogManager: IDialogManager = {
 	async showConfirmDialog(message: string): Promise<boolean> {
-		return fakeConfirmResult;
+		return fakeConfirmResult
 	},
 
 	async showOpenFileDialog(): Promise<Electron.OpenDialogReturnValue> {
-		return fakeOpenFileDialogResult;
+		return fakeOpenFileDialogResult
 	},
 
 	async showOpenDirectoryDialog() {
-		return fakeOpenDirectoryDialogResult;
+		return fakeOpenDirectoryDialogResult
 	},
 
 	async showSaveDialog(mainWindow: BrowserWindow, fileName = ""): Promise<Electron.SaveDialogReturnValue> {
-		return fakeSaveDialogResult;
+		return fakeSaveDialogResult
 	},
-};
+}
 
-export default fakeDialogManager;
+export default fakeDialogManager

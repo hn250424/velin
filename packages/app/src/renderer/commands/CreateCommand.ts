@@ -1,10 +1,10 @@
-import type ICommand from "./ICommand";
-import TreeFacade from "../modules/tree/TreeFacade";
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade";
+import type ICommand from "./ICommand"
+import TreeFacade from "../modules/tree/TreeFacade"
+import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 
 export default class CreateCommand implements ICommand {
-	private createdPath = "";
-	private openedTabId: number | null = null;
+	private createdPath = ""
+	private openedTabId: number | null = null
 
 	constructor(
 		private treeFacade: TreeFacade,
@@ -15,37 +15,37 @@ export default class CreateCommand implements ICommand {
 	) {}
 
 	async execute() {
-		this.createdPath = window.utils.getJoinedPath(this.parentPath, this.name);
-		await window.rendererToMain.create(this.createdPath, this.isDirectory);
+		this.createdPath = window.utils.getJoinedPath(this.parentPath, this.name)
+		await window.rendererToMain.create(this.createdPath, this.isDirectory)
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession();
+		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
 		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession);
-			this.treeFacade.renderTreeData(viewModel);
-			this.treeFacade.loadFlattenArrayAndMaps(viewModel);
+			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+			this.treeFacade.renderTreeData(viewModel)
+			this.treeFacade.loadFlattenArrayAndMaps(viewModel)
 		}
 	}
 
 	async undo() {
-		if (!this.createdPath) return;
+		if (!this.createdPath) return
 
-		await window.rendererToMain.delete([this.createdPath]);
+		await window.rendererToMain.delete([this.createdPath])
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession();
+		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
 		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession);
-			this.treeFacade.renderTreeData(viewModel);
-			this.treeFacade.loadFlattenArrayAndMaps(viewModel);
+			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
+			this.treeFacade.renderTreeData(viewModel)
+			this.treeFacade.loadFlattenArrayAndMaps(viewModel)
 		}
 
 		if (this.openedTabId !== null) {
-			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)!;
-			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)!;
-			this.tabEditorFacade.removeTab(tabEditorView.getId());
+			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)!
+			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)!
+			this.tabEditorFacade.removeTab(tabEditorView.getId())
 		}
 	}
 
 	setOpenedTabId(id: number) {
-		this.openedTabId = id;
+		this.openedTabId = id
 	}
 }

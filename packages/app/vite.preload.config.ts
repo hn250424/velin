@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import { builtinModules } from "module";
-import path from "path";
+import { defineConfig } from "vite"
+import { builtinModules } from "module"
+import path from "path"
 
 export default defineConfig({
 	build: {
@@ -11,10 +11,7 @@ export default defineConfig({
 			fileName: () => "preload.js",
 		},
 		rollupOptions: {
-			external: [
-				"electron",
-				...builtinModules.flatMap((m) => [m, `node:${m}`]),
-			],
+			external: ["electron", ...builtinModules.flatMap((m) => [m, `node:${m}`])],
 			output: {
 				format: "cjs",
 			},
@@ -29,4 +26,4 @@ export default defineConfig({
 			"@modules_contracts": path.resolve(__dirname, "src/main/modules/contracts"),
 		},
 	},
-});
+})

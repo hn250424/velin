@@ -1,10 +1,10 @@
-import type IFileManager from "../contracts/IFileManager";
-import type ITreeUtils from "@main/modules/contracts/ITreeUtils";
-import type { TreeDto} from "@shared/dto/TreeDto";
-import fs from "fs";
-import path from "path";
-import { inject, injectable } from "inversify";
-import DI_KEYS from "../../constants/di_keys";
+import type IFileManager from "../contracts/IFileManager"
+import type ITreeUtils from "@main/modules/contracts/ITreeUtils"
+import type { TreeDto } from "@shared/dto/TreeDto"
+import fs from "fs"
+import path from "path"
+import { inject, injectable } from "inversify"
+import DI_KEYS from "../../constants/di_keys"
 
 @injectable()
 export default class TreeUtils implements ITreeUtils {
@@ -21,19 +21,19 @@ export default class TreeUtils implements ITreeUtils {
 	 * - children: [] means no children exist or directory can't be read.
 	 */
 	async getDirectoryTree(dirPath: string, indent = 0) {
-		const stats = fs.statSync(dirPath);
-		if (!stats.isDirectory()) return null;
+		const stats = fs.statSync(dirPath)
+		if (!stats.isDirectory()) return null
 
-		let children: TreeDto[] | null = null;
+		let children: TreeDto[] | null = null
 
 		try {
-			const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
+			const dirents = fs.readdirSync(dirPath, { withFileTypes: true })
 
 			dirents.sort((a, b) => {
-				if (a.isDirectory() && !b.isDirectory()) return -1;
-				if (!a.isDirectory() && b.isDirectory()) return 1;
-				return a.name.localeCompare(b.name);
-			});
+				if (a.isDirectory() && !b.isDirectory()) return -1
+				if (!a.isDirectory() && b.isDirectory()) return 1
+				return a.name.localeCompare(b.name)
+			})
 
 			children = dirents.map(
 				(dirent: fs.Dirent): TreeDto => ({
@@ -44,9 +44,9 @@ export default class TreeUtils implements ITreeUtils {
 					expanded: false,
 					children: null,
 				})
-			);
+			)
 		} catch {
-			children = null;
+			children = null
 		}
 
 		return {
@@ -56,38 +56,38 @@ export default class TreeUtils implements ITreeUtils {
 			directory: true,
 			expanded: true,
 			children,
-		};
+		}
 	}
 
 	async syncWithFs(node: TreeDto): Promise<TreeDto | null> {
-		const exists = await this.fileManager.exists(node.path);
-		if (!exists) return null;
+		const exists = await this.fileManager.exists(node.path)
+		if (!exists) return null
 
-		if (!node.directory) return node;
+		if (!node.directory) return node
 
 		if (!node.expanded) {
 			return {
 				...node,
 				children: null,
-			};
+			}
 		}
 
-		const current = await this.getDirectoryTree(node.path, node.indent);
-		const sessionChildren = node.children ?? [];
-		const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]));
+		const current = await this.getDirectoryTree(node.path, node.indent)
+		const sessionChildren = node.children ?? []
+		const sessionMap = new Map(sessionChildren.map((c) => [c.path, c]))
 
-		const updatedChildren: TreeDto[] = [];
+		const updatedChildren: TreeDto[] = []
 
 		for (const child of current?.children ?? []) {
-			const sessionChild = sessionMap.get(child.path);
-			const merged = await this.syncWithFs(sessionChild ?? child);
-			if (merged) updatedChildren.push(merged);
+			const sessionChild = sessionMap.get(child.path)
+			const merged = await this.syncWithFs(sessionChild ?? child)
+			if (merged) updatedChildren.push(merged)
 		}
 
 		return {
 			...node,
 			expanded: node.expanded,
 			children: updatedChildren.length > 0 ? updatedChildren : null,
-		};
+		}
 	}
 }

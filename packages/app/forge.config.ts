@@ -1,13 +1,13 @@
-import type { ForgeConfig } from "@electron-forge/shared-types";
-import { VitePlugin } from "@electron-forge/plugin-vite";
-import { FusesPlugin } from "@electron-forge/plugin-fuses";
-import { FuseV1Options, FuseVersion } from "@electron/fuses";
+import type { ForgeConfig } from "@electron-forge/shared-types"
+import { VitePlugin } from "@electron-forge/plugin-vite"
+import { FusesPlugin } from "@electron-forge/plugin-fuses"
+import { FuseV1Options, FuseVersion } from "@electron/fuses"
 
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { fileURLToPath } from "url"
+import { dirname, join } from "path"
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const config: ForgeConfig = {
 	packagerConfig: {
@@ -52,6 +52,6 @@ const config: ForgeConfig = {
 			[FuseV1Options.OnlyLoadAppFromAsar]: true,
 		}),
 	],
-};
+}
 
-export default config;
+export default config

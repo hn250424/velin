@@ -4,4 +4,4 @@ export const mainToRendererEvents = {
 	syncFromWatch: "syncFromWatch",
 	onMaximizeWindow: "onMaximizeWindow",
 	onUnmaximizeWindow: "onUnmaximizeWindow",
-} as const;
+} as const

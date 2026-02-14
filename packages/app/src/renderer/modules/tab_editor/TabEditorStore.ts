@@ -1,17 +1,17 @@
-import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel";
-import type { TabEditorDto } from "@shared/dto/TabEditorDto";
-import { injectable } from "inversify";
+import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel"
+import type { TabEditorDto } from "@shared/dto/TabEditorDto"
+import { injectable } from "inversify"
 
 @injectable()
 export default class TabEditorStore {
-	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map();
+	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map()
 
-	private _activeTabId = -1;
-	private _activeTabIndex = -1;
-	private _contextTabId = -1;
+	private _activeTabId = -1
+	private _activeTabIndex = -1
+	private _contextTabId = -1
 
-	private _findReploceOpen = false;
-	private _findDirection: "up" | "down" = "down";
+	private _findReploceOpen = false
+	private _findDirection: "up" | "down" = "down"
 
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
 		return {
@@ -21,66 +21,66 @@ export default class TabEditorStore {
 			fileName: dto.fileName,
 			isBinary: dto.isBinary,
 			initialContent: this._idToTabEditorViewModelMap.get(dto.id)!.initialContent,
-		};
+		}
 	}
 
 	get activeTabId() {
-		return this._activeTabId;
+		return this._activeTabId
 	}
 
 	set activeTabId(id: number) {
-		this._activeTabId = id;
+		this._activeTabId = id
 	}
 
 	get activeTabIndex() {
-		return this._activeTabIndex;
+		return this._activeTabIndex
 	}
 
 	set activeTabIndex(index: number) {
-		this._activeTabIndex = index;
+		this._activeTabIndex = index
 	}
 
 	get contextTabId() {
-		return this._contextTabId;
+		return this._contextTabId
 	}
 
 	set contextTabId(id: number) {
-		this._contextTabId = id;
+		this._contextTabId = id
 	}
 
 	removeContextTabId() {
-		this._contextTabId = -1;
+		this._contextTabId = -1
 	}
 
 	get idToTabEditorViewModelMap(): ReadonlyMap<number, TabEditorViewModel> {
-		return this._idToTabEditorViewModelMap;
+		return this._idToTabEditorViewModelMap
 	}
 
 	getTabEditorViewModelById(id: number) {
-		return this._idToTabEditorViewModelMap.get(id);
+		return this._idToTabEditorViewModelMap.get(id)
 	}
 
 	setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
-		this._idToTabEditorViewModelMap.set(id, viewModel);
+		this._idToTabEditorViewModelMap.set(id, viewModel)
 	}
 
 	deleteTabEditorViewModelById(id: number) {
-		this._idToTabEditorViewModelMap.delete(id);
+		this._idToTabEditorViewModelMap.delete(id)
 	}
 
 	get findReploceOpen() {
-		return this._findReploceOpen;
+		return this._findReploceOpen
 	}
 
 	set findReplaceOpen(open: boolean) {
-		this._findReploceOpen = open;
+		this._findReploceOpen = open
 	}
 
 	get findDirection() {
-		return this._findDirection;
+		return this._findDirection
 	}
 
 	set findDirection(direction: "up" | "down") {
-		this._findDirection = direction;
+		this._findDirection = direction
 	}
 }

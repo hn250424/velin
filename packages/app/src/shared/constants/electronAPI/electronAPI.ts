@@ -1,6 +1,6 @@
-import { mainToRendererEvents } from "./mainToRendererEvents";
-import { rendererToMainEvents } from "./rendererToMainEvents";
-import { utilsEvents } from "./utilsEvents";
+import { mainToRendererEvents } from "./mainToRendererEvents"
+import { rendererToMainEvents } from "./rendererToMainEvents"
+import { utilsEvents } from "./utilsEvents"
 
 export const electronAPI = {
 	events: {
@@ -8,4 +8,4 @@ export const electronAPI = {
 		rendererToMain: rendererToMainEvents,
 		utils: utilsEvents,
 	},
-} as const;
+} as const

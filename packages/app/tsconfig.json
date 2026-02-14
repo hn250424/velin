@@ -1,17 +1,17 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "baseUrl": ".",
-    "moduleResolution": "node",
-    "types": ["node", "reflect-metadata"],
-    "paths": {
-      "@main/*": ["src/main/*"],
-      "@renderer/*": ["src/renderer/*"],
-      "@shared/*": ["src/shared/*"],
-      "@services/*": ["src/main/services/*"],
-      "@modules_contracts/*": ["src/main/modules/contracts/*"]
-    },
-  },
-  "include": ["src", "src/preload.d.ts", "tests"]
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"composite": true,
+		"baseUrl": ".",
+		"moduleResolution": "node",
+		"types": ["node", "reflect-metadata"],
+		"paths": {
+			"@main/*": ["src/main/*"],
+			"@renderer/*": ["src/renderer/*"],
+			"@shared/*": ["src/shared/*"],
+			"@services/*": ["src/main/services/*"],
+			"@modules_contracts/*": ["src/main/modules/contracts/*"]
+		}
+	},
+	"include": ["src", "src/preload.d.ts", "tests"]
 }

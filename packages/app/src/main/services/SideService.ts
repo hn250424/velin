@@ -1,9 +1,9 @@
-import type IFileManager from "@main/modules/contracts/IFileManager";
-import type ISideRepository from "@main/modules/contracts/ISideRepository";
-import type SideSessionModel from "@main/models/SideSessionModel";
-import type { SideDto } from "@shared/dto/SideDto";
-import { inject } from "inversify";
-import DI_KEYS from "../constants/di_keys";
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ISideRepository from "@main/modules/contracts/ISideRepository"
+import type SideSessionModel from "@main/models/SideSessionModel"
+import type { SideDto } from "@shared/dto/SideDto"
+import { inject } from "inversify"
+import DI_KEYS from "../constants/di_keys"
 
 export default class SideService {
 	constructor(
@@ -14,11 +14,11 @@ export default class SideService {
 
 	async syncSideSession(dto: SideDto): Promise<boolean> {
 		try {
-			const model = dto as SideSessionModel;
-			await this.sideRepository.writeSideSession(model);
-			return true;
+			const model = dto as SideSessionModel
+			await this.sideRepository.writeSideSession(model)
+			return true
 		} catch (e) {
-			return false;
+			return false
 		}
 	}
 }

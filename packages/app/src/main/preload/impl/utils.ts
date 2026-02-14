@@ -1,6 +1,6 @@
-import type { UtilsAPI } from "@shared/preload";
-import { webFrame } from "electron";
-import path from "path";
+import type { UtilsAPI } from "@shared/preload"
+import { webFrame } from "electron"
+import path from "path"
 
 const utils: UtilsAPI = {
 	setZoomFactor: (factor: number) => webFrame.setZoomFactor(factor),
@@ -10,6 +10,6 @@ const utils: UtilsAPI = {
 	getRelativePath: (from: string, to: string): string => path.relative(from, to),
 	isAbsolute: (p: string): boolean => path.isAbsolute(p),
 	pathSep: path.sep,
-};
+}
 
-export default utils;
+export default utils

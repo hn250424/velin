@@ -1,126 +1,119 @@
-import "./index.scss";
-import "@milkdown/theme-nord/style.css";
+import "./index.scss"
+import "@milkdown/theme-nord/style.css"
 
-import type { TabEditorsDto } from "@shared/dto/TabEditorDto";
-import type { TreeDto } from "@shared/dto/TreeDto";
+import type { TabEditorsDto } from "@shared/dto/TabEditorDto"
+import type { TreeDto } from "@shared/dto/TreeDto"
 
-import registerEditHandlers from "./handlers/editHandlers";
-import registerExitHandlers from "./handlers/exitHandlers";
-import registerFileHandlers from "./handlers/fileHandlers";
-import registerLoadHandlers from "./handlers/loadHandlers";
-import registerSideHandlers from "./handlers/sideHandlers";
-import registerTabHandlers from "./handlers/tabHandlers";
-import registerTreeHandlers from "./handlers/treeHandlers";
-import registerViewHandlers from "./handlers/viewHandlers";
-import registerWindowHandlers from "./handlers/windowHandlers";
-import registerMenuHandlers from "./handlers/menuHandlers";
-import registerSettingsHandlers from "./handlers/settingsHandlers";
-import registerHelpHandlers from "./handlers/helpHandlers";
+import registerEditHandlers from "./handlers/editHandlers"
+import registerExitHandlers from "./handlers/exitHandlers"
+import registerFileHandlers from "./handlers/fileHandlers"
+import registerLoadHandlers from "./handlers/loadHandlers"
+import registerSideHandlers from "./handlers/sideHandlers"
+import registerTabHandlers from "./handlers/tabHandlers"
+import registerTreeHandlers from "./handlers/treeHandlers"
+import registerViewHandlers from "./handlers/viewHandlers"
+import registerWindowHandlers from "./handlers/windowHandlers"
+import registerMenuHandlers from "./handlers/menuHandlers"
+import registerSettingsHandlers from "./handlers/settingsHandlers"
+import registerHelpHandlers from "./handlers/helpHandlers"
 
-import FocusManager from "./modules/state/FocusManager";
-import ShortcutRegistry from "./modules/input/ShortcutRegistry";
-import WindowState from "./modules/state/WindowState";
-import ZoomManager from "./modules/layout/ZoomManager";
-import SideState from "./modules/state/SideState";
+import FocusManager from "./modules/state/FocusManager"
+import ShortcutRegistry from "./modules/input/ShortcutRegistry"
+import WindowState from "./modules/state/WindowState"
+import ZoomManager from "./modules/layout/ZoomManager"
+import SideState from "./modules/state/SideState"
 
-import TabEditorFacade from "./modules/tab_editor/TabEditorFacade";
-import TreeFacade from "./modules/tree/TreeFacade";
-import SettingsFacade from "./modules/settings/SettingsFacade";
+import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
+import TreeFacade from "./modules/tree/TreeFacade"
+import SettingsFacade from "./modules/settings/SettingsFacade"
 
-import DI_KEYS from "./constants/di_keys";
-import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constants/dom";
+import DI_KEYS from "./constants/di_keys"
+import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constants/dom"
 
-import diContainer from "./diContainer";
+import diContainer from "./diContainer"
 
-import CommandManager from "./CommandManager";
+import CommandManager from "./CommandManager"
 
 window.addEventListener("DOMContentLoaded", () => {
-	const title = document.getElementById("title") as HTMLElement;
-	const tabContainer = document.getElementById("tab_container") as HTMLElement;
-	const tabContextMenu = document.getElementById("tab_context_menu") as HTMLElement;
-	const treeContextMenu = document.getElementById("tree_context_menu") as HTMLElement;
-	const menuContainer = document.getElementById("menu_container") as HTMLElement;
-	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu_container .menu_item");
-	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER) as HTMLElement;
+	const title = document.getElementById("title") as HTMLElement
+	const tabContainer = document.getElementById("tab_container") as HTMLElement
+	const tabContextMenu = document.getElementById("tab_context_menu") as HTMLElement
+	const treeContextMenu = document.getElementById("tree_context_menu") as HTMLElement
+	const menuContainer = document.getElementById("menu_container") as HTMLElement
+	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu_container .menu_item")
+	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER) as HTMLElement
 
-	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager);
-	const sideState = diContainer.get<SideState>(DI_KEYS.SideState);
-	const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState);
-	const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager);
-	const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry);
+	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
+	const sideState = diContainer.get<SideState>(DI_KEYS.SideState)
+	const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState)
+	const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
+	const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
 
-	const settingsFacade = diContainer.get<SettingsFacade>(DI_KEYS.SettingsFacade);
-	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade);
-	const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade);
+	const settingsFacade = diContainer.get<SettingsFacade>(DI_KEYS.SettingsFacade)
+	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
+	const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
 
-	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager);
+	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
-	registerFileHandlers(commandManager, tabEditorFacade, shortcutRegistry);
-	registerExitHandlers(tabEditorFacade, treeFacade);
-	registerEditHandlers(commandManager, shortcutRegistry);
-	registerViewHandlers(shortcutRegistry, zoomManager);
-	registerTabHandlers(commandManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry);
-	registerTreeHandlers(
-		commandManager,
-		focusManager,
-		treeNodeContainer,
-		treeFacade,
-		treeContextMenu,
-		shortcutRegistry
-	);
-	registerHelpHandlers(commandManager, shortcutRegistry);
-	registerMenuHandlers(menuItems);
+	registerFileHandlers(commandManager, tabEditorFacade, shortcutRegistry)
+	registerExitHandlers(tabEditorFacade, treeFacade)
+	registerEditHandlers(commandManager, shortcutRegistry)
+	registerViewHandlers(shortcutRegistry, zoomManager)
+	registerTabHandlers(commandManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
+	registerTreeHandlers(commandManager, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
+	registerHelpHandlers(commandManager, shortcutRegistry)
+	registerMenuHandlers(menuItems)
 
 	registerLoadHandlers(windowState, settingsFacade, sideState, tabEditorFacade, treeFacade, () => {
 		// TODO: Facade ?
-		registerWindowHandlers(windowState);
-		registerSideHandlers(sideState);
+		registerWindowHandlers(windowState)
+		registerSideHandlers(sideState)
 
-		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade);
-	});
+		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade)
+	})
 
-	bindSyncEventFromWatch(tabEditorFacade, treeFacade);
-	bindDocumentClickEvent(tabContextMenu, treeContextMenu);
-	bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade);
-	bindShortcutEvent(commandManager, shortcutRegistry);
+	bindSyncEventFromWatch(tabEditorFacade, treeFacade)
+	bindDocumentClickEvent(tabContextMenu, treeContextMenu)
+	bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade)
+	bindShortcutEvent(commandManager, shortcutRegistry)
 	document.addEventListener("keydown", (e) => {
-		shortcutRegistry.handleKeyEvent(e);
-	});
+		shortcutRegistry.handleKeyEvent(e)
+	})
 
-	window.rendererToMain.loadedRenderer();
+	window.rendererToMain.loadedRenderer()
 
 	// TODO.
 	// document.getElementById('settings').addEventListener('click', () => {
 	// document.documentElement.className = ''
 	// document.documentElement.classList.add('dark')
 	// })
-});
+})
 
 function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
 	window.mainToRenderer.syncFromWatch(async (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => {
 		if (tabEditorsDto) {
-			await tabEditorFacade.syncTabs(tabEditorsDto);
+			await tabEditorFacade.syncTabs(tabEditorsDto)
 		}
 
 		if (treeDto) {
-			const viewModel = treeFacade.toTreeViewModel(treeDto);
+			const viewModel = treeFacade.toTreeViewModel(treeDto)
 
-			treeFacade.clearPathToTreeWrapperMap(); // Must clear map manually before renderTreeData (no built-in clear).
-			treeFacade.renderTreeData(viewModel);
+			treeFacade.clearPathToTreeWrapperMap() // Must clear map manually before renderTreeData (no built-in clear).
+			treeFacade.renderTreeData(viewModel)
 
-			treeFacade.removeLastSelectedIndex();
-			treeFacade.clearSelectedIndices();
-			treeFacade.clearClipboardPaths();
-			treeFacade.loadFlattenArrayAndMaps(viewModel);
+			treeFacade.removeLastSelectedIndex()
+			treeFacade.clearSelectedIndices()
+			treeFacade.clearClipboardPaths()
+			treeFacade.loadFlattenArrayAndMaps(viewModel)
 		}
-	});
+	})
 }
 
 function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
 	document.addEventListener("click", () => {
-		tabContextMenu.classList.remove(CLASS_SELECTED);
-		treeContextMenu.classList.remove(CLASS_SELECTED);
-	});
+		tabContextMenu.classList.remove(CLASS_SELECTED)
+		treeContextMenu.classList.remove(CLASS_SELECTED)
+	})
 }
 
 function bindDocumentMousedownEvnet(
@@ -132,37 +125,37 @@ function bindDocumentMousedownEvnet(
 	treeFacade: TreeFacade
 ) {
 	document.addEventListener("mousedown", (e) => {
-		const target = e.target as HTMLElement;
-		const isInTreeContextMenu = !!target.closest("#tree_context_menu");
-		const isInTabContextMenu = !!target.closest("#tab_context_menu");
-		const isInTreeNodeContainer = !!target.closest("#tree_node_container");
-		const isInMenuItem = !!target.closest(".menu_item");
+		const target = e.target as HTMLElement
+		const isInTreeContextMenu = !!target.closest("#tree_context_menu")
+		const isInTabContextMenu = !!target.closest("#tab_context_menu")
+		const isInTreeNodeContainer = !!target.closest("#tree_node_container")
+		const isInMenuItem = !!target.closest(".menu_item")
 
-		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED));
-		if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED);
-		if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED);
-		trackRelevantFocus(e.target as HTMLElement, focusManager);
+		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED))
+		if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED)
+		if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED)
+		trackRelevantFocus(e.target as HTMLElement, focusManager)
 
-		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId();
+		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId()
 		if (!isInTreeContextMenu && !isInTreeNodeContainer) {
-			treeFacade.removeTreeFocus();
-			treeFacade.removeLastSelectedIndex();
-			treeFacade.clearTreeSelected();
+			treeFacade.removeTreeFocus()
+			treeFacade.removeLastSelectedIndex()
+			treeFacade.clearTreeSelected()
 		}
-	});
+	})
 }
 
 function bindShortcutEvent(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("ESC", async (e: KeyboardEvent) => await commandManager.performESC("shortcut"));
-	shortcutRegistry.register("ENTER", async (e: KeyboardEvent) => await commandManager.performENTER(e, "shortcut"));
+	shortcutRegistry.register("ESC", async (e: KeyboardEvent) => await commandManager.performESC("shortcut"))
+	shortcutRegistry.register("ENTER", async (e: KeyboardEvent) => await commandManager.performENTER(e, "shortcut"))
 }
 
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {
 	if (target.closest("#editor_container")) {
-		focusManager.setFocus("editor");
+		focusManager.setFocus("editor")
 	} else if (target.closest("#tree")) {
-		focusManager.setFocus("tree");
+		focusManager.setFocus("tree")
 	} else if (target.closest("#find_replace_container")) {
-		focusManager.setFocus("find_replace");
+		focusManager.setFocus("find_replace")
 	}
 }

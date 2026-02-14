@@ -1,5 +1,5 @@
-import { Footer } from "../components/footer";
-import { Header } from "../components/header";
+import { Footer } from "../components/footer"
+import { Header } from "../components/header"
 
 export const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
@@ -10,5 +10,5 @@ export const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
 			<div className="divider"></div>
 			<Footer />
 		</>
-	);
-};
+	)
+}

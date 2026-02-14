@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { defineConfig } from "vite"
+import path from "path"
 
 export default defineConfig({
 	base: "/velin/",
@@ -12,4 +12,4 @@ export default defineConfig({
 			"@styles": path.resolve(__dirname, "src/styles"),
 		},
 	},
-});
+})

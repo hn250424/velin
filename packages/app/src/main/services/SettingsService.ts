@@ -1,9 +1,9 @@
-import type IFileManager from "@main/modules/contracts/IFileManager";
-import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository";
-import type ISettingsUtils from "@main/modules/contracts/ISettingsUtils";
-import type { SettingsDto } from "@shared/dto/SettingsDto";
-import { inject } from "inversify";
-import DI_KEYS from "../constants/di_keys";
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository"
+import type ISettingsUtils from "@main/modules/contracts/ISettingsUtils"
+import type { SettingsDto } from "@shared/dto/SettingsDto"
+import { inject } from "inversify"
+import DI_KEYS from "../constants/di_keys"
 
 export default class SettingsService {
 	constructor(
@@ -16,11 +16,11 @@ export default class SettingsService {
 
 	async syncSettingsSession(dto: SettingsDto): Promise<boolean> {
 		try {
-			const model = this.settingsUtils.toSettingsSessionModel(dto);
-			await this.settingsRepository.writeSettingsSession(model);
-			return true;
+			const model = this.settingsUtils.toSettingsSessionModel(dto)
+			await this.settingsRepository.writeSettingsSession(model)
+			return true
 		} catch (e) {
-			return false;
+			return false
 		}
 	}
 }

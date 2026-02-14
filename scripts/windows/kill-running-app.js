@@ -1,25 +1,24 @@
-
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { execSync } = require('child_process');
+const { execSync } = require("child_process")
 
-const isWin = process.platform === 'win32';
+const isWin = process.platform === "win32"
 
 try {
-  if (isWin) {
-    execSync('taskkill /F /IM electron.exe', { stdio: 'ignore' });
-  } else {
-    execSync('pkill -9 electron', { stdio: 'ignore' });
-  }
+	if (isWin) {
+		execSync("taskkill /F /IM electron.exe", { stdio: "ignore" })
+	} else {
+		execSync("pkill -9 electron", { stdio: "ignore" })
+	}
 } catch (e) {
-  // ignore
+	// ignore
 }
 
 try {
-  if (isWin) {
-    execSync('taskkill /F /IM Velin.exe', { stdio: 'ignore' });
-  } else {
-    execSync('pkill -9 Velin', { stdio: 'ignore' });
-  }
+	if (isWin) {
+		execSync("taskkill /F /IM Velin.exe", { stdio: "ignore" })
+	} else {
+		execSync("pkill -9 Velin", { stdio: "ignore" })
+	}
 } catch (e) {
-  // ignore
+	// ignore
 }

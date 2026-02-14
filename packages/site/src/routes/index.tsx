@@ -1,10 +1,10 @@
-import type { RouteConfig } from "./RouteConfig";
+import type { RouteConfig } from "./RouteConfig"
 
-import { DefaultLayout } from "../layouts";
+import { DefaultLayout } from "../layouts"
 
-import { Home } from "../pages/home";
-import { Download } from "../pages/download";
-import { About } from "../pages/about";
+import { Home } from "../pages/home"
+import { Download } from "../pages/download"
+import { About } from "../pages/about"
 
 const routes: RouteConfig[] = [
 	{
@@ -39,6 +39,6 @@ const routes: RouteConfig[] = [
 			</DefaultLayout>
 		),
 	},
-];
+]
 
-export default routes;
+export default routes

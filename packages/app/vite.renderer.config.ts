@@ -1,12 +1,12 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { defineConfig } from "vite"
+import path from "path"
 
 export default defineConfig({
 	base: "",
 	build: {
 		outDir: "dist/renderer",
 		rollupOptions: {
-			input: path.resolve(__dirname, "index.html")
+			input: path.resolve(__dirname, "index.html"),
 		},
 		emptyOutDir: true,
 	},
@@ -18,4 +18,4 @@ export default defineConfig({
 			"@modules_contracts": path.resolve(__dirname, "src/main/modules/contracts"),
 		},
 	},
-});
+})
