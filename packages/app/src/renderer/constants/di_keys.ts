@@ -1,25 +1,39 @@
 const DI_KEYS = {
+	MenuElements: Symbol("MenuElements"),
+
 	FocusManager: Symbol("FocusManager"),
-	SideState: Symbol("SideState"),
-	WindowState: Symbol("WindowState"),
 
 	ZoomManager: Symbol("ZoomManager"),
 
 	ShortcutRegistry: Symbol("ShortcutRegistry"),
 
+	InfoFacade: Symbol("InfoFacade"),
+	InfoElements: Symbol("InfoElements"),
+
 	TabEditorFacade: Symbol("TabEditorFacade"),
-	TabEditorRenderer: Symbol("TabEditorRenderer"),
 	TabEditorStore: Symbol("TabEditorStore"),
+	TabEditorRenderer: Symbol("TabEditorRenderer"),
+	TabEditorElements: Symbol("TabEditorElements"),
 	TabDragManager: Symbol("TabDragManager"),
 
+	SideFacade: Symbol("SideFacade"),
+	SideState: Symbol("SideState"),
+	SideElements: Symbol("SideElements"),
+
 	TreeFacade: Symbol("TreeFacade"),
-	TreeRenderer: Symbol("TreeRenderer"),
 	TreeStore: Symbol("TreeStore"),
+	TreeRenderer: Symbol("TreeRenderer"),
+	TreeElements: Symbol("TreeElements"),
 	TreeDragManager: Symbol("TreeDragManager"),
 
 	SettingsFacade: Symbol("SettingsFacade"),
-	SettingsRenderer: Symbol("SettingsRenderer"),
 	SettingsStore: Symbol("SettingsStore"),
+	SettingsRenderer: Symbol("SettingsRenderer"),
+	SettingsElements: Symbol("SettingsElements"),
+
+	WindowFacade: Symbol("WindowState"),
+	WindowState: Symbol("WindowState"),
+	WindowElements: Symbol("WindowElements"),
 
 	CommandManager: Symbol("CommandManager"),
 }

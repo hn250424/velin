@@ -6,16 +6,18 @@ import type { SideDto } from "@shared/dto/SideDto"
 
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import TreeFacade from "../modules/tree/TreeFacade"
-import SideState from "../modules/state/SideState"
-import WindowState from "../modules/state/WindowState"
 import SettingsFacade from "../modules/settings/SettingsFacade"
+import type WindowFacade from "@renderer/modules/window/WindowFacade"
+import type SideFacade from "@renderer/modules/side/SideFacade"
+import type InfoFacade from "@renderer/modules/info/InfoFacade"
 
 export default function registerLoadHandlers(
-	windowState: WindowState,
+	windowFacade: WindowFacade,
 	settingsFacade: SettingsFacade,
-	sideState: SideState,
 	tabEditorFacade: TabEditorFacade,
 	treeFacade: TreeFacade,
+	sideFacade: SideFacade,
+	infoFacade: InfoFacade,
 	callback: () => void
 ) {
 	let sessionDone = false
@@ -31,7 +33,7 @@ export default function registerLoadHandlers(
 	window.mainToRenderer.session(
 		async (windowDto: WindowDto, settingsDto: SettingsDto, sideDto: SideDto, tabs: TabEditorsDto, tree: TreeDto) => {
 			if (windowDto) {
-				windowState.setWindowMaximizeState(windowDto.maximize)
+				windowFacade.setWindowMaximizeState(windowDto.maximize)
 			}
 
 			if (settingsDto) {
@@ -40,8 +42,8 @@ export default function registerLoadHandlers(
 			}
 
 			if (sideDto) {
-				sideState.setTreeOpenState(sideDto.open)
-				sideState.setTreeWidth(sideDto.width)
+				sideFacade.setSideOpenState(sideDto.open)
+				sideFacade.setSideWidth(sideDto.width)
 			}
 
 			if (tabs) {
@@ -60,7 +62,7 @@ export default function registerLoadHandlers(
 	)
 
 	window.mainToRenderer.info((version: string) => {
-		document.querySelector("#info-version > span")!.textContent = version
+		infoFacade.elements.version.textContent = version
 
 		infoDone = true
 		finish()

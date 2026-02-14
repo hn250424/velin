@@ -8,7 +8,6 @@ import registerEditHandlers from "./handlers/editHandlers"
 import registerExitHandlers from "./handlers/exitHandlers"
 import registerFileHandlers from "./handlers/fileHandlers"
 import registerLoadHandlers from "./handlers/loadHandlers"
-import registerSideHandlers from "./handlers/sideHandlers"
 import registerTabHandlers from "./handlers/tabHandlers"
 import registerTreeHandlers from "./handlers/treeHandlers"
 import registerViewHandlers from "./handlers/viewHandlers"
@@ -16,65 +15,71 @@ import registerWindowHandlers from "./handlers/windowHandlers"
 import registerMenuHandlers from "./handlers/menuHandlers"
 import registerSettingsHandlers from "./handlers/settingsHandlers"
 import registerHelpHandlers from "./handlers/helpHandlers"
+import registerSideHandlers from "./handlers/sideHandlers"
 
 import FocusManager from "./modules/state/FocusManager"
 import ShortcutRegistry from "./modules/input/ShortcutRegistry"
-import WindowState from "./modules/state/WindowState"
 import ZoomManager from "./modules/layout/ZoomManager"
-import SideState from "./modules/state/SideState"
 
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
 import TreeFacade from "./modules/tree/TreeFacade"
 import SettingsFacade from "./modules/settings/SettingsFacade"
 
 import DI_KEYS from "./constants/di_keys"
-import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER, SELECTOR_TREE_NODE_CONTAINER } from "./constants/dom"
+import {
+	CLASS_SELECTED,
+	SELECTOR_TAB_CONTEXT_MENU,
+	SELECTOR_TREE_CONTEXT_MENU,
+	SELECTOR_TREE_NODE_CONTAINER,
+	SELECTOR_MENU_ITEM,
+	SELECTOR_EDITOR_CONTAINER,
+	SELECTOR_FIND_REPLACE_CONTAINER,
+	SELECTOR_TREE,
+} from "./constants/dom"
 
 import diContainer from "./diContainer"
 
 import CommandManager from "./CommandManager"
+import type MenuElements from "./modules/menu/MenuElements"
+import type WindowFacade from "./modules/window/WindowFacade"
+import registerInfoHandlers from "./handlers/infoHandlers"
+import SideFacade from "./modules/side/SideFacade"
+import InfoFacade from "./modules/info/InfoFacade"
 
 window.addEventListener("DOMContentLoaded", () => {
-	const title = document.querySelector("#title") as HTMLElement
-	const tabContainer = document.querySelector("#tab-container") as HTMLElement
-	const tabContextMenu = document.querySelector("#tab-context-menu") as HTMLElement
-	const treeContextMenu = document.querySelector("#tree-context-menu") as HTMLElement
-	const menuContainer = document.querySelector("#menu-container") as HTMLElement
-	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu-container .menu-item")
-	const treeNodeContainer = document.querySelector(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+	const menuElements = diContainer.get<MenuElements>(DI_KEYS.MenuElements)
 
 	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
-	const sideState = diContainer.get<SideState>(DI_KEYS.SideState)
-	const windowState = diContainer.get<WindowState>(DI_KEYS.WindowState)
 	const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
 	const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
 
+	const infoFacade = diContainer.get<InfoFacade>(DI_KEYS.InfoFacade)
 	const settingsFacade = diContainer.get<SettingsFacade>(DI_KEYS.SettingsFacade)
 	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
 	const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
+	const sideFacade = diContainer.get<SideFacade>(DI_KEYS.SideFacade)
+	const windowFacade = diContainer.get<WindowFacade>(DI_KEYS.WindowFacade)
 
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
-	registerFileHandlers(commandManager, tabEditorFacade, shortcutRegistry)
-	registerExitHandlers(tabEditorFacade, treeFacade)
-	registerEditHandlers(commandManager, shortcutRegistry)
-	registerViewHandlers(shortcutRegistry, zoomManager)
-	registerTabHandlers(commandManager, tabContainer, tabEditorFacade, tabContextMenu, shortcutRegistry)
-	registerTreeHandlers(commandManager, focusManager, treeNodeContainer, treeFacade, treeContextMenu, shortcutRegistry)
-	registerHelpHandlers(commandManager, shortcutRegistry)
-	registerMenuHandlers(menuItems)
-
-	registerLoadHandlers(windowState, settingsFacade, sideState, tabEditorFacade, treeFacade, () => {
-		// TODO: Facade ?
-		registerWindowHandlers(windowState)
-		registerSideHandlers(sideState)
-
-		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade)
+	registerLoadHandlers(windowFacade, settingsFacade, tabEditorFacade, treeFacade, sideFacade, infoFacade, () => {
+		registerFileHandlers(commandManager, shortcutRegistry, menuElements)
+		registerExitHandlers(tabEditorFacade, treeFacade)
+		registerEditHandlers(commandManager, shortcutRegistry, menuElements)
+		registerViewHandlers(shortcutRegistry, menuElements, zoomManager)
+		registerTabHandlers(commandManager, tabEditorFacade, shortcutRegistry)
+		registerHelpHandlers(commandManager, shortcutRegistry, menuElements)
+		registerInfoHandlers(commandManager, infoFacade)
+		registerMenuHandlers(menuElements)
+		registerWindowHandlers(windowFacade)
+		registerTreeHandlers(commandManager, focusManager, treeFacade, shortcutRegistry)
+		registerSideHandlers(sideFacade, menuElements)
+		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade, menuElements)
 	})
 
 	bindSyncEventFromWatch(tabEditorFacade, treeFacade)
-	bindDocumentClickEvent(tabContextMenu, treeContextMenu)
-	bindDocumentMousedownEvnet(menuItems, tabContextMenu, treeContextMenu, focusManager, tabEditorFacade, treeFacade)
+	bindDocumentClickEvent(tabEditorFacade, treeFacade)
+	bindDocumentMousedownEvnet(menuElements, focusManager, tabEditorFacade, treeFacade)
 	bindShortcutEvent(commandManager, shortcutRegistry)
 	document.addEventListener("keydown", (e) => {
 		shortcutRegistry.handleKeyEvent(e)
@@ -109,7 +114,10 @@ function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: Tr
 	})
 }
 
-function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HTMLElement) {
+function bindDocumentClickEvent(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
+	const { tabContextMenu } = tabEditorFacade.renderer.elements
+	const { treeContextMenu } = treeFacade.renderer.elements
+
 	document.addEventListener("click", () => {
 		tabContextMenu.classList.remove(CLASS_SELECTED)
 		treeContextMenu.classList.remove(CLASS_SELECTED)
@@ -117,19 +125,21 @@ function bindDocumentClickEvent(tabContextMenu: HTMLElement, treeContextMenu: HT
 }
 
 function bindDocumentMousedownEvnet(
-	menuItems: NodeListOf<HTMLElement>,
-	tabContextMenu: HTMLElement,
-	treeContextMenu: HTMLElement,
+	menuElements: MenuElements,
 	focusManager: FocusManager,
 	tabEditorFacade: TabEditorFacade,
 	treeFacade: TreeFacade
 ) {
+	const { menuItems } = menuElements
+	const { tabContextMenu } = tabEditorFacade.renderer.elements
+	const { treeContextMenu } = treeFacade.renderer.elements
+
 	document.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement
-		const isInTreeContextMenu = !!target.closest("#tree_context_menu")
-		const isInTabContextMenu = !!target.closest("#tab_context_menu")
-		const isInTreeNodeContainer = !!target.closest("#tree_node_container")
-		const isInMenuItem = !!target.closest(".menu_item")
+		const isInTreeContextMenu = !!target.closest(SELECTOR_TREE_CONTEXT_MENU)
+		const isInTabContextMenu = !!target.closest(SELECTOR_TAB_CONTEXT_MENU)
+		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
+		const isInMenuItem = !!target.closest(SELECTOR_MENU_ITEM)
 
 		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED))
 		if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED)
@@ -151,11 +161,11 @@ function bindShortcutEvent(commandManager: CommandManager, shortcutRegistry: Sho
 }
 
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {
-	if (target.closest("#editor-container")) {
+	if (target.closest(SELECTOR_EDITOR_CONTAINER)) {
 		focusManager.setFocus("editor")
-	} else if (target.closest("#tree")) {
+	} else if (target.closest(SELECTOR_TREE)) {
 		focusManager.setFocus("tree")
-	} else if (target.closest("#find-replace-container")) {
+	} else if (target.closest(SELECTOR_FIND_REPLACE_CONTAINER)) {
 		focusManager.setFocus("find-replace")
 	}
 }

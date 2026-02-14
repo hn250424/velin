@@ -18,8 +18,8 @@ type Binding<T> = {
 injectable()
 export default class SettingsFacade {
 	constructor(
-		@inject(DI_KEYS.SettingsRenderer) private readonly renderer: SettingsRenderer,
-		@inject(DI_KEYS.SettingsStore) private readonly store: SettingsStore
+		@inject(DI_KEYS.SettingsRenderer) public readonly renderer: SettingsRenderer,
+		@inject(DI_KEYS.SettingsStore) public readonly store: SettingsStore
 	) {
 		this._bindChangeEvents()
 	}

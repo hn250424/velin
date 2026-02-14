@@ -1,29 +1,30 @@
-import WindowState from "../modules/state/WindowState"
-
 import maximizeSvg from "../assets/icons/maximize.svg?raw"
 import unmaximizeSvg from "../assets/icons/unmaximize.svg?raw"
+import type WindowFacade from "@renderer/modules/window/WindowFacade"
 
-export default function registerWindowHandlers(windowState: WindowState) {
-	const maximizeBtn = document.querySelector("#maximizeWindow") as HTMLElement
-	const minimizeBtn = document.querySelector("#minimizeWindow") as HTMLElement
+export default function registerWindowHandlers(windowFacade: WindowFacade) {
+	const {
+		maximizeBtn,
+		minimizeBtn
+	} = windowFacade.elements
 
 	window.mainToRenderer.onMaximizeWindow(() => {
-		maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg
-		windowState.setWindowMaximizeState(true)
+		windowFacade.setMaximizeButtonSvg(unmaximizeSvg)
+		windowFacade.setWindowMaximizeState(true)
 	})
 	window.mainToRenderer.onUnmaximizeWindow(() => {
-		maximizeBtn.querySelector("svg")!.outerHTML = maximizeSvg
-		windowState.setWindowMaximizeState(false)
+		windowFacade.setMaximizeButtonSvg(maximizeSvg)
+		windowFacade.setWindowMaximizeState(false)
 	})
 
 	maximizeBtn.addEventListener("click", () => {
-		if (windowState.isWindowMaximize()) window.rendererToMain.requestUnmaximizeWindow()
+		if (windowFacade.isWindowMaximize()) window.rendererToMain.requestUnmaximizeWindow()
 		else window.rendererToMain.requestMaximizeWindow()
 	})
 	minimizeBtn.addEventListener("click", () => {
 		window.rendererToMain.requestMinimizeWindow()
 	})
 
-	if (windowState.isWindowMaximize()) maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg
-	else maximizeBtn.querySelector("svg")!.outerHTML = maximizeSvg
+	if (windowFacade.isWindowMaximize()) windowFacade.setMaximizeButtonSvg(unmaximizeSvg)
+	else windowFacade.setMaximizeButtonSvg(maximizeSvg)
 }

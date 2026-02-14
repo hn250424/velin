@@ -9,6 +9,15 @@ export const CLASS_BINARY = "binary"
 export const CLASS_DEACTIVE = "deactive"
 export const CLASS_CUT = "cut"
 
+export const ID_TAB_CONTEXT_MENU = "tab-context-menu"
+export const SELECTOR_TAB_CONTEXT_MENU = `#${ID_TAB_CONTEXT_MENU}`
+
+export const ID_TREE_CONTEXT_MENU = "tree-context-menu"
+export const SELECTOR_TREE_CONTEXT_MENU = `#${ID_TREE_CONTEXT_MENU}`
+
+export const CLASS_MENU_ITEM = "menu-item"
+export const SELECTOR_MENU_ITEM = `.${CLASS_MENU_ITEM}`
+
 export const ID_FIND_REPLACE_CONTAINER = "find-replace-container"
 export const SELECTOR_FIND_REPLACE_CONTAINER = `#${ID_FIND_REPLACE_CONTAINER}`
 
@@ -27,17 +36,20 @@ export const SELECTOR_REPLACE_INPUT = `#${ID_REPLACE_INPUT}`
 export const ID_FIND_INFO = "find-info"
 export const SELECTOR_FIND_INFO = `#${ID_FIND_INFO}`
 
-export const ID_HELP_INFO_OVERLAY = "info-overlay"
-export const SELECTOR_HELP_INFO_OVERLAY = `#${ID_HELP_INFO_OVERLAY}`
-
 export const ID_TREE_CONTEXT_PASTE = "tree-context-paste"
 export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
 
 export const CLASS_TAB = "tab"
 export const SELECTOR_TAB = `.${CLASS_TAB}`
 
+export const ID_EDITOR_CONTAINER = "editor-container"
+export const SELECTOR_EDITOR_CONTAINER = `#${ID_EDITOR_CONTAINER}`
+
 export const CLASS_EDITOR_BOX = "editor-box"
 export const SELECTOR_EDITOR_BOX = `.${CLASS_EDITOR_BOX}`
+
+export const ID_TREE = "tree"
+export const SELECTOR_TREE = `#${ID_TREE}`
 
 export const ID_TREE_NODE_CONTAINER = "tree-node-container"
 export const SELECTOR_TREE_NODE_CONTAINER = `#${ID_TREE_NODE_CONTAINER}`

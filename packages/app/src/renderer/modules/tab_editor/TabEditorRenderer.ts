@@ -1,12 +1,12 @@
 import type { TabEditorViewModel } from "@renderer/viewmodels/TabEditorViewModel"
 
+import { inject, injectable } from "inversify"
 import { Editor, editorViewCtx, parserCtx, rootCtx } from "@milkdown/kit/core"
 import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
 import { redo, undo } from "prosemirror-history"
-import { injectable } from "inversify"
 import {
 	CLASS_TAB,
 	DATASET_ATTR_TAB_ID,
@@ -15,15 +15,11 @@ import {
 	NOT_MODIFIED_TEXT,
 	CLASS_TAB_GHOST,
 	CLASS_BINARY,
-	SELECTOR_FIND_REPLACE_CONTAINER,
-	SELECTOR_FIND,
-	SELECTOR_REPLACE,
-	SELECTOR_FIND_INPUT,
-	SELECTOR_REPLACE_INPUT,
-	SELECTOR_FIND_INFO,
 } from "../../constants/dom"
 import TabEditorView from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
+import DI_KEYS from "@renderer/constants/di_keys"
+import type TabEditorElements from "./TabEditorElements"
 
 @injectable()
 export default class TabEditorRenderer {
@@ -33,27 +29,7 @@ export default class TabEditorRenderer {
 	private _ghostTab: HTMLElement | null = null
 	private _indicator: HTMLElement | null = null
 
-	private _tabContainer: HTMLElement
-	private _editorContainer: HTMLElement
-
-	private readonly _findAndReplaceContainer: HTMLElement
-	private readonly _findBox: HTMLElement
-	private readonly _replaceBox: HTMLElement
-	private readonly _findInput: HTMLInputElement
-	private readonly _replaceInput: HTMLInputElement
-	private readonly _findInfo: HTMLElement
-
-	constructor() {
-		this._tabContainer = document.querySelector("#tab-container") as HTMLElement
-		this._editorContainer = document.querySelector("#editor-container") as HTMLElement
-
-		this._findAndReplaceContainer = document.querySelector(SELECTOR_FIND_REPLACE_CONTAINER) as HTMLElement
-		this._findBox = document.querySelector(SELECTOR_FIND) as HTMLElement
-		this._replaceBox = document.querySelector(SELECTOR_REPLACE) as HTMLElement
-		this._findInput = document.querySelector(SELECTOR_FIND_INPUT) as HTMLInputElement
-		this._replaceInput = document.querySelector(SELECTOR_REPLACE_INPUT) as HTMLInputElement
-		this._findInfo = document.querySelector(SELECTOR_FIND_INFO) as HTMLElement
-	}
+	constructor(@inject(DI_KEYS.TabEditorElements) readonly elements: TabEditorElements) {}
 
 	private createTabBox(fileName: string) {
 		const div = document.createElement("div")
@@ -77,7 +53,7 @@ export default class TabEditorRenderer {
 		const { div, span, button } = this.createTabBox(fileName)
 		div.dataset[DATASET_ATTR_TAB_ID] = id.toString()
 		span.title = filePath || ""
-		this._tabContainer.appendChild(div)
+		this.elements.tabContainer.appendChild(div)
 
 		const editorBox = document.createElement("div")
 		editorBox.className = CLASS_EDITOR_BOX
@@ -108,7 +84,7 @@ export default class TabEditorRenderer {
 			})
 		}
 
-		this._editorContainer.appendChild(editorBox)
+		this.elements.editorContainer.appendChild(editorBox)
 
 		const tabEditorView = new TabEditorView(div, span, button, editorBox, editor)
 
@@ -205,9 +181,9 @@ export default class TabEditorRenderer {
 	moveTabEditorView(fromIndex: number, toIndex: number) {
 		const view = this._tabEditorViews.splice(fromIndex, 1)[0]
 		this._tabEditorViews.splice(toIndex, 0, view)
-		this._tabContainer.removeChild(view.tabBox)
-		const refNode = this._tabContainer.children[toIndex] ?? null
-		this._tabContainer.insertBefore(view.tabBox, refNode)
+		this.elements.tabContainer.removeChild(view.tabBox)
+		const refNode = this.elements.tabContainer.children[toIndex] ?? null
+		this.elements.tabContainer.insertBefore(view.tabBox, refNode)
 	}
 
 	createGhostBox(fileName: string) {
@@ -242,7 +218,7 @@ export default class TabEditorRenderer {
 	}
 
 	changeFontSize(baseSize: number) {
-		const container = this._editorContainer
+		const container = this.elements.editorContainer
 		const setVar = (name: string, value: string) => container.style.setProperty(name, value)
 
 		const scale = {
@@ -275,30 +251,30 @@ export default class TabEditorRenderer {
 	}
 
 	changeFontFamily(family: string) {
-		this._editorContainer.style.fontFamily = family
+		this.elements.editorContainer.style.fontFamily = family
 	}
 
 	get findAndReplaceContainer() {
-		return this._findAndReplaceContainer
+		return this.elements.findAndReplaceContainer
 	}
 
 	get findBox() {
-		return this._findBox
+		return this.elements.findBox
 	}
 
 	get replaceBox() {
-		return this._replaceBox
+		return this.elements.replaceBox
 	}
 
 	get findInput() {
-		return this._findInput
+		return this.elements.findInput
 	}
 
 	get replaceInput() {
-		return this._replaceInput
+		return this.elements.replaceInput
 	}
 
 	get findInfo() {
-		return this._findInfo
+		return this.elements.findInfo
 	}
 }

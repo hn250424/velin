@@ -7,7 +7,6 @@ import {
 	SELECTOR_TREE_NODE,
 	SELECTOR_TREE_NODE_WRAPPER,
 	CLASS_DEACTIVE,
-	SELECTOR_TREE_CONTEXT_PASTE,
 	SELECTOR_TREE_NODE_CONTAINER,
 	CLASS_TREE_DRAG_OVERLAY,
 } from "../constants/dom"
@@ -18,27 +17,25 @@ import CommandManager from "../CommandManager"
 export default function registerTreeHandlers(
 	commandManager: CommandManager,
 	focusManager: FocusManager,
-	treeNodeContainer: HTMLElement,
 	treeFacade: TreeFacade,
-	treeContextMenu: HTMLElement,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	const treeContextPasteButton = treeContextMenu.querySelector(SELECTOR_TREE_CONTEXT_PASTE) as HTMLElement
-
-	bindTreeClickEvents(commandManager, treeNodeContainer, treeFacade)
-	bindTreeContextmenuEvents(treeNodeContainer, treeContextMenu, treeFacade, treeContextPasteButton)
-	bindCommandsWithContextmenu(commandManager)
+	bindTreeClickEvents(commandManager, treeFacade)
+	bindTreeContextmenuEvents(treeFacade)
+	bindCommandsWithContextmenu(commandManager, treeFacade)
 	bindCommandsWithShortcut(commandManager, shortcutRegistry, focusManager, treeFacade)
-	bindTreeMenuEvents(commandManager, treeNodeContainer, treeFacade)
+	bindTreeMenuEvents(commandManager, treeFacade)
 
 	// Drag.
-	bindMouseDownEvents(treeFacade, treeNodeContainer)
+	bindMouseDownEvents(treeFacade)
 	bindMouseMoveEvents(treeFacade)
-	bindMouseUpEvents(treeFacade, treeNodeContainer, commandManager)
+	bindMouseUpEvents(treeFacade, commandManager)
 }
 
-function bindMouseDownEvents(treeFacade: TreeFacade, treeContainer: HTMLElement) {
-	treeContainer!.addEventListener("mousedown", (e) => {
+function bindMouseDownEvents(treeFacade: TreeFacade) {
+	const { treeNodeContainer } = treeFacade.renderer.elements
+
+	treeNodeContainer.addEventListener("mousedown", (e) => {
 		let count = treeFacade.getSelectedIndices().length
 		if (count === 0) {
 			const target = e.target as HTMLElement
@@ -59,7 +56,7 @@ function bindMouseDownEvents(treeFacade: TreeFacade, treeContainer: HTMLElement)
 }
 
 function bindMouseMoveEvents(treeFacade: TreeFacade) {
-	document!.addEventListener("mousemove", (e: MouseEvent) => {
+	document.addEventListener("mousemove", (e: MouseEvent) => {
 		if (!treeFacade.isMouseDown()) return
 
 		if (!treeFacade.isDrag()) {
@@ -119,8 +116,8 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 	})
 }
 
-function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, commandManager: CommandManager) {
-	document!.addEventListener("mouseup", async (e: MouseEvent) => {
+function bindMouseUpEvents(treeFacade: TreeFacade, commandManager: CommandManager) {
+	document.addEventListener("mouseup", async (e: MouseEvent) => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
 			return
@@ -142,21 +139,22 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
 	})
 }
 
-function bindTreeMenuEvents(commandManager: CommandManager, treeNodeContainer: HTMLElement, treeFacade: TreeFacade) {
-	const addFile = document.querySelector("#tree-top-add-file")
-	const addDirectory = document.querySelector("#tree-top-add-directory")
+function bindTreeMenuEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
+	const { treeNodeContainer, treeTopAddFile, treeTopAddDirectory } = treeFacade.renderer.elements
 
-	addFile!.addEventListener("click", () => {
+	treeTopAddFile.addEventListener("click", () => {
 		commandManager.performCreate("element", treeNodeContainer, false)
 	})
 
-	addDirectory!.addEventListener("click", () => {
+	treeTopAddDirectory.addEventListener("click", () => {
 		commandManager.performCreate("element", treeNodeContainer, true)
 	})
 }
 
-function bindTreeClickEvents(commandManager: CommandManager, treeNodeContainer: HTMLElement, treeFacade: TreeFacade) {
-	treeNodeContainer!.addEventListener("click", async (e) => {
+function bindTreeClickEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
+	const { treeNodeContainer } = treeFacade.renderer.elements
+
+	treeNodeContainer.addEventListener("click", async (e) => {
 		if (treeFacade.lastSelectedIndex > 0) {
 			const _idx = treeFacade.lastSelectedIndex
 			const _treeNode = treeFacade.getTreeNodeByIndex(_idx)
@@ -216,13 +214,10 @@ function bindTreeClickEvents(commandManager: CommandManager, treeNodeContainer: 
 	})
 }
 
-function bindTreeContextmenuEvents(
-	treeNodeContainer: HTMLElement,
-	treeContextMenu: HTMLElement,
-	treeFacade: TreeFacade,
-	treeContextPasteButton: HTMLElement
-) {
-	treeNodeContainer!.addEventListener("contextmenu", (e) => {
+function bindTreeContextmenuEvents(treeFacade: TreeFacade) {
+	const { treeContextMenu, treeContextPaste, treeNodeContainer } = treeFacade.renderer.elements
+
+	treeNodeContainer.addEventListener("contextmenu", (e) => {
 		const contextTreeIndex = treeFacade.contextTreeIndex
 		if (contextTreeIndex !== -1) {
 			const _treeNode = treeFacade.getTreeNodeByIndex(contextTreeIndex)
@@ -245,31 +240,34 @@ function bindTreeContextmenuEvents(
 		const isPasteDisabled =
 			treeFacade.clipboardMode === "none" || !viewModel.directory || treeFacade.getSelectedIndices().length === 0
 
-		treeContextPasteButton.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
+		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
 
 		treeFacade.setContextTreeIndexByPath(path)
 		treeNode.classList.add(CLASS_FOCUSED)
 	})
 }
 
-function bindCommandsWithContextmenu(commandManager: CommandManager) {
-	document.querySelector("#tree-context-cut")!.addEventListener("click", async () => {
+function bindCommandsWithContextmenu(commandManager: CommandManager, treeFacade: TreeFacade) {
+	const { treeContextCut, treeContextCopy, treeContextPaste, treeContextRename, treeContextDelete } =
+		treeFacade.renderer.elements
+
+	treeContextCut.addEventListener("click", async () => {
 		await commandManager.performCut("context-menu")
 	})
 
-	document.querySelector("#tree-context-copy")!.addEventListener("click", async () => {
+	treeContextCopy.addEventListener("click", async () => {
 		await commandManager.performCopy("context-menu")
 	})
 
-	document.querySelector("#tree-context-paste")!.addEventListener("click", async () => {
+	treeContextPaste.addEventListener("click", async () => {
 		await commandManager.performPaste("context-menu")
 	})
 
-	document.querySelector("#tree-context-rename")!.addEventListener("click", async () => {
+	treeContextRename.addEventListener("click", async () => {
 		await commandManager.performRename("context-menu")
 	})
 
-	document.querySelector("#tree-context-delete")!.addEventListener("click", async () => {
+	treeContextDelete.addEventListener("click", async () => {
 		await commandManager.performDelete("context-menu")
 	})
 }

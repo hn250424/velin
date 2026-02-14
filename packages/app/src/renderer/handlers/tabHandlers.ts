@@ -11,23 +11,24 @@ import { throttle } from "../utils/throttle"
 
 export default function registerTabHandlers(
 	commandManager: CommandManager,
-	tabContainer: HTMLElement,
 	tabEditorFacade: TabEditorFacade,
-	tabContextMenu: HTMLElement,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTabClickEvents(commandManager, tabContainer, tabEditorFacade)
-	bindTabContextmenuEvents(tabContainer, tabEditorFacade, tabContextMenu)
+	bindTabClickEvents(commandManager, tabEditorFacade)
+	bindFindReplaceEvnets(commandManager, tabEditorFacade)
+	bindTabContextmenuEvents(tabEditorFacade)
 	bindCommandsWithContextmenu(commandManager, tabEditorFacade)
 	bindCommandsWithShortcut(commandManager, shortcutRegistry, tabEditorFacade)
 
 	// Drag.
-	bindMouseDownEvents(tabEditorFacade, tabContainer)
-	bindMouseMoveEvents(tabEditorFacade, tabContainer)
+	bindMouseDownEvents(tabEditorFacade)
+	bindMouseMoveEvents(tabEditorFacade)
 	bindMouseUpEvents(tabEditorFacade)
 }
 
-function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
+function bindMouseDownEvents(tabEditorFacade: TabEditorFacade) {
+	const { tabContainer } = tabEditorFacade.renderer.elements
+
 	tabContainer.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement
 		const tab = target.closest(SELECTOR_TAB) as HTMLElement
@@ -43,8 +44,10 @@ function bindMouseDownEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTM
 	})
 }
 
-function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade, tabContainer: HTMLElement) {
-	document!.addEventListener("mousemove", (e: MouseEvent) => {
+function bindMouseMoveEvents(tabEditorFacade: TabEditorFacade) {
+	const { tabContainer } = tabEditorFacade.renderer.elements
+
+	document.addEventListener("mousemove", (e: MouseEvent) => {
 		if (!tabEditorFacade.isMouseDown()) return
 
 		if (!tabEditorFacade.isDrag()) {
@@ -131,11 +134,9 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 	return tabs.length
 }
 
-function bindTabClickEvents(
-	commandManager: CommandManager,
-	tabContainer: HTMLElement,
-	tabEditorFacade: TabEditorFacade
-) {
+function bindTabClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+	const { tabContainer } = tabEditorFacade.renderer.elements
+
 	tabContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement
 		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
@@ -152,11 +153,33 @@ function bindTabClickEvents(
 	})
 }
 
-function bindTabContextmenuEvents(
-	tabContainer: HTMLElement,
-	tabEditorFacade: TabEditorFacade,
-	tabContextMenu: HTMLElement
-) {
+function bindFindReplaceEvnets(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+	const { findUp, findDown, findClose, replaceCurrent, replaceAll } = tabEditorFacade.renderer.elements
+
+	findUp.addEventListener("click", async () => {
+		commandManager.performFind("menu", "up")
+	})
+
+	findDown.addEventListener("click", async () => {
+		commandManager.performFind("menu", "down")
+	})
+
+	findClose.addEventListener("click", async () => {
+		commandManager.performCloseFindReplaceBox("menu")
+	})
+
+	replaceCurrent.addEventListener("click", async () => {
+		commandManager.performReplace("menu")
+	})
+
+	replaceAll.addEventListener("click", async () => {
+		commandManager.performReplaceAll("menu")
+	})
+}
+
+function bindTabContextmenuEvents(tabEditorFacade: TabEditorFacade) {
+	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
+
 	tabContainer.addEventListener("contextmenu", (e) => {
 		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
 		if (!tab) return
@@ -169,25 +192,28 @@ function bindTabContextmenuEvents(
 }
 
 function bindCommandsWithContextmenu(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	document.querySelector("#tab-context-close")!.addEventListener("click", async () => {
+	const { tabContextClose, tabContextCloseOthers, tabContextCloseRight, tabContextCloseAll } =
+		tabEditorFacade.renderer.elements
+
+	tabContextClose.addEventListener("click", async () => {
 		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
 	})
 
-	document.querySelector("#tab-context-close-others")!.addEventListener("click", async () => {
+	tabContextCloseOthers.addEventListener("click", async () => {
 		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
 		if (response.result) tabEditorFacade.removeTabsExcept(response.data)
 	})
 
-	document.querySelector("#tab-context-close-right")!.addEventListener("click", async () => {
+	tabContextCloseRight.addEventListener("click", async () => {
 		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
 		if (response.result) tabEditorFacade.removeTabsToRight(response.data)
 	})
 
-	document.querySelector("#tab-context-close-all")!.addEventListener("click", async () => {
+	tabContextCloseAll.addEventListener("click", async () => {
 		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
 		if (response.result) tabEditorFacade.removeAllTabs(response.data)
@@ -201,6 +227,6 @@ function bindCommandsWithShortcut(
 ) {
 	shortcutRegistry.register(
 		"Ctrl+W",
-		async (e: KeyboardEvent) => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
+		async () => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
 	)
 }

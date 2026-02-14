@@ -1,6 +1,6 @@
 import type { TreeViewModel } from "../../viewmodels/TreeViewModel"
 
-import { injectable } from "inversify"
+import { inject, injectable } from "inversify"
 
 import fileSvg from "../../assets/icons/file.svg?raw"
 import folderSvg from "../../assets/icons/folder.svg?raw"
@@ -18,20 +18,16 @@ import {
 	DATASET_ATTR_TREE_PATH,
 	SELECTOR_TREE_NODE,
 } from "../../constants/dom"
+import DI_KEYS from "@renderer/constants/di_keys"
+import type TreeElements from "./TreeElements"
 
 @injectable()
 export default class TreeRenderer {
-	private _tree_top_name: HTMLElement
-	private _tree_node_container: HTMLElement
-
 	private ghostBox: HTMLElement | null = null
 
 	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
 
-	constructor() {
-		this._tree_node_container = document.querySelector("#tree-node-container") as HTMLElement
-		this._tree_top_name = document.querySelector("#tree-top-name") as HTMLElement
-	}
+	constructor(@inject(DI_KEYS.TreeElements) readonly elements: TreeElements) {}
 
 	clean(container: HTMLElement) {
 		while (container.firstChild) {
@@ -40,15 +36,15 @@ export default class TreeRenderer {
 	}
 
 	removeContainerFocus() {
-		this._tree_node_container.classList.remove(CLASS_FOCUSED)
+		this.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
 	}
 
 	// Each DOM element with class `tree_node` has a dataset attribute for its path.
 	// The root node uses the container `tree_node_container` to hold its path in the dataset.
 	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
 		if (!container) {
-			this._tree_top_name.textContent = viewModel.name
-			container = this._tree_node_container
+			this.elements.treeTopName.textContent = viewModel.name
+			container = this.elements.treeNodeContainer
 
 			this._pathToTreeWrapperMap.set(viewModel.path, container)
 			container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path

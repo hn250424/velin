@@ -1,10 +1,9 @@
+import type MenuElements from "@renderer/modules/menu/MenuElements"
 import { CLASS_SELECTED } from "../constants/dom"
 
-export default function registerMenuHandlers(menuItems: NodeListOf<HTMLElement>) {
-	bindMenucontainerEvents(menuItems)
-}
+export default function registerMenuHandlers(menuElements: MenuElements) {
+	const { menuItems } = menuElements
 
-function bindMenucontainerEvents(menuItems: NodeListOf<HTMLElement>) {
 	menuItems.forEach((item) => {
 		item.addEventListener("click", (e) => {
 			menuItems.forEach((i) => {

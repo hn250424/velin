@@ -63,7 +63,7 @@ $setting-node-select-width: 120px;
 	display: flex;
 }
 
-#settings-menu {
+#settings-menus {
 	min-width: $settings-menu-width;
 
 	display: flex;
@@ -76,7 +76,7 @@ $setting-node-select-width: 120px;
 	background-color: var(--settings-menu-container);
 }
 
-#settings-menu button {
+#settings-menus button {
 	width: $settings-menu-button-width;
 	height: $settings-menu-button-height;
 
@@ -85,11 +85,11 @@ $setting-node-select-width: 120px;
 	background-color: var(--settings-menu-button-bg);
 }
 
-#settings-menu button:hover {
+#settings-menus button:hover {
 	background-color: var(--settings-menu-button-hover);
 }
 
-#settings-menu button.selected {
+#settings-menus button.selected {
 	background-color: var(--settings-menu-button-selected);
 }
 

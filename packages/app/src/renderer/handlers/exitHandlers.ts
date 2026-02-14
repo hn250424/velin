@@ -7,7 +7,7 @@ export default function registerExitHandlers(tabEditorFacade: TabEditorFacade, t
 		dom.addEventListener("click", () => {
 			const tabEditorDto: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 			const treeViewModel = treeFacade.extractTreeViewModel()
-			const treeSessionData = treeViewModel ? treeFacade.toTreeDto(treeViewModel) : null
+			const treeSessionData = treeFacade.toTreeDto(treeViewModel)
 			window.rendererToMain.exit(tabEditorDto, treeSessionData)
 		})
 	})

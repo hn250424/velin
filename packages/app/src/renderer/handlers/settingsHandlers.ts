@@ -1,3 +1,4 @@
+import type MenuElements from "@renderer/modules/menu/MenuElements"
 import CommandManager from "../CommandManager"
 import { CLASS_SELECTED } from "../constants/dom"
 import ShortcutRegistry from "../modules/input/ShortcutRegistry"
@@ -6,20 +7,21 @@ import SettingsFacade from "../modules/settings/SettingsFacade"
 export default function registerSettingsHandlers(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
-	settingsFacade: SettingsFacade
+	settingsFacade: SettingsFacade,
+	menuElements: MenuElements
 ) {
 	// Init.
 	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
 	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue())
 
 	// Bind.
-	bindCommandWithmenu(commandManager)
+	bindCommandWithmenu(commandManager, menuElements)
 	bindCommandWithShortcut(commandManager, shortcutRegistry)
 	bindCommandWithSettingsContainer(commandManager, settingsFacade)
 }
 
-function bindCommandWithmenu(commandManager: CommandManager) {
-	document.querySelector("#file-menu-settings")!.addEventListener("click", () => {
+function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
+	menuElements.settings.addEventListener("click", () => {
 		commandManager.performOpenSettings("menu")
 	})
 }
@@ -29,33 +31,30 @@ function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistr
 }
 
 function bindCommandWithSettingsContainer(commandManager: CommandManager, settingsFacade: SettingsFacade) {
-	document.querySelector("#settings-exit")!.addEventListener("click", () => {
+	const { exit, apply, close, menus, contents } = settingsFacade.renderer.elements
+
+	exit.addEventListener("click", () => {
 		commandManager.performCloseSettings("button")
 	})
 
-	document.querySelector("#settings-apply-btn")!.addEventListener("click", () => {
+	apply.addEventListener("click", () => {
 		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
 	})
 
-	document.querySelector("#settings-close-btn")!.addEventListener("click", () => {
+	close.addEventListener("click", () => {
 		commandManager.performCloseSettings("button")
 	})
 
-	const settingsMenus = [document.querySelector("#settings-menu-font"), document.querySelector("#settings-menu-theme")]
-	const settingsContents = [
-		document.querySelector("#settings-contents-font"),
-		document.querySelector("#settings-contents-theme"),
-	]
-	settingsMenus[0]!.classList.add(CLASS_SELECTED)
-	settingsContents[0]!.style.display = "block"
+	menus[0].classList.add(CLASS_SELECTED)
+	contents[0].style.display = "block"
 
-	settingsMenus.forEach((el, idx) => {
-		el!.addEventListener("click", () => {
-			settingsMenus.forEach((m) => m!.classList.remove(CLASS_SELECTED))
-			settingsContents.forEach((c) => (c!.style.display = "none"))
+	menus.forEach((el, idx) => {
+		el.addEventListener("click", () => {
+			menus.forEach((m) => m.classList.remove(CLASS_SELECTED))
+			contents.forEach((c) => (c.style.display = "none"))
 
-			el!.classList.add(CLASS_SELECTED)
-			settingsContents[idx]!.style.display = "block"
+			el.classList.add(CLASS_SELECTED)
+			contents[idx].style.display = "block"
 		})
 	})
 }

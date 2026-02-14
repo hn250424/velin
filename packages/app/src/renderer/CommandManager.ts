@@ -4,7 +4,7 @@ import type Response from "@shared/types/Response"
 import type { TreeViewModel } from "./viewmodels/TreeViewModel"
 
 import type { TreeDto } from "@shared/dto/TreeDto"
-import type { TabEditorDto } from "@shared/dto/TabEditorDto"
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import type { SettingsViewModel } from "./viewmodels/SettingsViewModel"
 
 import { inject, injectable } from "inversify"
@@ -36,11 +36,10 @@ import {
 	CLASS_TREE_NODE_INPUT,
 	CLASS_SELECTED,
 	CLASS_CUT,
-	ID_HELP_INFO_OVERLAY,
-	SELECTOR_HELP_INFO_OVERLAY,
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
 } from "./constants/dom"
+import type InfoFacade from "./modules/info/InfoFacade"
 
 type CommandSource = "shortcut" | "menu" | "element" | "context-menu" | "drag" | "programmatic" | "button"
 
@@ -61,16 +60,13 @@ export default class CommandManager {
 	private undoStack: ICommand[] = []
 	private redoStack: ICommand[] = []
 
-	private helpInfoOverlay: HTMLElement
-
 	constructor(
 		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
 		@inject(DI_KEYS.SettingsFacade) private readonly settingsFacade: SettingsFacade,
 		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
-		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
+		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade,
+		@inject(DI_KEYS.InfoFacade) private readonly infoFacade: InfoFacade,
 	) {
-		this.helpInfoOverlay = document.querySelector(SELECTOR_HELP_INFO_OVERLAY) as HTMLElement
-
 		this.tabEditorFacade.findInput.addEventListener(
 			"input",
 			debounce(() => {
@@ -203,6 +199,12 @@ export default class CommandManager {
 				)
 			}
 		}
+	}
+
+	async performSaveAll(source: CommandSource) {
+		const tabsData: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabsData)
+		if (response.result) this.tabEditorFacade.applySaveAllResults(response.data)
 	}
 
 	async performCloseTab(source: CommandSource, id: number) {
@@ -718,11 +720,11 @@ export default class CommandManager {
 	}
 
 	performShowInformation(source: CommandSource) {
-		this.helpInfoOverlay.style.display = "flex"
+		this.infoFacade.showInformation()
 	}
 
 	performHideInformation(source: CommandSource) {
-		this.helpInfoOverlay.style.display = "none"
+		this.infoFacade.hideInformation()
 	}
 
 	async performESC(source: CommandSource) {

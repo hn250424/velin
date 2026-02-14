@@ -19,9 +19,9 @@ export const BINARY_FILE_WARNING = `Can't read this file`
 @injectable()
 export default class TabEditorFacade {
 	constructor(
-		@inject(DI_KEYS.TabEditorRenderer) private readonly renderer: TabEditorRenderer,
-		@inject(DI_KEYS.TabEditorStore) private readonly store: TabEditorStore,
-		@inject(DI_KEYS.TabDragManager) private readonly drag: TabDragManager
+		@inject(DI_KEYS.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
+		@inject(DI_KEYS.TabEditorStore) public readonly store: TabEditorStore,
+		@inject(DI_KEYS.TabDragManager) public readonly drag: TabDragManager
 	) {}
 
 	async loadTabs(dto: TabEditorsDto) {

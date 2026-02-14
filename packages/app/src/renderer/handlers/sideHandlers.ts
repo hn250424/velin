@@ -1,55 +1,36 @@
-import type { SideDto } from "@shared/dto/SideDto"
-import SideState from "../modules/state/SideState"
-import { CLASS_SELECTED } from "../constants/dom"
+import type SideFacade from "@renderer/modules/side/SideFacade"
+import type MenuElements from "@renderer/modules/menu/MenuElements"
+import { CLASS_SELECTED } from "@renderer/constants/dom"
 
-export default function registerSideHandlers(sideState: SideState) {
+export default function registerSideHandlers(sideFacade: SideFacade, menuElements: MenuElements) {
+	bindSideToggleEvent(sideFacade, menuElements)
+	bindDragEvents(sideFacade)
+
+	processSideOpenState(menuElements, sideFacade)
+}
+
+function bindSideToggleEvent(sideFacade: SideFacade, menuElements: MenuElements) {
+	const { fileTree } = menuElements
+
+	fileTree.addEventListener("click", () => {
+		const isOpen = sideFacade.isSideOpen()
+		sideFacade.setSideOpenState(!isOpen)
+		sideFacade.syncSession()
+		processSideOpenState(menuElements, sideFacade)
+	})
+}
+
+function bindDragEvents(sideFacade: SideFacade) {
+	const { side, tree, resizer } = sideFacade.elements
+
 	let isDragging = false
 	let animationFrameId: number | null = null
 
 	const minWidth = 100
 	const maxWidth = 500
 
-	const side = document.querySelector("#side") as HTMLElement
-
-	const treeToggle = document.querySelector("#view-menu-file-tree") as HTMLElement
-	const tree = document.querySelector("#tree") as HTMLElement
-	const resizer = document.querySelector("#side-resizer") as HTMLElement
-
-	const settingsBtn = document.querySelector("#settingsBtn") as HTMLElement
-
-	processTreeOpenState()
-
-	// open & close file tree.
-	treeToggle.addEventListener("click", async () => {
-		const isOpen = sideState.isTreeOpen()
-		sideState.setTreeOpenState(!isOpen)
-		syncSession()
-		processTreeOpenState()
-	})
-
-	function processTreeOpenState() {
-		const isOpen = sideState.isTreeOpen()
-		if (isOpen) {
-			tree.style.width = `${sideState.getTreeWidth()}px`
-			treeToggle.classList.add(CLASS_SELECTED)
-		} else {
-			tree.style.width = "0px"
-			treeToggle.classList.remove(CLASS_SELECTED)
-		}
-	}
-
-	async function syncSession() {
-		const sideDto: SideDto = {
-			open: sideState.isTreeOpen(),
-			width: sideState.getTreeWidth(),
-		}
-		const result = await window.rendererToMain.syncSideSessionFromRenderer(sideDto)
-	}
-
-	// resize.
 	resizer.addEventListener("mousedown", (e) => {
-		if (!sideState.isTreeOpen()) return
-
+		if (!sideFacade.isSideOpen()) return
 		isDragging = true
 		document.body.style.cursor = "ew-resize"
 		document.body.style.userSelect = "none"
@@ -58,15 +39,12 @@ export default function registerSideHandlers(sideState: SideState) {
 	document.addEventListener("mousemove", (e) => {
 		if (!isDragging) return
 
-		if (animationFrameId) {
-			cancelAnimationFrame(animationFrameId)
-		}
+		if (animationFrameId) cancelAnimationFrame(animationFrameId)
 
 		animationFrameId = requestAnimationFrame(() => {
 			const sideRect = side.getBoundingClientRect()
 			const offsetX = e.clientX - sideRect.left
 			const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
-
 			tree.style.width = `${newWidth}px`
 		})
 	})
@@ -87,7 +65,22 @@ export default function registerSideHandlers(sideState: SideState) {
 		const offsetX = e.clientX - sideRect.left
 		const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
 
-		sideState.setTreeWidth(newWidth)
-		syncSession()
+		sideFacade.setSideWidth(newWidth)
+		sideFacade.syncSession()
 	})
+}
+
+function processSideOpenState(menuElements: MenuElements, sideFacade: SideFacade) {
+	const { fileTree } = menuElements
+	const { tree } = sideFacade.elements
+
+	const isOpen = sideFacade.isSideOpen()
+
+	if (isOpen) {
+		tree.style.width = `${sideFacade.getSideWidth()}px`
+		fileTree.classList.add(CLASS_SELECTED)
+	} else {
+		tree.style.width = "0px"
+		fileTree.classList.remove(CLASS_SELECTED)
+	}
 }

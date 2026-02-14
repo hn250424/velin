@@ -19,9 +19,9 @@ import TreeDragManager from "./TreeDragManager"
 @injectable()
 export default class TreeFacade {
 	constructor(
-		@inject(DI_KEYS.TreeRenderer) private readonly renderer: TreeRenderer,
-		@inject(DI_KEYS.TreeStore) private readonly store: TreeStore,
-		@inject(DI_KEYS.TreeDragManager) private readonly drag: TreeDragManager
+		@inject(DI_KEYS.TreeRenderer) public readonly renderer: TreeRenderer,
+		@inject(DI_KEYS.TreeStore) public readonly store: TreeStore,
+		@inject(DI_KEYS.TreeDragManager) public readonly drag: TreeDragManager
 	) {}
 
 	toTreeDto(viewModel: TreeViewModel): TreeDto {
@@ -32,7 +32,7 @@ export default class TreeFacade {
 		return this.store.toTreeViewModel(dto)
 	}
 
-	extractTreeViewModel(): TreeViewModel | null {
+	extractTreeViewModel(): TreeViewModel {
 		return this.store.extractTreeViewModel()
 	}
 

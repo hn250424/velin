@@ -28,13 +28,15 @@ export default class TreeStore {
 	}
 
 	toTreeDto(viewModel: TreeViewModel): TreeDto {
+		if (!Object.keys(viewModel).length) return {} as TreeDto
+
 		return {
 			path: viewModel.path,
 			name: viewModel.name,
 			indent: viewModel.indent,
 			directory: viewModel.directory,
 			expanded: viewModel.expanded,
-			children: viewModel.children ? viewModel.children.map((child: any) => this.toTreeDto(child)) : null,
+			children: Array.isArray(viewModel.children) ? viewModel.children.map((child) => this.toTreeDto(child)) : null,
 		}
 	}
 
@@ -66,8 +68,8 @@ export default class TreeStore {
 		return result
 	}
 
-	extractTreeViewModel(): TreeViewModel | null {
-		if (!this._flattenTreeArray || this._flattenTreeArray.length === 0) return null
+	extractTreeViewModel(): TreeViewModel {
+		if (this._flattenTreeArray.length === 0) return {} as TreeViewModel
 
 		const pathToNode = new Map<string, TreeViewModel>()
 		const root = this._flattenTreeArray[0]
