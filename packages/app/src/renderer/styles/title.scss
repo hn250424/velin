@@ -1,9 +1,9 @@
 @use "./dimensions.scss" as dimensions;
 
-$menu_horizontal_padding: 4px;
-$menu_border_radius: 4px;
+$menu-horizontal-padding: 4px;
+$menu-border-radius: 4px;
 
-$menu_container_horizontal_margin: 10px;
+$menu-container-horizontal-margin: 10px;
 
 #title,
 #title > :nth-child(-n + 3) {
@@ -13,18 +13,18 @@ $menu_container_horizontal_margin: 10px;
 
 #title {
 	width: 100%;
-	height: dimensions.$title_height;
+	height: dimensions.$title-height;
 	flex-shrink: 0;
 
 	background-color: var(--title-bg);
 }
 
 #logo {
-	margin-left: dimensions.$icon_horizontal_margin;
-	margin-right: dimensions.$icon_horizontal_margin;
+	margin-left: dimensions.$icon-horizontal-margin;
+	margin-right: dimensions.$icon-horizontal-margin;
 
-	width: dimensions.$icon_size;
-	height: dimensions.$icon_size;
+	width: dimensions.$icon-size;
+	height: dimensions.$icon-size;
 }
 
 #logo > img {
@@ -35,19 +35,19 @@ $menu_container_horizontal_margin: 10px;
 }
 
 #window {
-	border-radius: dimensions.$window_icon_border_radius;
+	border-radius: dimensions.$window-icon-border-radius;
 	margin-left: auto;
 }
 
 #window button {
-	width: dimensions.$title_button_width;
-	height: dimensions.$title_button_height;
+	width: dimensions.$title-button-width;
+	height: dimensions.$title-button-height;
 }
 
 // should be of equal width and height
 #window svg {
-	width: dimensions.$title_button_height;
-	height: dimensions.$title_button_height;
+	width: dimensions.$title-button-height;
+	height: dimensions.$title-button-height;
 	padding: 10px;
 }
 
@@ -56,7 +56,7 @@ $menu_container_horizontal_margin: 10px;
 	background: var(--window-icon-hover);
 }
 
-#title_exit:hover {
+#title-exit:hover {
 	background: var(--warning-color);
 
 	& svg {
@@ -64,19 +64,19 @@ $menu_container_horizontal_margin: 10px;
 	}
 }
 
-#menu_container {
+#menu-container {
 	flex-shrink: 0;
 
 	display: flex;
 }
 
-.menu_item {
-	border-radius: $menu_border_radius;
-	padding: 0 $menu_horizontal_padding;
+.menu-item {
+	border-radius: $menu-border-radius;
+	padding: 0 $menu-horizontal-padding;
 
 	text-align: center;
 
-	margin-right: $menu_container_horizontal_margin;
+	margin-right: $menu-container-horizontal-margin;
 	font-size: 0.9rem;
 
 	position: relative;
@@ -84,11 +84,11 @@ $menu_container_horizontal_margin: 10px;
 	user-select: none;
 }
 
-.menu_item.selected > .dropdown {
+.menu-item.selected > .dropdown {
 	display: block;
 }
 
-.menu_item:hover {
+.menu-item:hover {
 	cursor: pointer;
 	background: var(--menu-item-hover);
 }

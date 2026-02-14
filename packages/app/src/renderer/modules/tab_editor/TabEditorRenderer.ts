@@ -15,12 +15,12 @@ import {
 	NOT_MODIFIED_TEXT,
 	CLASS_TAB_GHOST,
 	CLASS_BINARY,
-	ID_FIND_REPLACE_CONTAINER,
-	ID_FIND,
-	ID_REPLACE,
-	ID_FIND_INPUT,
-	ID_REPLACE_INPUT,
-	ID_FIND_INFO,
+	SELECTOR_FIND_REPLACE_CONTAINER,
+	SELECTOR_FIND,
+	SELECTOR_REPLACE,
+	SELECTOR_FIND_INPUT,
+	SELECTOR_REPLACE_INPUT,
+	SELECTOR_FIND_INFO,
 } from "../../constants/dom"
 import TabEditorView from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
@@ -44,15 +44,15 @@ export default class TabEditorRenderer {
 	private readonly _findInfo: HTMLElement
 
 	constructor() {
-		this._tabContainer = document.getElementById("tab_container") as HTMLElement
-		this._editorContainer = document.getElementById("editor_container") as HTMLElement
+		this._tabContainer = document.querySelector("#tab-container") as HTMLElement
+		this._editorContainer = document.querySelector("#editor-container") as HTMLElement
 
-		this._findAndReplaceContainer = document.getElementById(ID_FIND_REPLACE_CONTAINER) as HTMLElement
-		this._findBox = document.getElementById(ID_FIND) as HTMLElement
-		this._replaceBox = document.getElementById(ID_REPLACE) as HTMLElement
-		this._findInput = document.getElementById(ID_FIND_INPUT) as HTMLInputElement
-		this._replaceInput = document.getElementById(ID_REPLACE_INPUT) as HTMLInputElement
-		this._findInfo = document.getElementById(ID_FIND_INFO) as HTMLElement
+		this._findAndReplaceContainer = document.querySelector(SELECTOR_FIND_REPLACE_CONTAINER) as HTMLElement
+		this._findBox = document.querySelector(SELECTOR_FIND) as HTMLElement
+		this._replaceBox = document.querySelector(SELECTOR_REPLACE) as HTMLElement
+		this._findInput = document.querySelector(SELECTOR_FIND_INPUT) as HTMLInputElement
+		this._replaceInput = document.querySelector(SELECTOR_REPLACE_INPUT) as HTMLInputElement
+		this._findInfo = document.querySelector(SELECTOR_FIND_INFO) as HTMLElement
 	}
 
 	private createTabBox(fileName: string) {

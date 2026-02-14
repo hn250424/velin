@@ -143,8 +143,8 @@ function bindMouseUpEvents(treeFacade: TreeFacade, treeContainer: HTMLElement, c
 }
 
 function bindTreeMenuEvents(commandManager: CommandManager, treeNodeContainer: HTMLElement, treeFacade: TreeFacade) {
-	const addFile = document.getElementById("tree_top_add_file")
-	const addDirectory = document.getElementById("tree_top_add_directory")
+	const addFile = document.querySelector("#tree-top-add-file")
+	const addDirectory = document.querySelector("#tree-top-add-directory")
 
 	addFile!.addEventListener("click", () => {
 		commandManager.performCreate("element", treeNodeContainer, false)
@@ -253,24 +253,24 @@ function bindTreeContextmenuEvents(
 }
 
 function bindCommandsWithContextmenu(commandManager: CommandManager) {
-	document.getElementById("tree_context_cut")!.addEventListener("click", async () => {
-		await commandManager.performCut("context_menu")
+	document.querySelector("#tree-context-cut")!.addEventListener("click", async () => {
+		await commandManager.performCut("context-menu")
 	})
 
-	document.getElementById("tree_context_copy")!.addEventListener("click", async () => {
-		await commandManager.performCopy("context_menu")
+	document.querySelector("#tree-context-copy")!.addEventListener("click", async () => {
+		await commandManager.performCopy("context-menu")
 	})
 
-	document.getElementById("tree_context_paste")!.addEventListener("click", async () => {
-		await commandManager.performPaste("context_menu")
+	document.querySelector("#tree-context-paste")!.addEventListener("click", async () => {
+		await commandManager.performPaste("context-menu")
 	})
 
-	document.getElementById("tree_context_rename")!.addEventListener("click", async () => {
-		await commandManager.performRename("context_menu")
+	document.querySelector("#tree-context-rename")!.addEventListener("click", async () => {
+		await commandManager.performRename("context-menu")
 	})
 
-	document.getElementById("tree_context_delete")!.addEventListener("click", async () => {
-		await commandManager.performDelete("context_menu")
+	document.querySelector("#tree-context-delete")!.addEventListener("click", async () => {
+		await commandManager.performDelete("context-menu")
 	})
 }
 

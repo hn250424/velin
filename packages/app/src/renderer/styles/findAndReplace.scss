@@ -1,29 +1,29 @@
 @use "./dimensions.scss" as dimensions;
 
-$row_height: 24px;
+$row-height: 24px;
 
-$input_width: 150px;
-$info_width: 70px;
+$input-width: 150px;
+$info-width: 70px;
 
-$container_padding: 4px;
-$container_gap: 4px;
+$container-padding: 4px;
+$container-gap: 4px;
 
-$button_horizontal_margin: 4px;
+$button-horizontal-margin: 4px;
 
-$input_horizontal_padding: 4px;
-$info_horizontal_padding: 4px;
+$input-horizontal-padding: 4px;
+$info-horizontal-padding: 4px;
 
-#find_replace_container {
+#find-replace-container {
 	display: none;
 	flex-direction: column;
-	gap: $container_gap;
+	gap: $container-gap;
 
 	position: fixed;
 	top: 10%;
 	right: 10%;
 	z-index: 95;
 
-	padding: $container_padding;
+	padding: $container-padding;
 
 	background-color: var(--find-replace-container-bg);
 }
@@ -31,19 +31,19 @@ $info_horizontal_padding: 4px;
 #find,
 #replace {
 	width: 100%;
-	height: $row_height;
+	height: $row-height;
 }
 
 #find > input,
 #replace > input {
-	width: $input_width;
-	padding: 0 $input_horizontal_padding;
+	width: $input-width;
+	padding: 0 $input-horizontal-padding;
 	background: var(--find-replace-input);
 }
 
 #find > button,
 #replace > button {
-	margin: 0 $button_horizontal_margin;
+	margin: 0 $button-horizontal-margin;
 }
 
 #find > button:hover,
@@ -51,10 +51,10 @@ $info_horizontal_padding: 4px;
 	background-color: var(--find-replace-button-hover);
 }
 
-#find_info,
-#replace_info {
-	width: $info_width;
-	padding: 0 $info_horizontal_padding;
+#find-info,
+#replace-info {
+	width: $info-width;
+	padding: 0 $info-horizontal-padding;
 
 	display: flex;
 	align-items: center;
@@ -82,8 +82,8 @@ $info_horizontal_padding: 4px;
 
 #find > button,
 #replace > button {
-	width: dimensions.$icon_size;
-	height: dimensions.$icon_size;
+	width: dimensions.$icon-size;
+	height: dimensions.$icon-size;
 }
 
 .search-highlight {

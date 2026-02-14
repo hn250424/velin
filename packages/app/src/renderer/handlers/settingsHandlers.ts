@@ -19,7 +19,7 @@ export default function registerSettingsHandlers(
 }
 
 function bindCommandWithmenu(commandManager: CommandManager) {
-	document.getElementById("file_menu_settings")!.addEventListener("click", () => {
+	document.querySelector("#file-menu-settings")!.addEventListener("click", () => {
 		commandManager.performOpenSettings("menu")
 	})
 }
@@ -29,22 +29,22 @@ function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistr
 }
 
 function bindCommandWithSettingsContainer(commandManager: CommandManager, settingsFacade: SettingsFacade) {
-	document.getElementById("settings-exit")!.addEventListener("click", () => {
+	document.querySelector("#settings-exit")!.addEventListener("click", () => {
 		commandManager.performCloseSettings("button")
 	})
 
-	document.getElementById("settings-apply-btn")!.addEventListener("click", () => {
+	document.querySelector("#settings-apply-btn")!.addEventListener("click", () => {
 		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
 	})
 
-	document.getElementById("settings-close-btn")!.addEventListener("click", () => {
+	document.querySelector("#settings-close-btn")!.addEventListener("click", () => {
 		commandManager.performCloseSettings("button")
 	})
 
-	const settingsMenus = [document.getElementById("settings-menu-font"), document.getElementById("settings-menu-theme")]
+	const settingsMenus = [document.querySelector("#settings-menu-font"), document.querySelector("#settings-menu-theme")]
 	const settingsContents = [
-		document.getElementById("settings-contents-font"),
-		document.getElementById("settings-contents-theme"),
+		document.querySelector("#settings-contents-font"),
+		document.querySelector("#settings-contents-theme"),
 	]
 	settingsMenus[0]!.classList.add(CLASS_SELECTED)
 	settingsContents[0]!.style.display = "block"

@@ -37,11 +37,12 @@ import {
 	CLASS_SELECTED,
 	CLASS_CUT,
 	ID_HELP_INFO_OVERLAY,
+	SELECTOR_HELP_INFO_OVERLAY,
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
 } from "./constants/dom"
 
-type CommandSource = "shortcut" | "menu" | "element" | "context_menu" | "drag" | "programmatic" | "button"
+type CommandSource = "shortcut" | "menu" | "element" | "context-menu" | "drag" | "programmatic" | "button"
 
 /**
  * CommandManager centrally manages and executes commands that involve side effects,
@@ -68,7 +69,7 @@ export default class CommandManager {
 		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
 		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
 	) {
-		this.helpInfoOverlay = document.getElementById(ID_HELP_INFO_OVERLAY) as HTMLElement
+		this.helpInfoOverlay = document.querySelector(SELECTOR_HELP_INFO_OVERLAY) as HTMLElement
 
 		this.tabEditorFacade.findInput.addEventListener(
 			"input",
@@ -367,7 +368,7 @@ export default class CommandManager {
 
 		if (focus === "editor") {
 			if (source !== "shortcut") {
-				const editable = document.querySelector('#editor_container [contenteditable="true"]') as HTMLElement
+				const editable = document.querySelector('#editor-container [contenteditable="true"]') as HTMLElement
 				if (!editable) return
 				editable.focus()
 
@@ -394,7 +395,7 @@ export default class CommandManager {
 
 		if (focus === "tree") {
 			let targetIndex
-			if (source === "context_menu") targetIndex = this.treeFacade.contextTreeIndex
+			if (source === "context-menu") targetIndex = this.treeFacade.contextTreeIndex
 			else if (source === "shortcut") targetIndex = this.treeFacade.lastSelectedIndex
 			else if (source === "drag") targetIndex = this.treeFacade.selectedDragIndex
 
@@ -568,7 +569,7 @@ export default class CommandManager {
 			parentContainer = treeNodeContainer
 		} else {
 			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
-			parentContainer = parentWrapper.querySelector(".tree_node_children") as HTMLElement
+			parentContainer = parentWrapper.querySelector(".tree-node-children") as HTMLElement
 		}
 
 		const { wrapper, input } = this.treeFacade.createInputbox(directory, viewModel.indent)
@@ -645,7 +646,7 @@ export default class CommandManager {
 	toggleFindReplaceBox(source: CommandSource, showReplace: boolean) {
 		if (this.tabEditorFacade.activeTabId === -1) return
 
-		this.focusManager.setFocus("find_replace")
+		this.focusManager.setFocus("find-replace")
 
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "flex"
 		this.tabEditorFacade.replaceBox.style.display = showReplace ? "flex" : "none"
@@ -674,7 +675,7 @@ export default class CommandManager {
 
 	performReplaceAll(source: CommandSource) {
 		const focus = this.focusManager.getFocus()
-		if (focus !== "find_replace") return
+		if (focus !== "find-replace") return
 
 		const findInput = this.tabEditorFacade.findInput.value
 		const replaceInput = this.tabEditorFacade.replaceInput.value
@@ -727,7 +728,7 @@ export default class CommandManager {
 	async performESC(source: CommandSource) {
 		const focus = this.focusManager.getFocus()
 
-		if (focus === "editor" || focus === "find_replace") {
+		if (focus === "editor" || focus === "find-replace") {
 			this.performCloseFindReplaceBox(source)
 		}
 	}
@@ -735,7 +736,7 @@ export default class CommandManager {
 	async performENTER(e: KeyboardEvent, source: CommandSource) {
 		const focus = this.focusManager.getFocus()
 
-		if (focus === "find_replace") {
+		if (focus === "find-replace") {
 			const activateElement = document.activeElement
 
 			if (activateElement === this.tabEditorFacade.findInput) {

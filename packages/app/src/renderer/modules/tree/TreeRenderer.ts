@@ -29,8 +29,8 @@ export default class TreeRenderer {
 	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
 
 	constructor() {
-		this._tree_node_container = document.getElementById("tree_node_container") as HTMLElement
-		this._tree_top_name = document.getElementById("tree_top_name") as HTMLElement
+		this._tree_node_container = document.querySelector("#tree-node-container") as HTMLElement
+		this._tree_top_name = document.querySelector("#tree-top-name") as HTMLElement
 	}
 
 	clean(container: HTMLElement) {

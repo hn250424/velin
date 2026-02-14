@@ -1,19 +1,19 @@
-$tab_min_width: 50px;
-$tab_max_width: 150px;
-$tab_height: 30px;
-$tab_right_margin: 10px;
-$tab_elem_padding: 5px;
-$tab_button_width: 20px;
-$tab_button_radius: 5px;
+$tab-min-width: 50px;
+$tab-max-width: 150px;
+$tab-height: 30px;
+$tab-right-margin: 10px;
+$tab-elem-padding: 5px;
+$tab-button-width: 20px;
+$tab-button-radius: 5px;
 $indicator-size: 3px;
 
 $padding-top-binary-warning: 40px;
 
-#tab_container {
+#tab-container {
 	display: flex;
 
 	width: 100%;
-	height: $tab_height;
+	height: $tab-height;
 
 	overflow-y: hidden;
 	overflow-x: scroll;
@@ -40,16 +40,16 @@ $padding-top-binary-warning: 40px;
 
 .tab {
 	flex: 1;
-	min-width: $tab_min_width;
-	max-width: $tab_max_width;
+	min-width: $tab-min-width;
+	max-width: $tab-max-width;
 	height: 100%;
-	margin-right: $tab_right_margin;
+	margin-right: $tab-right-margin;
 
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 
-	padding: $tab_elem_padding;
+	padding: $tab-elem-padding;
 
 	user-select: none;
 }
@@ -78,10 +78,10 @@ $padding-top-binary-warning: 40px;
 }
 
 .tab > button {
-	width: $tab_button_width;
-	height: $tab_button_width;
+	width: $tab-button-width;
+	height: $tab-button-width;
 
-	border-radius: $tab_button_radius;
+	border-radius: $tab-button-radius;
 
 	background-color: var(--tab-btn-bg);
 	transition: background-color 0.2s ease;
@@ -98,26 +98,26 @@ $padding-top-binary-warning: 40px;
 	color: var(--tab-btn-hover-font);
 }
 
-#tab_context_menu {
+#tab-context-menu {
 	display: none;
 	position: fixed;
 	flex-direction: column;
 	z-index: 90;
 }
 
-#tab_context_menu.selected {
+#tab-context-menu.selected {
 	display: flex;
 }
 
-.editorBox {
+.editor-box {
 	display: none;
 }
 
-.editorBox.selected {
+.editor-box.selected {
 	display: block;
 }
 
-.editorBox.binary {
+.editor-box.binary {
 	font-size: 1.5rem;
 	font-weight: bold;
 	text-align: center;
@@ -136,10 +136,10 @@ $padding-top-binary-warning: 40px;
 	pointer-events: none;
 }
 
-.tab_ghost {
+.tab-ghost {
 	position: fixed;
-	width: $tab_max_width;
-	height: $tab_height;
+	width: $tab-max-width;
+	height: $tab-height;
 	pointer-events: none;
 	opacity: 0.7;
 	z-index: 90;

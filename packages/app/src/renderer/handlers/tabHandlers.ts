@@ -169,25 +169,25 @@ function bindTabContextmenuEvents(
 }
 
 function bindCommandsWithContextmenu(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	document.getElementById("tab_context_close")!.addEventListener("click", async () => {
-		await commandManager.performCloseTab("context_menu", tabEditorFacade.contextTabId)
+	document.querySelector("#tab-context-close")!.addEventListener("click", async () => {
+		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
 	})
 
-	document.getElementById("tab_context_close_others")!.addEventListener("click", async () => {
+	document.querySelector("#tab-context-close-others")!.addEventListener("click", async () => {
 		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
 		if (response.result) tabEditorFacade.removeTabsExcept(response.data)
 	})
 
-	document.getElementById("tab_context_close_right")!.addEventListener("click", async () => {
+	document.querySelector("#tab-context-close-right")!.addEventListener("click", async () => {
 		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
 		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
 		if (response.result) tabEditorFacade.removeTabsToRight(response.data)
 	})
 
-	document.getElementById("tab_context_close_all")!.addEventListener("click", async () => {
+	document.querySelector("#tab-context-close-all")!.addEventListener("click", async () => {
 		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
 		if (response.result) tabEditorFacade.removeAllTabs(response.data)

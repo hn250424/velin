@@ -9,13 +9,13 @@ export default function registerSideHandlers(sideState: SideState) {
 	const minWidth = 100
 	const maxWidth = 500
 
-	const side = document.getElementById("side") as HTMLElement
+	const side = document.querySelector("#side") as HTMLElement
 
-	const treeToggle = document.querySelector("#view_menu_file_tree") as HTMLElement
-	const tree = document.getElementById("tree") as HTMLElement
-	const resizer = document.getElementById("side_resizer") as HTMLElement
+	const treeToggle = document.querySelector("#view-menu-file-tree") as HTMLElement
+	const tree = document.querySelector("#tree") as HTMLElement
+	const resizer = document.querySelector("#side-resizer") as HTMLElement
 
-	const settingsBtn = document.getElementById("settingsBtn") as HTMLElement
+	const settingsBtn = document.querySelector("#settingsBtn") as HTMLElement
 
 	processTreeOpenState()
 

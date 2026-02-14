@@ -28,20 +28,20 @@ import TreeFacade from "./modules/tree/TreeFacade"
 import SettingsFacade from "./modules/settings/SettingsFacade"
 
 import DI_KEYS from "./constants/di_keys"
-import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER } from "./constants/dom"
+import { CLASS_FOCUSED, CLASS_SELECTED, ID_TREE_NODE_CONTAINER, SELECTOR_TREE_NODE_CONTAINER } from "./constants/dom"
 
 import diContainer from "./diContainer"
 
 import CommandManager from "./CommandManager"
 
 window.addEventListener("DOMContentLoaded", () => {
-	const title = document.getElementById("title") as HTMLElement
-	const tabContainer = document.getElementById("tab_container") as HTMLElement
-	const tabContextMenu = document.getElementById("tab_context_menu") as HTMLElement
-	const treeContextMenu = document.getElementById("tree_context_menu") as HTMLElement
-	const menuContainer = document.getElementById("menu_container") as HTMLElement
-	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu_container .menu_item")
-	const treeNodeContainer = document.getElementById(ID_TREE_NODE_CONTAINER) as HTMLElement
+	const title = document.querySelector("#title") as HTMLElement
+	const tabContainer = document.querySelector("#tab-container") as HTMLElement
+	const tabContextMenu = document.querySelector("#tab-context-menu") as HTMLElement
+	const treeContextMenu = document.querySelector("#tree-context-menu") as HTMLElement
+	const menuContainer = document.querySelector("#menu-container") as HTMLElement
+	const menuItems: NodeListOf<HTMLElement> = document.querySelectorAll("#menu-container .menu-item")
+	const treeNodeContainer = document.querySelector(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
 
 	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
 	const sideState = diContainer.get<SideState>(DI_KEYS.SideState)
@@ -151,11 +151,11 @@ function bindShortcutEvent(commandManager: CommandManager, shortcutRegistry: Sho
 }
 
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {
-	if (target.closest("#editor_container")) {
+	if (target.closest("#editor-container")) {
 		focusManager.setFocus("editor")
 	} else if (target.closest("#tree")) {
 		focusManager.setFocus("tree")
-	} else if (target.closest("#find_replace_container")) {
-		focusManager.setFocus("find_replace")
+	} else if (target.closest("#find-replace-container")) {
+		focusManager.setFocus("find-replace")
 	}
 }

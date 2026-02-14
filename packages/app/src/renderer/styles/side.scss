@@ -9,7 +9,7 @@ $risizer-size: 3px;
 	user-select: none;
 }
 
-#view_menu_file_tree.selected {
+#view-menu-file-tree.selected {
 	& .checkbox {
 		position: relative;
 	}
@@ -27,7 +27,7 @@ $risizer-size: 3px;
 	}
 }
 
-#side_resizer {
+#side-resizer {
 	width: $risizer-size;
 	height: 100%;
 	cursor: ew-resize;
@@ -35,6 +35,6 @@ $risizer-size: 3px;
 	transition: background-color 0.3s ease;
 }
 
-#side_resizer:hover {
+#side-resizer:hover {
 	background-color: var(--side-resizer);
 }

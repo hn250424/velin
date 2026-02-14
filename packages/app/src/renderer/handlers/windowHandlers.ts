@@ -4,8 +4,8 @@ import maximizeSvg from "../assets/icons/maximize.svg?raw"
 import unmaximizeSvg from "../assets/icons/unmaximize.svg?raw"
 
 export default function registerWindowHandlers(windowState: WindowState) {
-	const maximizeBtn = document.getElementById("maximizeWindow") as HTMLElement
-	const minimizeBtn = document.getElementById("minimizeWindow") as HTMLElement
+	const maximizeBtn = document.querySelector("#maximizeWindow") as HTMLElement
+	const minimizeBtn = document.querySelector("#minimizeWindow") as HTMLElement
 
 	window.mainToRenderer.onMaximizeWindow(() => {
 		maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg

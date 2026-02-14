@@ -7,11 +7,11 @@ export default function registerHelpHandlers(commandManager: CommandManager, sho
 }
 
 function bindCommandWithmenu(commandManager: CommandManager) {
-	document.getElementById("help-information")!.addEventListener("click", async () => {
+	document.querySelector("#help-information")!.addEventListener("click", async () => {
 		commandManager.performShowInformation("menu")
 	})
 
-	document.getElementById("info-button")!.addEventListener("click", () => {
+	document.querySelector("#info-button")!.addEventListener("click", () => {
 		commandManager.performHideInformation("menu")
 	})
 }

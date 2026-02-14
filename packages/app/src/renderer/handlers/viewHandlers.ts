@@ -7,19 +7,19 @@ export default function registerViewHandlers(shortcutRegistry: ShortcutRegistry,
 }
 
 function bindCommandsWithMenu(zoomManager: ZoomManager) {
-	document.getElementById("view_menu_zoom_in")!.addEventListener("click", () => {
+	document.querySelector("#view-menu-zoom-in")!.addEventListener("click", () => {
 		zoomManager.zoomIn()
 	})
 
-	document.getElementById("view_menu_zoom_out")!.addEventListener("click", () => {
+	document.querySelector("#view-menu-zoom-out")!.addEventListener("click", () => {
 		zoomManager.zoomOut()
 	})
 
-	document.getElementById("view_menu_zoom_reset")!.addEventListener("click", () => {
+	document.querySelector("#view-menu-zoom-reset")!.addEventListener("click", () => {
 		zoomManager.resetZoom()
 	})
 
-	// document.getElementById('view_menu_fullscreen')!.addEventListener('click', () => {
+	// document.querySelector('#view-menu-fullscreen')!.addEventListener('click', () => {
 	// 	performFullscreen()
 	// })
 }

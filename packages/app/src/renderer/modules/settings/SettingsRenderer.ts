@@ -16,12 +16,12 @@ export default class SettingsRenderer {
 	private _fontFamilyInput: HTMLInputElement
 
 	constructor() {
-		this._settingsOverlay = document.getElementById("settings-overlay") as HTMLElement
+		this._settingsOverlay = document.querySelector("#settings-overlay") as HTMLElement
 
-		this._fontSizeDiv = document.getElementById("setting-node-font-size") as HTMLElement
+		this._fontSizeDiv = document.querySelector("#setting-node-font-size") as HTMLElement
 		this._fontSizeInput = this._fontSizeDiv.querySelector("input") as HTMLInputElement
 
-		this._fontFamilyDiv = document.getElementById("setting-node-font-family") as HTMLElement
+		this._fontFamilyDiv = document.querySelector("#setting-node-font-family") as HTMLElement
 		this._fontFamilyInput = this._fontFamilyDiv.querySelector("input") as HTMLInputElement
 	}
 

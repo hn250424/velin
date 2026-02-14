@@ -16,27 +16,27 @@ export default function registerFileHandlers(
 }
 
 function bindCommandWithmenu(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	document.getElementById("file_menu_new_tab")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-new-tab")!.addEventListener("click", async () => {
 		await commandManager.performNewTab("menu")
 	})
 
-	document.getElementById("file_menu_open_file")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-open-file")!.addEventListener("click", async () => {
 		await commandManager.performOpenFile("menu")
 	})
 
-	document.getElementById("file_menu_open_directory")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-open-directory")!.addEventListener("click", async () => {
 		await commandManager.performOpenDirectory("menu")
 	})
 
-	document.getElementById("file_menu_save")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-save")!.addEventListener("click", async () => {
 		await commandManager.performSave("menu")
 	})
 
-	document.getElementById("file_menu_save_as")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-save-as")!.addEventListener("click", async () => {
 		await commandManager.performSaveAs("menu")
 	})
 
-	document.getElementById("file_menu_save_all")!.addEventListener("click", async () => {
+	document.querySelector("#file-menu-save-all")!.addEventListener("click", async () => {
 		const tabsData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
 		const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabsData)
 		if (response.result) tabEditorFacade.applySaveAllResults(response.data)
