@@ -1,24 +1,29 @@
 import DI_KEYS from "@renderer/constants/di_keys"
 import { inject, injectable } from "inversify"
-import type WindowState from "./WindowState"
-import type WindowElements from "./WindowElements"
+import type WindowStore from "./WindowStore"
+
+import type WindowRenderer from "./WindowRenderer"
 
 @injectable()
 export default class WindowFacade {
 	constructor(
-		@inject(DI_KEYS.WindowState) public readonly state: WindowState,
-		@inject(DI_KEYS.WindowElements) public readonly elements: WindowElements
+		@inject(DI_KEYS.WindowStore) public readonly store: WindowStore,
+		@inject(DI_KEYS.WindowRenderer) public readonly renderer: WindowRenderer
 	) {}
 
 	isWindowMaximize(): boolean {
-		return this.state.isWindowMaximize()
+		return this.store.isWindowMaximize()
 	}
 
 	setWindowMaximizeState(state: boolean) {
-		this.state.setWindowMaximizeState(state)
+		this.store.setWindowMaximizeState(state)
 	}
 
-	setMaximizeButtonSvg(svg: string) {
-		this.elements.maximizeBtn.querySelector("svg")!.outerHTML = svg
+	renderMaximizeButtonSvg() {
+		this.renderer.renderMaximizeButtonSvg()
+	}
+
+	renderUnMaximizeButtonSvg() {
+		this.renderer.renderUnMaximizeButtonSvg()
 	}
 }

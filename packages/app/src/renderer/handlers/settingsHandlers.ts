@@ -1,36 +1,15 @@
-import type MenuElements from "@renderer/modules/menu/MenuElements"
 import CommandManager from "../CommandManager"
 import { CLASS_SELECTED } from "../constants/dom"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import SettingsFacade from "../modules/settings/SettingsFacade"
 
 export default function registerSettingsHandlers(
 	commandManager: CommandManager,
-	shortcutRegistry: ShortcutRegistry,
 	settingsFacade: SettingsFacade,
-	menuElements: MenuElements
 ) {
-	// Init.
-	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
-	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue())
-
-	// Bind.
-	bindCommandWithmenu(commandManager, menuElements)
-	bindCommandWithShortcut(commandManager, shortcutRegistry)
-	bindCommandWithSettingsContainer(commandManager, settingsFacade)
+	bindEvents(commandManager, settingsFacade)
 }
 
-function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
-	menuElements.settings.addEventListener("click", () => {
-		commandManager.performOpenSettings("menu")
-	})
-}
-
-function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("Ctrl+,", (e: KeyboardEvent) => commandManager.performOpenSettings("shortcut"))
-}
-
-function bindCommandWithSettingsContainer(commandManager: CommandManager, settingsFacade: SettingsFacade) {
+function bindEvents(commandManager: CommandManager, settingsFacade: SettingsFacade) {
 	const { exit, apply, close, menus, contents } = settingsFacade.renderer.elements
 
 	exit.addEventListener("click", () => {

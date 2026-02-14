@@ -8,7 +8,7 @@ import TreeFacade from "./modules/tree/TreeFacade"
 import ShortcutRegistry from "./modules/input/ShortcutRegistry"
 import TabDragManager from "./modules/tab_editor/TabDragManager"
 import TreeDragManager from "./modules/tree/TreeDragManager"
-import WindowState from "./modules/window/WindowState"
+import WindowStore from "./modules/window/WindowStore"
 import ZoomManager from "./modules/layout/ZoomManager"
 import TabEditorRenderer from "./modules/tab_editor/TabEditorRenderer"
 import TabEditorStore from "./modules/tab_editor/TabEditorStore"
@@ -64,7 +64,7 @@ diContainer.bind(DI_KEYS.SettingsRenderer).to(SettingsRenderer).inSingletonScope
 diContainer.bind(DI_KEYS.SettingsElements).to(SettingsElements).inSingletonScope()
 
 diContainer.bind(DI_KEYS.WindowFacade).to(WindowFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.WindowState).to(WindowState).inSingletonScope()
+diContainer.bind(DI_KEYS.WindowStore).to(WindowStore).inSingletonScope()
 diContainer.bind(DI_KEYS.WindowElements).to(WindowElements).inSingletonScope()
 
 diContainer.bind(DI_KEYS.CommandManager).to(CommandManager).inSingletonScope()

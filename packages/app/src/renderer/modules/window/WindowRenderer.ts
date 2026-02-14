@@ -1,0 +1,19 @@
+import DI_KEYS from "@renderer/constants/di_keys"
+import { inject, injectable } from "inversify"
+import type WindowElements from "./WindowElements"
+import maximizeSvg from "../../assets/icons/maximize.svg?raw"
+import unmaximizeSvg from "../../assets/icons/unmaximize.svg?raw"
+
+@injectable()
+export default class WindowRenderer {
+
+	constructor(@inject(DI_KEYS.WindowElements) public readonly elements: WindowElements) {}
+
+	renderMaximizeButtonSvg() {
+		this.elements.maximizeBtn.querySelector("svg")!.outerHTML = maximizeSvg
+	}
+
+	renderUnMaximizeButtonSvg() {
+		this.elements.maximizeBtn.querySelector("svg")!.outerHTML = unmaximizeSvg
+	}
+}

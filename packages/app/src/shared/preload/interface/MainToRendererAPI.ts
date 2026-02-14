@@ -11,10 +11,10 @@ export default interface MainToRendererAPI {
 			settingsDto: SettingsDto,
 			sideDto: SideDto,
 			tabEditorsDto: TabEditorsDto,
-			treeDto: TreeDto
+			treeDto: TreeDto,
+			version: string,
 		) => void
 	) => void
-	info: (callback: (version: string) => void) => void
 	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => void
 	onMaximizeWindow: (callback: () => void) => void
 	onUnmaximizeWindow: (callback: () => void) => void

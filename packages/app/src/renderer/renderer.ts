@@ -59,21 +59,31 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
-	registerLoadHandlers(windowFacade, settingsFacade, tabEditorFacade, treeFacade, sideFacade, infoFacade, () => {
-		handleMenuItems(menuElements)
-		handleFileMenu(commandManager, shortcutRegistry, menuElements)
-		handleEditMenu(commandManager, shortcutRegistry, menuElements)
-		handleViewMenu(shortcutRegistry, menuElements, zoomManager)
-		handleHelpMenu(commandManager, shortcutRegistry, menuElements)
+	registerLoadHandlers(
+		commandManager,
+		windowFacade,
+		settingsFacade,
+		tabEditorFacade,
+		treeFacade,
+		sideFacade,
+		infoFacade,
+		menuElements,
+		() => {
+			handleMenuItems(menuElements)
+			handleFileMenu(commandManager, shortcutRegistry, menuElements)
+			handleEditMenu(commandManager, shortcutRegistry, menuElements)
+			handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
+			handleHelpMenu(commandManager, shortcutRegistry, menuElements)
 
-		registerExitHandlers(tabEditorFacade, treeFacade)
-		registerTabHandlers(commandManager, tabEditorFacade, shortcutRegistry)
-		registerInfoHandlers(commandManager, infoFacade)
-		registerWindowHandlers(windowFacade)
-		registerTreeHandlers(commandManager, focusManager, treeFacade, shortcutRegistry)
-		registerSideHandlers(sideFacade, menuElements)
-		registerSettingsHandlers(commandManager, shortcutRegistry, settingsFacade, menuElements)
-	})
+			registerExitHandlers(tabEditorFacade, treeFacade)
+			registerTabHandlers(commandManager, tabEditorFacade, shortcutRegistry)
+			registerInfoHandlers(commandManager, infoFacade)
+			registerWindowHandlers(windowFacade)
+			registerTreeHandlers(commandManager, focusManager, treeFacade, shortcutRegistry)
+			registerSideHandlers(sideFacade)
+			registerSettingsHandlers(commandManager, settingsFacade)
+		}
+	)
 
 	bindSyncEventFromWatch(tabEditorFacade, treeFacade)
 	bindDocumentClickEvent(tabEditorFacade, treeFacade)

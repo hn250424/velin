@@ -58,19 +58,21 @@ export async function loadedRenderer(
 	const tabDto = newTabSession ? await tabUtils.toTabEditorsDto(newTabSession) : null
 	const treeDto = newTreeSession ? (newTreeSession as TreeDto) : null
 
+	const version = app.getVersion()
+
 	mainWindow.webContents.send(
 		electronAPI.events.mainToRenderer.session,
 		windowDto,
 		settingsDto,
 		sideDto,
 		tabDto,
-		treeDto
+		treeDto,
+		version
 	)
 	fileManager.cleanTrash()
 
 	if (newTreeSession) fileWatcher.watch(newTreeSession.path)
 
 	// info.
-	const version = app.getVersion()
 	mainWindow.webContents.send(electronAPI.events.mainToRenderer.info, version)
 }

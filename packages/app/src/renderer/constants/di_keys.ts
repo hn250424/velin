@@ -31,8 +31,9 @@ const DI_KEYS = {
 	SettingsRenderer: Symbol("SettingsRenderer"),
 	SettingsElements: Symbol("SettingsElements"),
 
-	WindowFacade: Symbol("WindowState"),
-	WindowState: Symbol("WindowState"),
+	WindowFacade: Symbol("WindowFacade"),
+	WindowStore: Symbol("WindowStore"),
+	WindowRenderer: Symbol("WindowRenderer"),
 	WindowElements: Symbol("WindowElements"),
 
 	CommandManager: Symbol("CommandManager"),

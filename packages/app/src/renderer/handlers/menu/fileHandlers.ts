@@ -14,7 +14,7 @@ export function handleFileMenu(
 }
 
 function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
-	const { newTab, openFile, openDirectory, save, saveAs, saveAll } = menuElements
+	const { newTab, openFile, openDirectory, save, saveAs, saveAll, settings } = menuElements
 
 	newTab.addEventListener("click", async () => {
 		await commandManager.performNewTab("menu")
@@ -39,6 +39,10 @@ function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuE
 	saveAll.addEventListener("click", async () => {
 		await commandManager.performSaveAll("menu")
 	})
+
+	settings.addEventListener("click", () => {
+		commandManager.performOpenSettings("menu")
+	})
 }
 
 function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
@@ -47,4 +51,5 @@ function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistr
 	shortcutRegistry.register("Ctrl+Shift+O", async () => await commandManager.performOpenDirectory("shortcut"))
 	shortcutRegistry.register("Ctrl+S", async () => await commandManager.performSave("shortcut"))
 	shortcutRegistry.register("Ctrl+Shift+S", async () => await commandManager.performSaveAs("shortcut"))
+	shortcutRegistry.register("Ctrl+,", () => commandManager.performOpenSettings("shortcut"))
 }

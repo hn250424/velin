@@ -1,23 +1,7 @@
 import type SideFacade from "@renderer/modules/side/SideFacade"
-import type MenuElements from "@renderer/modules/menu/MenuElements"
-import { CLASS_SELECTED } from "@renderer/constants/dom"
 
-export default function registerSideHandlers(sideFacade: SideFacade, menuElements: MenuElements) {
-	bindSideToggleEvent(sideFacade, menuElements)
+export default function registerSideHandlers(sideFacade: SideFacade) {
 	bindDragEvents(sideFacade)
-
-	processSideOpenState(menuElements, sideFacade)
-}
-
-function bindSideToggleEvent(sideFacade: SideFacade, menuElements: MenuElements) {
-	const { fileTree } = menuElements
-
-	fileTree.addEventListener("click", () => {
-		const isOpen = sideFacade.isSideOpen()
-		sideFacade.setSideOpenState(!isOpen)
-		sideFacade.syncSession()
-		processSideOpenState(menuElements, sideFacade)
-	})
 }
 
 function bindDragEvents(sideFacade: SideFacade) {
@@ -68,19 +52,4 @@ function bindDragEvents(sideFacade: SideFacade) {
 		sideFacade.setSideWidth(newWidth)
 		sideFacade.syncSession()
 	})
-}
-
-function processSideOpenState(menuElements: MenuElements, sideFacade: SideFacade) {
-	const { fileTree } = menuElements
-	const { tree } = sideFacade.elements
-
-	const isOpen = sideFacade.isSideOpen()
-
-	if (isOpen) {
-		tree.style.width = `${sideFacade.getSideWidth()}px`
-		fileTree.classList.add(CLASS_SELECTED)
-	} else {
-		tree.style.width = "0px"
-		fileTree.classList.remove(CLASS_SELECTED)
-	}
 }

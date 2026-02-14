@@ -1,13 +1,17 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
 import ZoomManager from "../../modules/layout/ZoomManager"
+import type SideFacade from "@renderer/modules/side/SideFacade"
+import { toggleSide } from "@renderer/actions"
 
 export function handleViewMenu(
 	shortcutRegistry: ShortcutRegistry,
 	menuElements: MenuElements,
-	zoomManager: ZoomManager
+	zoomManager: ZoomManager,
+	sideFacade: SideFacade
 ) {
 	bindCommandsWithMenu(menuElements, zoomManager)
+	bindSideToggleEvent(menuElements, sideFacade)
 	bindCommandsWithShortcut(shortcutRegistry, zoomManager)
 }
 
@@ -29,23 +33,21 @@ function bindCommandsWithMenu(menuElements: MenuElements, zoomManager: ZoomManag
 	zoomReset.addEventListener("click", () => {
 		zoomManager.resetZoom()
 	})
+}
 
-	// document.querySelector('#view-menu-fullscreen')!.addEventListener('click', () => {
-	// 	performFullscreen()
-	// })
+function bindSideToggleEvent(menuElements: MenuElements, sideFacade: SideFacade) {
+	const { fileTree } = menuElements
+
+	fileTree.addEventListener("click", () => {
+		const isOpen = sideFacade.isSideOpen()
+		sideFacade.setSideOpenState(!isOpen)
+		sideFacade.syncSession()
+		toggleSide(menuElements, sideFacade)
+	})
 }
 
 function bindCommandsWithShortcut(shortcutRegistry: ShortcutRegistry, zoomManager: ZoomManager) {
 	shortcutRegistry.register("Ctrl++", () => zoomManager.zoomIn())
 	shortcutRegistry.register("Ctrl+-", () => zoomManager.zoomOut())
 	shortcutRegistry.register("Ctrl+0", () => zoomManager.resetZoom())
-	// shortcutRegistry.register('F11', () => performFullscreen())
 }
-
-// function performFullscreen() {
-// 	if (!document.fullscreenElement) {
-// 		document.documentElement.requestFullscreen()
-// 	} else {
-// 		document.exitFullscreen()
-// 	}
-// }
