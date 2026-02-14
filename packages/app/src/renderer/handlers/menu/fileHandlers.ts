@@ -1,10 +1,10 @@
 import "@milkdown/theme-nord/style.css"
 
-import CommandManager from "../CommandManager"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
+import CommandManager from "../../CommandManager"
+import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 
-export default function registerFileHandlers(
+export function handleFileMenu(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	menueElements: MenuElements

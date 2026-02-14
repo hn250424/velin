@@ -1,8 +1,8 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import ZoomManager from "../modules/layout/ZoomManager"
+import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
+import ZoomManager from "../../modules/layout/ZoomManager"
 
-export default function registerViewHandlers(
+export function handleViewMenu(
 	shortcutRegistry: ShortcutRegistry,
 	menuElements: MenuElements,
 	zoomManager: ZoomManager

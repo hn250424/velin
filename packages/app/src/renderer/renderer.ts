@@ -4,17 +4,14 @@ import "@milkdown/theme-nord/style.css"
 import type { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import type { TreeDto } from "@shared/dto/TreeDto"
 
-import registerEditHandlers from "./handlers/editHandlers"
+import { handleMenuItems, handleFileMenu, handleEditMenu, handleViewMenu, handleHelpMenu } from "./handlers/menu"
+
 import registerExitHandlers from "./handlers/exitHandlers"
-import registerFileHandlers from "./handlers/fileHandlers"
 import registerLoadHandlers from "./handlers/loadHandlers"
 import registerTabHandlers from "./handlers/tabHandlers"
 import registerTreeHandlers from "./handlers/treeHandlers"
-import registerViewHandlers from "./handlers/viewHandlers"
 import registerWindowHandlers from "./handlers/windowHandlers"
-import registerMenuHandlers from "./handlers/menuHandlers"
 import registerSettingsHandlers from "./handlers/settingsHandlers"
-import registerHelpHandlers from "./handlers/helpHandlers"
 import registerSideHandlers from "./handlers/sideHandlers"
 
 import FocusManager from "./modules/state/FocusManager"
@@ -63,14 +60,15 @@ window.addEventListener("DOMContentLoaded", () => {
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
 	registerLoadHandlers(windowFacade, settingsFacade, tabEditorFacade, treeFacade, sideFacade, infoFacade, () => {
-		registerFileHandlers(commandManager, shortcutRegistry, menuElements)
+		handleMenuItems(menuElements)
+		handleFileMenu(commandManager, shortcutRegistry, menuElements)
+		handleEditMenu(commandManager, shortcutRegistry, menuElements)
+		handleViewMenu(shortcutRegistry, menuElements, zoomManager)
+		handleHelpMenu(commandManager, shortcutRegistry, menuElements)
+
 		registerExitHandlers(tabEditorFacade, treeFacade)
-		registerEditHandlers(commandManager, shortcutRegistry, menuElements)
-		registerViewHandlers(shortcutRegistry, menuElements, zoomManager)
 		registerTabHandlers(commandManager, tabEditorFacade, shortcutRegistry)
-		registerHelpHandlers(commandManager, shortcutRegistry, menuElements)
 		registerInfoHandlers(commandManager, infoFacade)
-		registerMenuHandlers(menuElements)
 		registerWindowHandlers(windowFacade)
 		registerTreeHandlers(commandManager, focusManager, treeFacade, shortcutRegistry)
 		registerSideHandlers(sideFacade, menuElements)

@@ -4,7 +4,7 @@ import type InfoElements from "./InfoElements";
 
 @injectable()
 export default class InfoFacade {
-	constructor(@inject(DI_KEYS.SideState) public readonly elements: InfoElements) {}
+	constructor(@inject(DI_KEYS.InfoElements) public readonly elements: InfoElements) {}
 
 	showInformation() {
 		this.elements.overlay.style.display = "flex"

@@ -1,7 +1,7 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import { CLASS_SELECTED } from "../constants/dom"
+import { CLASS_SELECTED } from "../../constants/dom"
 
-export default function registerMenuHandlers(menuElements: MenuElements) {
+export function handleMenuItems(menuElements: MenuElements) {
 	const { menuItems } = menuElements
 
 	menuItems.forEach((item) => {

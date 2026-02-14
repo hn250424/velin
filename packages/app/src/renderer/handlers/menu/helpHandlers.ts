@@ -1,8 +1,8 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import CommandManager from "../CommandManager"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
+import CommandManager from "../../CommandManager"
+import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
 
-export default function registerHelpHandlers(
+export function handleHelpMenu(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	menuElements: MenuElements

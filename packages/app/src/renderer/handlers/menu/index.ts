@@ -1,0 +1,5 @@
+export { handleMenuItems } from "./itemHandlers"
+export { handleFileMenu } from "./fileHandlers"
+export { handleEditMenu } from "./editHandlers"
+export { handleViewMenu } from "./viewHandlers"
+export { handleHelpMenu } from "./helpHandlers"
