@@ -1,6 +1,6 @@
 import type WindowFacade from "@renderer/modules/window/WindowFacade"
 
-export default function registerWindowHandlers(windowFacade: WindowFacade) {
+export function handleWindow(windowFacade: WindowFacade) {
 	const {
 		maximizeBtn,
 		minimizeBtn

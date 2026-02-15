@@ -1,6 +1,6 @@
 import type SideFacade from "@renderer/modules/side/SideFacade"
 
-export default function registerSideHandlers(sideFacade: SideFacade) {
+export function handleSide(sideFacade: SideFacade) {
 	bindDragEvents(sideFacade)
 }
 

@@ -2,7 +2,7 @@ import CommandManager from "../CommandManager"
 import { CLASS_SELECTED } from "../constants/dom"
 import SettingsFacade from "../modules/settings/SettingsFacade"
 
-export default function registerSettingsHandlers(
+export function handleSettings(
 	commandManager: CommandManager,
 	settingsFacade: SettingsFacade,
 ) {

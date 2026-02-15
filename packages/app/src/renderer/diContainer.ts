@@ -28,6 +28,7 @@ import SideFacade from "./modules/side/SideFacade"
 import SideElements from "./modules/side/SideElements"
 import SideState from "./modules/side/SideState"
 import InfoFacade from "./modules/info/InfoFacade"
+import WindowRenderer from "./modules/window/WindowRenderer"
 
 const diContainer = new Container()
 
@@ -65,6 +66,7 @@ diContainer.bind(DI_KEYS.SettingsElements).to(SettingsElements).inSingletonScope
 
 diContainer.bind(DI_KEYS.WindowFacade).to(WindowFacade).inSingletonScope()
 diContainer.bind(DI_KEYS.WindowStore).to(WindowStore).inSingletonScope()
+diContainer.bind(DI_KEYS.WindowRenderer).to(WindowRenderer).inSingletonScope()
 diContainer.bind(DI_KEYS.WindowElements).to(WindowElements).inSingletonScope()
 
 diContainer.bind(DI_KEYS.CommandManager).to(CommandManager).inSingletonScope()

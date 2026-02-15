@@ -14,7 +14,7 @@ import { toggleSide } from "@renderer/actions"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import type CommandManager from "@renderer/CommandManager"
 
-export default function registerLoadHandlers(
+export function handleLoad(
 	commandManager: CommandManager,
 	windowFacade: WindowFacade,
 	settingsFacade: SettingsFacade,
@@ -23,7 +23,6 @@ export default function registerLoadHandlers(
 	sideFacade: SideFacade,
 	infoFacade: InfoFacade,
 	menuElements: MenuElements,
-	callback: () => void
 ) {
 	window.mainToRenderer.session(
 		async (
@@ -39,8 +38,6 @@ export default function registerLoadHandlers(
 			processSideSession(sideFacade, sideDto)
 			processTabEditorSession(tabEditorFacade, tabEditorsDto)
 			processTreeSession(treeFacade, treeDto)
-
-			callback()
 
 			initSettings(commandManager, settingsFacade)
 			initSide(sideFacade, menuElements)

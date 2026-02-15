@@ -4,15 +4,21 @@ import "@milkdown/theme-nord/style.css"
 import type { TabEditorsDto } from "@shared/dto/TabEditorDto"
 import type { TreeDto } from "@shared/dto/TreeDto"
 
-import { handleMenuItems, handleFileMenu, handleEditMenu, handleViewMenu, handleHelpMenu } from "./handlers/menu"
-
-import registerExitHandlers from "./handlers/exitHandlers"
-import registerLoadHandlers from "./handlers/loadHandlers"
-import registerTabHandlers from "./handlers/tabHandlers"
-import registerTreeHandlers from "./handlers/treeHandlers"
-import registerWindowHandlers from "./handlers/windowHandlers"
-import registerSettingsHandlers from "./handlers/settingsHandlers"
-import registerSideHandlers from "./handlers/sideHandlers"
+import {
+	handleMenuItems,
+	handleFileMenu,
+	handleEditMenu,
+	handleViewMenu,
+	handleHelpMenu,
+	handleExit,
+	handleInfo,
+	handleLoad,
+	handleSettings,
+	handleSide,
+	handleTab,
+	handleTree,
+	handleWindow,
+} from "./handlers"
 
 import FocusManager from "./modules/state/FocusManager"
 import ShortcutRegistry from "./modules/input/ShortcutRegistry"
@@ -39,7 +45,6 @@ import diContainer from "./diContainer"
 import CommandManager from "./CommandManager"
 import type MenuElements from "./modules/menu/MenuElements"
 import type WindowFacade from "./modules/window/WindowFacade"
-import registerInfoHandlers from "./handlers/infoHandlers"
 import SideFacade from "./modules/side/SideFacade"
 import InfoFacade from "./modules/info/InfoFacade"
 
@@ -59,7 +64,21 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
-	registerLoadHandlers(
+	handleMenuItems(menuElements)
+	handleFileMenu(commandManager, shortcutRegistry, menuElements)
+	handleEditMenu(commandManager, shortcutRegistry, menuElements)
+	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
+	handleHelpMenu(commandManager, shortcutRegistry, menuElements)
+
+	handleExit(tabEditorFacade, treeFacade)
+	handleTab(commandManager, tabEditorFacade, shortcutRegistry)
+	handleInfo(commandManager, infoFacade)
+	handleWindow(windowFacade)
+	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
+	handleSide(sideFacade)
+	handleSettings(commandManager, settingsFacade)
+	
+	handleLoad(
 		commandManager,
 		windowFacade,
 		settingsFacade,
@@ -67,22 +86,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		treeFacade,
 		sideFacade,
 		infoFacade,
-		menuElements,
-		() => {
-			handleMenuItems(menuElements)
-			handleFileMenu(commandManager, shortcutRegistry, menuElements)
-			handleEditMenu(commandManager, shortcutRegistry, menuElements)
-			handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
-			handleHelpMenu(commandManager, shortcutRegistry, menuElements)
-
-			registerExitHandlers(tabEditorFacade, treeFacade)
-			registerTabHandlers(commandManager, tabEditorFacade, shortcutRegistry)
-			registerInfoHandlers(commandManager, infoFacade)
-			registerWindowHandlers(windowFacade)
-			registerTreeHandlers(commandManager, focusManager, treeFacade, shortcutRegistry)
-			registerSideHandlers(sideFacade)
-			registerSettingsHandlers(commandManager, settingsFacade)
-		}
+		menuElements
 	)
 
 	bindSyncEventFromWatch(tabEditorFacade, treeFacade)

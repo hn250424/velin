@@ -9,7 +9,7 @@ import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import { throttle } from "../utils/throttle"
 
-export default function registerTabHandlers(
+export function handleTab(
 	commandManager: CommandManager,
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry

@@ -14,7 +14,7 @@ import ShortcutRegistry from "../modules/input/ShortcutRegistry"
 import FocusManager from "../modules/state/FocusManager"
 import CommandManager from "../CommandManager"
 
-export default function registerTreeHandlers(
+export function handleTree(
 	commandManager: CommandManager,
 	focusManager: FocusManager,
 	treeFacade: TreeFacade,
