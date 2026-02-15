@@ -47,9 +47,13 @@ export default class TabEditorView {
 		this._editor = editor
 	}
 
+	//
+
 	getId(): number {
 		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID]!)
 	}
+
+	//
 
 	observeEditor(onInput: () => void, onBlur: () => void) {
 		this._onEditorInputCallback = onInput
@@ -77,6 +81,8 @@ export default class TabEditorView {
 		})
 	}
 
+	//
+
 	getEditorFirstLine() {
 		const editorView = this._editor!.ctx.get(editorViewCtx)
 		const firstLine = editorView.state.doc.textBetween(0, editorView.state.doc.content.size).split("\n")[0].trim()
@@ -103,6 +109,8 @@ export default class TabEditorView {
 			}
 		})
 	}
+
+	//
 
 	getSelection() {
 		return this._editor!.action((ctx) => {
@@ -136,6 +144,8 @@ export default class TabEditorView {
 		})
 	}
 
+	//
+
 	focus() {
 		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx)
@@ -149,6 +159,9 @@ export default class TabEditorView {
 		this._tabBox.remove()
 	}
 
+
+	//
+
 	setActive() {
 		this._editorBox.classList.add(CLASS_SELECTED)
 		this._tabBox.classList.add(CLASS_SELECTED)
@@ -160,6 +173,8 @@ export default class TabEditorView {
 		this._tabBox.classList.remove(CLASS_SELECTED)
 	}
 
+	//
+
 	setTabSpanTextContent(text: string) {
 		this._tabSpan.textContent = text
 	}
@@ -167,6 +182,8 @@ export default class TabEditorView {
 	setTabButtonTextContent(text: string) {
 		this._tabButton.textContent = text
 	}
+
+	//
 
 	findMatches(searchText: string): SearchMatch[] {
 		const view = this._editor!.ctx.get(editorViewCtx)
@@ -308,6 +325,8 @@ export default class TabEditorView {
 		return this._searchState
 	}
 
+	//
+
 	setSuppressInputEvent(value: boolean) {
 		this._suppressInputEvent = value
 	}
@@ -315,6 +334,8 @@ export default class TabEditorView {
 	shouldSuppressInputEvent(): boolean {
 		return this._suppressInputEvent
 	}
+
+	//
 
 	get editor(): Editor | null {
 		return this._editor

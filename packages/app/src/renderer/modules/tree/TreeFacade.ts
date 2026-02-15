@@ -19,10 +19,12 @@ import TreeDragManager from "./TreeDragManager"
 @injectable()
 export default class TreeFacade {
 	constructor(
-		@inject(DI_KEYS.TreeRenderer) public readonly renderer: TreeRenderer,
 		@inject(DI_KEYS.TreeStore) public readonly store: TreeStore,
+		@inject(DI_KEYS.TreeRenderer) public readonly renderer: TreeRenderer,
 		@inject(DI_KEYS.TreeDragManager) public readonly drag: TreeDragManager
 	) {}
+
+	// store
 
 	toTreeDto(viewModel: TreeViewModel): TreeDto {
 		return this.store.toTreeDto(viewModel)
@@ -32,17 +34,7 @@ export default class TreeFacade {
 		return this.store.toTreeViewModel(dto)
 	}
 
-	extractTreeViewModel(): TreeViewModel {
-		return this.store.extractTreeViewModel()
-	}
-
-	expandNode(node: TreeViewModel) {
-		this.store.expandNode(node)
-	}
-
-	collapseNode(node: TreeViewModel) {
-		this.store.collapseNode(node)
-	}
+	//
 
 	getFlattenTreeArrayLength(): number {
 		return this.store.flattenTreeArray.length
@@ -52,9 +44,27 @@ export default class TreeFacade {
 		return this.store.getFlattenArrayIndexByPath(path)
 	}
 
+	extractTreeViewModel(): TreeViewModel {
+		return this.store.extractTreeViewModel()
+	}
+
+	//
+
+	expandNode(node: TreeViewModel) {
+		this.store.expandNode(node)
+	}
+
+	collapseNode(node: TreeViewModel) {
+		this.store.collapseNode(node)
+	}
+
+	//
+
 	findParentDirectoryIndex(index: number) {
 		return this.store.findParentDirectoryIndex(index)
 	}
+
+	//
 
 	getTreeViewModelByIndex(index: number) {
 		return this.store.getTreeViewModelByIndex(index)
@@ -65,6 +75,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	get lastSelectedIndex() {
 		return this.store.lastSelectedIndex
 	}
@@ -84,6 +95,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	get contextTreeIndex() {
 		return this.store.contextTreeIndex
 	}
@@ -101,6 +113,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	get selectedDragIndex() {
 		return this.store.selectedDragIndex
 	}
@@ -122,6 +135,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	addClipboardPaths(path: string) {
 		this.store.addClipboardPaths(path)
 	}
@@ -148,7 +162,8 @@ export default class TreeFacade {
 		this.store.clipboardMode = mode
 	}
 
-	//
+	// renderer
+
 	clean(container: HTMLElement) {
 		this.renderer.clean(container)
 	}
@@ -174,6 +189,8 @@ export default class TreeFacade {
 
 		this.clearSelectedIndices()
 	}
+
+	//
 
 	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
 		this.renderer.renderTreeData(viewModel, container)
@@ -218,7 +235,8 @@ export default class TreeFacade {
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
 	}
 
-	//
+	// drag
+
 	isMouseDown(): boolean {
 		return this.drag.isMouseDown()
 	}
@@ -226,6 +244,8 @@ export default class TreeFacade {
 	setMouseDown(state: boolean) {
 		this.drag.setMouseDown(state)
 	}
+
+	//
 
 	isDrag(): boolean {
 		return this.drag.isDrag()
@@ -238,6 +258,8 @@ export default class TreeFacade {
 	endDrag() {
 		this.drag.endDrag()
 	}
+
+	//
 
 	getStartPosition() {
 		return this.drag.getStartPosition()
@@ -256,6 +278,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	getDragTreeCount() {
 		return this.drag.getDragTreeCount()
 	}
@@ -265,6 +288,7 @@ export default class TreeFacade {
 	}
 
 	//
+
 	getInsertWrapper() {
 		return this.drag.getInsertWrapper()
 	}
@@ -281,7 +305,8 @@ export default class TreeFacade {
 		this.drag.setInsertPath(path)
 	}
 
-	//
+	// orchestra
+
 	loadFlattenArrayAndMaps(json: TreeViewModel) {
 		const arr = this.store.flattenTree(json)
 		this.store.setFlattenTree(arr)

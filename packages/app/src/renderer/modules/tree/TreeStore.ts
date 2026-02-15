@@ -23,9 +23,7 @@ export default class TreeStore {
 	private _clipboardPaths = new Set<string>()
 	private _clipboardMode: ClipboardMode = "none"
 
-	constructor() {
-		// intentionally empty.
-	}
+	//
 
 	toTreeDto(viewModel: TreeViewModel): TreeDto {
 		if (!Object.keys(viewModel).length) return {} as TreeDto
@@ -51,6 +49,8 @@ export default class TreeStore {
 			children: dto.children ? dto.children.map((child) => this.toTreeViewModel(child)) : null,
 		}
 	}
+
+	//
 
 	flattenTree(tree: TreeViewModel): TreeViewModel[] {
 		const result: TreeViewModel[] = []
@@ -98,6 +98,8 @@ export default class TreeStore {
 		return root
 	}
 
+	//
+
 	expandNode(node: TreeViewModel) {
 		const index = this._flattenTreeArray.findIndex((dto) => dto.path === node.path)
 		if (index === -1) return
@@ -122,6 +124,8 @@ export default class TreeStore {
 		this.rebuildPathToFlattenArrayIndexMap()
 	}
 
+	//
+
 	spliceFlattenTreeArray(start: number, length: number) {
 		this._flattenTreeArray.splice(start, length)
 	}
@@ -137,6 +141,8 @@ export default class TreeStore {
 		}
 		return 0
 	}
+
+	//
 
 	get flattenTreeArray(): readonly TreeViewModel[] {
 		return this._flattenTreeArray
@@ -155,6 +161,8 @@ export default class TreeStore {
 		return this._flattenTreeArray[idx]
 	}
 
+	//
+
 	rebuildPathToFlattenArrayIndexMap() {
 		this._pathToFlattenArrayIndexMap.clear()
 
@@ -165,6 +173,8 @@ export default class TreeStore {
 			this._pathToFlattenArrayIndexMap.set(path, i)
 		}
 	}
+
+	//
 
 	getFlattenArrayIndexByPath(path: string) {
 		return this._pathToFlattenArrayIndexMap.get(path)
@@ -178,6 +188,8 @@ export default class TreeStore {
 		this._pathToFlattenArrayIndexMap.delete(path)
 	}
 
+	//
+
 	get lastSelectedIndex() {
 		return this._lastSelectedIndex
 	}
@@ -189,6 +201,8 @@ export default class TreeStore {
 	removeLastSelectedIndex() {
 		this._lastSelectedIndex = -1
 	}
+
+	//
 
 	get contextTreeIndex() {
 		return this._contextTreeIndex
@@ -202,6 +216,8 @@ export default class TreeStore {
 		this._contextTreeIndex = -1
 	}
 
+	//
+
 	get selectedDragIndex() {
 		return this._selectedDragIndex
 	}
@@ -209,6 +225,8 @@ export default class TreeStore {
 	set selectedDragIndex(index: number) {
 		this._selectedDragIndex = index
 	}
+
+	//
 
 	addSelectedIndices(index: number) {
 		this._selectedIndices.add(index)
@@ -221,6 +239,8 @@ export default class TreeStore {
 	clearSelectedIndices() {
 		this._selectedIndices.clear()
 	}
+
+	//
 
 	addClipboardPaths(path: string) {
 		this._clipboardPaths.add(path)

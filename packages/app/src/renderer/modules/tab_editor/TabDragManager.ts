@@ -12,6 +12,8 @@ export default class TabDragManager {
 	private _start_y = 0
 	private _insertIndex = -1
 
+	//
+
 	isMouseDown(): boolean {
 		return this._isMouseDown
 	}
@@ -20,13 +22,13 @@ export default class TabDragManager {
 		this._isMouseDown = state
 	}
 
-	isDrag(): boolean {
-		return this._isDrag
-	}
+	//
 
 	setTargetElement(tab: HTMLElement) {
 		this._targetTab = tab
 	}
+
+	//
 
 	getTabs() {
 		return this._tabs
@@ -34,6 +36,12 @@ export default class TabDragManager {
 
 	setTabs(tabs: HTMLElement[]) {
 		this._tabs = tabs
+	}
+
+	//
+
+	isDrag(): boolean {
+		return this._isDrag
 	}
 
 	startDrag() {
@@ -52,6 +60,8 @@ export default class TabDragManager {
 		this._start_y = 0
 	}
 
+	//
+
 	getStartPosition() {
 		return { x: this._start_x, y: this._start_y }
 	}
@@ -69,6 +79,8 @@ export default class TabDragManager {
 		return this._start_y
 	}
 
+	//
+
 	getDragTargetTab() {
 		return this._targetTab
 	}
@@ -81,6 +93,8 @@ export default class TabDragManager {
 		this._targetTabId = id
 	}
 
+	//
+
 	getDragTargetTabName() {
 		return this._targetTabName
 	}
@@ -88,6 +102,8 @@ export default class TabDragManager {
 	setDragTargetTabName(name: string) {
 		this._targetTabName = name
 	}
+
+	//
 
 	getInsertIndex(): number {
 		return this._insertIndex

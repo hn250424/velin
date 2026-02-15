@@ -9,22 +9,131 @@ import ShortcutRegistry from "../core/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import { throttle } from "../utils/throttle"
 
-export function handleTab(
+export function handleTabEditor(
 	commandManager: CommandManager,
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
 	bindTabClickEvents(commandManager, tabEditorFacade)
-	bindFindReplaceEvnets(commandManager, tabEditorFacade)
-	bindTabContextmenuEvents(tabEditorFacade)
-	bindCommandsWithContextmenu(commandManager, tabEditorFacade)
-	bindCommandsWithShortcut(commandManager, shortcutRegistry, tabEditorFacade)
 
-	// Drag.
+	bindTabContextmenuToggleEvent(tabEditorFacade)
+	bindTabContextmenuClickEvents(commandManager, tabEditorFacade)
+
+	bindFindReplaceEvnets(commandManager, tabEditorFacade)
+
+	bindShortcutEvents(commandManager, shortcutRegistry, tabEditorFacade)
+
 	bindMouseDownEvents(tabEditorFacade)
 	bindMouseMoveEvents(tabEditorFacade)
 	bindMouseUpEvents(tabEditorFacade)
 }
+
+//
+
+function bindTabClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+	const { tabContainer } = tabEditorFacade.renderer.elements
+
+	tabContainer.addEventListener("click", async (e) => {
+		const target = e.target as HTMLElement
+		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
+
+		if (tabBox) {
+			if (target.tagName === "BUTTON") {
+				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
+				await commandManager.performCloseTab("button", id)
+			} else if (target.tagName === "SPAN") {
+				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
+				tabEditorFacade.activateTabEditorById(parseInt(id))
+			}
+		}
+	})
+}
+
+//
+
+function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
+	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
+
+	tabContainer.addEventListener("contextmenu", (e) => {
+		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
+		if (!tab) return
+
+		tabContextMenu.classList.add(CLASS_SELECTED)
+		tabContextMenu.style.left = `${e.clientX}px`
+		tabContextMenu.style.top = `${e.clientY}px`
+		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID]!)
+	})
+}
+
+function bindTabContextmenuClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+	const { tabContextClose, tabContextCloseOthers, tabContextCloseRight, tabContextCloseAll } =
+		tabEditorFacade.renderer.elements
+
+	tabContextClose.addEventListener("click", async () => {
+		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
+	})
+
+	tabContextCloseOthers.addEventListener("click", async () => {
+		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
+		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
+		if (response.result) tabEditorFacade.removeTabsExcept(response.data)
+	})
+
+	tabContextCloseRight.addEventListener("click", async () => {
+		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
+		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
+		if (response.result) tabEditorFacade.removeTabsToRight(response.data)
+	})
+
+	tabContextCloseAll.addEventListener("click", async () => {
+		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
+		if (response.result) tabEditorFacade.removeAllTabs(response.data)
+	})
+}
+
+//
+
+function bindFindReplaceEvnets(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+	const { findUp, findDown, findClose, replaceCurrent, replaceAll } = tabEditorFacade.renderer.elements
+
+	findUp.addEventListener("click", async () => {
+		commandManager.performFind("menu", "up")
+	})
+
+	findDown.addEventListener("click", async () => {
+		commandManager.performFind("menu", "down")
+	})
+
+	findClose.addEventListener("click", async () => {
+		commandManager.performCloseFindReplaceBox("menu")
+	})
+
+	replaceCurrent.addEventListener("click", async () => {
+		commandManager.performReplace("menu")
+	})
+
+	replaceAll.addEventListener("click", async () => {
+		commandManager.performReplaceAll("menu")
+	})
+}
+
+//
+
+function bindShortcutEvents(
+	commandManager: CommandManager,
+	shortcutRegistry: ShortcutRegistry,
+	tabEditorFacade: TabEditorFacade
+) {
+	shortcutRegistry.register(
+		"Ctrl+W",
+		async () => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
+	)
+}
+
+//
 
 function bindMouseDownEvents(tabEditorFacade: TabEditorFacade) {
 	const { tabContainer } = tabEditorFacade.renderer.elements
@@ -132,101 +241,4 @@ function getInsertIndexFromMouseX(tabs: HTMLElement[], mouseX: number): number {
 	}
 
 	return tabs.length
-}
-
-function bindTabClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	const { tabContainer } = tabEditorFacade.renderer.elements
-
-	tabContainer.addEventListener("click", async (e) => {
-		const target = e.target as HTMLElement
-		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
-
-		if (tabBox) {
-			if (target.tagName === "BUTTON") {
-				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
-				await commandManager.performCloseTab("button", id)
-			} else if (target.tagName === "SPAN") {
-				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
-				tabEditorFacade.activateTabEditorById(parseInt(id))
-			}
-		}
-	})
-}
-
-function bindFindReplaceEvnets(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	const { findUp, findDown, findClose, replaceCurrent, replaceAll } = tabEditorFacade.renderer.elements
-
-	findUp.addEventListener("click", async () => {
-		commandManager.performFind("menu", "up")
-	})
-
-	findDown.addEventListener("click", async () => {
-		commandManager.performFind("menu", "down")
-	})
-
-	findClose.addEventListener("click", async () => {
-		commandManager.performCloseFindReplaceBox("menu")
-	})
-
-	replaceCurrent.addEventListener("click", async () => {
-		commandManager.performReplace("menu")
-	})
-
-	replaceAll.addEventListener("click", async () => {
-		commandManager.performReplaceAll("menu")
-	})
-}
-
-function bindTabContextmenuEvents(tabEditorFacade: TabEditorFacade) {
-	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
-
-	tabContainer.addEventListener("contextmenu", (e) => {
-		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
-		if (!tab) return
-
-		tabContextMenu.classList.add(CLASS_SELECTED)
-		tabContextMenu.style.left = `${e.clientX}px`
-		tabContextMenu.style.top = `${e.clientY}px`
-		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID]!)
-	})
-}
-
-function bindCommandsWithContextmenu(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	const { tabContextClose, tabContextCloseOthers, tabContextCloseRight, tabContextCloseAll } =
-		tabEditorFacade.renderer.elements
-
-	tabContextClose.addEventListener("click", async () => {
-		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
-	})
-
-	tabContextCloseOthers.addEventListener("click", async () => {
-		const exceptData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
-		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeTabsExcept(exceptData, allData)
-		if (response.result) tabEditorFacade.removeTabsExcept(response.data)
-	})
-
-	tabContextCloseRight.addEventListener("click", async () => {
-		const referenceData: TabEditorDto = tabEditorFacade.getTabEditorDataById(tabEditorFacade.contextTabId)
-		const allData: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(referenceData, allData)
-		if (response.result) tabEditorFacade.removeTabsToRight(response.data)
-	})
-
-	tabContextCloseAll.addEventListener("click", async () => {
-		const data: TabEditorsDto = tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
-		if (response.result) tabEditorFacade.removeAllTabs(response.data)
-	})
-}
-
-function bindCommandsWithShortcut(
-	commandManager: CommandManager,
-	shortcutRegistry: ShortcutRegistry,
-	tabEditorFacade: TabEditorFacade
-) {
-	shortcutRegistry.register(
-		"Ctrl+W",
-		async () => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
-	)
 }

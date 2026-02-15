@@ -29,6 +29,8 @@ export default class TreeRenderer {
 
 	constructor(@inject(DI_KEYS.TreeElements) readonly elements: TreeElements) {}
 
+	//
+
 	clean(container: HTMLElement) {
 		while (container.firstChild) {
 			container.removeChild(container.firstChild)
@@ -38,6 +40,8 @@ export default class TreeRenderer {
 	removeContainerFocus() {
 		this.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
 	}
+
+	//
 
 	// Each DOM element with class `tree_node` has a dataset attribute for its path.
 	// The root node uses the container `tree_node_container` to hold its path in the dataset.
@@ -110,6 +114,8 @@ export default class TreeRenderer {
 		}
 	}
 
+	//
+
 	createInputbox(directory: boolean, indent: number) {
 		const box = document.createElement("div")
 		box.classList.add("tree_node_temp")
@@ -160,6 +166,8 @@ export default class TreeRenderer {
 			this.ghostBox = null
 		}
 	}
+
+	//
 
 	clearPathToTreeWrapperMap() {
 		this._pathToTreeWrapperMap.clear()

@@ -19,10 +19,279 @@ export const BINARY_FILE_WARNING = `Can't read this file`
 @injectable()
 export default class TabEditorFacade {
 	constructor(
-		@inject(DI_KEYS.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
 		@inject(DI_KEYS.TabEditorStore) public readonly store: TabEditorStore,
+		@inject(DI_KEYS.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
 		@inject(DI_KEYS.TabDragManager) public readonly drag: TabDragManager
 	) {}
+
+	// store
+
+	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
+		return this.store.toTabEditorViewModel(dto)
+	}
+
+	//
+
+	get activeTabId() {
+		return this.store.activeTabId
+	}
+
+	set activeTabId(id: number) {
+		this.store.activeTabId = id
+	}
+
+	get activeTabIndex() {
+		return this.store.activeTabIndex
+	}
+
+	set activeTabIndex(index: number) {
+		this.store.activeTabIndex = index
+	}
+
+	get contextTabId() {
+		return this.store.contextTabId
+	}
+
+	set contextTabId(id: number) {
+		this.store.contextTabId = id
+	}
+
+	removeContextTabId() {
+		this.store.removeContextTabId()
+	}
+
+	//
+
+	getTabEditorViewModelById(id: number) {
+		return this.store.getTabEditorViewModelById(id)
+	}
+
+	setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
+		this.store.setTabEditorViewModelById(id, viewModel)
+	}
+
+	//
+
+	get findReplaceOpen() {
+		return this.store.findReploceOpen
+	}
+
+	set findReplaceOpen(open: boolean) {
+		this.store.findReplaceOpen = open
+	}
+
+	get findDirection() {
+		return this.store.findDirection
+	}
+
+	set findDirection(direction: "up" | "down") {
+		this.store.findDirection = direction
+	}
+
+	// renderer
+
+	getTabEditorViewByIndex(index: number) {
+		return this.renderer.getTabEditorViewByIndex(index)
+	}
+
+	getTabEditorViewIndexById(id: number) {
+		return this.renderer.getTabEditorViewIndexById(id)
+	}
+
+	//
+
+	getTabEditorViewByPath(path: string) {
+		return this.renderer.getTabEditorViewByPath(path)
+	}
+
+	setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
+		this.renderer.setTabEditorViewByPath(path, tabEditorVeiw)
+	}
+
+	deleteTabEditorViewByPath(path: string) {
+		this.renderer.deleteTabEditorViewByPath(path)
+	}
+
+	//
+
+	undo() {
+		const activeTabIndex = this.store.activeTabIndex
+		this.renderer.undo(activeTabIndex)
+	}
+
+	redo() {
+		const activeTabIndex = this.store.activeTabIndex
+		this.renderer.redo(activeTabIndex)
+	}
+
+	paste(text: string) {
+		const activeTabIndex = this.store.activeTabIndex
+		this.renderer.paste(activeTabIndex, text)
+	}
+
+	//
+
+	moveTabEditorViewAndUpdateActiveIndex(fromIndex: number, toIndex: number): void {
+		if (fromIndex === toIndex) return
+
+		this.renderer.moveTabEditorView(fromIndex, toIndex)
+
+		if (this.store.activeTabIndex === fromIndex) {
+			this.store.activeTabIndex = toIndex
+		} else if (fromIndex < this.store.activeTabIndex && toIndex >= this.store.activeTabIndex) {
+			this.store.activeTabIndex--
+		} else if (fromIndex > this.store.activeTabIndex && toIndex <= this.store.activeTabIndex) {
+			this.store.activeTabIndex++
+		}
+	}
+
+	//
+
+	createGhostBox(fileName: string) {
+		return this.renderer.createGhostBox(fileName)
+	}
+
+	removeGhostBox() {
+		this.renderer.removeGhostBox()
+	}
+
+	createIndicator() {
+		return this.renderer.createIndicator()
+	}
+
+	removeIndicator() {
+		this.renderer.removeIndicator()
+	}
+
+	//
+
+	changeFontSize(size: number) {
+		this.renderer.changeFontSize(size)
+	}
+
+	changeFontFamily(family: string) {
+		this.renderer.changeFontFamily(family)
+	}
+
+	//
+
+	get findAndReplaceContainer() {
+		return this.renderer.findAndReplaceContainer
+	}
+
+	get findBox() {
+		return this.renderer.findBox
+	}
+
+	get replaceBox() {
+		return this.renderer.replaceBox
+	}
+
+	get findInput() {
+		return this.renderer.findInput
+	}
+
+	get replaceInput() {
+		return this.renderer.replaceInput
+	}
+
+	get findInfo() {
+		return this.renderer.findInfo
+	}
+
+	// drag
+
+	isMouseDown(): boolean {
+		return this.drag.isMouseDown()
+	}
+
+	setMouseDown(state: boolean) {
+		this.drag.setMouseDown(state)
+	}
+
+	//
+
+	setTargetElement(tab: HTMLElement) {
+		return this.drag.setTargetElement(tab)
+	}
+
+	//
+
+	getTabs() {
+		return this.drag.getTabs()
+	}
+
+	setTabs(tabs: HTMLElement[]) {
+		this.drag.setTabs(tabs)
+	}
+
+	//
+
+	isDrag(): boolean {
+		return this.drag.isDrag()
+	}
+
+	startDrag() {
+		this.drag.startDrag()
+	}
+
+	endDrag() {
+		this.drag.endDrag()
+	}
+
+	//
+
+	getStartPosition() {
+		return this.drag.getStartPosition()
+	}
+
+	setStartPosition(x: number, y: number) {
+		this.drag.setStartPosition(x, y)
+	}
+
+	getStartPosition_x() {
+		return this.drag.getStartPosition_x()
+	}
+
+	getStartPosition_y() {
+		return this.drag.getStartPosition_y()
+	}
+
+	//
+
+	getDragTargetTab() {
+		return this.drag.getDragTargetTab()
+	}
+
+	getDragTargetTabId() {
+		return this.drag.getDragTargetTabId()
+	}
+
+	setDragTargetTabId(id: number) {
+		this.drag.setDragTargetTabId(id)
+	}
+
+	//
+
+	getDragTargetTabName() {
+		return this.drag.getDragTargetTabName()
+	}
+
+	setDragTargetTabName(name: string) {
+		this.drag.setDragTargetTabName(name)
+	}
+
+	//
+
+	getInsertIndex(): number {
+		return this.drag.getInsertIndex()
+	}
+
+	setInsertIndex(index: number) {
+		this.drag.setInsertIndex(index)
+	}
+
+	// orchestra
 
 	async loadTabs(dto: TabEditorsDto) {
 		this.store.activeTabId = dto.activatedId
@@ -265,20 +534,6 @@ export default class TabEditorFacade {
 		this._processFindAndSelect(view)
 	}
 
-	moveTabEditorViewAndUpdateActiveIndex(fromIndex: number, toIndex: number): void {
-		if (fromIndex === toIndex) return
-
-		this.renderer.moveTabEditorView(fromIndex, toIndex)
-
-		if (this.store.activeTabIndex === fromIndex) {
-			this.store.activeTabIndex = toIndex
-		} else if (fromIndex < this.store.activeTabIndex && toIndex >= this.store.activeTabIndex) {
-			this.store.activeTabIndex--
-		} else if (fromIndex > this.store.activeTabIndex && toIndex <= this.store.activeTabIndex) {
-			this.store.activeTabIndex++
-		}
-	}
-
 	private resolveFileNameByView(view: TabEditorView): string {
 		const id = view.getId()
 		const data = this.getTabEditorViewModelById(id)!
@@ -400,62 +655,6 @@ export default class TabEditorFacade {
 		}
 	}
 
-	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
-		return this.store.toTabEditorViewModel(dto)
-	}
-
-	getTabEditorViewModelById(id: number) {
-		return this.store.getTabEditorViewModelById(id)
-	}
-
-	setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
-		this.store.setTabEditorViewModelById(id, viewModel)
-	}
-
-	get activeTabId() {
-		return this.store.activeTabId
-	}
-
-	set activeTabId(id: number) {
-		this.store.activeTabId = id
-	}
-
-	get activeTabIndex() {
-		return this.store.activeTabIndex
-	}
-
-	set activeTabIndex(index: number) {
-		this.store.activeTabIndex = index
-	}
-
-	get contextTabId() {
-		return this.store.contextTabId
-	}
-
-	set contextTabId(id: number) {
-		this.store.contextTabId = id
-	}
-
-	removeContextTabId() {
-		this.store.removeContextTabId()
-	}
-
-	get findReplaceOpen() {
-		return this.store.findReploceOpen
-	}
-
-	set findReplaceOpen(open: boolean) {
-		this.store.findReplaceOpen = open
-	}
-
-	get findDirection() {
-		return this.store.findDirection
-	}
-
-	set findDirection(direction: "up" | "down") {
-		this.store.findDirection = direction
-	}
-
 	get searchText() {
 		return this.findInput.value
 	}
@@ -463,164 +662,5 @@ export default class TabEditorFacade {
 	getActiveTabEditorView(): TabEditorView {
 		const activeIndex = this.store.activeTabIndex
 		return this.renderer.getTabEditorViewByIndex(activeIndex)
-	}
-
-	getTabEditorViewByPath(path: string) {
-		return this.renderer.getTabEditorViewByPath(path)
-	}
-
-	setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
-		this.renderer.setTabEditorViewByPath(path, tabEditorVeiw)
-	}
-
-	getTabEditorViewByIndex(index: number) {
-		return this.renderer.getTabEditorViewByIndex(index)
-	}
-
-	getTabEditorViewIndexById(id: number) {
-		return this.renderer.getTabEditorViewIndexById(id)
-	}
-
-	deleteTabEditorViewByPath(path: string) {
-		this.renderer.deleteTabEditorViewByPath(path)
-	}
-
-	undo() {
-		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.undo(activeTabIndex)
-	}
-
-	redo() {
-		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.redo(activeTabIndex)
-	}
-
-	paste(text: string) {
-		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.paste(activeTabIndex, text)
-	}
-
-	createGhostBox(fileName: string) {
-		return this.renderer.createGhostBox(fileName)
-	}
-
-	removeGhostBox() {
-		this.renderer.removeGhostBox()
-	}
-
-	createIndicator() {
-		return this.renderer.createIndicator()
-	}
-
-	removeIndicator() {
-		this.renderer.removeIndicator()
-	}
-
-	changeFontSize(size: number) {
-		this.renderer.changeFontSize(size)
-	}
-
-	changeFontFamily(family: string) {
-		this.renderer.changeFontFamily(family)
-	}
-
-	isMouseDown(): boolean {
-		return this.drag.isMouseDown()
-	}
-
-	setMouseDown(state: boolean) {
-		this.drag.setMouseDown(state)
-	}
-
-	isDrag(): boolean {
-		return this.drag.isDrag()
-	}
-
-	setTargetElement(tab: HTMLElement) {
-		return this.drag.setTargetElement(tab)
-	}
-
-	getTabs() {
-		return this.drag.getTabs()
-	}
-
-	setTabs(tabs: HTMLElement[]) {
-		this.drag.setTabs(tabs)
-	}
-
-	startDrag() {
-		this.drag.startDrag()
-	}
-
-	endDrag() {
-		this.drag.endDrag()
-	}
-
-	getStartPosition() {
-		return this.drag.getStartPosition()
-	}
-
-	setStartPosition(x: number, y: number) {
-		this.drag.setStartPosition(x, y)
-	}
-
-	getStartPosition_x() {
-		return this.drag.getStartPosition_x()
-	}
-
-	getStartPosition_y() {
-		return this.drag.getStartPosition_y()
-	}
-
-	getDragTargetTab() {
-		return this.drag.getDragTargetTab()
-	}
-
-	getDragTargetTabId() {
-		return this.drag.getDragTargetTabId()
-	}
-
-	setDragTargetTabId(id: number) {
-		this.drag.setDragTargetTabId(id)
-	}
-
-	getDragTargetTabName() {
-		return this.drag.getDragTargetTabName()
-	}
-
-	setDragTargetTabName(name: string) {
-		this.drag.setDragTargetTabName(name)
-	}
-
-	getInsertIndex(): number {
-		return this.drag.getInsertIndex()
-	}
-
-	setInsertIndex(index: number) {
-		this.drag.setInsertIndex(index)
-	}
-
-	get findAndReplaceContainer() {
-		return this.renderer.findAndReplaceContainer
-	}
-
-	get findBox() {
-		return this.renderer.findBox
-	}
-
-	get replaceBox() {
-		return this.renderer.replaceBox
-	}
-
-	get findInput() {
-		return this.renderer.findInput
-	}
-
-	get replaceInput() {
-		return this.renderer.replaceInput
-	}
-
-	get findInfo() {
-		return this.renderer.findInfo
 	}
 }

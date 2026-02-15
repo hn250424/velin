@@ -13,6 +13,8 @@ export default class TabEditorStore {
 	private _findReploceOpen = false
 	private _findDirection: "up" | "down" = "down"
 
+	//
+
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
 		return {
 			id: dto.id,
@@ -23,6 +25,8 @@ export default class TabEditorStore {
 			initialContent: this._idToTabEditorViewModelMap.get(dto.id)!.initialContent,
 		}
 	}
+
+	//
 
 	get activeTabId() {
 		return this._activeTabId
@@ -52,6 +56,8 @@ export default class TabEditorStore {
 		this._contextTabId = -1
 	}
 
+	//
+
 	get idToTabEditorViewModelMap(): ReadonlyMap<number, TabEditorViewModel> {
 		return this._idToTabEditorViewModelMap
 	}
@@ -67,6 +73,8 @@ export default class TabEditorStore {
 	deleteTabEditorViewModelById(id: number) {
 		this._idToTabEditorViewModelMap.delete(id)
 	}
+
+	//
 
 	get findReploceOpen() {
 		return this._findReploceOpen

@@ -31,6 +31,8 @@ export default class TabEditorRenderer {
 
 	constructor(@inject(DI_KEYS.TabEditorElements) readonly elements: TabEditorElements) {}
 
+	//
+
 	private createTabBox(fileName: string) {
 		const div = document.createElement("div")
 		div.classList.add(CLASS_TAB)
@@ -120,6 +122,8 @@ export default class TabEditorRenderer {
 		this._tabEditorViews.splice(index, 1)
 	}
 
+	//
+
 	get tabEditorViews(): readonly TabEditorView[] {
 		return this._tabEditorViews
 	}
@@ -132,12 +136,10 @@ export default class TabEditorRenderer {
 		return this._tabEditorViews.findIndex((v) => v.getId() === id)
 	}
 
+	//
+
 	get pathToTabEditorViewMap(): ReadonlyMap<string, TabEditorView> {
 		return this._pathToTabEditorViewMap
-	}
-
-	deleteTabEditorViewByPath(path: string) {
-		this._pathToTabEditorViewMap.delete(path)
 	}
 
 	getTabEditorViewByPath(path: string) {
@@ -147,6 +149,12 @@ export default class TabEditorRenderer {
 	setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {
 		this._pathToTabEditorViewMap.set(path, tabEditorVeiw)
 	}
+
+	deleteTabEditorViewByPath(path: string) {
+		this._pathToTabEditorViewMap.delete(path)
+	}
+
+	//
 
 	undo(index: number) {
 		this._tabEditorViews[index].editor!.action((ctx) => {
@@ -173,10 +181,14 @@ export default class TabEditorRenderer {
 		})
 	}
 
+	//
+
 	activateTabEditorByIndex(targetIndex: number, preActiveindex: number) {
 		this._tabEditorViews[preActiveindex].setDeactive()
 		this._tabEditorViews[targetIndex].setActive()
 	}
+
+	//
 
 	moveTabEditorView(fromIndex: number, toIndex: number) {
 		const view = this._tabEditorViews.splice(fromIndex, 1)[0]
@@ -185,6 +197,8 @@ export default class TabEditorRenderer {
 		const refNode = this.elements.tabContainer.children[toIndex] ?? null
 		this.elements.tabContainer.insertBefore(view.tabBox, refNode)
 	}
+
+	//
 
 	createGhostBox(fileName: string) {
 		if (this._ghostTab) return this._ghostTab
@@ -216,6 +230,8 @@ export default class TabEditorRenderer {
 			this._indicator = null
 		}
 	}
+
+	//
 
 	changeFontSize(baseSize: number) {
 		const container = this.elements.editorContainer
@@ -253,6 +269,8 @@ export default class TabEditorRenderer {
 	changeFontFamily(family: string) {
 		this.elements.editorContainer.style.fontFamily = family
 	}
+
+	//
 
 	get findAndReplaceContainer() {
 		return this.elements.findAndReplaceContainer

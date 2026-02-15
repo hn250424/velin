@@ -14,7 +14,7 @@ import {
 	handleLoad,
 	handleSettings,
 	handleSide,
-	handleTab,
+	handleTabEditor,
 	handleTree,
 	handleWindow,
 } from "./handlers"
@@ -69,7 +69,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
 	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 
-	handleTab(commandManager, tabEditorFacade, shortcutRegistry)
+	handleTabEditor(commandManager, tabEditorFacade, shortcutRegistry)
 	handleInfo(infoFacade)
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
 	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)

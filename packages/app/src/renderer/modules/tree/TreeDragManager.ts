@@ -11,6 +11,8 @@ export default class TreeDragManager {
 	private _insertWrapper: HTMLElement | null = null
 	private _insertPath = ""
 
+	//
+
 	isMouseDown(): boolean {
 		return this._isMouseDown
 	}
@@ -18,6 +20,8 @@ export default class TreeDragManager {
 	setMouseDown(state: boolean) {
 		this._isMouseDown = state
 	}
+
+	//
 
 	isDrag(): boolean {
 		return this._isDrag
@@ -40,6 +44,8 @@ export default class TreeDragManager {
 		}
 	}
 
+	//
+
 	getStartPosition() {
 		return { x: this._start_x, y: this._start_y }
 	}
@@ -57,6 +63,8 @@ export default class TreeDragManager {
 		return this._start_y
 	}
 
+	//
+
 	getDragTreeCount() {
 		return this._count
 	}
@@ -64,6 +72,8 @@ export default class TreeDragManager {
 	setDragTreeCount(count: number) {
 		this._count = count
 	}
+
+	//
 
 	getInsertWrapper() {
 		return this._insertWrapper
