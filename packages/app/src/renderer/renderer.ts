@@ -20,9 +20,9 @@ import {
 	handleWindow,
 } from "./handlers"
 
-import FocusManager from "./modules/state/FocusManager"
-import ShortcutRegistry from "./modules/input/ShortcutRegistry"
-import ZoomManager from "./modules/layout/ZoomManager"
+import FocusManager from "./core/FocusManager"
+import ShortcutRegistry from "./core/ShortcutRegistry"
+import ZoomManager from "./modules/zoom/ZoomManager"
 
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
 import TreeFacade from "./modules/tree/TreeFacade"
@@ -65,10 +65,10 @@ window.addEventListener("DOMContentLoaded", () => {
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
 	handleMenuItems(menuElements)
-	handleFileMenu(commandManager, shortcutRegistry, menuElements)
+	handleFileMenu(commandManager, shortcutRegistry, menuElements, settingsFacade)
 	handleEditMenu(commandManager, shortcutRegistry, menuElements)
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
-	handleHelpMenu(commandManager, shortcutRegistry, menuElements)
+	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 
 	handleExit(tabEditorFacade, treeFacade)
 	handleTab(commandManager, tabEditorFacade, shortcutRegistry)
@@ -77,7 +77,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
 	handleSide(sideFacade)
 	handleSettings(commandManager, settingsFacade)
-	
+
 	handleLoad(
 		commandManager,
 		windowFacade,

@@ -17,7 +17,7 @@ const DI_KEYS = {
 	TabDragManager: Symbol("TabDragManager"),
 
 	SideFacade: Symbol("SideFacade"),
-	SideState: Symbol("SideState"),
+	SideStore: Symbol("SideStore"),
 	SideElements: Symbol("SideElements"),
 
 	TreeFacade: Symbol("TreeFacade"),

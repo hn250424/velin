@@ -1,15 +1,15 @@
 import "reflect-metadata"
 import DI_KEYS from "./constants/di_keys"
 import { Container } from "inversify"
-import FocusManager from "./modules/state/FocusManager"
+import FocusManager from "./core/FocusManager"
 import CommandManager from "./CommandManager"
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
 import TreeFacade from "./modules/tree/TreeFacade"
-import ShortcutRegistry from "./modules/input/ShortcutRegistry"
+import ShortcutRegistry from "./core/ShortcutRegistry"
 import TabDragManager from "./modules/tab_editor/TabDragManager"
 import TreeDragManager from "./modules/tree/TreeDragManager"
 import WindowStore from "./modules/window/WindowStore"
-import ZoomManager from "./modules/layout/ZoomManager"
+import ZoomManager from "./modules/zoom/ZoomManager"
 import TabEditorRenderer from "./modules/tab_editor/TabEditorRenderer"
 import TabEditorStore from "./modules/tab_editor/TabEditorStore"
 import TreeRenderer from "./modules/tree/TreeRenderer"
@@ -26,7 +26,7 @@ import WindowElements from "./modules/window/WindowElements"
 import InfoElements from "./modules/info/InfoElements"
 import SideFacade from "./modules/side/SideFacade"
 import SideElements from "./modules/side/SideElements"
-import SideState from "./modules/side/SideState"
+import SideStore from "./modules/side/SideStore"
 import InfoFacade from "./modules/info/InfoFacade"
 import WindowRenderer from "./modules/window/WindowRenderer"
 
@@ -56,7 +56,7 @@ diContainer.bind(DI_KEYS.TreeElements).to(TreeElements).inSingletonScope()
 diContainer.bind(DI_KEYS.TreeDragManager).to(TreeDragManager).inSingletonScope()
 
 diContainer.bind(DI_KEYS.SideFacade).to(SideFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.SideState).to(SideState).inSingletonScope()
+diContainer.bind(DI_KEYS.SideStore).to(SideStore).inSingletonScope()
 diContainer.bind(DI_KEYS.SideElements).to(SideElements).inSingletonScope()
 
 diContainer.bind(DI_KEYS.SettingsFacade).to(SettingsFacade).inSingletonScope()

@@ -13,7 +13,7 @@ import DI_KEYS from "./constants/di_keys"
 import folderSvg from "./assets/icons/folder.svg?raw"
 import openedFolderSvg from "./assets/icons/opened_folder.svg?raw"
 
-import FocusManager from "./modules/state/FocusManager"
+import FocusManager from "./core/FocusManager"
 
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
 import TreeFacade from "./modules/tree/TreeFacade"
@@ -696,10 +696,6 @@ export default class CommandManager {
 		this.tabEditorFacade.findReplaceOpen = false
 	}
 
-	performOpenSettings(source: CommandSource) {
-		this.settingsFacade.openSettings()
-	}
-
 	async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
 		const font = viewModel.settingFontViewModel
 
@@ -717,10 +713,6 @@ export default class CommandManager {
 	performCloseSettings(source: CommandSource) {
 		this.settingsFacade.resetChangeSet()
 		this.settingsFacade.closeSettings()
-	}
-
-	performShowInformation(source: CommandSource) {
-		this.infoFacade.showInformation()
 	}
 
 	performHideInformation(source: CommandSource) {

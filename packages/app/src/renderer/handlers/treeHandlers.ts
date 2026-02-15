@@ -10,8 +10,8 @@ import {
 	SELECTOR_TREE_NODE_CONTAINER,
 	CLASS_TREE_DRAG_OVERLAY,
 } from "../constants/dom"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
-import FocusManager from "../modules/state/FocusManager"
+import ShortcutRegistry from "../core/ShortcutRegistry"
+import FocusManager from "../core/FocusManager"
 import CommandManager from "../CommandManager"
 
 export function handleTree(

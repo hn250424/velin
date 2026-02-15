@@ -1,6 +1,6 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import CommandManager from "../../CommandManager"
-import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
+import ShortcutRegistry from "../../core/ShortcutRegistry"
 
 export function handleEditMenu(
 	commandManager: CommandManager,

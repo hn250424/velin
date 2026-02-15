@@ -1,19 +1,25 @@
 import "@milkdown/theme-nord/style.css"
 
 import CommandManager from "../../CommandManager"
-import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
+import ShortcutRegistry from "../../core/ShortcutRegistry"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
+import type SettingsFacade from "@renderer/modules/settings/SettingsFacade"
 
 export function handleFileMenu(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
-	menueElements: MenuElements
+	menueElements: MenuElements,
+	settingsFacade: SettingsFacade
 ) {
-	bindCommandWithmenu(commandManager, menueElements)
-	bindCommandWithShortcut(commandManager, shortcutRegistry)
+	bindCommandWithMenu(commandManager, menueElements, settingsFacade)
+	bindCommandWithShortcut(commandManager, shortcutRegistry, settingsFacade)
 }
 
-function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
+function bindCommandWithMenu(
+	commandManager: CommandManager,
+	menuElements: MenuElements,
+	settingsFacade: SettingsFacade
+) {
 	const { newTab, openFile, openDirectory, save, saveAs, saveAll, settings } = menuElements
 
 	newTab.addEventListener("click", async () => {
@@ -41,15 +47,19 @@ function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuE
 	})
 
 	settings.addEventListener("click", () => {
-		commandManager.performOpenSettings("menu")
+		settingsFacade.openSettings()
 	})
 }
 
-function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+function bindCommandWithShortcut(
+	commandManager: CommandManager,
+	shortcutRegistry: ShortcutRegistry,
+	settingsFacade: SettingsFacade
+) {
 	shortcutRegistry.register("Ctrl+T", async () => await commandManager.performNewTab("shortcut"))
 	shortcutRegistry.register("Ctrl+O", async () => await commandManager.performOpenFile("shortcut"))
 	shortcutRegistry.register("Ctrl+Shift+O", async () => await commandManager.performOpenDirectory("shortcut"))
 	shortcutRegistry.register("Ctrl+S", async () => await commandManager.performSave("shortcut"))
 	shortcutRegistry.register("Ctrl+Shift+S", async () => await commandManager.performSaveAs("shortcut"))
-	shortcutRegistry.register("Ctrl+,", () => commandManager.performOpenSettings("shortcut"))
+	shortcutRegistry.register("Ctrl+,", () => settingsFacade.openSettings())
 }

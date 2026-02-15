@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify"
-import FocusManager from "../state/FocusManager"
-import DI_KEYS from "../../constants/di_keys"
+import FocusManager from "./FocusManager"
+import DI_KEYS from "../constants/di_keys"
 
 @injectable()
 export default class ShortcutRegistry {

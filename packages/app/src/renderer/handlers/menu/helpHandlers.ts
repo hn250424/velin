@@ -1,24 +1,27 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import CommandManager from "../../CommandManager"
-import ShortcutRegistry from "../../modules/input/ShortcutRegistry"
+import ShortcutRegistry from "../../core/ShortcutRegistry"
+import type InfoFacade from "@renderer/modules/info/InfoFacade"
 
 export function handleHelpMenu(
-	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
-	menuElements: MenuElements
+	menuElements: MenuElements,
+	infoFacade: InfoFacade
 ) {
-	bindCommandWithmenu(commandManager, menuElements)
-	bindCommandWithShortcut(commandManager, shortcutRegistry)
+	bindCommandWithMenu(menuElements, infoFacade)
+	bindCommandWithShortcut(shortcutRegistry, infoFacade)
 }
 
-function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
+function bindCommandWithMenu(menuElements: MenuElements, infoFacade: InfoFacade) {
 	const { information } = menuElements
 
 	information.addEventListener("click", async () => {
-		commandManager.performShowInformation("menu")
+		infoFacade.showInformation()
 	})
 }
 
-function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("F1", async () => commandManager.performShowInformation("shortcut"))
+function bindCommandWithShortcut(
+	shortcutRegistry: ShortcutRegistry,
+	infoFacade: InfoFacade
+) {
+	shortcutRegistry.register("F1", async () => infoFacade.showInformation())
 }

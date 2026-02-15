@@ -5,7 +5,7 @@ import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
 import CommandManager from "../CommandManager"
-import ShortcutRegistry from "../modules/input/ShortcutRegistry"
+import ShortcutRegistry from "../core/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import { throttle } from "../utils/throttle"
 
