@@ -12,6 +12,7 @@ export default class MenuElements {
 	public readonly saveAs: HTMLElement
 	public readonly saveAll: HTMLElement
 	public readonly settings: HTMLElement
+	public readonly exit: HTMLElement
 
 	public readonly undo: HTMLElement
 	public readonly redo: HTMLElement
@@ -39,6 +40,7 @@ export default class MenuElements {
 		this.saveAs = document.querySelector("#file-menu-save-as") as HTMLElement
 		this.saveAll = document.querySelector("#file-menu-save-all") as HTMLElement
 		this.settings = document.querySelector("#file-menu-settings") as HTMLElement
+		this.exit = document.querySelector("#file-menu-exit") as HTMLElement
 
 		this.undo = document.querySelector("#edit-menu-undo") as HTMLElement
 		this.redo = document.querySelector("#edit-menu-redo") as HTMLElement

@@ -13,6 +13,7 @@ import type InfoFacade from "@renderer/modules/info/InfoFacade"
 import { toggleSide } from "@renderer/actions"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import type CommandManager from "@renderer/CommandManager"
+import { CLASS_SELECTED } from "@renderer/constants/dom"
 
 export function handleLoad(
 	commandManager: CommandManager,
@@ -22,7 +23,7 @@ export function handleLoad(
 	treeFacade: TreeFacade,
 	sideFacade: SideFacade,
 	infoFacade: InfoFacade,
-	menuElements: MenuElements,
+	menuElements: MenuElements
 ) {
 	window.mainToRenderer.session(
 		async (
@@ -88,6 +89,10 @@ function processTreeSession(facade: TreeFacade, dto: TreeDto) {
 //
 
 function initSettings(commandManager: CommandManager, settingsFacade: SettingsFacade) {
+	const { menus, contents } = settingsFacade.renderer.elements
+	menus[0].classList.add(CLASS_SELECTED)
+	contents[0].style.display = "block"
+
 	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
 	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue())
 }

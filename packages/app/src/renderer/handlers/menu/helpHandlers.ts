@@ -7,11 +7,11 @@ export function handleHelpMenu(
 	menuElements: MenuElements,
 	infoFacade: InfoFacade
 ) {
-	bindCommandWithMenu(menuElements, infoFacade)
-	bindCommandWithShortcut(shortcutRegistry, infoFacade)
+	bindMenuEvents(menuElements, infoFacade)
+	bindShortcutEvents(shortcutRegistry, infoFacade)
 }
 
-function bindCommandWithMenu(menuElements: MenuElements, infoFacade: InfoFacade) {
+function bindMenuEvents(menuElements: MenuElements, infoFacade: InfoFacade) {
 	const { information } = menuElements
 
 	information.addEventListener("click", async () => {
@@ -19,7 +19,7 @@ function bindCommandWithMenu(menuElements: MenuElements, infoFacade: InfoFacade)
 	})
 }
 
-function bindCommandWithShortcut(
+function bindShortcutEvents(
 	shortcutRegistry: ShortcutRegistry,
 	infoFacade: InfoFacade
 ) {

@@ -1,10 +1,10 @@
 import type WindowFacade from "@renderer/modules/window/WindowFacade"
+import { exit as actExit } from "../actions"
+import type TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
+import type TreeFacade from "@renderer/modules/tree/TreeFacade"
 
-export function handleWindow(windowFacade: WindowFacade) {
-	const {
-		maximizeBtn,
-		minimizeBtn
-	} = windowFacade.renderer.elements
+export function handleWindow(windowFacade: WindowFacade, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
+	const { maximizeBtn, minimizeBtn, exitBtn } = windowFacade.renderer.elements
 
 	window.mainToRenderer.onMaximizeWindow(() => {
 		windowFacade.renderUnMaximizeButtonSvg()
@@ -21,5 +21,8 @@ export function handleWindow(windowFacade: WindowFacade) {
 	})
 	minimizeBtn.addEventListener("click", () => {
 		window.rendererToMain.requestMinimizeWindow()
+	})
+	exitBtn.addEventListener("click", () => {
+		actExit(tabEditorFacade, treeFacade)
 	})
 }

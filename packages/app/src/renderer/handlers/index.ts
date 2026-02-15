@@ -1,4 +1,3 @@
-export { handleExit } from "./exitHandlers"
 export { handleInfo } from "./infoHandlers"
 export { handleLoad } from "./loadHandlers"
 export { handleSettings} from "./settingsHandlers"

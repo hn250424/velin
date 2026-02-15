@@ -4,23 +4,30 @@ import CommandManager from "../../CommandManager"
 import ShortcutRegistry from "../../core/ShortcutRegistry"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import type SettingsFacade from "@renderer/modules/settings/SettingsFacade"
+import { exit as actExit } from "../../actions"
+import TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
+import TreeFacade from "@renderer/modules/tree/TreeFacade"
 
 export function handleFileMenu(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	menueElements: MenuElements,
-	settingsFacade: SettingsFacade
+	settingsFacade: SettingsFacade,
+	tabEditorFacade: TabEditorFacade,
+	treeFacade: TreeFacade
 ) {
-	bindCommandWithMenu(commandManager, menueElements, settingsFacade)
-	bindCommandWithShortcut(commandManager, shortcutRegistry, settingsFacade)
+	bindMenuEvents(commandManager, menueElements, settingsFacade, tabEditorFacade, treeFacade)
+	bindShortcutEvents(commandManager, shortcutRegistry, settingsFacade)
 }
 
-function bindCommandWithMenu(
+function bindMenuEvents(
 	commandManager: CommandManager,
 	menuElements: MenuElements,
-	settingsFacade: SettingsFacade
+	settingsFacade: SettingsFacade,
+	tabEditorFacade: TabEditorFacade,
+	treeFacade: TreeFacade
 ) {
-	const { newTab, openFile, openDirectory, save, saveAs, saveAll, settings } = menuElements
+	const { newTab, openFile, openDirectory, save, saveAs, saveAll, settings, exit } = menuElements
 
 	newTab.addEventListener("click", async () => {
 		await commandManager.performNewTab("menu")
@@ -49,9 +56,13 @@ function bindCommandWithMenu(
 	settings.addEventListener("click", () => {
 		settingsFacade.openSettings()
 	})
+
+	exit.addEventListener("click", () => {
+		actExit(tabEditorFacade, treeFacade)
+	})
 }
 
-function bindCommandWithShortcut(
+function bindShortcutEvents(
 	commandManager: CommandManager,
 	shortcutRegistry: ShortcutRegistry,
 	settingsFacade: SettingsFacade

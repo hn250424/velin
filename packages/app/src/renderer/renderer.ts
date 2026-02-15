@@ -10,7 +10,6 @@ import {
 	handleEditMenu,
 	handleViewMenu,
 	handleHelpMenu,
-	handleExit,
 	handleInfo,
 	handleLoad,
 	handleSettings,
@@ -65,15 +64,14 @@ window.addEventListener("DOMContentLoaded", () => {
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
 
 	handleMenuItems(menuElements)
-	handleFileMenu(commandManager, shortcutRegistry, menuElements, settingsFacade)
+	handleFileMenu(commandManager, shortcutRegistry, menuElements, settingsFacade, tabEditorFacade, treeFacade)
 	handleEditMenu(commandManager, shortcutRegistry, menuElements)
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
 	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 
-	handleExit(tabEditorFacade, treeFacade)
 	handleTab(commandManager, tabEditorFacade, shortcutRegistry)
-	handleInfo(commandManager, infoFacade)
-	handleWindow(windowFacade)
+	handleInfo(infoFacade)
+	handleWindow(windowFacade, tabEditorFacade, treeFacade)
 	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
 	handleSide(sideFacade)
 	handleSettings(commandManager, settingsFacade)

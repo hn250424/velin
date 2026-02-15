@@ -709,16 +709,7 @@ export default class CommandManager {
 			await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
 		}
 	}
-
-	performCloseSettings(source: CommandSource) {
-		this.settingsFacade.resetChangeSet()
-		this.settingsFacade.closeSettings()
-	}
-
-	performHideInformation(source: CommandSource) {
-		this.infoFacade.hideInformation()
-	}
-
+	
 	async performESC(source: CommandSource) {
 		const focus = this.focusManager.getFocus()
 

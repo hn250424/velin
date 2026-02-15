@@ -6,26 +6,7 @@ export function handleSettings(
 	commandManager: CommandManager,
 	settingsFacade: SettingsFacade,
 ) {
-	bindEvents(commandManager, settingsFacade)
-}
-
-function bindEvents(commandManager: CommandManager, settingsFacade: SettingsFacade) {
-	const { exit, apply, close, menus, contents } = settingsFacade.renderer.elements
-
-	exit.addEventListener("click", () => {
-		commandManager.performCloseSettings("button")
-	})
-
-	apply.addEventListener("click", () => {
-		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
-	})
-
-	close.addEventListener("click", () => {
-		commandManager.performCloseSettings("button")
-	})
-
-	menus[0].classList.add(CLASS_SELECTED)
-	contents[0].style.display = "block"
+	const { menus, contents, exit, apply, close } = settingsFacade.renderer.elements
 
 	menus.forEach((el, idx) => {
 		el.addEventListener("click", () => {
@@ -35,5 +16,17 @@ function bindEvents(commandManager: CommandManager, settingsFacade: SettingsFaca
 			el.classList.add(CLASS_SELECTED)
 			contents[idx].style.display = "block"
 		})
+	})
+
+	exit.addEventListener("click", () => {
+		settingsFacade.closeSettings()
+	})
+
+	apply.addEventListener("click", () => {
+		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
+	})
+
+	close.addEventListener("click", () => {
+		settingsFacade.closeSettings()
 	})
 }

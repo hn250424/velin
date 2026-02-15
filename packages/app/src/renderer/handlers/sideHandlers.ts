@@ -1,10 +1,6 @@
 import type SideFacade from "@renderer/modules/side/SideFacade"
 
 export function handleSide(sideFacade: SideFacade) {
-	bindDragEvents(sideFacade)
-}
-
-function bindDragEvents(sideFacade: SideFacade) {
 	const { side, tree, resizer } = sideFacade.elements
 
 	let isDragging = false

@@ -7,11 +7,11 @@ export function handleEditMenu(
 	shortcutRegistry: ShortcutRegistry,
 	menuElements: MenuElements
 ) {
-	bindCommandWithmenu(commandManager, menuElements)
-	bindCommandWithShortcut(commandManager, shortcutRegistry)
+	bindMenuEvents(commandManager, menuElements)
+	bindShortcutEvents(commandManager, shortcutRegistry)
 }
 
-function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuElements) {
+function bindMenuEvents(commandManager: CommandManager, menuElements: MenuElements) {
 	const { undo, redo, cut, copy, paste, find, replace } = menuElements
 
 	undo.addEventListener("click", async () => {
@@ -43,7 +43,7 @@ function bindCommandWithmenu(commandManager: CommandManager, menuElements: MenuE
 	})
 }
 
-function bindCommandWithShortcut(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
+function bindShortcutEvents(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
 	shortcutRegistry.register("Ctrl+Z", async () => await commandManager.performUndo("shortcut"))
 	shortcutRegistry.register("Ctrl+Shift+Z", async () => await commandManager.performRedo("shortcut"))
 	shortcutRegistry.register("Ctrl+X", async () => await commandManager.performCut("shortcut"))
