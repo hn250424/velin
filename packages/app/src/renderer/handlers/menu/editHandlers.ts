@@ -1,6 +1,6 @@
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import ShortcutRegistry from "../../core/ShortcutRegistry"
-import type Dispatcher from "@renderer/dispatch/Dispatcher"
+import { Dispatcher } from "../../dispatch"
 
 export function handleEditMenu(
 	dispatcher: Dispatcher,

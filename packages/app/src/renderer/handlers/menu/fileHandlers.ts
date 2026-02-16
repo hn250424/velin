@@ -6,7 +6,7 @@ import type SettingsFacade from "@renderer/modules/settings/SettingsFacade"
 import { exit as actExit } from "../../actions"
 import TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
 import TreeFacade from "@renderer/modules/tree/TreeFacade"
-import Dispatcher from "@renderer/dispatch/Dispatcher"
+import { Dispatcher } from "../../dispatch"
 
 export function handleFileMenu(
 	dispatcher: Dispatcher,

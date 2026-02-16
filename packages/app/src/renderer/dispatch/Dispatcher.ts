@@ -1,16 +1,18 @@
 import { inject, injectable } from "inversify"
-import FocusManager, { type Focus } from "../core/FocusManager"
+import type { Focus } from "../core/types"
+import FocusManager from "../core/FocusManager"
 import DI_KEYS from "../constants/di_keys"
 import type CommandManager from "../modules/CommandManager"
 import { assert } from "../utils"
-import type { DispatchEventsWithArgs, Source } from "./types"
+import type { DispatchEventsWithArgs, GetArgs, Source } from "./types"
+import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 
 @injectable()
-export default class Dispatcher {
+export class Dispatcher {
 	private readonly _handlers: {
 		[E in keyof DispatchEventsWithArgs]: Partial<
 			Record<
-				NonNullable<Focus> | "default",
+				Focus | "default",
 				Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>
 			>
 		>
@@ -86,15 +88,26 @@ export default class Dispatcher {
 				default: {
 					default: () => this.commandManager.performReplaceAll()
 				}
-			}
+			},
+
 			//
 
+			applySettings: {
+				none: {
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel)
+				}
+			},
+			applyAndSaveSettings: {
+				default: {
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel)
+				}
+			}
 
 
 		}
 	}
 
-	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: any[]) {
+	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: GetArgs<E>) {
 		const focus = this.focusManager.getFocus()!
 
 		const eventNode = this._handlers[event]

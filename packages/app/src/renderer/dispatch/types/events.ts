@@ -1,4 +1,16 @@
-export type DispatchEventsWithArgs = {
+import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
+import type { Focus } from "../../core/types"
+import type { Source } from "."
+
+type DispatchEventSchema = {
+	[F in Focus | "default"]?: {
+		[S in Source | "default"]?: any[]
+	}
+}
+
+type EnforceSchema<T extends Record<string, DispatchEventSchema>> = T
+
+export type DispatchEventsWithArgs = EnforceSchema<{
 	//
 
 	newTab: {
@@ -91,4 +103,24 @@ export type DispatchEventsWithArgs = {
 			default: []
 		}
 	}
-}
+
+	//
+
+	applySettings: {
+		none: {
+			default: [viewModel: SettingsViewModel]
+		}
+	}
+	applyAndSaveSettings: {
+		default: {
+			default: [viewModel: SettingsViewModel]
+		}
+	}
+}>
+
+export type GetArgs<E extends keyof DispatchEventsWithArgs> =
+  DispatchEventsWithArgs[E][keyof DispatchEventsWithArgs[E]] extends infer SNode
+    ? SNode extends Partial<Record<Source | "default", any[]>>
+      ? SNode[keyof SNode]
+      : []
+    : [];

@@ -879,7 +879,7 @@ export default class CommandManager {
 	}
 
 	performCloseFindReplaceBox(source: CommandSource) {
-		this.focusManager.setFocus(null)
+		this.focusManager.setFocus("none")
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "none"
 
 		const activeView = this.tabEditorFacade.getActiveTabEditorView()
@@ -888,19 +888,34 @@ export default class CommandManager {
 		this.tabEditorFacade.findReplaceOpen = false
 	}
 
-	async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
+	performApplySettings(viewModel: SettingsViewModel) {
 		const font = viewModel.settingFontViewModel
 
 		font.size && this.tabEditorFacade.changeFontSize(font.size)
 		font.family && this.tabEditorFacade.changeFontFamily(font.family)
 
 		this.settingsFacade.applyChangeSet()
-
-		if (source === "button") {
-			const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
-			await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
-		}
 	}
+
+	async performApplyAndSaveSettings(viewModel: SettingsViewModel) {
+		this.performApplySettings(viewModel)
+		const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
+		await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
+	}
+
+	// async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
+	// 	const font = viewModel.settingFontViewModel
+
+	// 	font.size && this.tabEditorFacade.changeFontSize(font.size)
+	// 	font.family && this.tabEditorFacade.changeFontFamily(font.family)
+
+	// 	this.settingsFacade.applyChangeSet()
+
+	// 	if (source === "button") {
+	// 		const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
+	// 		await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
+	// 	}
+	// }
 
 	async performESC(source: CommandSource) {
 		const focus = this.focusManager.getFocus()

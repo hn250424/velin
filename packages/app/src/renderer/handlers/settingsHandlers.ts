@@ -1,9 +1,9 @@
-import CommandManager from "../modules/CommandManager"
 import { CLASS_SELECTED } from "../constants/dom"
 import SettingsFacade from "../modules/settings/SettingsFacade"
+import { Dispatcher } from "../dispatch"
 
 export function handleSettings(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	settingsFacade: SettingsFacade,
 ) {
 	const { menus, contents, exit, apply, close } = settingsFacade.renderer.elements
@@ -22,9 +22,8 @@ export function handleSettings(
 		settingsFacade.closeSettings()
 	})
 
-	apply.addEventListener("click", () => {
-		// TODO
-		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
+	apply.addEventListener("click", async () => {
+		await dispatcher.dispatch("applyAndSaveSettings", "button", settingsFacade.getChangeSet())
 	})
 
 	close.addEventListener("click", () => {

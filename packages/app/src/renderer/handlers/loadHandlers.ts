@@ -12,11 +12,11 @@ import type SideFacade from "@renderer/modules/side/SideFacade"
 import type InfoFacade from "@renderer/modules/info/InfoFacade"
 import { toggleSide } from "@renderer/actions"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import type CommandManager from "@renderer/modules/CommandManager"
 import { CLASS_SELECTED } from "@renderer/constants/dom"
+import { Dispatcher } from "../dispatch"
 
 export function handleLoad(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	windowFacade: WindowFacade,
 	settingsFacade: SettingsFacade,
 	tabEditorFacade: TabEditorFacade,
@@ -40,7 +40,7 @@ export function handleLoad(
 			processTabEditorSession(tabEditorFacade, tabEditorsDto)
 			processTreeSession(treeFacade, treeDto)
 
-			initSettings(commandManager, settingsFacade)
+			initSettings(dispatcher, settingsFacade)
 			initSide(sideFacade, menuElements)
 			initInfo(infoFacade, version)
 			initWindow(windowFacade)
@@ -88,14 +88,14 @@ function processTreeSession(facade: TreeFacade, dto: TreeDto) {
 
 //
 
-function initSettings(commandManager: CommandManager, settingsFacade: SettingsFacade) {
+function initSettings(dispatcher: Dispatcher, settingsFacade: SettingsFacade) {
 	const { menus, contents } = settingsFacade.renderer.elements
 	menus[0].classList.add(CLASS_SELECTED)
 	contents[0].style.display = "block"
 
-	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
-	// TODO
-	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue())
+	const viewModel = settingsFacade.getSettingsValue()
+	settingsFacade.renderSettingsValue(viewModel)
+	dispatcher.dispatch("applySettings", "programmatic", viewModel)
 }
 
 function initSide(sideFacade: SideFacade, menuElements: MenuElements) {

@@ -46,7 +46,7 @@ import type MenuElements from "./modules/menu/MenuElements"
 import type WindowFacade from "./modules/window/WindowFacade"
 import SideFacade from "./modules/side/SideFacade"
 import InfoFacade from "./modules/info/InfoFacade"
-import Dispatcher from "./dispatch/Dispatcher"
+import { Dispatcher } from "./dispatch"
 
 window.addEventListener("DOMContentLoaded", () => {
 	const menuElements = diContainer.get<MenuElements>(DI_KEYS.MenuElements)
@@ -76,10 +76,10 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
 	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
 	handleSide(sideFacade)
-	handleSettings(commandManager, settingsFacade)
+	handleSettings(dispatcher, settingsFacade)
 
 	handleLoad(
-		commandManager,
+		dispatcher,
 		windowFacade,
 		settingsFacade,
 		tabEditorFacade,
