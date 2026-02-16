@@ -41,11 +41,12 @@ import {
 
 import diContainer from "./diContainer"
 
-import CommandManager from "./CommandManager"
+import CommandManager from "./modules/CommandManager"
 import type MenuElements from "./modules/menu/MenuElements"
 import type WindowFacade from "./modules/window/WindowFacade"
 import SideFacade from "./modules/side/SideFacade"
 import InfoFacade from "./modules/info/InfoFacade"
+import Dispatcher from "./dispatch/Dispatcher"
 
 window.addEventListener("DOMContentLoaded", () => {
 	const menuElements = diContainer.get<MenuElements>(DI_KEYS.MenuElements)
@@ -62,10 +63,11 @@ window.addEventListener("DOMContentLoaded", () => {
 	const windowFacade = diContainer.get<WindowFacade>(DI_KEYS.WindowFacade)
 
 	const commandManager = diContainer.get<CommandManager>(DI_KEYS.CommandManager)
+	const dispatcher = diContainer.get<Dispatcher>(DI_KEYS.Dispatcher)
 
 	handleMenuItems(menuElements)
-	handleFileMenu(commandManager, shortcutRegistry, menuElements, settingsFacade, tabEditorFacade, treeFacade)
-	handleEditMenu(commandManager, shortcutRegistry, menuElements)
+	handleFileMenu(dispatcher, shortcutRegistry, menuElements, settingsFacade, tabEditorFacade, treeFacade)
+	handleEditMenu(dispatcher, shortcutRegistry, menuElements)
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
 	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 

@@ -1,4 +1,4 @@
-import CommandManager from "../CommandManager"
+import CommandManager from "../modules/CommandManager"
 import { CLASS_SELECTED } from "../constants/dom"
 import SettingsFacade from "../modules/settings/SettingsFacade"
 
@@ -23,6 +23,7 @@ export function handleSettings(
 	})
 
 	apply.addEventListener("click", () => {
+		// TODO
 		commandManager.performApplySettings("button", settingsFacade.getChangeSet())
 	})
 

@@ -37,6 +37,7 @@ const DI_KEYS = {
 	WindowElements: Symbol("WindowElements"),
 
 	CommandManager: Symbol("CommandManager"),
+	Dispatcher: Symbol("Dispatcher"),
 }
 
 export default DI_KEYS

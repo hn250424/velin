@@ -1,27 +1,27 @@
 import "@milkdown/theme-nord/style.css"
 
-import CommandManager from "../../CommandManager"
 import ShortcutRegistry from "../../core/ShortcutRegistry"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
 import type SettingsFacade from "@renderer/modules/settings/SettingsFacade"
 import { exit as actExit } from "../../actions"
 import TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
 import TreeFacade from "@renderer/modules/tree/TreeFacade"
+import Dispatcher from "@renderer/dispatch/Dispatcher"
 
 export function handleFileMenu(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	shortcutRegistry: ShortcutRegistry,
 	menueElements: MenuElements,
 	settingsFacade: SettingsFacade,
 	tabEditorFacade: TabEditorFacade,
 	treeFacade: TreeFacade
 ) {
-	bindMenuEvents(commandManager, menueElements, settingsFacade, tabEditorFacade, treeFacade)
-	bindShortcutEvents(commandManager, shortcutRegistry, settingsFacade)
+	bindMenuEvents(dispatcher, menueElements, settingsFacade, tabEditorFacade, treeFacade)
+	bindShortcutEvents(dispatcher, shortcutRegistry, settingsFacade)
 }
 
 function bindMenuEvents(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	menuElements: MenuElements,
 	settingsFacade: SettingsFacade,
 	tabEditorFacade: TabEditorFacade,
@@ -30,27 +30,27 @@ function bindMenuEvents(
 	const { newTab, openFile, openDirectory, save, saveAs, saveAll, settings, exit } = menuElements
 
 	newTab.addEventListener("click", async () => {
-		await commandManager.performNewTab("menu")
+		await dispatcher.dispatch("newTab", "menu")
 	})
 
 	openFile.addEventListener("click", async () => {
-		await commandManager.performOpenFile("menu")
+		await dispatcher.dispatch("openFile", "menu")
 	})
 
 	openDirectory.addEventListener("click", async () => {
-		await commandManager.performOpenDirectory("menu")
+		await dispatcher.dispatch("openDirectory", "menu")
 	})
 
 	save.addEventListener("click", async () => {
-		await commandManager.performSave("menu")
+		await dispatcher.dispatch("save", "menu")
 	})
 
 	saveAs.addEventListener("click", async () => {
-		await commandManager.performSaveAs("menu")
+		await dispatcher.dispatch("saveAs", "menu")
 	})
 
 	saveAll.addEventListener("click", async () => {
-		await commandManager.performSaveAll("menu")
+		await dispatcher.dispatch("saveAll", "menu")
 	})
 
 	settings.addEventListener("click", () => {
@@ -63,14 +63,14 @@ function bindMenuEvents(
 }
 
 function bindShortcutEvents(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	shortcutRegistry: ShortcutRegistry,
 	settingsFacade: SettingsFacade
 ) {
-	shortcutRegistry.register("Ctrl+T", async () => await commandManager.performNewTab("shortcut"))
-	shortcutRegistry.register("Ctrl+O", async () => await commandManager.performOpenFile("shortcut"))
-	shortcutRegistry.register("Ctrl+Shift+O", async () => await commandManager.performOpenDirectory("shortcut"))
-	shortcutRegistry.register("Ctrl+S", async () => await commandManager.performSave("shortcut"))
-	shortcutRegistry.register("Ctrl+Shift+S", async () => await commandManager.performSaveAs("shortcut"))
+	shortcutRegistry.register("Ctrl+T", async () => await dispatcher.dispatch("newTab", "shortcut"))
+	shortcutRegistry.register("Ctrl+O", async () => await dispatcher.dispatch("openFile", "shortcut"))
+	shortcutRegistry.register("Ctrl+Shift+O", async () => await dispatcher.dispatch("openDirectory", "shortcut"))
+	shortcutRegistry.register("Ctrl+S", async () => await dispatcher.dispatch("save", "shortcut"))
+	shortcutRegistry.register("Ctrl+Shift+S", async () => await dispatcher.dispatch("saveAs", "shortcut"))
 	shortcutRegistry.register("Ctrl+,", () => settingsFacade.openSettings())
 }

@@ -4,7 +4,7 @@ import type Response from "@shared/types/Response"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
-import CommandManager from "../CommandManager"
+import CommandManager from "../modules/CommandManager"
 import ShortcutRegistry from "../core/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import { throttle } from "../utils/throttle"
@@ -40,6 +40,7 @@ function bindTabClickEvents(commandManager: CommandManager, tabEditorFacade: Tab
 		if (tabBox) {
 			if (target.tagName === "BUTTON") {
 				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
+				// TODO
 				await commandManager.performCloseTab("button", id)
 			} else if (target.tagName === "SPAN") {
 				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
@@ -70,6 +71,7 @@ function bindTabContextmenuClickEvents(commandManager: CommandManager, tabEditor
 		tabEditorFacade.renderer.elements
 
 	tabContextClose.addEventListener("click", async () => {
+		// TODO
 		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
 	})
 
@@ -96,6 +98,7 @@ function bindTabContextmenuClickEvents(commandManager: CommandManager, tabEditor
 
 //
 
+// TODO
 function bindFindReplaceEvnets(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
 	const { findUp, findDown, findClose, replaceCurrent, replaceAll } = tabEditorFacade.renderer.elements
 
@@ -127,6 +130,7 @@ function bindShortcutEvents(
 	shortcutRegistry: ShortcutRegistry,
 	tabEditorFacade: TabEditorFacade
 ) {
+	// TODO
 	shortcutRegistry.register(
 		"Ctrl+W",
 		async () => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)

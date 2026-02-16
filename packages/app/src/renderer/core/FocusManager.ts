@@ -1,12 +1,12 @@
 import { injectable } from "inversify"
 
-type Target = "editor" | "tree" | "find-replace" | null
+export type Focus = "editor" | "tree" | "find-replace" | null
 
 @injectable()
 export default class FocusManager {
-	private focusedTarget: Target = null
+	private focusedTarget: Focus = null
 
-	setFocus(focusedTarget: Target) {
+	setFocus(focusedTarget: Focus) {
 		this.focusedTarget = focusedTarget
 	}
 

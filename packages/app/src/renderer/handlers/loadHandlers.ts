@@ -12,7 +12,7 @@ import type SideFacade from "@renderer/modules/side/SideFacade"
 import type InfoFacade from "@renderer/modules/info/InfoFacade"
 import { toggleSide } from "@renderer/actions"
 import type MenuElements from "@renderer/modules/menu/MenuElements"
-import type CommandManager from "@renderer/CommandManager"
+import type CommandManager from "@renderer/modules/CommandManager"
 import { CLASS_SELECTED } from "@renderer/constants/dom"
 
 export function handleLoad(
@@ -94,6 +94,7 @@ function initSettings(commandManager: CommandManager, settingsFacade: SettingsFa
 	contents[0].style.display = "block"
 
 	settingsFacade.renderSettingsValue(settingsFacade.getSettingsValue())
+	// TODO
 	commandManager.performApplySettings("programmatic", settingsFacade.getSettingsValue())
 }
 

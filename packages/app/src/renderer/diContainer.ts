@@ -2,7 +2,7 @@ import "reflect-metadata"
 import DI_KEYS from "./constants/di_keys"
 import { Container } from "inversify"
 import FocusManager from "./core/FocusManager"
-import CommandManager from "./CommandManager"
+import CommandManager from "./modules/CommandManager"
 import TabEditorFacade from "./modules/tab_editor/TabEditorFacade"
 import TreeFacade from "./modules/tree/TreeFacade"
 import ShortcutRegistry from "./core/ShortcutRegistry"
@@ -29,6 +29,7 @@ import SideElements from "./modules/side/SideElements"
 import SideStore from "./modules/side/SideStore"
 import InfoFacade from "./modules/info/InfoFacade"
 import WindowRenderer from "./modules/window/WindowRenderer"
+import Dispatcher from "./dispatch/Dispatcher"
 
 const diContainer = new Container()
 
@@ -70,5 +71,6 @@ diContainer.bind(DI_KEYS.WindowRenderer).to(WindowRenderer).inSingletonScope()
 diContainer.bind(DI_KEYS.WindowElements).to(WindowElements).inSingletonScope()
 
 diContainer.bind(DI_KEYS.CommandManager).to(CommandManager).inSingletonScope()
+diContainer.bind(DI_KEYS.Dispatcher).to(Dispatcher).inSingletonScope()
 
 export default diContainer

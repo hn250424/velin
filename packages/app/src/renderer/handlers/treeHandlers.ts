@@ -12,7 +12,7 @@ import {
 } from "../constants/dom"
 import ShortcutRegistry from "../core/ShortcutRegistry"
 import FocusManager from "../core/FocusManager"
-import CommandManager from "../CommandManager"
+import CommandManager from "../modules/CommandManager"
 
 export function handleTree(
 	commandManager: CommandManager,
@@ -36,6 +36,7 @@ export function handleTree(
 
 //
 
+// TODO
 function bindTreeTopMenuEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
 	const { treeNodeContainer, treeTopAddFile, treeTopAddDirectory } = treeFacade.renderer.elements
 
@@ -99,11 +100,14 @@ function bindTreeClickEvents(commandManager: CommandManager, treeFacade: TreeFac
 		} else {
 			treeFacade.clearTreeSelected()
 
+			// TODO
 			const viewModel = treeFacade.getTreeViewModelByPath(path)
 			if (viewModel.directory) {
-				await commandManager.performOpenDirectory("element", treeNode)
+				// await commandManager.performOpenDirectory("element", treeNode)
+				await commandManager.performOpenDirectory(treeNode)
 			} else {
-				await commandManager.performOpenFile("element", path)
+				// await commandManager.performOpenFile("element", path)
+				await commandManager.performOpenFile(path)
 			}
 
 			treeNode.classList.add(CLASS_SELECTED)
@@ -148,6 +152,7 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 	})
 }
 
+// TODO
 function bindTreeContextmenuClickEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
 	const { treeContextCut, treeContextCopy, treeContextPaste, treeContextRename, treeContextDelete } =
 		treeFacade.renderer.elements
@@ -186,11 +191,12 @@ function bindShortcutEvents(
 	shortcutRegistry.register("Shift+ARROWUP", (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade))
 	shortcutRegistry.register("Shift+ARROWDOWN", (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade))
 
-	shortcutRegistry.register("Ctrl+X", async (e: KeyboardEvent) => await commandManager.performCut("shortcut"))
-	shortcutRegistry.register("Ctrl+C", async (e: KeyboardEvent) => await commandManager.performCopy("shortcut"))
-	shortcutRegistry.register("Ctrl+V", async (e: KeyboardEvent) => await commandManager.performPaste("shortcut"))
-	shortcutRegistry.register("F2", async (e: KeyboardEvent) => await commandManager.performRename("shortcut"))
-	shortcutRegistry.register("DELETE", async (e: KeyboardEvent) => await commandManager.performDelete("shortcut"))
+	// TODO
+	shortcutRegistry.register("Ctrl+X", async () => await commandManager.performCut("shortcut"))
+	shortcutRegistry.register("Ctrl+C", async () => await commandManager.performCopy("shortcut"))
+	shortcutRegistry.register("Ctrl+V", async () => await commandManager.performPaste("shortcut"))
+	shortcutRegistry.register("F2", async () => await commandManager.performRename("shortcut"))
+	shortcutRegistry.register("DELETE", async () => await commandManager.performDelete("shortcut"))
 }
 
 //
@@ -335,7 +341,7 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 }
 
 function bindMouseUpEvents(treeFacade: TreeFacade, commandManager: CommandManager) {
-	document.addEventListener("mouseup", async (e: MouseEvent) => {
+	document.addEventListener("mouseup", async () => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
 			return
@@ -349,6 +355,7 @@ function bindMouseUpEvents(treeFacade: TreeFacade, commandManager: CommandManage
 		treeFacade.endDrag()
 		treeFacade.removeGhostBox()
 
+		// TODO
 		if (isRight) {
 			treeFacade.setSelectedDragIndexByPath(path)
 			await commandManager.performCut("drag")
