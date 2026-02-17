@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify"
-import type { Focus } from "../core/types"
-import FocusManager from "../core/FocusManager"
+import type { Focus } from "../core"
+import { FocusManager } from "../core"
 import DI_KEYS from "../constants/di_keys"
-import type CommandManager from "../modules/CommandManager"
+import { CommandManager } from "../modules"
 import { assert } from "../utils"
 import type { DispatchEventsWithArgs, GetArgs, Source } from "./types"
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
@@ -59,18 +59,18 @@ export class Dispatcher {
 
 			create: {
 				default: {
-					default: (directory: boolean) => this.commandManager.performCreate(directory)
-				}
+					default: (directory: boolean) => this.commandManager.performCreate(directory),
+				},
 			},
 			rename: {
 				default: {
-					default: async () => await this.commandManager.performRename()
-				}
+					default: async () => await this.commandManager.performRename(),
+				},
 			},
 			delete: {
 				default: {
-					default: async () => await this.commandManager.performDelete()
-				}
+					default: async () => await this.commandManager.performDelete(),
+				},
 			},
 
 			//
@@ -148,19 +148,19 @@ export class Dispatcher {
 
 			esc: {
 				default: {
-					default: async () => await this.commandManager.performESC()
-				}
+					default: async () => await this.commandManager.performESC(),
+				},
 			},
 			enter: {
 				default: {
-					default: async () => await this.commandManager.performENTER()
-				}
+					default: async () => await this.commandManager.performENTER(),
+				},
 			},
 		}
 	}
 
 	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: GetArgs<E>) {
-		const focus = this.focusManager.getFocus()!
+		const focus = this.focusManager.getFocus()
 
 		const eventNode = this._handlers[event]
 		assert(eventNode, `Missing event: ${event}`)

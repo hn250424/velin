@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class SideStore {
+export class SideStore {
 	private _isSideOpen = true
 	private _sideWidth = 150
 

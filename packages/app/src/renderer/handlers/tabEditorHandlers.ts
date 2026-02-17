@@ -4,8 +4,8 @@ import type Response from "@shared/types/Response"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
-import ShortcutRegistry from "../core/ShortcutRegistry"
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
+import { ShortcutRegistry } from "../core"
+import { TabEditorFacade } from "../modules"
 import { throttle } from "../utils/throttle"
 import { Dispatcher } from "@renderer/dispatch"
 
@@ -33,7 +33,7 @@ export function handleTabEditor(
 function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
 	const { tabContainer } = tabEditorFacade.renderer.elements
 
-	tabContainer.addEventListener("click", async (e) => {
+	tabContainer.addEventListener("click", async (e: MouseEvent) => {
 		const target = e.target as HTMLElement
 		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
 		if (!tabBox) return
@@ -53,7 +53,7 @@ function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFa
 function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
 	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
 
-	tabContainer.addEventListener("contextmenu", (e) => {
+	tabContainer.addEventListener("contextmenu", (e: MouseEvent) => {
 		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
 		if (!tab) return
 
@@ -138,7 +138,7 @@ function bindShortcutEvents(
 function bindMouseDownEvents(tabEditorFacade: TabEditorFacade) {
 	const { tabContainer } = tabEditorFacade.renderer.elements
 
-	tabContainer.addEventListener("mousedown", (e) => {
+	tabContainer.addEventListener("mousedown", (e: MouseEvent) => {
 		const target = e.target as HTMLElement
 		const tab = target.closest(SELECTOR_TAB) as HTMLElement
 		if (!tab) return

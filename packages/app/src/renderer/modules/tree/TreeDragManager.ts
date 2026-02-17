@@ -2,7 +2,7 @@ import { injectable } from "inversify"
 import { CLASS_TREE_DRAG_OVERLAY } from "../../constants/dom"
 
 @injectable()
-export default class TreeDragManager {
+export class TreeDragManager {
 	private _isMouseDown = false
 	private _isDrag = false
 	private _count = -1

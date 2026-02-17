@@ -1,8 +1,7 @@
-import type ICommand from "./ICommand"
-import TreeFacade from "../modules/tree/TreeFacade"
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
+import type { ICommand } from "./index"
+import { TabEditorFacade, TreeFacade } from "../modules"
 
-export default class CreateCommand implements ICommand {
+export class CreateCommand implements ICommand {
 	private createdPath = ""
 	private openedTabId: number | null = null
 

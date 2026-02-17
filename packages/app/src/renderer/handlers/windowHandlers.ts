@@ -1,7 +1,5 @@
-import type WindowFacade from "@renderer/modules/window/WindowFacade"
 import { exit as actExit } from "../actions"
-import type TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
-import type TreeFacade from "@renderer/modules/tree/TreeFacade"
+import type { TabEditorFacade, TreeFacade, WindowFacade } from "@renderer/modules"
 
 export function handleWindow(windowFacade: WindowFacade, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
 	const { maximizeBtn, minimizeBtn, exitBtn } = windowFacade.renderer.elements

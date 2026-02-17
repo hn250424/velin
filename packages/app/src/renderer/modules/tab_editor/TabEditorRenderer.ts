@@ -16,13 +16,13 @@ import {
 	CLASS_TAB_GHOST,
 	CLASS_BINARY,
 } from "../../constants/dom"
-import TabEditorView from "./TabEditorView"
+import { TabEditorView } from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
 import DI_KEYS from "@renderer/constants/di_keys"
-import type TabEditorElements from "./TabEditorElements"
+import type { TabEditorElements } from "./TabEditorElements"
 
 @injectable()
-export default class TabEditorRenderer {
+export class TabEditorRenderer {
 	private _tabEditorViews: TabEditorView[] = []
 	private _pathToTabEditorViewMap: Map<string, TabEditorView> = new Map()
 

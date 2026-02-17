@@ -1,11 +1,8 @@
 import "@milkdown/theme-nord/style.css"
 
-import ShortcutRegistry from "../../core/ShortcutRegistry"
-import type MenuElements from "@renderer/modules/menu/MenuElements"
-import type SettingsFacade from "@renderer/modules/settings/SettingsFacade"
+import { ShortcutRegistry } from "../../core"
 import { exit as actExit } from "../../actions"
-import TabEditorFacade from "@renderer/modules/tab_editor/TabEditorFacade"
-import TreeFacade from "@renderer/modules/tree/TreeFacade"
+import { MenuElements, TabEditorFacade, TreeFacade, SettingsFacade } from "@renderer/modules"
 import { Dispatcher } from "../../dispatch"
 
 export function handleFileMenu(

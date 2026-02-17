@@ -1,10 +1,10 @@
 import DI_KEYS from "@renderer/constants/di_keys"
 import { inject, injectable } from "inversify"
-import type SideStore from "./SideStore"
-import type SideElements from "./SideElements"
+import type { SideStore } from "./SideStore"
+import type { SideElements } from "./SideElements"
 
 @injectable()
-export default class SideFacade {
+export class SideFacade {
 	constructor(
 		@inject(DI_KEYS.SideStore) public readonly state: SideStore,
 		@inject(DI_KEYS.SideElements) public readonly elements: SideElements

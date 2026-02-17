@@ -1,14 +1,10 @@
-import type { SettingsDto, SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto"
-import type {
-	SettingsViewModel,
-	SettingFontViewModel,
-	SettingThemeViewModel,
-} from "@renderer/viewmodels/SettingsViewModel"
+import type { SettingsDto } from "@shared/dto/SettingsDto"
+import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 
 import { inject, injectable } from "inversify"
 import DI_KEYS from "../../constants/di_keys"
-import SettingsStore from "./SettingsStore"
-import SettingsRenderer from "./SettingsRenderer"
+import { SettingsStore } from "./SettingsStore"
+import { SettingsRenderer } from "./SettingsRenderer"
 
 type Binding<T> = {
 	on: (callback: (value: T) => void) => void
@@ -16,7 +12,7 @@ type Binding<T> = {
 }
 
 injectable()
-export default class SettingsFacade {
+export class SettingsFacade {
 	constructor(
 		@inject(DI_KEYS.SettingsRenderer) public readonly renderer: SettingsRenderer,
 		@inject(DI_KEYS.SettingsStore) public readonly store: SettingsStore

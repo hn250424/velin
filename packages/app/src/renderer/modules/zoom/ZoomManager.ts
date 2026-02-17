@@ -1,4 +1,4 @@
-export default class ZoomManager {
+export class ZoomManager {
 	private zoomLevel = 1
 
 	zoomIn() {

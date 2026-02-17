@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class TabDragManager {
+export class TabDragManager {
 	private _isMouseDown = false
 	private _isDrag = false
 	private _targetTab: HTMLElement | null = null

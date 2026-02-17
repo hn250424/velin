@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class MenuElements {
+export class MenuElements {
 	public readonly menuContainer: HTMLElement
 	public readonly menuItems: NodeListOf<HTMLElement>
 

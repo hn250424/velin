@@ -1,4 +1,4 @@
-import type InfoFacade from "@renderer/modules/info/InfoFacade";
+import type { InfoFacade } from "@renderer/modules"
 
 export function handleInfo(infoFacade: InfoFacade) {
 	const { close } = infoFacade.elements

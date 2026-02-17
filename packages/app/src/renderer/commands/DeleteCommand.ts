@@ -1,12 +1,11 @@
-import type ICommand from "./ICommand"
+import type { ICommand } from "./index"
 import type TrashMap from "@shared/types/TrashMap"
 import type Response from "@shared/types/Response"
 import type { TreeViewModel } from "../viewmodels/TreeViewModel"
 
-import TreeFacade from "../modules/tree/TreeFacade"
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
+import { TabEditorFacade, TreeFacade } from "../modules"
 
-export default class DeleteCommand implements ICommand {
+export class DeleteCommand implements ICommand {
 	private trashMap: TrashMap[] | null = null
 
 	constructor(
@@ -39,8 +38,8 @@ export default class DeleteCommand implements ICommand {
 		const tabEditorDto = this.tabEditorFacade.getAllTabEditorData()
 		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto)
 
-		const vm = this.treeFacade.extractTreeViewModel()
-		const treeDto = vm ? this.treeFacade.toTreeDto(vm) : null
+		const viewModel = this.treeFacade.extractTreeViewModel()
+		const treeDto = this.treeFacade.toTreeDto(viewModel)
 		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 	}
 

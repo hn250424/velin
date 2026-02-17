@@ -1,28 +1,22 @@
-import type ICommand from "../commands/ICommand"
+import { inject, injectable } from "inversify"
 
 import type Response from "@shared/types/Response"
 import type { TreeViewModel } from "../viewmodels/TreeViewModel"
-
+import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
 import type { TreeDto } from "@shared/dto/TreeDto"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
-import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
 
-import { inject, injectable } from "inversify"
-
-import DI_KEYS from "../constants/di_keys"
 import folderSvg from "../assets/icons/folder.svg?raw"
 import openedFolderSvg from "../assets/icons/opened_folder.svg?raw"
 
-import FocusManager from "../core/FocusManager"
+import DI_KEYS from "../constants/di_keys"
 
-import TabEditorFacade from "./tab_editor/TabEditorFacade"
-import TreeFacade from "./tree/TreeFacade"
-import SettingsFacade from "./settings/SettingsFacade"
+import { FocusManager } from "../core"
 
-import RenameCommand from "../commands/RenameCommand"
-import DeleteCommand from "../commands/DeleteCommand"
-import PasteCommand from "../commands/PasteCommand"
-import CreateCommand from "../commands/CreateCommand"
+import { TabEditorFacade, TreeFacade, SettingsFacade } from "./index"
+
+import type { ICommand } from "../commands/"
+import { CreateCommand, DeleteCommand, PasteCommand, RenameCommand } from "../commands"
 
 import { debounce } from "../utils/debounce"
 import { sleep } from "../utils/sleep"
@@ -41,7 +35,7 @@ import {
 } from "../constants/dom"
 
 @injectable()
-export default class CommandManager {
+export class CommandManager {
 	private undoStack: ICommand[] = []
 	private redoStack: ICommand[] = []
 

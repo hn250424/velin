@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class InfoElements {
+export class InfoElements {
 	public readonly overlay: HTMLElement
 	public readonly close: HTMLElement
 	public readonly version: HTMLElement

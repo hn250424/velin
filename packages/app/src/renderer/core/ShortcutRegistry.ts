@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify"
-import FocusManager from "./FocusManager"
 import DI_KEYS from "../constants/di_keys"
+import { FocusManager } from "./index"
 
 @injectable()
-export default class ShortcutRegistry {
+export class ShortcutRegistry {
 	private shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
 
 	constructor(@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager) {}

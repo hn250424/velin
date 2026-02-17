@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class SettingsElements {
+export class SettingsElements {
 	public readonly exit: HTMLElement
 	public readonly apply: HTMLElement
 	public readonly close: HTMLElement

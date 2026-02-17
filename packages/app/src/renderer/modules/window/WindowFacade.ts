@@ -1,11 +1,11 @@
 import DI_KEYS from "@renderer/constants/di_keys"
 import { inject, injectable } from "inversify"
-import type WindowStore from "./WindowStore"
+import type { WindowStore } from "./WindowStore"
 
-import type WindowRenderer from "./WindowRenderer"
+import type { WindowRenderer } from "./WindowRenderer"
 
 @injectable()
-export default class WindowFacade {
+export class WindowFacade {
 	constructor(
 		@inject(DI_KEYS.WindowStore) public readonly store: WindowStore,
 		@inject(DI_KEYS.WindowRenderer) public readonly renderer: WindowRenderer

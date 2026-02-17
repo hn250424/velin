@@ -1,11 +1,8 @@
 import { CLASS_SELECTED } from "../constants/dom"
-import SettingsFacade from "../modules/settings/SettingsFacade"
+import { SettingsFacade } from "../modules"
 import { Dispatcher } from "../dispatch"
 
-export function handleSettings(
-	dispatcher: Dispatcher,
-	settingsFacade: SettingsFacade,
-) {
+export function handleSettings(dispatcher: Dispatcher, settingsFacade: SettingsFacade) {
 	const { menus, contents, exit, apply, close } = settingsFacade.renderer.elements
 
 	menus.forEach((el, idx) => {

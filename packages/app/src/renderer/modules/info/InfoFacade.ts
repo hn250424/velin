@@ -1,9 +1,9 @@
 import DI_KEYS from "@renderer/constants/di_keys";
 import { inject, injectable } from "inversify"
-import type InfoElements from "./InfoElements";
+import type { InfoElements } from "./InfoElements";
 
 @injectable()
-export default class InfoFacade {
+export class InfoFacade {
 	constructor(@inject(DI_KEYS.InfoElements) public readonly elements: InfoElements) {}
 
 	showInformation() {

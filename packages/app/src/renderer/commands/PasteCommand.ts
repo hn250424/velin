@@ -1,10 +1,9 @@
-import type ICommand from "./ICommand"
+import type { ICommand } from "./index"
 import type { TreeViewModel } from "../viewmodels/TreeViewModel"
 import type ClipboardMode from "@shared/types/ClipboardMode"
 import type Response from "@shared/types/Response"
 
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
-import TreeFacade from "../modules/tree/TreeFacade"
+import { TabEditorFacade, TreeFacade } from "../modules"
 
 type UndoInfo = {
 	src: string
@@ -13,7 +12,7 @@ type UndoInfo = {
 	isDir: boolean
 }
 
-export default class PasteCommand implements ICommand {
+export class PasteCommand implements ICommand {
 	private undoInfos: UndoInfo[] = []
 
 	constructor(

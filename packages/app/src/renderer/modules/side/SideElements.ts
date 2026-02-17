@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class SideElements {
+export class SideElements {
 	public readonly side: HTMLElement
 	public readonly tree: HTMLElement
 	public readonly resizer: HTMLElement

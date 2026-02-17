@@ -19,7 +19,7 @@ type SearchState = {
 	currentIndex: number
 }
 
-export default class TabEditorView {
+export class TabEditorView {
 	private _editor: Editor | null
 	private _tabBox: HTMLElement
 	private _tabSpan: HTMLElement

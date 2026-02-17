@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class TabEditorElements {
+export class TabEditorElements {
 	public readonly tabContextMenu: HTMLElement
 
 	public readonly tabContextClose: HTMLElement

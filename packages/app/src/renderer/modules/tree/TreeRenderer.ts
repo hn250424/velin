@@ -19,10 +19,10 @@ import {
 	SELECTOR_TREE_NODE,
 } from "../../constants/dom"
 import DI_KEYS from "@renderer/constants/di_keys"
-import type TreeElements from "./TreeElements"
+import type { TreeElements } from "./TreeElements"
 
 @injectable()
-export default class TreeRenderer {
+export class TreeRenderer {
 	private ghostBox: HTMLElement | null = null
 
 	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()

@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class WindowStore {
+export class WindowStore {
 	private _maximize = false
 
 	isWindowMaximize(): boolean {

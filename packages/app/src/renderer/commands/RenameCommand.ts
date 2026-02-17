@@ -1,11 +1,10 @@
 import type Response from "@shared/types/Response"
-import type ICommand from "./ICommand"
+import type { ICommand } from "./index"
 
 import { CLASS_TREE_NODE_TEXT, SELECTOR_TREE_NODE_TEXT } from "../constants/dom"
-import TreeFacade from "../modules/tree/TreeFacade"
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
+import { TabEditorFacade, TreeFacade } from "../modules"
 
-export default class RenameCommand implements ICommand {
+export class RenameCommand implements ICommand {
 	constructor(
 		private treeFacade: TreeFacade,
 		private tabEditorFacade: TabEditorFacade,

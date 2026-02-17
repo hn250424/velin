@@ -12,12 +12,12 @@ import {
 	CLASS_SELECTED,
 	CLASS_CUT,
 } from "../../constants/dom"
-import TreeRenderer from "./TreeRenderer"
-import TreeStore from "./TreeStore"
-import TreeDragManager from "./TreeDragManager"
+import { TreeRenderer } from "./TreeRenderer"
+import { TreeStore } from "./TreeStore"
+import { TreeDragManager } from "./TreeDragManager"
 
 @injectable()
-export default class TreeFacade {
+export class TreeFacade {
 	constructor(
 		@inject(DI_KEYS.TreeStore) public readonly store: TreeStore,
 		@inject(DI_KEYS.TreeRenderer) public readonly renderer: TreeRenderer,

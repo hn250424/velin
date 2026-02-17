@@ -1,5 +1,5 @@
 import "@milkdown/theme-nord/style.css"
-import TreeFacade from "../modules/tree/TreeFacade"
+import { TreeFacade } from "../modules"
 import {
 	DATASET_ATTR_TREE_PATH,
 	CLASS_FOCUSED,
@@ -10,8 +10,7 @@ import {
 	SELECTOR_TREE_NODE_CONTAINER,
 	CLASS_TREE_DRAG_OVERLAY,
 } from "../constants/dom"
-import ShortcutRegistry from "../core/ShortcutRegistry"
-import FocusManager from "../core/FocusManager"
+import { FocusManager, ShortcutRegistry } from "../core"
 import { Dispatcher } from "@renderer/dispatch"
 
 export function handleTree(

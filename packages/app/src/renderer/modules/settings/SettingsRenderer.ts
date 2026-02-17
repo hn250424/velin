@@ -5,10 +5,10 @@ import type {
 	SettingThemeViewModel,
 } from "@renderer/viewmodels/SettingsViewModel"
 import { inject, injectable } from "inversify"
-import type SettingsElements from "./SettingsElements"
+import type { SettingsElements } from "./SettingsElements"
 
 @injectable()
-export default class SettingsRenderer {
+export class SettingsRenderer {
 	constructor(@inject(DI_KEYS.SettingsElements) readonly elements: SettingsElements) {}
 
 	openSettings() {

@@ -5,7 +5,7 @@ import type { TreeViewModel } from "../../viewmodels/TreeViewModel"
 import { injectable } from "inversify"
 
 @injectable()
-export default class TreeStore {
+export class TreeStore {
 	private _flattenTreeArray: TreeViewModel[] = []
 	private _pathToFlattenArrayIndexMap: Map<string, number> = new Map()
 

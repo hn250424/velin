@@ -8,7 +8,7 @@ import type {
 import { injectable } from "inversify"
 
 @injectable()
-export default class SettingsStore {
+export class SettingsStore {
 	private _currentSettings: SettingsViewModel
 	private _draftSettings: SettingsViewModel
 

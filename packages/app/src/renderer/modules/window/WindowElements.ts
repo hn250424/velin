@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class WindowElements {
+export class WindowElements {
 	public readonly maximizeBtn: HTMLElement
 	public readonly minimizeBtn: HTMLElement
 	public readonly exitBtn: HTMLElement

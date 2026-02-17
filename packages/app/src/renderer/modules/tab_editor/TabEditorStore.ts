@@ -3,7 +3,7 @@ import type { TabEditorDto } from "@shared/dto/TabEditorDto"
 import { injectable } from "inversify"
 
 @injectable()
-export default class TabEditorStore {
+export class TabEditorStore {
 	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map()
 
 	private _activeTabId = -1

@@ -8,16 +8,16 @@ import { TextSelection } from "prosemirror-state"
 
 import DI_KEYS from "../../constants/di_keys"
 import { NOT_MODIFIED_TEXT } from "../../constants/dom"
-import TabEditorRenderer from "./TabEditorRenderer"
-import TabEditorStore from "./TabEditorStore"
-import TabEditorView from "./TabEditorView"
-import TabDragManager from "./TabDragManager"
+import { TabEditorRenderer } from "./TabEditorRenderer"
+import { TabEditorStore } from "./TabEditorStore"
+import { TabEditorView } from "./TabEditorView"
+import { TabDragManager } from "./TabDragManager"
 
 // export const BINARY_FILE_WARNING = '❌'
 export const BINARY_FILE_WARNING = `Can't read this file`
 
 @injectable()
-export default class TabEditorFacade {
+export class TabEditorFacade {
 	constructor(
 		@inject(DI_KEYS.TabEditorStore) public readonly store: TabEditorStore,
 		@inject(DI_KEYS.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
@@ -571,7 +571,7 @@ export default class TabEditorFacade {
 	getAllTabEditorData(): TabEditorsDto {
 		return {
 			activatedId: this.store.activeTabId,
-			data: this.renderer.tabEditorViews.map((view) => this.getTabEditorDataByView(view)),
+			data: this.renderer.tabEditorViews.map((view: TabEditorView) => this.getTabEditorDataByView(view)),
 		}
 	}
 

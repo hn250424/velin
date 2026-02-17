@@ -1,7 +1,7 @@
 import { injectable } from "inversify"
 
 @injectable()
-export default class TreeElements {
+export class TreeElements {
 	public readonly treeContextMenu: HTMLElement
 
 	public readonly treeContextCut: HTMLElement
