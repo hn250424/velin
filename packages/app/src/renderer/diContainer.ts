@@ -29,7 +29,7 @@ import SideElements from "./modules/side/SideElements"
 import SideStore from "./modules/side/SideStore"
 import InfoFacade from "./modules/info/InfoFacade"
 import WindowRenderer from "./modules/window/WindowRenderer"
-import Dispatcher from "./dispatch/Dispatcher"
+import { Dispatcher } from "./dispatch"
 
 const diContainer = new Container()
 

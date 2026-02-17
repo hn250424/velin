@@ -51,5 +51,4 @@ function bindShortcutEvents(dispatcher: Dispatcher, shortcutRegistry: ShortcutRe
 	shortcutRegistry.register("Ctrl+V", async () => await dispatcher.dispatch("paste", "shortcut"))
 	shortcutRegistry.register("Ctrl+F", () => dispatcher.dispatch("toggleFindReplace", "shortcut", false))
 	shortcutRegistry.register("Ctrl+R", () => dispatcher.dispatch("toggleFindReplace", "shortcut", true))
-	shortcutRegistry.register("Ctrl+Alt+ENTER", () => dispatcher.dispatch("replaceAll", "shortcut"))
 }

@@ -13,6 +13,27 @@ type EnforceSchema<T extends Record<string, DispatchEventSchema>> = T
 export type DispatchEventsWithArgs = EnforceSchema<{
 	//
 
+	undo: {
+		editor: {
+			shortcut: []
+			default: []
+		}
+		tree: {
+			default: []
+		}
+	}
+	redo: {
+		editor: {
+			shortcut: []
+			default: []
+		}
+		tree: {
+			default: []
+		}
+	}
+	
+	//
+
 	newTab: {
 		default: {
 			default: []
@@ -43,27 +64,16 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: []
 		}
 	}
+	closeTab: {
+		default: {
+			default: [id: number]
+		}
+	}
+
+
 
 	//
 
-	undo: {
-		editor: {
-			shortcut: []
-			default: []
-		}
-		tree: {
-			default: []
-		}
-	}
-	redo: {
-		editor: {
-			shortcut: []
-			default: []
-		}
-		tree: {
-			default: []
-		}
-	}
 	cut: {
 		editor: {
 			shortcut: []
@@ -93,16 +103,6 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			drag: []
 		}
 	}
-	toggleFindReplace: {
-		default: {
-			default: [replace: boolean]
-		}
-	}
-	replaceAll: {
-		default: {
-			default: []
-		}
-	}
 
 	//
 
@@ -116,11 +116,41 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: [viewModel: SettingsViewModel]
 		}
 	}
+
+	//
+
+	toggleFindReplace: {
+		default: {
+			default: [replace: boolean]
+		}
+	}
+	find: {
+		default: {
+			default: [direction: "up" | "down"]
+		}
+	}
+	replace: {
+		default: {
+			default: []
+		}
+	}
+	replaceAll: {
+		default: {
+			default: []
+		}
+	}
+	closeFindReplace: {
+		default: {
+			default: []
+		}
+	}
+
+	//
 }>
 
 export type GetArgs<E extends keyof DispatchEventsWithArgs> =
-  DispatchEventsWithArgs[E][keyof DispatchEventsWithArgs[E]] extends infer SNode
-    ? SNode extends Partial<Record<Source | "default", any[]>>
-      ? SNode[keyof SNode]
-      : []
-    : [];
+	DispatchEventsWithArgs[E][keyof DispatchEventsWithArgs[E]] extends infer SNode
+		? SNode extends Partial<Record<Source | "default", any[]>>
+			? SNode[keyof SNode]
+			: []
+		: []

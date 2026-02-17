@@ -4,24 +4,24 @@ import type Response from "@shared/types/Response"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
-import CommandManager from "../modules/CommandManager"
 import ShortcutRegistry from "../core/ShortcutRegistry"
 import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
 import { throttle } from "../utils/throttle"
+import { Dispatcher } from "@renderer/dispatch"
 
 export function handleTabEditor(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTabClickEvents(commandManager, tabEditorFacade)
+	bindTabClickEvents(dispatcher, tabEditorFacade)
 
 	bindTabContextmenuToggleEvent(tabEditorFacade)
-	bindTabContextmenuClickEvents(commandManager, tabEditorFacade)
+	bindTabContextmenuClickEvents(dispatcher, tabEditorFacade)
 
-	bindFindReplaceEvnets(commandManager, tabEditorFacade)
+	bindFindReplaceEvnets(dispatcher, tabEditorFacade)
 
-	bindShortcutEvents(commandManager, shortcutRegistry, tabEditorFacade)
+	bindShortcutEvents(dispatcher, shortcutRegistry, tabEditorFacade)
 
 	bindMouseDownEvents(tabEditorFacade)
 	bindMouseMoveEvents(tabEditorFacade)
@@ -30,22 +30,20 @@ export function handleTabEditor(
 
 //
 
-function bindTabClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
 	const { tabContainer } = tabEditorFacade.renderer.elements
 
 	tabContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement
 		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
+		if (!tabBox) return
 
-		if (tabBox) {
-			if (target.tagName === "BUTTON") {
-				const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
-				// TODO
-				await commandManager.performCloseTab("button", id)
-			} else if (target.tagName === "SPAN") {
-				const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
-				tabEditorFacade.activateTabEditorById(parseInt(id))
-			}
+		if (target.tagName === "BUTTON") {
+			const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
+			await dispatcher.dispatch("closeTab", "button", id)
+		} else if (target.tagName === "SPAN") {
+			const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
+			tabEditorFacade.activateTabEditorById(parseInt(id))
 		}
 	})
 }
@@ -66,13 +64,12 @@ function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
 	})
 }
 
-function bindTabContextmenuClickEvents(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
+function bindTabContextmenuClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
 	const { tabContextClose, tabContextCloseOthers, tabContextCloseRight, tabContextCloseAll } =
 		tabEditorFacade.renderer.elements
 
 	tabContextClose.addEventListener("click", async () => {
-		// TODO
-		await commandManager.performCloseTab("context-menu", tabEditorFacade.contextTabId)
+		await dispatcher.dispatch("closeTab", "context-menu", tabEditorFacade.contextTabId)
 	})
 
 	tabContextCloseOthers.addEventListener("click", async () => {
@@ -98,43 +95,42 @@ function bindTabContextmenuClickEvents(commandManager: CommandManager, tabEditor
 
 //
 
-// TODO
-function bindFindReplaceEvnets(commandManager: CommandManager, tabEditorFacade: TabEditorFacade) {
-	const { findUp, findDown, findClose, replaceCurrent, replaceAll } = tabEditorFacade.renderer.elements
+function bindFindReplaceEvnets(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
+	const { findUp, findDown, replaceCurrent, replaceAll, closeFindReplace } = tabEditorFacade.renderer.elements
 
 	findUp.addEventListener("click", async () => {
-		commandManager.performFind("menu", "up")
+		await dispatcher.dispatch("find", "menu", "up")
 	})
 
 	findDown.addEventListener("click", async () => {
-		commandManager.performFind("menu", "down")
-	})
-
-	findClose.addEventListener("click", async () => {
-		commandManager.performCloseFindReplaceBox("menu")
+		await dispatcher.dispatch("find", "menu", "down")
 	})
 
 	replaceCurrent.addEventListener("click", async () => {
-		commandManager.performReplace("menu")
+		await dispatcher.dispatch("replace", "menu")
 	})
 
 	replaceAll.addEventListener("click", async () => {
-		commandManager.performReplaceAll("menu")
+		await dispatcher.dispatch("replaceAll", "menu")
+	})
+
+	closeFindReplace.addEventListener("click", async () => {
+		await dispatcher.dispatch("closeFindReplace", "menu")
 	})
 }
 
 //
 
 function bindShortcutEvents(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	shortcutRegistry: ShortcutRegistry,
 	tabEditorFacade: TabEditorFacade
 ) {
-	// TODO
 	shortcutRegistry.register(
 		"Ctrl+W",
-		async () => await commandManager.performCloseTab("shortcut", tabEditorFacade.activeTabId)
+		async () => await dispatcher.dispatch("closeTab", "shortcut", tabEditorFacade.activeTabId)
 	)
+	shortcutRegistry.register("Ctrl+Alt+ENTER", async () => await dispatcher.dispatch("replaceAll", "shortcut"))
 }
 
 //

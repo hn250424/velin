@@ -11,10 +11,7 @@ import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 export class Dispatcher {
 	private readonly _handlers: {
 		[E in keyof DispatchEventsWithArgs]: Partial<
-			Record<
-				Focus | "default",
-				Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>
-			>
+			Record<Focus | "default", Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>>
 		>
 	}
 
@@ -23,15 +20,6 @@ export class Dispatcher {
 		@inject(DI_KEYS.CommandManager) private readonly commandManager: CommandManager
 	) {
 		this._handlers = {
-			//
-
-			newTab: { default: { default: () => this.commandManager.performNewTab() } },
-			openFile: { default: { default: (path) => this.commandManager.performOpenFile(path) } },
-			openDirectory: { default: { default: (node) => this.commandManager.performOpenDirectory(node) } },
-			save: { default: { default: () => this.commandManager.performSave() } },
-			saveAs: { default: { default: () => this.commandManager.performSaveAs() } },
-			saveAll: { default: { default: () => this.commandManager.performSaveAll() } },
-
 			//
 
 			undo: {
@@ -52,6 +40,23 @@ export class Dispatcher {
 				},
 				tree: { default: () => this.commandManager.performRedoTree() },
 			},
+
+			//
+
+			newTab: { default: { default: () => this.commandManager.performNewTab() } },
+			openFile: { default: { default: (path) => this.commandManager.performOpenFile(path) } },
+			openDirectory: { default: { default: (node) => this.commandManager.performOpenDirectory(node) } },
+			save: { default: { default: () => this.commandManager.performSave() } },
+			saveAs: { default: { default: () => this.commandManager.performSaveAs() } },
+			saveAll: { default: { default: () => this.commandManager.performSaveAll() } },
+			closeTab: {
+				default: {
+					default: (id: number) => this.commandManager.performCloseTab(id),
+				},
+			},
+
+			//
+
 			cut: {
 				editor: {
 					shortcut: () => this.commandManager.performCutEditor(),
@@ -79,31 +84,49 @@ export class Dispatcher {
 					drag: () => this.commandManager.performPasteTreeWithDrag(),
 				},
 			},
-			toggleFindReplace: {
-				default: {
-					default: (replace) => this.commandManager.toggleFindReplaceBox(replace)
-				}
-			},
-			replaceAll: {
-				default: {
-					default: () => this.commandManager.performReplaceAll()
-				}
-			},
 
 			//
 
 			applySettings: {
 				none: {
-					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel)
-				}
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel),
+				},
 			},
 			applyAndSaveSettings: {
 				default: {
-					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel)
-				}
-			}
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel),
+				},
+			},
 
+			//
 
+			toggleFindReplace: {
+				default: {
+					default: (replace) => this.commandManager.toggleFindReplaceBox(replace),
+				},
+			},
+			find: {
+				default: {
+					default: (direction: "up" | "down") => this.commandManager.performFind(direction),
+				},
+			},
+			replace: {
+				default: {
+					default: () => this.commandManager.performReplace(),
+				},
+			},
+			replaceAll: {
+				default: {
+					default: () => this.commandManager.performReplaceAll(),
+				},
+			},
+			closeFindReplace: {
+				default: {
+					default: () => this.commandManager.performCloseFindReplaceBox(),
+				},
+			},
+
+			//
 		}
 	}
 
@@ -117,9 +140,8 @@ export class Dispatcher {
 		assert(focusNode, `Missing focus node: ${event} > ${focus}`)
 
 		const handler = focusNode[source] || focusNode["default"]
-		assert(handler, `Missing handler: ${event} > ${focus} > ${source}`);
+		assert(handler, `Missing handler: ${event} > ${focus} > ${source}`)
 
 		await handler(...args)
 	}
 }
-

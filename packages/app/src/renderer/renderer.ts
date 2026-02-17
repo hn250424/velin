@@ -71,7 +71,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
 	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 
-	handleTabEditor(commandManager, tabEditorFacade, shortcutRegistry)
+	handleTabEditor(dispatcher, tabEditorFacade, shortcutRegistry)
 	handleInfo(infoFacade)
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
 	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
@@ -98,12 +98,6 @@ window.addEventListener("DOMContentLoaded", () => {
 	})
 
 	window.rendererToMain.loadedRenderer()
-
-	// TODO.
-	// document.getElementById('settings').addEventListener('click', () => {
-	// document.documentElement.className = ''
-	// document.documentElement.classList.add('dark')
-	// })
 })
 
 function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {

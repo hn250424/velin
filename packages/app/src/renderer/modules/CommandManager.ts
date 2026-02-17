@@ -43,18 +43,6 @@ import type InfoFacade from "./info/InfoFacade"
 
 type CommandSource = "shortcut" | "menu" | "element" | "context-menu" | "drag" | "programmatic" | "button"
 
-/**
- * CommandManager centrally manages and executes commands that involve side effects,
- * state changes, or require Undo/Redo support.
- *
- * - Commands triggered via multiple UI input sources (keyboard shortcuts, menus, etc.)
- *   should go through this dispatcher for consistent handling.
- *
- * - Even commands from a single source (e.g., click only) may be dispatched here if they
- *   require Undo/Redo support or are part of a centralized command flow.
- *
- * - Local UI-only operations without side effects can remain in their event handlers.
- */
 @injectable()
 export default class CommandManager {
 	private undoStack: ICommand[] = []
@@ -70,7 +58,7 @@ export default class CommandManager {
 		this.tabEditorFacade.findInput.addEventListener(
 			"input",
 			debounce(() => {
-				this.performFind("programmatic", this.tabEditorFacade.findDirection)
+				this.performFind(this.tabEditorFacade.findDirection)
 			}, 300)
 		)
 	}
@@ -198,14 +186,13 @@ export default class CommandManager {
 
 	//
 
-	async performCloseTab(source: CommandSource, id: number) {
+	async performCloseTab(id: number) {
 		const data = this.tabEditorFacade.getTabEditorDataById(id)
-		if (!data) return
 
 		const response: Response<void> = await window.rendererToMain.closeTab(data)
 		if (response.result) this.tabEditorFacade.removeTab(data.id)
 
-		if (this.tabEditorFacade.activeTabId === -1) this.performCloseFindReplaceBox("programmatic")
+		if (this.tabEditorFacade.activeTabId === -1) this.performCloseFindReplaceBox()
 	}
 
 	//
@@ -230,35 +217,6 @@ export default class CommandManager {
 		}
 	}
 
-	// async performUndo(source: CommandSource) {
-	// 	const focus = this.focusManager.getFocus()
-
-	// 	if (focus === "editor" && source === "shortcut") return
-
-	// 	if (focus === "editor") {
-	// 		this.tabEditorFacade.undo()
-	// 		return
-	// 	}
-
-	// 	if (focus === "tree") {
-	// 		try {
-	// 			window.rendererToMain.setWatchSkipState(true)
-	// 			const cmd = this.undoStack.pop()
-	// 			if (!cmd) return
-	// 			await cmd.undo()
-	// 			this.redoStack.push(cmd)
-	// 		} catch (err) {
-	// 			// Undo failed (e.g., parent copied into child, or src/dest no longer exists).
-	// 			// OS/File system may have ignored the operation; we just skip it to avoid breaking the stack.
-	// 		} finally {
-	// 			await sleep(300)
-	// 			window.rendererToMain.setWatchSkipState(false)
-	// 		}
-
-	// 		return
-	// 	}
-	// }
-
 	performRedoEditor() {
 		this.tabEditorFacade.redo()
 	}
@@ -277,34 +235,6 @@ export default class CommandManager {
 			window.rendererToMain.setWatchSkipState(false)
 		}
 	}
-
-	// async performRedo(source: CommandSource) {
-	// 	const focus = this.focusManager.getFocus()
-
-	// 	if (focus === "editor" && source === "shortcut") return
-
-	// 	if (focus === "editor") {
-	// 		this.tabEditorFacade.redo()
-	// 		return
-	// 	}
-
-	// 	if (focus === "tree") {
-	// 		try {
-	// 			window.rendererToMain.setWatchSkipState(true)
-	// 			const cmd = this.redoStack.pop()
-	// 			if (!cmd) return
-	// 			await cmd.execute()
-	// 			this.undoStack.push(cmd)
-	// 		} catch (err) {
-	// 			// intentionally empty
-	// 		} finally {
-	// 			await sleep(300)
-	// 			window.rendererToMain.setWatchSkipState(false)
-	// 		}
-
-	// 		return
-	// 	}
-	// }
 
 	performCutEditor() {
 		const view = this.tabEditorFacade.getActiveTabEditorView()
@@ -351,55 +281,6 @@ export default class CommandManager {
 		return
 	}
 
-	// async performCut(source: CommandSource) {
-	// 	const focus = this.focusManager.getFocus()
-
-	// 	if (focus === "editor") {
-	// 		if (source !== "shortcut") {
-	// 			const sel = window.getSelection()
-	// 			const selectedText = sel?.toString()
-	// 			if (!sel || !selectedText) return
-
-	// 			await window.rendererToMain.cutEditor(selectedText)
-	// 			sel.deleteFromDocument()
-	// 		}
-
-	// 		const view = this.tabEditorFacade.getActiveTabEditorView()
-	// 		view.markAsModified()
-
-	// 		return
-	// 	}
-
-	// 	if (focus === "tree") {
-	// 		this.treeFacade.clearClipboardPaths()
-	// 		this.treeFacade.clipboardMode = "cut"
-	// 		const selectedIndices = this.treeFacade.getSelectedIndices()
-
-	// 		for (const idx of selectedIndices) {
-	// 			this.treeFacade.getTreeWrapperByIndex(idx)!.classList.add(CLASS_CUT)
-	// 			this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
-	// 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-
-	// 			if (viewModel.directory) {
-	// 				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
-	// 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
-
-	// 					if (viewModel.indent < isChildViewModel.indent) {
-	// 						// note: We skip adding CLASS_CUT to children, as parent visually affects them
-	// 						// this.treeFacade.getTreeWrapperByIndex(i).classList.add(CLASS_CUT)
-	// 						this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
-	// 						continue
-	// 					}
-
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-
-	// 		return
-	// 	}
-	// }
-
 	async performCopyEditor() {
 		const sel = window.getSelection()
 		const selectedText = window.getSelection()?.toString()
@@ -431,48 +312,6 @@ export default class CommandManager {
 			}
 		}
 	}
-
-	// async performCopy(source: CommandSource) {
-	// 	const focus = this.focusManager.getFocus()
-
-	// 	if (focus === "editor" && source === "shortcut") return
-
-	// 	if (focus === "editor") {
-	// 		const sel = window.getSelection()
-	// 		const selectedText = window.getSelection()?.toString()
-	// 		if (!sel || !selectedText) return
-
-	// 		await window.rendererToMain.copyEditor(selectedText)
-
-	// 		return
-	// 	}
-
-	// 	if (focus === "tree") {
-	// 		this.treeFacade.clearClipboardPaths()
-	// 		this.treeFacade.clipboardMode = "copy"
-	// 		const selectedIndices = this.treeFacade.getSelectedIndices()
-
-	// 		for (const idx of selectedIndices) {
-	// 			this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
-	// 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-
-	// 			if (viewModel.directory) {
-	// 				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
-	// 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
-
-	// 					if (viewModel.indent < isChildViewModel.indent) {
-	// 						this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
-	// 						continue
-	// 					}
-
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-
-	// 		return
-	// 	}
-	// }
 
 	performPasteEditor() {
 		const view = this.tabEditorFacade.getActiveTabEditorView()
@@ -554,81 +393,6 @@ export default class CommandManager {
 
 		return
 	}
-
-	// async performPaste(source: CommandSource) {
-	// 	const focus = this.focusManager.getFocus()
-
-	// 	if (focus === "editor") {
-	// 		if (source !== "shortcut") {
-	// 			const editable = document.querySelector('#editor-container [contenteditable="true"]') as HTMLElement
-	// 			if (!editable) return
-	// 			editable.focus()
-
-	// 			const sel = window.getSelection()
-	// 			if (!sel || !sel.rangeCount) return
-	// 			sel.deleteFromDocument()
-
-	// 			const text = await window.rendererToMain.pasteEditor()
-	// 			const textNode = document.createTextNode(text)
-	// 			const range = sel.getRangeAt(0)
-	// 			range.insertNode(textNode)
-	// 			range.setStartAfter(textNode)
-	// 			// Defensive code to ensure cursor positioning
-	// 			range.collapse(true)
-	// 			sel.removeAllRanges()
-	// 			sel.addRange(range)
-	// 		}
-
-	// 		const view = this.tabEditorFacade.getActiveTabEditorView()
-	// 		view.markAsModified()
-
-	// 		return
-	// 	}
-
-	// 	if (focus === "tree") {
-	// 		let targetIndex
-	// 		if (source === "context-menu") targetIndex = this.treeFacade.contextTreeIndex
-	// 		else if (source === "shortcut") targetIndex = this.treeFacade.lastSelectedIndex
-	// 		else if (source === "drag") targetIndex = this.treeFacade.selectedDragIndex
-
-	// 		if (targetIndex === -1) return
-
-	// 		let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex!)
-	// 		if (!targetViewModel.directory) {
-	// 			targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex!)
-	// 			targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
-	// 		}
-
-	// 		const selectedViewModels = []
-	// 		const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
-
-	// 		for (const path of clipboardPaths) {
-	// 			selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
-	// 		}
-
-	// 		const cmd = new PasteCommand(
-	// 			this.treeFacade,
-	// 			this.tabEditorFacade,
-	// 			targetViewModel,
-	// 			selectedViewModels,
-	// 			this.treeFacade.clipboardMode
-	// 		)
-
-	// 		try {
-	// 			window.rendererToMain.setWatchSkipState(true)
-	// 			await cmd.execute()
-	// 			this.undoStack.push(cmd)
-	// 			this.redoStack.length = 0
-	// 		} catch {
-	// 			// intentionally empty
-	// 		} finally {
-	// 			await sleep(300)
-	// 			window.rendererToMain.setWatchSkipState(false)
-	// 		}
-
-	// 		return
-	// 	}
-	// }
 
 	async performRename(source: CommandSource) {
 		const focus = this.focusManager.getFocus()
@@ -837,6 +601,8 @@ export default class CommandManager {
 		}
 	}
 
+	//
+
 	toggleFindReplaceBox(showReplace: boolean) {
 		if (this.tabEditorFacade.activeTabId === -1) return
 
@@ -849,14 +615,14 @@ export default class CommandManager {
 		if (showReplace) this.tabEditorFacade.replaceInput.focus()
 		else this.tabEditorFacade.findInput.focus()
 
-		this.performFind("programmatic", this.tabEditorFacade.findDirection)
+		this.performFind(this.tabEditorFacade.findDirection)
 	}
 
-	performFind(source: CommandSource, direction: "up" | "down") {
+	performFind(direction: "up" | "down") {
 		this.tabEditorFacade.findAndSelect(direction)
 	}
 
-	performReplace(source: CommandSource) {
+	performReplace() {
 		const findInput = this.tabEditorFacade.findInput.value
 		const replaceInput = this.tabEditorFacade.replaceInput.value
 		const view = this.tabEditorFacade.getActiveTabEditorView()
@@ -878,7 +644,7 @@ export default class CommandManager {
 		view.replaceAll(findInput, replaceInput)
 	}
 
-	performCloseFindReplaceBox(source: CommandSource) {
+	performCloseFindReplaceBox() {
 		this.focusManager.setFocus("none")
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "none"
 
@@ -887,6 +653,8 @@ export default class CommandManager {
 
 		this.tabEditorFacade.findReplaceOpen = false
 	}
+
+	//
 
 	performApplySettings(viewModel: SettingsViewModel) {
 		const font = viewModel.settingFontViewModel
@@ -921,7 +689,7 @@ export default class CommandManager {
 		const focus = this.focusManager.getFocus()
 
 		if (focus === "editor" || focus === "find-replace") {
-			this.performCloseFindReplaceBox(source)
+			this.performCloseFindReplaceBox()
 		}
 	}
 
@@ -932,9 +700,9 @@ export default class CommandManager {
 			const activateElement = document.activeElement
 
 			if (activateElement === this.tabEditorFacade.findInput) {
-				this.performFind(source, this.tabEditorFacade.findDirection)
+				this.performFind(this.tabEditorFacade.findDirection)
 			} else if (activateElement === this.tabEditorFacade.replaceInput) {
-				this.performReplace(source)
+				this.performReplace()
 			}
 
 			return

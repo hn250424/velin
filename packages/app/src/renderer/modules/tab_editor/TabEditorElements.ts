@@ -20,9 +20,9 @@ export default class TabEditorElements {
 	public readonly findInfo: HTMLElement
 	public readonly findUp: HTMLElement
 	public readonly findDown: HTMLElement
-	public readonly findClose: HTMLElement
 	public readonly replaceCurrent: HTMLElement
 	public readonly replaceAll: HTMLElement
+	public readonly closeFindReplace: HTMLElement
 
 	constructor() {
 		this.tabContextMenu = document.querySelector("#tab-context-menu") as HTMLElement
@@ -43,8 +43,8 @@ export default class TabEditorElements {
 		this.findInfo = document.querySelector("#find-info") as HTMLElement
 		this.findUp = document.querySelector("#find-up") as HTMLElement
 		this.findDown = document.querySelector("#find-down") as HTMLElement
-		this.findClose = document.querySelector("#find-close") as HTMLElement
 		this.replaceCurrent = document.querySelector("#replace-current") as HTMLElement
 		this.replaceAll = document.querySelector("#replace-all") as HTMLElement
+		this.closeFindReplace = document.querySelector("#close-find-replace") as HTMLElement
 	}
 }
