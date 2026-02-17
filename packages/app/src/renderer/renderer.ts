@@ -98,6 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	})
 
 	window.rendererToMain.loadedRenderer()
+	console.log(import.meta.env)
 })
 
 function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {

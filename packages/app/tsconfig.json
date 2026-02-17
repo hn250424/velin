@@ -4,7 +4,7 @@
 		"composite": true,
 		"baseUrl": ".",
 		"moduleResolution": "node",
-		"types": ["node", "reflect-metadata"],
+		"types": ["node", "reflect-metadata", "vite/client"],
 		"paths": {
 			"@main/*": ["src/main/*"],
 			"@renderer/*": ["src/renderer/*"],
