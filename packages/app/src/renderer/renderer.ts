@@ -92,7 +92,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	bindSyncEventFromWatch(tabEditorFacade, treeFacade)
 	bindDocumentClickEvent(tabEditorFacade, treeFacade)
 	bindDocumentMousedownEvnet(menuElements, focusManager, tabEditorFacade, treeFacade)
-	bindShortcutEvent(commandManager, shortcutRegistry)
+	bindShortcutEvent(dispatcher, shortcutRegistry)
 	document.addEventListener("keydown", (e) => {
 		shortcutRegistry.handleKeyEvent(e)
 	})
@@ -161,9 +161,9 @@ function bindDocumentMousedownEvnet(
 	})
 }
 
-function bindShortcutEvent(commandManager: CommandManager, shortcutRegistry: ShortcutRegistry) {
-	shortcutRegistry.register("ESC", async (e: KeyboardEvent) => await commandManager.performESC("shortcut"))
-	shortcutRegistry.register("ENTER", async (e: KeyboardEvent) => await commandManager.performENTER(e, "shortcut"))
+function bindShortcutEvent(dispatcher: Dispatcher, shortcutRegistry: ShortcutRegistry) {
+	shortcutRegistry.register("ESC", async () => await dispatcher.dispatch("esc", "shortcut"))
+	shortcutRegistry.register("ENTER", async () => await dispatcher.dispatch("enter", "shortcut"))
 }
 
 function trackRelevantFocus(target: HTMLElement, focusManager: FocusManager) {

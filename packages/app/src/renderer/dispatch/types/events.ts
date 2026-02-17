@@ -160,6 +160,19 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: [viewModel: SettingsViewModel]
 		}
 	}
+
+	//
+
+	esc: {
+		default: {
+			default: []
+		}
+	}
+	enter: {
+		default: {
+			default: []
+		}
+	}
 }>
 
 export type GetArgs<E extends keyof DispatchEventsWithArgs> =

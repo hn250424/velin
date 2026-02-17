@@ -143,6 +143,19 @@ export class Dispatcher {
 					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel),
 				},
 			},
+
+			//
+
+			esc: {
+				default: {
+					default: () => this.commandManager.performESC()
+				}
+			},
+			enter: {
+				default: {
+					default: () => this.commandManager.performENTER()
+				}
+			},
 		}
 	}
 
