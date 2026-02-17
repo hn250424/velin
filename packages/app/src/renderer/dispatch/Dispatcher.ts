@@ -57,6 +57,24 @@ export class Dispatcher {
 
 			//
 
+			create: {
+				default: {
+					default: (directory: boolean) => this.commandManager.performCreate(directory)
+				}
+			},
+			rename: {
+				default: {
+					default: () => this.commandManager.performRename()
+				}
+			},
+			delete: {
+				default: {
+					default: () => this.commandManager.performDelete()
+				}
+			},
+
+			//
+
 			cut: {
 				editor: {
 					shortcut: () => this.commandManager.performCutEditor(),
@@ -82,19 +100,6 @@ export class Dispatcher {
 					"context-menu": () => this.commandManager.performPasteTreeWithContextmenu(),
 					shortcut: () => this.commandManager.performPasteTreeWithShortcut(),
 					drag: () => this.commandManager.performPasteTreeWithDrag(),
-				},
-			},
-
-			//
-
-			applySettings: {
-				none: {
-					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel),
-				},
-			},
-			applyAndSaveSettings: {
-				default: {
-					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel),
 				},
 			},
 
@@ -127,6 +132,17 @@ export class Dispatcher {
 			},
 
 			//
+
+			applySettings: {
+				none: {
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel),
+				},
+			},
+			applyAndSaveSettings: {
+				default: {
+					default: (viewModel: SettingsViewModel) => this.commandManager.performApplyAndSaveSettings(viewModel),
+				},
+			},
 		}
 	}
 

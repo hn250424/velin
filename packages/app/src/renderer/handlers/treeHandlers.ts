@@ -12,46 +12,45 @@ import {
 } from "../constants/dom"
 import ShortcutRegistry from "../core/ShortcutRegistry"
 import FocusManager from "../core/FocusManager"
-import CommandManager from "../modules/CommandManager"
+import { Dispatcher } from "@renderer/dispatch"
 
 export function handleTree(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	focusManager: FocusManager,
 	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTreeTopMenuEvents(commandManager, treeFacade)
+	bindTreeTopMenuEvents(dispatcher, treeFacade)
 
-	bindTreeClickEvents(commandManager, treeFacade)
+	bindTreeClickEvents(dispatcher, treeFacade)
 
 	bindTreeContextmenuToggleEvents(treeFacade)
-	bindTreeContextmenuClickEvents(commandManager, treeFacade)
+	bindTreeContextmenuClickEvents(dispatcher, treeFacade)
 
-	bindShortcutEvents(commandManager, shortcutRegistry, focusManager, treeFacade)
+	bindShortcutEvents(dispatcher, shortcutRegistry, focusManager, treeFacade)
 
 	bindMouseDownEvents(treeFacade)
 	bindMouseMoveEvents(treeFacade)
-	bindMouseUpEvents(treeFacade, commandManager)
+	bindMouseUpEvents(dispatcher, treeFacade)
 }
 
 //
 
-// TODO
-function bindTreeTopMenuEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
-	const { treeNodeContainer, treeTopAddFile, treeTopAddDirectory } = treeFacade.renderer.elements
+function bindTreeTopMenuEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
+	const { treeTopAddFile, treeTopAddDirectory } = treeFacade.renderer.elements
 
-	treeTopAddFile.addEventListener("click", () => {
-		commandManager.performCreate("element", treeNodeContainer, false)
+	treeTopAddFile.addEventListener("click", async () => {
+		await dispatcher.dispatch("create", "element", false)
 	})
 
-	treeTopAddDirectory.addEventListener("click", () => {
-		commandManager.performCreate("element", treeNodeContainer, true)
+	treeTopAddDirectory.addEventListener("click", async () => {
+		await dispatcher.dispatch("create", "element", true)
 	})
 }
 
 //
 
-function bindTreeClickEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
+function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("click", async (e) => {
@@ -100,14 +99,11 @@ function bindTreeClickEvents(commandManager: CommandManager, treeFacade: TreeFac
 		} else {
 			treeFacade.clearTreeSelected()
 
-			// TODO
 			const viewModel = treeFacade.getTreeViewModelByPath(path)
 			if (viewModel.directory) {
-				// await commandManager.performOpenDirectory("element", treeNode)
-				await commandManager.performOpenDirectory(treeNode)
+				await dispatcher.dispatch("openDirectory", "element", treeNode)
 			} else {
-				// await commandManager.performOpenFile("element", path)
-				await commandManager.performOpenFile(path)
+				await dispatcher.dispatch("openFile", "element", path)
 			}
 
 			treeNode.classList.add(CLASS_SELECTED)
@@ -152,36 +148,35 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 	})
 }
 
-// TODO
-function bindTreeContextmenuClickEvents(commandManager: CommandManager, treeFacade: TreeFacade) {
+function bindTreeContextmenuClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeContextCut, treeContextCopy, treeContextPaste, treeContextRename, treeContextDelete } =
 		treeFacade.renderer.elements
 
 	treeContextCut.addEventListener("click", async () => {
-		await commandManager.performCut("context-menu")
+		await dispatcher.dispatch("cut", "context-menu")
 	})
 
 	treeContextCopy.addEventListener("click", async () => {
-		await commandManager.performCopy("context-menu")
+		await dispatcher.dispatch("copy", "context-menu")
 	})
 
 	treeContextPaste.addEventListener("click", async () => {
-		await commandManager.performPaste("context-menu")
+		await dispatcher.dispatch("paste", "context-menu")
 	})
 
 	treeContextRename.addEventListener("click", async () => {
-		await commandManager.performRename("context-menu")
+		await dispatcher.dispatch("rename", "context-menu")
 	})
 
 	treeContextDelete.addEventListener("click", async () => {
-		await commandManager.performDelete("context-menu")
+		await dispatcher.dispatch("delete", "context-menu")
 	})
 }
 
 //
 
 function bindShortcutEvents(
-	commandManager: CommandManager,
+	dispatcher: Dispatcher,
 	shortcutRegistry: ShortcutRegistry,
 	focusManager: FocusManager,
 	treeFacade: TreeFacade
@@ -191,12 +186,11 @@ function bindShortcutEvents(
 	shortcutRegistry.register("Shift+ARROWUP", (e: KeyboardEvent) => moveUpFocus(e, focusManager, treeFacade))
 	shortcutRegistry.register("Shift+ARROWDOWN", (e: KeyboardEvent) => moveDownFocus(e, focusManager, treeFacade))
 
-	// TODO
-	shortcutRegistry.register("Ctrl+X", async () => await commandManager.performCut("shortcut"))
-	shortcutRegistry.register("Ctrl+C", async () => await commandManager.performCopy("shortcut"))
-	shortcutRegistry.register("Ctrl+V", async () => await commandManager.performPaste("shortcut"))
-	shortcutRegistry.register("F2", async () => await commandManager.performRename("shortcut"))
-	shortcutRegistry.register("DELETE", async () => await commandManager.performDelete("shortcut"))
+	shortcutRegistry.register("Ctrl+X", async () => await dispatcher.dispatch("cut", "shortcut"))
+	shortcutRegistry.register("Ctrl+C", async () => await dispatcher.dispatch("copy", "shortcut"))
+	shortcutRegistry.register("Ctrl+V", async () => await dispatcher.dispatch("paste", "shortcut"))
+	shortcutRegistry.register("F2", async () => await dispatcher.dispatch("rename", "shortcut"))
+	shortcutRegistry.register("DELETE", async () => await dispatcher.dispatch("delete", "shortcut"))
 }
 
 //
@@ -340,7 +334,7 @@ function bindMouseMoveEvents(treeFacade: TreeFacade) {
 	})
 }
 
-function bindMouseUpEvents(treeFacade: TreeFacade, commandManager: CommandManager) {
+function bindMouseUpEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	document.addEventListener("mouseup", async () => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
@@ -355,11 +349,10 @@ function bindMouseUpEvents(treeFacade: TreeFacade, commandManager: CommandManage
 		treeFacade.endDrag()
 		treeFacade.removeGhostBox()
 
-		// TODO
 		if (isRight) {
 			treeFacade.setSelectedDragIndexByPath(path)
-			await commandManager.performCut("drag")
-			await commandManager.performPaste("drag")
+			await dispatcher.dispatch("cut", "drag")
+			await dispatcher.dispatch("paste", "drag")
 		}
 	})
 }

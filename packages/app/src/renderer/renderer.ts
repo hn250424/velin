@@ -74,7 +74,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleTabEditor(dispatcher, tabEditorFacade, shortcutRegistry)
 	handleInfo(infoFacade)
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
-	handleTree(commandManager, focusManager, treeFacade, shortcutRegistry)
+	handleTree(dispatcher, focusManager, treeFacade, shortcutRegistry)
 	handleSide(sideFacade)
 	handleSettings(dispatcher, settingsFacade)
 
@@ -98,7 +98,6 @@ window.addEventListener("DOMContentLoaded", () => {
 	})
 
 	window.rendererToMain.loadedRenderer()
-	console.log(import.meta.env)
 })
 
 function bindSyncEventFromWatch(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {

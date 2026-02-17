@@ -31,7 +31,7 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: []
 		}
 	}
-	
+
 	//
 
 	newTab: {
@@ -70,7 +70,23 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 		}
 	}
 
+	//
 
+	create: {
+		default: {
+			default: [directory: boolean]
+		}
+	}
+	rename: {
+		default: {
+			default: []
+		}
+	}
+	delete: {
+		default: {
+			default: []
+		}
+	}
 
 	//
 
@@ -106,19 +122,6 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 
 	//
 
-	applySettings: {
-		none: {
-			default: [viewModel: SettingsViewModel]
-		}
-	}
-	applyAndSaveSettings: {
-		default: {
-			default: [viewModel: SettingsViewModel]
-		}
-	}
-
-	//
-
 	toggleFindReplace: {
 		default: {
 			default: [replace: boolean]
@@ -146,6 +149,17 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 	}
 
 	//
+
+	applySettings: {
+		none: {
+			default: [viewModel: SettingsViewModel]
+		}
+	}
+	applyAndSaveSettings: {
+		default: {
+			default: [viewModel: SettingsViewModel]
+		}
+	}
 }>
 
 export type GetArgs<E extends keyof DispatchEventsWithArgs> =

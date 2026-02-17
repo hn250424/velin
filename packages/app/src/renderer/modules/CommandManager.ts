@@ -39,9 +39,6 @@ import {
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
 } from "../constants/dom"
-import type InfoFacade from "./info/InfoFacade"
-
-type CommandSource = "shortcut" | "menu" | "element" | "context-menu" | "drag" | "programmatic" | "button"
 
 @injectable()
 export default class CommandManager {
@@ -52,8 +49,7 @@ export default class CommandManager {
 		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
 		@inject(DI_KEYS.SettingsFacade) private readonly settingsFacade: SettingsFacade,
 		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
-		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade,
-		@inject(DI_KEYS.InfoFacade) private readonly infoFacade: InfoFacade
+		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
 	) {
 		this.tabEditorFacade.findInput.addEventListener(
 			"input",
@@ -61,6 +57,47 @@ export default class CommandManager {
 				this.performFind(this.tabEditorFacade.findDirection)
 			}, 300)
 		)
+	}
+
+	//
+
+	performUndoEditor() {
+		this.tabEditorFacade.undo()
+	}
+
+	async performUndoTree() {
+		try {
+			window.rendererToMain.setWatchSkipState(true)
+			const cmd = this.undoStack.pop()
+			if (!cmd) return
+			await cmd.undo()
+			this.redoStack.push(cmd)
+		} catch (err) {
+			// Undo failed (e.g., parent copied into child, or src/dest no longer exists).
+			// OS/File system may have ignored the operation; we just skip it to avoid breaking the stack.
+		} finally {
+			await sleep(300)
+			window.rendererToMain.setWatchSkipState(false)
+		}
+	}
+
+	performRedoEditor() {
+		this.tabEditorFacade.redo()
+	}
+
+	async performRedoTree() {
+		try {
+			window.rendererToMain.setWatchSkipState(true)
+			const cmd = this.redoStack.pop()
+			if (!cmd) return
+			await cmd.execute()
+			this.undoStack.push(cmd)
+		} catch (err) {
+			// intentionally empty
+		} finally {
+			await sleep(300)
+			window.rendererToMain.setWatchSkipState(false)
+		}
 	}
 
 	//
@@ -184,8 +221,6 @@ export default class CommandManager {
 		if (response.result) this.tabEditorFacade.applySaveAllResults(response.data)
 	}
 
-	//
-
 	async performCloseTab(id: number) {
 		const data = this.tabEditorFacade.getTabEditorDataById(id)
 
@@ -197,44 +232,214 @@ export default class CommandManager {
 
 	//
 
-	performUndoEditor() {
-		this.tabEditorFacade.undo()
-	}
+	async performCreate(directory: boolean) {
+		let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
+		let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
-	async performUndoTree() {
-		try {
-			window.rendererToMain.setWatchSkipState(true)
-			const cmd = this.undoStack.pop()
-			if (!cmd) return
-			await cmd.undo()
-			this.redoStack.push(cmd)
-		} catch (err) {
-			// Undo failed (e.g., parent copied into child, or src/dest no longer exists).
-			// OS/File system may have ignored the operation; we just skip it to avoid breaking the stack.
-		} finally {
-			await sleep(300)
-			window.rendererToMain.setWatchSkipState(false)
+		if (!viewModel.directory) {
+			idx = this.treeFacade.findParentDirectoryIndex(idx)
+			viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
+		} else {
+			// if (!viewModel.expanded) await this.performOpenDirectory("programmatic", this.treeFacade.getTreeNodeByIndex(idx))
+			if (!viewModel.expanded) await this.performOpenDirectory(this.treeFacade.getTreeNodeByIndex(idx))
+		}
+
+		let parentContainer: HTMLElement
+		if (idx === 0) {
+			parentContainer = this.treeFacade.renderer.elements.treeNodeContainer
+		} else {
+			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
+			parentContainer = parentWrapper.querySelector(".tree-node-children") as HTMLElement
+		}
+
+		const { wrapper, input } = this.treeFacade.createInputbox(directory, viewModel.indent)
+		parentContainer.appendChild(wrapper)
+		input.focus()
+
+		let alreadyFinished = false
+
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Enter") finalize()
+			else if (e.key === "Escape") cancel()
+		}
+		const onBlur = () => finalize()
+
+		input.addEventListener("keydown", onKeyDown)
+		input.addEventListener("blur", onBlur)
+
+		const finalize = async () => {
+			if (alreadyFinished) return
+			alreadyFinished = true
+
+			input.removeEventListener("keydown", onKeyDown)
+			input.removeEventListener("blur", onBlur)
+
+			wrapper.remove()
+
+			const name = input.value.trim()
+			if (name) {
+				const cmd = new CreateCommand(this.treeFacade, this.tabEditorFacade, viewModel.path, name, directory)
+
+				try {
+					window.rendererToMain.setWatchSkipState(true)
+					await cmd.execute()
+					this.undoStack.push(cmd)
+					this.redoStack.length = 0
+
+					this.treeFacade.clearTreeSelected()
+
+					const filePath = window.utils.getJoinedPath(viewModel.path, name)
+
+					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)!
+					this.treeFacade.addSelectedIndices(createdIdx)
+					this.treeFacade.lastSelectedIndex = createdIdx
+
+					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx)
+					createdNode.classList.add(CLASS_FOCUSED)
+					createdNode.classList.add(CLASS_SELECTED)
+
+					if (!directory) {
+						// await this.performOpenFile("programmatic", filePath)
+						await this.performOpenFile(filePath)
+						this.focusManager.setFocus("editor")
+						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!
+						cmd.setOpenedTabId(createdTabView.getId())
+					}
+				} catch (error) {
+					// intentionally empty
+				} finally {
+					await sleep(300)
+					window.rendererToMain.setWatchSkipState(false)
+				}
+			}
+		}
+
+		const cancel = () => {
+			if (alreadyFinished) return
+			alreadyFinished = true
+
+			input.removeEventListener("keydown", onKeyDown)
+			input.removeEventListener("blur", onBlur)
+			wrapper.remove()
 		}
 	}
 
-	performRedoEditor() {
-		this.tabEditorFacade.redo()
+	async performRename() {
+		const focus = this.focusManager.getFocus()
+		if (focus !== "tree") return
+
+		const lastSelectedIndex = this.treeFacade.lastSelectedIndex
+		const treeNode = this.treeFacade.getTreeNodeByIndex(lastSelectedIndex)
+		const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
+		if (!treeSpan) return
+
+		const treeInput = document.createElement("input")
+		treeInput.type = "text"
+		treeInput.value = treeSpan.textContent ?? ""
+		treeInput.classList.add(CLASS_TREE_NODE_INPUT)
+
+		treeNode.classList.remove(CLASS_FOCUSED)
+		treeNode.replaceChild(treeInput, treeSpan)
+		treeInput.focus()
+
+		// Except ext name.
+		const fileName = treeInput.value
+		const lastDotIndex = fileName.lastIndexOf(".")
+		if (lastDotIndex > 0) {
+			treeInput.setSelectionRange(0, lastDotIndex)
+		} else {
+			treeInput.select()
+		}
+
+		let alreadyFinished = false
+
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Enter") finishRename()
+			else if (e.key === "Escape") cancelRename()
+		}
+		const onBlur = () => finishRename()
+
+		treeInput.addEventListener("keydown", onKeyDown)
+		treeInput.addEventListener("blur", onBlur)
+
+		const finishRename = async () => {
+			if (alreadyFinished) return
+			alreadyFinished = true
+
+			treeInput.removeEventListener("keydown", onKeyDown)
+			treeInput.removeEventListener("blur", onBlur)
+
+			const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+			const newName = treeInput.value.trim()
+			const dir = window.utils.getDirName(prePath)
+			const newPath = window.utils.getJoinedPath(dir, newName)
+
+			// Skip unique name generation for unchanged rename (unlike create or paste)
+			if (prePath === newPath) {
+				const restoreSpan = document.createElement("span")
+				restoreSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
+				restoreSpan.textContent = window.utils.getBaseName(newPath)
+				treeNode.replaceChild(restoreSpan, treeInput)
+				return
+			}
+
+			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]!)
+
+			const cmd = new RenameCommand(
+				this.treeFacade,
+				this.tabEditorFacade,
+				treeNode,
+				viewModel.directory,
+				prePath,
+				newPath
+			)
+
+			try {
+				window.rendererToMain.setWatchSkipState(true)
+				await cmd.execute()
+				this.undoStack.push(cmd)
+				this.redoStack.length = 0
+			} catch {
+				treeNode.replaceChild(treeSpan, treeInput)
+			} finally {
+				await sleep(300)
+				window.rendererToMain.setWatchSkipState(false)
+			}
+		}
+
+		const cancelRename = () => {
+			if (alreadyFinished) return
+			alreadyFinished = true
+
+			treeInput.removeEventListener("keydown", onKeyDown)
+			treeInput.removeEventListener("blur", onBlur)
+
+			treeNode.replaceChild(treeSpan, treeInput)
+		}
 	}
 
-	async performRedoTree() {
+	async performDelete() {
+		const focus = this.focusManager.getFocus()
+		if (focus !== "tree") return
+
+		const selectedIndices = this.treeFacade.getSelectedIndices()
+
+		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices)
+
 		try {
-			window.rendererToMain.setWatchSkipState(true)
-			const cmd = this.redoStack.pop()
-			if (!cmd) return
+			await window.rendererToMain.setWatchSkipState(true)
 			await cmd.execute()
 			this.undoStack.push(cmd)
-		} catch (err) {
+			this.redoStack.length = 0
+		} catch {
 			// intentionally empty
 		} finally {
 			await sleep(300)
 			window.rendererToMain.setWatchSkipState(false)
 		}
 	}
+
+	//
 
 	performCutEditor() {
 		const view = this.tabEditorFacade.getActiveTabEditorView()
@@ -394,213 +599,6 @@ export default class CommandManager {
 		return
 	}
 
-	async performRename(source: CommandSource) {
-		const focus = this.focusManager.getFocus()
-		if (focus !== "tree") return
-
-		const lastSelectedIndex = this.treeFacade.lastSelectedIndex
-		const treeNode = this.treeFacade.getTreeNodeByIndex(lastSelectedIndex)
-		const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
-		if (!treeSpan) return
-
-		const treeInput = document.createElement("input")
-		treeInput.type = "text"
-		treeInput.value = treeSpan.textContent ?? ""
-		treeInput.classList.add(CLASS_TREE_NODE_INPUT)
-
-		treeNode.classList.remove(CLASS_FOCUSED)
-		treeNode.replaceChild(treeInput, treeSpan)
-		treeInput.focus()
-
-		// Except ext name.
-		const fileName = treeInput.value
-		const lastDotIndex = fileName.lastIndexOf(".")
-		if (lastDotIndex > 0) {
-			treeInput.setSelectionRange(0, lastDotIndex)
-		} else {
-			treeInput.select()
-		}
-
-		let alreadyFinished = false
-
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Enter") finishRename()
-			else if (e.key === "Escape") cancelRename()
-		}
-		const onBlur = () => finishRename()
-
-		treeInput.addEventListener("keydown", onKeyDown)
-		treeInput.addEventListener("blur", onBlur)
-
-		const finishRename = async () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
-
-			treeInput.removeEventListener("keydown", onKeyDown)
-			treeInput.removeEventListener("blur", onBlur)
-
-			const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
-			const newName = treeInput.value.trim()
-			const dir = window.utils.getDirName(prePath)
-			const newPath = window.utils.getJoinedPath(dir, newName)
-
-			// Skip unique name generation for unchanged rename (unlike create or paste)
-			if (prePath === newPath) {
-				const restoreSpan = document.createElement("span")
-				restoreSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
-				restoreSpan.textContent = window.utils.getBaseName(newPath)
-				treeNode.replaceChild(restoreSpan, treeInput)
-				return
-			}
-
-			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]!)
-
-			const cmd = new RenameCommand(
-				this.treeFacade,
-				this.tabEditorFacade,
-				treeNode,
-				viewModel.directory,
-				prePath,
-				newPath
-			)
-
-			try {
-				window.rendererToMain.setWatchSkipState(true)
-				await cmd.execute()
-				this.undoStack.push(cmd)
-				this.redoStack.length = 0
-			} catch {
-				treeNode.replaceChild(treeSpan, treeInput)
-			} finally {
-				await sleep(300)
-				window.rendererToMain.setWatchSkipState(false)
-			}
-		}
-
-		const cancelRename = () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
-
-			treeInput.removeEventListener("keydown", onKeyDown)
-			treeInput.removeEventListener("blur", onBlur)
-
-			treeNode.replaceChild(treeSpan, treeInput)
-		}
-	}
-
-	async performDelete(source: CommandSource) {
-		const focus = this.focusManager.getFocus()
-		if (focus !== "tree") return
-
-		const selectedIndices = this.treeFacade.getSelectedIndices()
-
-		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices)
-
-		try {
-			await window.rendererToMain.setWatchSkipState(true)
-			await cmd.execute()
-			this.undoStack.push(cmd)
-			this.redoStack.length = 0
-		} catch {
-			// intentionally empty
-		} finally {
-			await sleep(300)
-			window.rendererToMain.setWatchSkipState(false)
-		}
-	}
-
-	async performCreate(source: CommandSource, treeNodeContainer: HTMLElement, directory: boolean) {
-		let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
-		let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-
-		if (!viewModel.directory) {
-			idx = this.treeFacade.findParentDirectoryIndex(idx)
-			viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-		} else {
-			// if (!viewModel.expanded) await this.performOpenDirectory("programmatic", this.treeFacade.getTreeNodeByIndex(idx))
-			if (!viewModel.expanded) await this.performOpenDirectory(this.treeFacade.getTreeNodeByIndex(idx))
-		}
-
-		let parentContainer: HTMLElement
-		if (idx === 0) {
-			parentContainer = treeNodeContainer
-		} else {
-			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
-			parentContainer = parentWrapper.querySelector(".tree-node-children") as HTMLElement
-		}
-
-		const { wrapper, input } = this.treeFacade.createInputbox(directory, viewModel.indent)
-		parentContainer.appendChild(wrapper)
-		input.focus()
-
-		let alreadyFinished = false
-
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Enter") finalize()
-			else if (e.key === "Escape") cancel()
-		}
-		const onBlur = () => finalize()
-
-		input.addEventListener("keydown", onKeyDown)
-		input.addEventListener("blur", onBlur)
-
-		const finalize = async () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
-
-			input.removeEventListener("keydown", onKeyDown)
-			input.removeEventListener("blur", onBlur)
-
-			wrapper.remove()
-
-			const name = input.value.trim()
-			if (name) {
-				const cmd = new CreateCommand(this.treeFacade, this.tabEditorFacade, viewModel.path, name, directory)
-
-				try {
-					window.rendererToMain.setWatchSkipState(true)
-					await cmd.execute()
-					this.undoStack.push(cmd)
-					this.redoStack.length = 0
-
-					this.treeFacade.clearTreeSelected()
-
-					const filePath = window.utils.getJoinedPath(viewModel.path, name)
-
-					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)!
-					this.treeFacade.addSelectedIndices(createdIdx)
-					this.treeFacade.lastSelectedIndex = createdIdx
-
-					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx)
-					createdNode.classList.add(CLASS_FOCUSED)
-					createdNode.classList.add(CLASS_SELECTED)
-
-					if (!directory) {
-						// await this.performOpenFile("programmatic", filePath)
-						await this.performOpenFile(filePath)
-						this.focusManager.setFocus("editor")
-						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!
-						cmd.setOpenedTabId(createdTabView.getId())
-					}
-				} catch (error) {
-					// intentionally empty
-				} finally {
-					await sleep(300)
-					window.rendererToMain.setWatchSkipState(false)
-				}
-			}
-		}
-
-		const cancel = () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
-
-			input.removeEventListener("keydown", onKeyDown)
-			input.removeEventListener("blur", onBlur)
-			wrapper.remove()
-		}
-	}
-
 	//
 
 	toggleFindReplaceBox(showReplace: boolean) {
@@ -671,21 +669,9 @@ export default class CommandManager {
 		await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
 	}
 
-	// async performApplySettings(source: CommandSource, viewModel: SettingsViewModel) {
-	// 	const font = viewModel.settingFontViewModel
+	//
 
-	// 	font.size && this.tabEditorFacade.changeFontSize(font.size)
-	// 	font.family && this.tabEditorFacade.changeFontFamily(font.family)
-
-	// 	this.settingsFacade.applyChangeSet()
-
-	// 	if (source === "button") {
-	// 		const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
-	// 		await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
-	// 	}
-	// }
-
-	async performESC(source: CommandSource) {
+	async performESC() {
 		const focus = this.focusManager.getFocus()
 
 		if (focus === "editor" || focus === "find-replace") {
@@ -693,7 +679,7 @@ export default class CommandManager {
 		}
 	}
 
-	async performENTER(e: KeyboardEvent, source: CommandSource) {
+	async performENTER() {
 		const focus = this.focusManager.getFocus()
 
 		if (focus === "find-replace") {
@@ -714,10 +700,8 @@ export default class CommandManager {
 
 			if (viewModel.directory) {
 				const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
-				// await this.performOpenDirectory("programmatic", treeNode)
 				await this.performOpenDirectory(treeNode)
 			} else {
-				// await this.performOpenFile("programmatic", viewModel.path)
 				await this.performOpenFile(viewModel.path)
 			}
 
