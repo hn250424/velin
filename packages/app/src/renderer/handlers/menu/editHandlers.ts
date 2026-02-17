@@ -49,6 +49,6 @@ function bindShortcutEvents(dispatcher: Dispatcher, shortcutRegistry: ShortcutRe
 	shortcutRegistry.register("Ctrl+X", async () => await dispatcher.dispatch("cut", "shortcut"))
 	shortcutRegistry.register("Ctrl+C", async () => await dispatcher.dispatch("copy", "shortcut"))
 	shortcutRegistry.register("Ctrl+V", async () => await dispatcher.dispatch("paste", "shortcut"))
-	shortcutRegistry.register("Ctrl+F", () => dispatcher.dispatch("toggleFindReplace", "shortcut", false))
-	shortcutRegistry.register("Ctrl+R", () => dispatcher.dispatch("toggleFindReplace", "shortcut", true))
+	shortcutRegistry.register("Ctrl+F", async () => await dispatcher.dispatch("toggleFindReplace", "shortcut", false))
+	shortcutRegistry.register("Ctrl+R", async () => await dispatcher.dispatch("toggleFindReplace", "shortcut", true))
 }

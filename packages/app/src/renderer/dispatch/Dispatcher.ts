@@ -27,28 +27,28 @@ export class Dispatcher {
 					shortcut: () => {
 						/* intentional no-op */
 					},
-					default: () => this.commandManager.performUndoEditor(),
+					default: async () => await this.commandManager.performUndoEditor(),
 				},
-				tree: { default: () => this.commandManager.performUndoTree() },
+				tree: { default: async () => await this.commandManager.performUndoTree() },
 			},
 			redo: {
 				editor: {
 					shortcut: () => {
 						/* intentional no-op */
 					},
-					default: () => this.commandManager.performRedoEditor(),
+					default: async () => await this.commandManager.performRedoEditor(),
 				},
-				tree: { default: () => this.commandManager.performRedoTree() },
+				tree: { default: async () => await this.commandManager.performRedoTree() },
 			},
 
 			//
 
-			newTab: { default: { default: () => this.commandManager.performNewTab() } },
+			newTab: { default: { default: async () => await this.commandManager.performNewTab() } },
 			openFile: { default: { default: (path) => this.commandManager.performOpenFile(path) } },
 			openDirectory: { default: { default: (node) => this.commandManager.performOpenDirectory(node) } },
-			save: { default: { default: () => this.commandManager.performSave() } },
-			saveAs: { default: { default: () => this.commandManager.performSaveAs() } },
-			saveAll: { default: { default: () => this.commandManager.performSaveAll() } },
+			save: { default: { default: async () => await this.commandManager.performSave() } },
+			saveAs: { default: { default: async () => await this.commandManager.performSaveAs() } },
+			saveAll: { default: { default: async () => await this.commandManager.performSaveAll() } },
 			closeTab: {
 				default: {
 					default: (id: number) => this.commandManager.performCloseTab(id),
@@ -64,12 +64,12 @@ export class Dispatcher {
 			},
 			rename: {
 				default: {
-					default: () => this.commandManager.performRename()
+					default: async () => await this.commandManager.performRename()
 				}
 			},
 			delete: {
 				default: {
-					default: () => this.commandManager.performDelete()
+					default: async () => await this.commandManager.performDelete()
 				}
 			},
 
@@ -77,29 +77,29 @@ export class Dispatcher {
 
 			cut: {
 				editor: {
-					shortcut: () => this.commandManager.performCutEditor(),
-					default: () => this.commandManager.performCutEditorManual(),
+					shortcut: async () => await this.commandManager.performCutEditor(),
+					default: async () => await this.commandManager.performCutEditorManual(),
 				},
-				tree: { default: () => this.commandManager.performCutTree() },
+				tree: { default: async () => await this.commandManager.performCutTree() },
 			},
 			copy: {
 				editor: {
 					shortcut: () => {
 						/* intentional no-op */
 					},
-					default: () => this.commandManager.performCopyEditor(),
+					default: async () => await this.commandManager.performCopyEditor(),
 				},
-				tree: { default: () => this.commandManager.performCopyTree() },
+				tree: { default: async () => await this.commandManager.performCopyTree() },
 			},
 			paste: {
 				editor: {
-					shortcut: () => this.commandManager.performPasteEditor(),
-					default: () => this.commandManager.performPasteEditorManual(),
+					shortcut: async () => await this.commandManager.performPasteEditor(),
+					default: async () => await this.commandManager.performPasteEditorManual(),
 				},
 				tree: {
-					"context-menu": () => this.commandManager.performPasteTreeWithContextmenu(),
-					shortcut: () => this.commandManager.performPasteTreeWithShortcut(),
-					drag: () => this.commandManager.performPasteTreeWithDrag(),
+					"context-menu": async () => await this.commandManager.performPasteTreeWithContextmenu(),
+					shortcut: async () => await this.commandManager.performPasteTreeWithShortcut(),
+					drag: async () => await this.commandManager.performPasteTreeWithDrag(),
 				},
 			},
 
@@ -117,17 +117,17 @@ export class Dispatcher {
 			},
 			replace: {
 				default: {
-					default: () => this.commandManager.performReplace(),
+					default: async () => await this.commandManager.performReplace(),
 				},
 			},
 			replaceAll: {
 				default: {
-					default: () => this.commandManager.performReplaceAll(),
+					default: async () => await this.commandManager.performReplaceAll(),
 				},
 			},
 			closeFindReplace: {
 				default: {
-					default: () => this.commandManager.performCloseFindReplaceBox(),
+					default: async () => await this.commandManager.performCloseFindReplaceBox(),
 				},
 			},
 
@@ -148,12 +148,12 @@ export class Dispatcher {
 
 			esc: {
 				default: {
-					default: () => this.commandManager.performESC()
+					default: async () => await this.commandManager.performESC()
 				}
 			},
 			enter: {
 				default: {
-					default: () => this.commandManager.performENTER()
+					default: async () => await this.commandManager.performENTER()
 				}
 			},
 		}

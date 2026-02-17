@@ -88,14 +88,14 @@ function processTreeSession(facade: TreeFacade, dto: TreeDto) {
 
 //
 
-function initSettings(dispatcher: Dispatcher, settingsFacade: SettingsFacade) {
+async function initSettings(dispatcher: Dispatcher, settingsFacade: SettingsFacade) {
 	const { menus, contents } = settingsFacade.renderer.elements
 	menus[0].classList.add(CLASS_SELECTED)
 	contents[0].style.display = "block"
 
 	const viewModel = settingsFacade.getSettingsValue()
 	settingsFacade.renderSettingsValue(viewModel)
-	dispatcher.dispatch("applySettings", "programmatic", viewModel)
+	await dispatcher.dispatch("applySettings", "programmatic", viewModel)
 }
 
 function initSide(sideFacade: SideFacade, menuElements: MenuElements) {
