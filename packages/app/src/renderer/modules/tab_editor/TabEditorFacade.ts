@@ -215,11 +215,11 @@ export class TabEditorFacade {
 		this.setTargetTabName(name)
 	}
 
-	moveGhostBox(clientX: number, clientY: number) {
+	moveGhostBox(x: number, y: number) {
 		const ghost = this.createGhostBox(this.getTargetTabName())
 
-		ghost.style.left = `${clientX + 5}px`
-		ghost.style.top = `${clientY + 5}px`
+		ghost.style.left = `${x + 5}px`
+		ghost.style.top = `${y + 5}px`
 	}
 
 	getInsertIndexFromMouseX(mouseX: number): number {

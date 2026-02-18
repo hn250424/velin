@@ -11,6 +11,10 @@ import {
 	CLASS_FOCUSED,
 	CLASS_SELECTED,
 	CLASS_CUT,
+	CLASS_DEACTIVE,
+	CLASS_TREE_DRAG_OVERLAY,
+	SELECTOR_TREE_NODE_WRAPPER,
+	SELECTOR_TREE_NODE_CONTAINER,
 } from "../../constants/dom"
 import { TreeRenderer } from "./TreeRenderer"
 import { TreeStore } from "./TreeStore"
@@ -209,6 +213,7 @@ export class TreeFacade {
 	}
 
 	//
+	
 	clearPathToTreeWrapperMap() {
 		this.renderer.clearPathToTreeWrapperMap()
 	}
@@ -237,12 +242,58 @@ export class TreeFacade {
 
 	// drag
 
-	isMouseDown(): boolean {
-		return this.drag.isMouseDown()
+	initDrag(count: number, x: number, y: number) {
+		this.setMouseDown(true)
+		this.setDragTreeCount(count)
+		this.setStartPosition(x, y)
 	}
 
-	setMouseDown(state: boolean) {
-		this.drag.setMouseDown(state)
+	moveGhostBox(x: number, y: number) {
+		const ghost = this.createGhostBox(this.getDragTreeCount())
+		ghost.style.left = `${x + 5}px`
+		ghost.style.top = `${y + 5}px`
+	}
+
+	updateDragOverStatus(target: HTMLElement) {
+		const previousWrapper = this.getInsertWrapper()
+
+		let currentWrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
+		let isContainer = false
+
+		if (!currentWrapper) {
+			const container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+			if (!container) {
+				this.clearDrag()
+				return
+			}
+			currentWrapper = container
+			isContainer = true
+		}
+
+		if (previousWrapper === currentWrapper) return
+
+		if (previousWrapper) previousWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
+
+		const path = isContainer
+			? currentWrapper.dataset[DATASET_ATTR_TREE_PATH]!
+			: (currentWrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement).dataset[DATASET_ATTR_TREE_PATH]!
+
+		const viewModel = this.getTreeViewModelByPath(path)
+
+		if (!viewModel || !viewModel.directory) {
+			this.setInsertWrapper(null)
+			this.setInsertPath("")
+			return
+		}
+
+		this.setInsertPath(viewModel.path)
+		this.setInsertWrapper(currentWrapper)
+		currentWrapper.classList.add(CLASS_TREE_DRAG_OVERLAY)
+	}
+
+	clearDrag() {
+		this.endDrag()
+		this.removeGhostBox()
 	}
 
 	//
@@ -279,6 +330,16 @@ export class TreeFacade {
 
 	//
 
+	isMouseDown(): boolean {
+		return this.drag.isMouseDown()
+	}
+
+	setMouseDown(state: boolean) {
+		this.drag.setMouseDown(state)
+	}
+
+	//
+
 	getDragTreeCount() {
 		return this.drag.getDragTreeCount()
 	}
@@ -306,6 +367,45 @@ export class TreeFacade {
 	}
 
 	// orchestra
+
+	removeLastSelectedTreeNodeFocus() {
+		if (this.lastSelectedIndex > 0) {
+			const lastSelectedTreeNode = this.getTreeNodeByIndex(this.lastSelectedIndex)
+			lastSelectedTreeNode.classList.remove(CLASS_FOCUSED)
+		}
+	}
+
+	removeContextSelectedTreeNodeFocus() {
+		if (this.contextTreeIndex !== -1) {
+			const contextSelectedTreeNode = this.getTreeNodeByIndex(this.contextTreeIndex)
+			contextSelectedTreeNode.classList.remove(CLASS_FOCUSED)
+		}
+	}
+
+	focusContainer() {
+		const { treeNodeContainer } = this.renderer.elements
+		treeNodeContainer.classList.add(CLASS_FOCUSED)
+		this.clearTreeSelected()
+		this.lastSelectedIndex = 0
+	}
+
+	renderContextmenuAndUpdateContextIndex(treeNode: HTMLElement, x: number, y: number) {
+		const { treeContextMenu, treeContextPaste } = this.renderer.elements
+
+		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		const viewModel = this.getTreeViewModelByPath(path)
+
+		const isPasteDisabled =
+			this.clipboardMode === "none" || !viewModel.directory || this.getSelectedIndices().length === 0
+
+		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
+		treeContextMenu.classList.add(CLASS_SELECTED)
+		treeContextMenu.style.left = `${x}px`
+		treeContextMenu.style.top = `${y}px`
+		treeNode.classList.add(CLASS_FOCUSED)
+
+		this.setContextTreeIndexByPath(path)
+	}
 
 	loadFlattenArrayAndMaps(json: TreeViewModel) {
 		const arr = this.store.flattenTree(json)

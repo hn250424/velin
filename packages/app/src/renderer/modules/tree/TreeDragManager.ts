@@ -13,16 +13,6 @@ export class TreeDragManager {
 
 	//
 
-	isMouseDown(): boolean {
-		return this._isMouseDown
-	}
-
-	setMouseDown(state: boolean) {
-		this._isMouseDown = state
-	}
-
-	//
-
 	isDrag(): boolean {
 		return this._isDrag
 	}
@@ -61,6 +51,16 @@ export class TreeDragManager {
 
 	getStartPosition_y() {
 		return this._start_y
+	}
+
+	//
+
+	isMouseDown(): boolean {
+		return this._isMouseDown
+	}
+
+	setMouseDown(state: boolean) {
+		this._isMouseDown = state
 	}
 
 	//

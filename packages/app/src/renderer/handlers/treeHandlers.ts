@@ -5,13 +5,11 @@ import {
 	CLASS_FOCUSED,
 	CLASS_SELECTED,
 	SELECTOR_TREE_NODE,
-	SELECTOR_TREE_NODE_WRAPPER,
-	CLASS_DEACTIVE,
 	SELECTOR_TREE_NODE_CONTAINER,
-	CLASS_TREE_DRAG_OVERLAY,
 } from "../constants/dom"
 import { FocusManager, ShortcutRegistry } from "../core"
 import { Dispatcher } from "@renderer/dispatch"
+import { throttle } from "@renderer/utils"
 
 export function handleTree(
 	dispatcher: Dispatcher,
@@ -28,9 +26,10 @@ export function handleTree(
 
 	bindShortcutEvents(dispatcher, shortcutRegistry, focusManager, treeFacade)
 
-	bindMouseDownEvents(treeFacade)
-	bindMouseMoveEvents(treeFacade)
-	bindMouseUpEvents(dispatcher, treeFacade)
+	bindMouseDownEventsForDrag(treeFacade)
+	bindMouseMoveEventsForDrag(treeFacade)
+	bindMouseUpEventsForDrag(dispatcher, treeFacade)
+	bindMouseLeaveEventsForDrag(treeFacade)
 }
 
 //
@@ -53,42 +52,32 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("click", async (e) => {
-		if (treeFacade.lastSelectedIndex > 0) {
-			const _idx = treeFacade.lastSelectedIndex
-			const _treeNode = treeFacade.getTreeNodeByIndex(_idx)
-			_treeNode.classList.remove(CLASS_FOCUSED)
-		}
+		treeFacade.removeLastSelectedTreeNodeFocus()
 
 		const target = e.target as HTMLElement
 		const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
 
 		if (!treeNode) {
-			const isTreeNodeContainer = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
-
-			if (isTreeNodeContainer) {
-				treeFacade.clearTreeSelected()
-				treeNodeContainer.classList.add(CLASS_FOCUSED)
-				treeFacade.lastSelectedIndex = 0
+			if (target.closest(SELECTOR_TREE_NODE_CONTAINER)) {
+				treeFacade.focusContainer()
 			}
-
 			return
 		}
 
 		treeNodeContainer.classList.remove(CLASS_FOCUSED)
-
 		treeNode.classList.add(CLASS_FOCUSED)
+
 		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
 
 		if (e.shiftKey && treeFacade.lastSelectedIndex > 0) {
-			const startIndex = treeFacade.lastSelectedIndex!
+			const startIndex = treeFacade.lastSelectedIndex
 			const endIndex = treeFacade.getFlattenArrayIndexByPath(path)!
 			treeFacade.setLastSelectedIndexByPath(path)
 			const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
 			for (let i = start; i <= end; i++) {
 				treeFacade.addSelectedIndices(i)
-				const div = treeFacade.getTreeNodeByIndex(i)
-				div.classList.add(CLASS_SELECTED)
+				treeFacade.getTreeNodeByIndex(i).classList.add(CLASS_SELECTED)
 			}
 		} else if (e.ctrlKey) {
 			treeNode.classList.add(CLASS_SELECTED)
@@ -115,14 +104,10 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 //
 
 function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
-	const { treeContextMenu, treeContextPaste, treeNodeContainer } = treeFacade.renderer.elements
+	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("contextmenu", (e) => {
-		const contextTreeIndex = treeFacade.contextTreeIndex
-		if (contextTreeIndex !== -1) {
-			const _treeNode = treeFacade.getTreeNodeByIndex(contextTreeIndex)
-			_treeNode.classList.remove(CLASS_FOCUSED)
-		}
+		treeFacade.removeContextSelectedTreeNodeFocus()
 
 		const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
 		if (!treeNode) {
@@ -130,20 +115,7 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 			return
 		}
 
-		treeContextMenu.classList.add(CLASS_SELECTED)
-		treeContextMenu.style.left = `${e.clientX}px`
-		treeContextMenu.style.top = `${e.clientY}px`
-
-		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
-		const viewModel = treeFacade.getTreeViewModelByPath(path)
-
-		const isPasteDisabled =
-			treeFacade.clipboardMode === "none" || !viewModel.directory || treeFacade.getSelectedIndices().length === 0
-
-		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
-
-		treeFacade.setContextTreeIndexByPath(path)
-		treeNode.classList.add(CLASS_FOCUSED)
+		treeFacade.renderContextmenuAndUpdateContextIndex(treeNode, e.clientX, e.clientY)
 	})
 }
 
@@ -196,60 +168,41 @@ function bindShortcutEvents(
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return
-
-	let lastIdx = treeFacade.lastSelectedIndex
-	if (lastIdx <= 0) return
-
-	const preTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
-	preTreeNode.classList.remove(CLASS_FOCUSED)
-
-	lastIdx--
-	treeFacade.lastSelectedIndex = lastIdx
-	const newTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
-	newTreeNode.classList.add(CLASS_FOCUSED)
-
-	if (e.shiftKey) {
-		newTreeNode.classList.add(CLASS_SELECTED)
-		treeFacade.addSelectedIndices(lastIdx)
-		treeFacade.lastSelectedIndex = lastIdx
-	} else {
-		treeFacade.clearTreeSelected()
-		newTreeNode.classList.add(CLASS_SELECTED)
-		treeFacade.addSelectedIndices(lastIdx)
-		treeFacade.lastSelectedIndex = lastIdx
-	}
+	if (treeFacade.lastSelectedIndex <= 0) return
+	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, -1)
 }
 
 function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return
+	if (treeFacade.lastSelectedIndex >= treeFacade.getFlattenTreeArrayLength() - 1) return
+	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, 1)
+}
 
-	let lastIdx = treeFacade.lastSelectedIndex
-	const totalLength = treeFacade.getFlattenTreeArrayLength()
-	if (lastIdx >= totalLength) return
+function _moveFocus(e: KeyboardEvent, treeFacade: TreeFacade, lastIndex: number, delta: number) {
+	const preNode = treeFacade.getTreeNodeByIndex(lastIndex)
+	preNode.classList.remove(CLASS_FOCUSED)
 
-	const preTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
-	preTreeNode.classList.remove(CLASS_FOCUSED)
+	lastIndex = lastIndex += delta
+	treeFacade.lastSelectedIndex = lastIndex
 
-	lastIdx++
-	treeFacade.lastSelectedIndex = lastIdx
-	const newTreeNode = treeFacade.getTreeNodeByIndex(lastIdx)
+	const newTreeNode = treeFacade.getTreeNodeByIndex(lastIndex)
 	newTreeNode.classList.add(CLASS_FOCUSED)
 
 	if (e.shiftKey) {
 		newTreeNode.classList.add(CLASS_SELECTED)
-		treeFacade.addSelectedIndices(lastIdx)
-		treeFacade.lastSelectedIndex = lastIdx
+		treeFacade.addSelectedIndices(lastIndex)
+		treeFacade.lastSelectedIndex = lastIndex
 	} else {
 		treeFacade.clearTreeSelected()
 		newTreeNode.classList.add(CLASS_SELECTED)
-		treeFacade.addSelectedIndices(lastIdx)
-		treeFacade.lastSelectedIndex = lastIdx
+		treeFacade.addSelectedIndices(lastIndex)
+		treeFacade.lastSelectedIndex = lastIndex
 	}
 }
 
 //
 
-function bindMouseDownEvents(treeFacade: TreeFacade) {
+function bindMouseDownEventsForDrag(treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("mousedown", (e) => {
@@ -266,92 +219,57 @@ function bindMouseDownEvents(treeFacade: TreeFacade) {
 			count = 1
 		}
 
-		treeFacade.setDragTreeCount(count)
-		treeFacade.setMouseDown(true)
-		treeFacade.setStartPosition(e.clientX, e.clientY)
+		treeFacade.initDrag(count, e.clientX, e.clientY)
 	})
 }
 
-function bindMouseMoveEvents(treeFacade: TreeFacade) {
+function bindMouseMoveEventsForDrag(treeFacade: TreeFacade) {
+	const updateOverStatus = throttle((target: HTMLElement) => {
+		if (!treeFacade.isDrag()) return
+		treeFacade.updateDragOverStatus(target)
+	}, 100)
+
 	document.addEventListener("mousemove", (e: MouseEvent) => {
 		if (!treeFacade.isMouseDown()) return
 
 		if (!treeFacade.isDrag()) {
-			const dx = Math.abs(e.clientX - treeFacade.getStartPosition_x())
-			const dy = Math.abs(e.clientY - treeFacade.getStartPosition_y())
-			if (dx > 5 || dy > 5) {
+			const { x, y } = treeFacade.getStartPosition()
+			if (Math.abs(e.clientX - x) > 5 || Math.abs(e.clientY - y) > 5) {
 				treeFacade.startDrag()
 			} else {
 				return
 			}
 		}
 
-		const div = treeFacade.createGhostBox(treeFacade.getDragTreeCount())
-		div.style.left = `${e.clientX + 5}px`
-		div.style.top = `${e.clientY + 5}px`
-
-		const target = e.target as HTMLElement
-		let wrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
-		let isContainer = false
-
-		const previousInsertWrapper = treeFacade.getInsertWrapper()
-
-		if (!wrapper) {
-			const _container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
-			if (!_container) {
-				if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
-
-				treeFacade.setInsertWrapper(null)
-				treeFacade.setInsertPath("") // Set falsy empty string as flag since path-based logic must run if mouse up event completes properly.
-				return
-			}
-
-			wrapper = _container
-			isContainer = true
-		}
-
-		if (previousInsertWrapper === wrapper) return // Wrapper comparison faster than Path
-		if (previousInsertWrapper) previousInsertWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
-
-		let viewModel
-		if (!isContainer) {
-			const node = wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
-			viewModel = treeFacade.getTreeViewModelByPath(node.dataset[DATASET_ATTR_TREE_PATH]!)
-		} else {
-			viewModel = treeFacade.getTreeViewModelByPath(wrapper.dataset[DATASET_ATTR_TREE_PATH]!)
-		}
-
-		if (!viewModel || !viewModel.directory) {
-			treeFacade.setInsertWrapper(null)
-			treeFacade.setInsertPath("")
-			return
-		}
-		treeFacade.setInsertPath(viewModel.path)
-
-		wrapper.classList.add(CLASS_TREE_DRAG_OVERLAY)
-		treeFacade.setInsertWrapper(wrapper)
+		treeFacade.moveGhostBox(e.clientX, e.clientY)
+		updateOverStatus(e.target as HTMLElement)
 	})
 }
 
-function bindMouseUpEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
+function bindMouseUpEventsForDrag(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	document.addEventListener("mouseup", async () => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
 			return
 		}
 
-		let isRight = true
+		const dropPath = treeFacade.getInsertPath()
+		const canDrop = dropPath !== ""
 
-		const path = treeFacade.getInsertPath()
-		if (path === "") isRight = false
+		treeFacade.clearDrag()
 
-		treeFacade.endDrag()
-		treeFacade.removeGhostBox()
-
-		if (isRight) {
-			treeFacade.setSelectedDragIndexByPath(path)
+		if (canDrop) {
+			treeFacade.setSelectedDragIndexByPath(dropPath)
 			await dispatcher.dispatch("cut", "drag")
 			await dispatcher.dispatch("paste", "drag")
+		}
+	})
+}
+
+function bindMouseLeaveEventsForDrag(treeFacade: TreeFacade) {
+	document.addEventListener("mouseleave", () => {
+		if (treeFacade.isDrag()) {
+			treeFacade.clearDrag()
 		}
 	})
 }

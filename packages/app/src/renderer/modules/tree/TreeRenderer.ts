@@ -17,6 +17,7 @@ import {
 	CLASS_TREE_NODE_WRAPPER,
 	DATASET_ATTR_TREE_PATH,
 	SELECTOR_TREE_NODE,
+	CLASS_SELECTED,
 } from "../../constants/dom"
 import DI_KEYS from "@renderer/constants/di_keys"
 import type { TreeElements } from "./TreeElements"
@@ -118,7 +119,7 @@ export class TreeRenderer {
 
 	createInputbox(directory: boolean, indent: number) {
 		const box = document.createElement("div")
-		box.classList.add("tree_node_temp")
+		box.classList.add("tree-node-temp")
 		box.style.paddingLeft = `${indent * 16}px`
 
 		const nodeType = document.createElement("div")
