@@ -49,9 +49,27 @@ export class Dispatcher {
 			save: { default: { default: async () => await this.commandManager.performSave() } },
 			saveAs: { default: { default: async () => await this.commandManager.performSaveAs() } },
 			saveAll: { default: { default: async () => await this.commandManager.performSaveAll() } },
+
+			//
+
 			closeTab: {
 				default: {
 					default: (id: number) => this.commandManager.performCloseTab(id),
+				},
+			},
+			closeOtherTabs: {
+				default: {
+					default: () => this.commandManager.performCloseOtherTabs(),
+				},
+			},
+			closeTabsToRight: {
+				default: {
+					default: () => this.commandManager.performCloseTabsToRight(),
+				},
+			},
+			closeAllTabs: {
+				default: {
+					default: () => this.commandManager.performCloseAllTabs(),
 				},
 			},
 

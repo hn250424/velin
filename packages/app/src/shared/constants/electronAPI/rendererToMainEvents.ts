@@ -14,7 +14,7 @@ export const rendererToMainEvents = {
 	saveAll: "saveAll",
 
 	closeTab: "closeTab",
-	closeTabsExcept: "closeTabsExcept",
+	closeOtherTabs: "closeOtherTabs",
 	closeTabsToRight: "closeTabsToRight",
 	closeAllTabs: "closeAllTabs",
 

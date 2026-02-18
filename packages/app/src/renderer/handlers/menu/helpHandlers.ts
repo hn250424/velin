@@ -1,12 +1,7 @@
-import type MenuElements from "@renderer/modules/menu/MenuElements"
-import ShortcutRegistry from "../../core/ShortcutRegistry"
-import type InfoFacade from "@renderer/modules/info/InfoFacade"
+import type { MenuElements, InfoFacade } from "@renderer/modules"
+import { ShortcutRegistry } from "../../core"
 
-export function handleHelpMenu(
-	shortcutRegistry: ShortcutRegistry,
-	menuElements: MenuElements,
-	infoFacade: InfoFacade
-) {
+export function handleHelpMenu(shortcutRegistry: ShortcutRegistry, menuElements: MenuElements, infoFacade: InfoFacade) {
 	bindMenuEvents(menuElements, infoFacade)
 	bindShortcutEvents(shortcutRegistry, infoFacade)
 }
@@ -19,9 +14,6 @@ function bindMenuEvents(menuElements: MenuElements, infoFacade: InfoFacade) {
 	})
 }
 
-function bindShortcutEvents(
-	shortcutRegistry: ShortcutRegistry,
-	infoFacade: InfoFacade
-) {
+function bindShortcutEvents(shortcutRegistry: ShortcutRegistry, infoFacade: InfoFacade) {
 	shortcutRegistry.register("F1", async () => infoFacade.showInformation())
 }

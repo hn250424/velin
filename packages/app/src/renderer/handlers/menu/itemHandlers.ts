@@ -1,4 +1,4 @@
-import type MenuElements from "@renderer/modules/menu/MenuElements"
+import type { MenuElements } from "@renderer/modules"
 import { CLASS_SELECTED } from "../../constants/dom"
 
 export function handleMenuItems(menuElements: MenuElements) {

@@ -13,9 +13,9 @@ export default function registerTabHandlers(mainWindow: BrowserWindow, tabServic
 	})
 
 	ipcMain.handle(
-		electronAPI.events.rendererToMain.closeTabsExcept,
+		electronAPI.events.rendererToMain.closeOtherTabs,
 		async (e, exceptData: TabEditorDto, allData: TabEditorsDto) => {
-			const resultArr = await tabService.closeTabsExcept(exceptData, allData, mainWindow)
+			const resultArr = await tabService.closeOtherTabs(exceptData, allData, mainWindow)
 			return {
 				result: true,
 				data: resultArr,

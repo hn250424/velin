@@ -1,4 +1,4 @@
-import { TabEditorDto } from "@shared/dto/TabEditorDto"
+import type { TabEditorDto } from "@shared/dto/TabEditorDto"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import FakeMainWindow from "../mocks/FakeMainWindow"
 import FakeFileManager from "../modules/fs/FakeFileManager"
@@ -136,7 +136,7 @@ describe("Tab Service - closeTab", () => {
 	})
 })
 
-describe("Tab Service - closeTabsExcept", () => {
+describe("Tab Service - closeOtherTabs", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
@@ -161,7 +161,7 @@ describe("Tab Service - closeTabsExcept", () => {
 		const exceptData: TabEditorDto = copiedDto.data[1]
 
 		// When.
-		const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
+		const response = await tabService.closeOtherTabs(exceptData, copiedDto, fakeMainWindow as any)
 
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(3)
@@ -189,7 +189,7 @@ describe("Tab Service - closeTabsExcept", () => {
 		const exceptData: TabEditorDto = copiedDto.data[1]
 
 		// When.
-		const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
+		const response = await tabService.closeOtherTabs(exceptData, copiedDto, fakeMainWindow as any)
 
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(1)
@@ -219,7 +219,7 @@ describe("Tab Service - closeTabsExcept", () => {
 		const exceptData: TabEditorDto = copiedDto.data[1]
 
 		// When.
-		const response = await tabService.closeTabsExcept(exceptData, copiedDto, fakeMainWindow as any)
+		const response = await tabService.closeOtherTabs(exceptData, copiedDto, fakeMainWindow as any)
 
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(2)

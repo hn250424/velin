@@ -215,6 +215,8 @@ export class CommandManager {
 		if (response.result) this.tabEditorFacade.applySaveAllResults(response.data)
 	}
 
+	//
+
 	async performCloseTab(id: number) {
 		const data = this.tabEditorFacade.getTabEditorDataById(id)
 
@@ -222,6 +224,26 @@ export class CommandManager {
 		if (response.result) this.tabEditorFacade.removeTab(data.id)
 
 		if (this.tabEditorFacade.activeTabId === -1) this.performCloseFindReplaceBox()
+	}
+
+	async performCloseOtherTabs() {
+		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(this.tabEditorFacade.contextTabId)
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeOtherTabs(tabEditorDtoToExclude, tabEditorsDto)
+		if (response.result) this.tabEditorFacade.removeTabsExcept(response.data)
+	}
+
+	async performCloseTabsToRight() {
+		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(this.tabEditorFacade.contextTabId)
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(tabEditorDtoAsReference, tabEditorsDto)
+		if (response.result) this.tabEditorFacade.removeTabsToRight(response.data)
+	}
+
+	async performCloseAllTabs() {
+		const data: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
+		if (response.result) this.tabEditorFacade.removeAllTabs(response.data)
 	}
 
 	//

@@ -14,32 +14,6 @@ export class TabDragManager {
 
 	//
 
-	isMouseDown(): boolean {
-		return this._isMouseDown
-	}
-
-	setMouseDown(state: boolean) {
-		this._isMouseDown = state
-	}
-
-	//
-
-	setTargetElement(tab: HTMLElement) {
-		this._targetTab = tab
-	}
-
-	//
-
-	getTabs() {
-		return this._tabs
-	}
-
-	setTabs(tabs: HTMLElement[]) {
-		this._tabs = tabs
-	}
-
-	//
-
 	isDrag(): boolean {
 		return this._isDrag
 	}
@@ -81,25 +55,51 @@ export class TabDragManager {
 
 	//
 
-	getDragTargetTab() {
+	isMouseDown(): boolean {
+		return this._isMouseDown
+	}
+
+	setMouseDown(state: boolean) {
+		this._isMouseDown = state
+	}
+
+	//
+
+	getTabs() {
+		return this._tabs
+	}
+
+	setTabs(tabs: HTMLElement[]) {
+		this._tabs = tabs
+	}
+
+	//
+
+	getTargetTab() {
 		return this._targetTab
 	}
 
-	getDragTargetTabId() {
+	setTargetTab(tab: HTMLElement) {
+		this._targetTab = tab
+	}
+
+	//
+
+	getTargetTabId() {
 		return this._targetTabId
 	}
 
-	setDragTargetTabId(id: number) {
+	setTargetTabId(id: number) {
 		this._targetTabId = id
 	}
 
 	//
 
-	getDragTargetTabName() {
+	getTargetTabName() {
 		return this._targetTabName
 	}
 
-	setDragTargetTabName(name: string) {
+	setTargetTabName(name: string) {
 		this._targetTabName = name
 	}
 

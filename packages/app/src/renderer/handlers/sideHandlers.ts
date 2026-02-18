@@ -1,4 +1,4 @@
-import type SideFacade from "@renderer/modules/side/SideFacade"
+import type { SideFacade } from "@renderer/modules"
 
 export function handleSide(sideFacade: SideFacade) {
 	const { side, tree, resizer } = sideFacade.elements

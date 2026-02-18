@@ -48,11 +48,11 @@ const rendererToMain: RendererToMainAPI = {
 	closeTab: (data: TabEditorDto) => {
 		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeTab, data)
 	},
-	closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorsDto) => {
-		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeTabsExcept, exceptData, allData)
+	closeOtherTabs: (tabEditorDtoToExclude: TabEditorDto, tabEditorsDto: TabEditorsDto) => {
+		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeOtherTabs, tabEditorDtoToExclude, tabEditorsDto)
 	},
-	closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorsDto) => {
-		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeTabsToRight, referenceData, allData)
+	closeTabsToRight: (tabEditorDtoAsReference: TabEditorDto, tabEditorsDto: TabEditorsDto) => {
+		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeTabsToRight, tabEditorDtoAsReference, tabEditorsDto)
 	},
 	closeAllTabs: (data: TabEditorsDto) => {
 		return ipcRenderer.invoke(electronAPI.events.rendererToMain.closeAllTabs, data)

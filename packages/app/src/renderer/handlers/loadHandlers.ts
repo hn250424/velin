@@ -4,16 +4,20 @@ import type { WindowDto } from "@shared/dto/WindowDto"
 import type { SettingsDto } from "@shared/dto/SettingsDto"
 import type { SideDto } from "@shared/dto/SideDto"
 
-import TabEditorFacade from "../modules/tab_editor/TabEditorFacade"
-import TreeFacade from "../modules/tree/TreeFacade"
-import SettingsFacade from "../modules/settings/SettingsFacade"
-import type WindowFacade from "@renderer/modules/window/WindowFacade"
-import type SideFacade from "@renderer/modules/side/SideFacade"
-import type InfoFacade from "@renderer/modules/info/InfoFacade"
-import { toggleSide } from "@renderer/actions"
-import type MenuElements from "@renderer/modules/menu/MenuElements"
 import { CLASS_SELECTED } from "@renderer/constants/dom"
+
+import { toggleSide } from "@renderer/actions"
 import { Dispatcher } from "../dispatch"
+
+import {
+	MenuElements,
+	TabEditorFacade,
+	TreeFacade,
+	SettingsFacade,
+	WindowFacade,
+	SideFacade,
+	InfoFacade,
+} from "../modules"
 
 export function handleLoad(
 	dispatcher: Dispatcher,

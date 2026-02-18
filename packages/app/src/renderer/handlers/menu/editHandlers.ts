@@ -1,12 +1,8 @@
-import type MenuElements from "@renderer/modules/menu/MenuElements"
-import ShortcutRegistry from "../../core/ShortcutRegistry"
+import type { MenuElements } from "@renderer/modules/menu/MenuElements"
+import { ShortcutRegistry } from "../../core/ShortcutRegistry"
 import { Dispatcher } from "../../dispatch"
 
-export function handleEditMenu(
-	dispatcher: Dispatcher,
-	shortcutRegistry: ShortcutRegistry,
-	menuElements: MenuElements
-) {
+export function handleEditMenu(dispatcher: Dispatcher, shortcutRegistry: ShortcutRegistry, menuElements: MenuElements) {
 	bindMenuEvents(dispatcher, menuElements)
 	bindShortcutEvents(dispatcher, shortcutRegistry)
 }

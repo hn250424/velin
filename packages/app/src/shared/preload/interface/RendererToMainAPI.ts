@@ -22,8 +22,8 @@ export default interface RendererToMainAPI {
 	saveAll: (data: TabEditorsDto) => Promise<Response<TabEditorsDto>>
 
 	closeTab: (data: TabEditorDto) => Promise<Response<void>>
-	closeTabsExcept: (exceptData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>
-	closeTabsToRight: (referenceData: TabEditorDto, allData: TabEditorsDto) => Promise<Response<boolean[]>>
+	closeOtherTabs: (tabEditorDtoToExclude: TabEditorDto, tabEditorsDto: TabEditorsDto) => Promise<Response<boolean[]>>
+	closeTabsToRight: (tabEditorDtoAsReference: TabEditorDto, tabEditorsDto: TabEditorsDto) => Promise<Response<boolean[]>>
 	closeAllTabs: (data: TabEditorsDto) => Promise<Response<boolean[]>>
 
 	exit: (tabSessionData: TabEditorsDto, treeSessionData: TreeDto) => Promise<void>

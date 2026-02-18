@@ -7,11 +7,12 @@ import { editorViewCtx } from "@milkdown/kit/core"
 import { TextSelection } from "prosemirror-state"
 
 import DI_KEYS from "../../constants/di_keys"
-import { NOT_MODIFIED_TEXT } from "../../constants/dom"
+import { DATASET_ATTR_TAB_ID, NOT_MODIFIED_TEXT } from "../../constants/dom"
 import { TabEditorRenderer } from "./TabEditorRenderer"
 import { TabEditorStore } from "./TabEditorStore"
 import { TabEditorView } from "./TabEditorView"
 import { TabDragManager } from "./TabDragManager"
+import { assert } from "@renderer/utils"
 
 // export const BINARY_FILE_WARNING = '❌'
 export const BINARY_FILE_WARNING = `Can't read this file`
@@ -201,28 +202,74 @@ export class TabEditorFacade {
 
 	// drag
 
-	isMouseDown(): boolean {
-		return this.drag.isMouseDown()
+	initDrag(target: HTMLElement, x: number, y: number) {
+		const tabsSnapshot = Array.from(this.renderer.elements.tabContainer.children) as HTMLElement[]
+		const id = parseInt(target.dataset[DATASET_ATTR_TAB_ID]!)
+		const name = this.getTabEditorViewModelById(id)!.fileName
+
+		this.setTabs(tabsSnapshot)
+		this.setMouseDown(true)
+		this.setTargetTab(target)
+		this.setStartPosition(x, y)
+		this.setTargetTabId(id)
+		this.setTargetTabName(name)
 	}
 
-	setMouseDown(state: boolean) {
-		this.drag.setMouseDown(state)
+	moveGhostBox(clientX: number, clientY: number) {
+		const ghost = this.createGhostBox(this.getTargetTabName())
+
+		ghost.style.left = `${clientX + 5}px`
+		ghost.style.top = `${clientY + 5}px`
 	}
 
-	//
+	getInsertIndexFromMouseX(mouseX: number): number {
+		const tabs = this.getTabs()
+		assert(tabs, "Can not call getInsertIndexFromMouseX() before initDrag()")
 
-	setTargetElement(tab: HTMLElement) {
-		return this.drag.setTargetElement(tab)
+		for (let i = 0; i < tabs.length; i++) {
+			const rect = tabs[i].getBoundingClientRect()
+			const middleX = rect.left + rect.width / 2
+
+			if (mouseX < middleX) {
+				return i
+			}
+		}
+
+		return tabs.length
 	}
 
-	//
+	updateDragIndicator(insertIndex: number) {
+		const indicator = this.createIndicator()
+		const { tabContainer } = this.renderer.elements
+		const containerRect = tabContainer.getBoundingClientRect()
 
-	getTabs() {
-		return this.drag.getTabs()
+		const targetTab = this.getTabEditorViewByIndex(insertIndex)
+		let leftPosition = 0
+
+		if (targetTab) {
+			const tabRect = targetTab.tabBox.getBoundingClientRect()
+			leftPosition = tabRect.left - containerRect.left + tabContainer.scrollLeft
+		} else {
+			const lastTab = this.getTabEditorViewByIndex(insertIndex - 1)
+			if (lastTab) {
+				const lastRect = lastTab.tabBox.getBoundingClientRect()
+				leftPosition = lastRect.right - containerRect.left + tabContainer.scrollLeft
+			} else {
+				leftPosition = 0
+			}
+		}
+
+		indicator.style.left = `${leftPosition}px`
+
+		if (!tabContainer.contains(indicator)) {
+			tabContainer.appendChild(indicator)
+		}
 	}
 
-	setTabs(tabs: HTMLElement[]) {
-		this.drag.setTabs(tabs)
+	clearDrag() {
+		this.endDrag()
+		this.removeGhostBox()
+		this.removeIndicator()
 	}
 
 	//
@@ -259,26 +306,50 @@ export class TabEditorFacade {
 
 	//
 
-	getDragTargetTab() {
-		return this.drag.getDragTargetTab()
+	isMouseDown(): boolean {
+		return this.drag.isMouseDown()
 	}
 
-	getDragTargetTabId() {
-		return this.drag.getDragTargetTabId()
-	}
-
-	setDragTargetTabId(id: number) {
-		this.drag.setDragTargetTabId(id)
+	setMouseDown(state: boolean) {
+		this.drag.setMouseDown(state)
 	}
 
 	//
 
-	getDragTargetTabName() {
-		return this.drag.getDragTargetTabName()
+	getTabs() {
+		return this.drag.getTabs()
 	}
 
-	setDragTargetTabName(name: string) {
-		this.drag.setDragTargetTabName(name)
+	setTabs(tabs: HTMLElement[]) {
+		this.drag.setTabs(tabs)
+	}
+
+	//
+
+	getTargetTab() {
+		return this.drag.getTargetTab()
+	}
+
+	setTargetTab(tab: HTMLElement) {
+		return this.drag.setTargetTab(tab)
+	}
+
+	getTargetTabId() {
+		return this.drag.getTargetTabId()
+	}
+
+	setTargetTabId(id: number) {
+		this.drag.setTargetTabId(id)
+	}
+
+	//
+
+	getTargetTabName() {
+		return this.drag.getTargetTabName()
+	}
+
+	setTargetTabName(name: string) {
+		this.drag.setTargetTabName(name)
 	}
 
 	//

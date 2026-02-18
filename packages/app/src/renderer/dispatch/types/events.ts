@@ -1,5 +1,5 @@
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
-import type { Focus } from "../../core/types"
+import type { Focus } from "../../core"
 import type { Source } from "."
 
 type DispatchEventSchema = {
@@ -64,9 +64,27 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: []
 		}
 	}
+
+	//
+
 	closeTab: {
 		default: {
 			default: [id: number]
+		}
+	}
+	closeOtherTabs: {
+		default: {
+			default: []
+		}
+	}
+	closeTabsToRight: {
+		default: {
+			default: []
+		}
+	}
+	closeAllTabs: {
+		default: {
+			default: []
 		}
 	}
 

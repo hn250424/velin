@@ -1,8 +1,7 @@
-import type MenuElements from "@renderer/modules/menu/MenuElements"
-import ShortcutRegistry from "../../core/ShortcutRegistry"
-import ZoomManager from "../../modules/zoom/ZoomManager"
-import type SideFacade from "@renderer/modules/side/SideFacade"
 import { toggleSide } from "@renderer/actions"
+
+import { ShortcutRegistry } from "../../core"
+import { MenuElements, SideFacade, ZoomManager } from "@renderer/modules"
 
 export function handleViewMenu(
 	shortcutRegistry: ShortcutRegistry,

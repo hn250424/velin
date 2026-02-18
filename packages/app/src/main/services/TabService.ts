@@ -56,7 +56,7 @@ export default class TabService {
 		return true
 	}
 
-	async closeTabsExcept(exceptData: TabEditorDto, dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
+	async closeOtherTabs(exceptData: TabEditorDto, dto: TabEditorsDto, mainWindow: BrowserWindow): Promise<boolean[]> {
 		const sessionArr: TabSessionData[] = []
 		const responseArr: boolean[] = []
 
