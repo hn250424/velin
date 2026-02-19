@@ -18,7 +18,9 @@ const DI_KEYS = {
 
 	SideFacade: Symbol("SideFacade"),
 	SideStore: Symbol("SideStore"),
+	SideRenderer: Symbol("SideRenderer"),
 	SideElements: Symbol("SideElements"),
+	SideDragManager: Symbol("SideDragManager"),
 
 	TreeFacade: Symbol("TreeFacade"),
 	TreeStore: Symbol("TreeStore"),

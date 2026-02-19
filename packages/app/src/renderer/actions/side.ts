@@ -4,7 +4,7 @@ import type SideFacade from "@renderer/modules/side/SideFacade"
 
 export function toggleSide(menuElements: MenuElements, sideFacade: SideFacade) {
 	const { fileTree } = menuElements
-	const { tree } = sideFacade.elements
+	const { tree } = sideFacade.renderer.elements
 
 	const isOpen = sideFacade.isSideOpen()
 

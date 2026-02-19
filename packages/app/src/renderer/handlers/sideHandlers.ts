@@ -1,51 +1,36 @@
 import type { SideFacade } from "@renderer/modules"
 
 export function handleSide(sideFacade: SideFacade) {
-	const { side, tree, resizer } = sideFacade.elements
-
-	let isDragging = false
-	let animationFrameId: number | null = null
-
-	const minWidth = 100
-	const maxWidth = 500
+	const { resizer } = sideFacade.renderer.elements
 
 	resizer.addEventListener("mousedown", (e) => {
 		if (!sideFacade.isSideOpen()) return
-		isDragging = true
-		document.body.style.cursor = "ew-resize"
-		document.body.style.userSelect = "none"
+		sideFacade.initDrag()
 	})
 
 	document.addEventListener("mousemove", (e) => {
-		if (!isDragging) return
+		if (!sideFacade.isDragging()) return
+		if (sideFacade.dragAnimationFrameId) return
 
-		if (animationFrameId) cancelAnimationFrame(animationFrameId)
-
-		animationFrameId = requestAnimationFrame(() => {
-			const sideRect = side.getBoundingClientRect()
-			const offsetX = e.clientX - sideRect.left
-			const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
-			tree.style.width = `${newWidth}px`
+		sideFacade.dragAnimationFrameId = requestAnimationFrame(() => {
+			const width = sideFacade.calculateWidth(e.clientX)
+			sideFacade.updateSideWidth(width)
+			sideFacade.dragAnimationFrameId = null
 		})
 	})
 
 	document.addEventListener("mouseup", async (e) => {
-		if (!isDragging) return
+		if (!sideFacade.isDragging()) return
 
-		isDragging = false
-		document.body.style.cursor = ""
-		document.body.style.userSelect = ""
+		sideFacade.clearDrag()
 
-		if (animationFrameId) {
-			cancelAnimationFrame(animationFrameId)
-			animationFrameId = null
-		}
-
-		const sideRect = side.getBoundingClientRect()
-		const offsetX = e.clientX - sideRect.left
-		const newWidth = Math.min(Math.max(offsetX, minWidth), maxWidth)
-
-		sideFacade.setSideWidth(newWidth)
+		const width = sideFacade.calculateWidth(e.clientX)
+		sideFacade.setSideWidth(width)
 		sideFacade.syncSession()
+	})
+
+	document.addEventListener("mouseleave", async () => {
+		if (!sideFacade.isDragging()) return
+		sideFacade.clearDrag()
 	})
 }
