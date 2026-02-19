@@ -8,16 +8,16 @@ import FakeTabRepository from "../modules/tab/FakeTabRepository"
 import FakeTreeRepository from "../modules/tree/FakeTreeRepository"
 import FakeTreeUtils from "../modules/tree/FakeTreeUtils"
 import FakeTabUtils from "../modules/tab/FakeTabUtils"
-import { TabSessionModel } from "@main/models/TabSessionModel"
+import type { TabSessionModel } from "@main/models/TabSessionModel"
 import FakeFileWatcher from "../modules/fs/FakeFileWatcher"
 import FakeSideRepository from "../modules/side/FakeSideRepository"
-import SideSessionModel from "@main/models/SideSessionModel"
+import type SideSessionModel from "@main/models/SideSessionModel"
 import FakeSettingsRepository from "../modules/settings/FakeSettingsRepository"
 import FakeSettingsUtils from "../modules/settings/FakeSettingsUtils"
 import FakeWindowRepository from "../modules/window/FakeWindowRepository"
 import FakeWindowUtils from "../modules/window/FakeWindowUtils"
-import { WindowSessionModel } from "@main/models/WindowSessionModel"
-import SettingsSessionModel from "@main/models/SettingsSessionModel"
+import type { WindowSessionModel } from "@main/models/WindowSessionModel"
+import type { SettingsSessionModel } from "@main/models/SettingsSessionModel"
 import {
 	tabSessionPath,
 	treeSessionPath,
@@ -67,6 +67,7 @@ describe("Load Service - loadedRenderer", () => {
 		const initialSettingsSession: SettingsSessionModel = {
 			settingFontSessionModel: {
 				size: 16,
+				family: 'sans-serif'
 			},
 			settingThemeSessionModel: {},
 		}
@@ -186,7 +187,7 @@ describe("Load Service - loadedRenderer", () => {
 	test("should handle missing tab session file gracefully and send default data", async () => {
 		// Given.
 		fakeFileManager.setPathExistence(TAB_SESSION_PATH, false)
-		fakeTabRepository.setTabSession(null)
+		// fakeTabRepository.setTabSession(null)
 
 		// When.
 		await loadedRenderer(

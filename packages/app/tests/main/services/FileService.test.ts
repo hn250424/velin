@@ -1,5 +1,5 @@
 import FileService from "@services/FileService"
-import { TabEditorDto } from "@shared/dto/TabEditorDto"
+import type { TabEditorDto } from "@shared/dto/TabEditorDto"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import FakeMainWindow from "../mocks/FakeMainWindow"
 import FakeFileManager from "../modules/fs/FakeFileManager"
@@ -62,8 +62,8 @@ describe("FileService.newTab", () => {
 		// Then.
 		expect(id).toBe(6)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(2)
-		expect(session.data[1].id).toBe(6)
+		expect(session!.data.length).toBe(2)
+		expect(session!.data[1].id).toBe(6)
 	})
 })
 
@@ -111,12 +111,12 @@ describe("FileService.openFile", () => {
 		const data = await fileService.openFile()
 
 		// Then.
-		expect(data.filePath).toBe("openPath")
-		expect(data.content).toBe("content")
+		expect(data!.filePath).toBe("openPath")
+		expect(data!.content).toBe("content")
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.activatedId).toBe(2)
-		expect(session.data.length).toBe(3)
-		expect(session.data[2].filePath).toBe("openPath")
+		expect(session!.activatedId).toBe(2)
+		expect(session!.data.length).toBe(3)
+		expect(session!.data[2].filePath).toBe("openPath")
 	})
 
 	test("should open a file by path, update tab session, and return its content", async () => {
@@ -134,11 +134,11 @@ describe("FileService.openFile", () => {
 		const response = await fileService.openFile("testPath")
 
 		// Then.
-		expect(response.content).toBe("testContent")
-		expect(response.id).toBe(2)
+		expect(response!.content).toBe("testContent")
+		expect(response!.id).toBe(2)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.activatedId).toBe(2)
-		expect(session.data[2].filePath).toBe("testPath")
+		expect(session!.activatedId).toBe(2)
+		expect(session!.data[2].filePath).toBe("testPath")
 	})
 })
 
@@ -175,7 +175,7 @@ describe("FileService.openDirectory", () => {
 		// Then.
 		expect(response).toEqual(copiedDto)
 		const session = await fakeTreeRepository.readTreeSession()
-		expect(response.path).toEqual(session.path)
+		expect(response!.path).toEqual(session!.path)
 	})
 
 	test("should return the correctly updated child tree when opening a directory via dialog", async () => {
@@ -192,9 +192,9 @@ describe("FileService.openDirectory", () => {
 		const response = await fileService.openDirectory()
 
 		// Then.
-		expect(response.path).toBe(copiedDto.path)
+		expect(response!.path).toBe(copiedDto.path)
 		const session = await fakeTreeRepository.readTreeSession()
-		expect(response.path).toBe(session.path)
+		expect(response!.path).toBe(session!.path)
 	})
 
 	test("should return the correctly updated root tree when opening a directory by DTO", async () => {
@@ -208,7 +208,7 @@ describe("FileService.openDirectory", () => {
 		// Then.
 		expect(response).toEqual(copiedDto)
 		const session = await fakeTreeRepository.readTreeSession()
-		expect(response.path).toEqual(session.path)
+		expect(response!.path).toEqual(session!.path)
 	})
 
 	test("should return the correctly updated child tree and mark it as expanded when opening a child directory by DTO", async () => {
@@ -218,13 +218,13 @@ describe("FileService.openDirectory", () => {
 		fakeTreeRepository.setTreeSession(copiedDto)
 
 		// When.
-		const response = await fileService.openDirectory(copiedDto.children[0])
+		const response = await fileService.openDirectory(copiedDto!.children![0])
 
 		// Then.
-		expect(response.path).toBe(copiedDto.children[0].path)
+		expect(response!.path).toBe(copiedDto!.children![0].path)
 		const session = await fakeTreeRepository.readTreeSession()
-		expect(response.path).toBe(session.children[0].path)
-		expect(session.children[0].expanded).toBe(true)
+		expect(response!.path).toBe(session!.children![0].path)
+		expect(session!.children![0].expanded).toBe(true)
 	})
 })
 
@@ -280,8 +280,8 @@ describe("FileService.save", () => {
 		expect(response.isModified).toBe(false)
 		expect(await fakeFileManager.read(newFilePath)).toBe(data.content)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data[0].id).toBe(0)
-		expect(tabSession.data[0].filePath).toBe(newFilePath)
+		expect(tabSession!.data[0].id).toBe(0)
+		expect(tabSession!.data[0].filePath).toBe(newFilePath)
 	})
 
 	test("should save existing file and update tab session if file path exists", async () => {
@@ -300,8 +300,8 @@ describe("FileService.save", () => {
 		expect(response.isModified).toBe(false)
 		expect(await fakeFileManager.read(data.filePath)).toBe(data.content)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data[0].id).toBe(0)
-		expect(tabSession.data[0].filePath).toBe(data.filePath)
+		expect(tabSession!.data[0].id).toBe(0)
+		expect(tabSession!.data[0].filePath).toBe(data.filePath)
 	})
 })
 
@@ -354,12 +354,12 @@ describe("FileService.saveAs", () => {
 		const response = await fileService.saveAs(data, fakeMainWindow as any)
 
 		// Then.
-		expect(response.isModified).toBe(false)
+		expect(response!.isModified).toBe(false)
 		const savedFile = await fakeFileManager.read(newFilePath)
 		expect(savedFile).toBe(data.content)
 		const updatedTabSession = await fakeTabRepository.readTabSession()
-		expect(updatedTabSession.data[updatedTabSession.data.length - 1].id).toBe(data.id + 1)
-		expect(updatedTabSession.data[updatedTabSession.data.length - 1].filePath).toBe(newFilePath)
+		expect(updatedTabSession!.data[updatedTabSession!.data.length - 1].id).toBe(data.id + 1)
+		expect(updatedTabSession!.data[updatedTabSession!.data.length - 1].filePath).toBe(newFilePath)
 	})
 })
 
@@ -399,15 +399,15 @@ describe("FileService.saveAll", () => {
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data[0].filePath).toBe("")
-		expect(session.data[1].filePath).toBe(copiedDto.data[1].filePath)
+		expect(session!.data[0].filePath).toBe("")
+		expect(session!.data[1].filePath).toBe(copiedDto.data[1].filePath)
 		const file_2 = await fakeFileManager.read(copiedDto.data[2].filePath)
 		expect(file_2).toBe(copiedDto.data[2].content)
 		expect(response.data[2].isModified).toBe(false)
 		const file_3 = await fakeFileManager.read(newFilePath)
 		expect(file_3).toBe(copiedDto.data[3].content)
 		expect(response.data[3].isModified).toBe(false)
-		expect(session.data[3].filePath).toBe(newFilePath)
+		expect(session!.data[3].filePath).toBe(newFilePath)
 		expect(spy).toHaveBeenCalledTimes(3)
 	})
 
@@ -430,13 +430,13 @@ describe("FileService.saveAll", () => {
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data[0].filePath).toBe("")
-		expect(session.data[1].filePath).toBe(copiedDto.data[1].filePath)
+		expect(session!.data[0].filePath).toBe("")
+		expect(session!.data[1].filePath).toBe(copiedDto.data[1].filePath)
 		const file_2 = await fakeFileManager.read(copiedDto.data[2].filePath)
 		expect(file_2).toBe(copiedDto.data[2].content)
 		expect(response.data[2].isModified).toBe(false)
 		expect(response.data[3].isModified).toBe(true)
-		expect(session.data[3].filePath).toBe("")
+		expect(session!.data[3].filePath).toBe("")
 		expect(spy).toHaveBeenCalledTimes(2)
 	})
 })

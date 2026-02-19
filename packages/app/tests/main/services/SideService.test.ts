@@ -1,5 +1,5 @@
 import SideService from "@services/SideService"
-import SideDto from "@shared/dto/SideDto"
+import type { SideDto } from "@shared/dto/SideDto"
 import { beforeEach, describe, expect, test } from "vitest"
 import FakeFileManager from "../modules/fs/FakeFileManager"
 import FakeSideRepository from "../modules/side/FakeSideRepository"
@@ -31,7 +31,7 @@ describe("Side Service - Sync Side Session", () => {
 
 		// Then.
 		const sideSession = await fakeSideRepository.readSideSession()
-		expect(sideSession.open).toBe(copiedSideDto.open)
-		expect(sideSession.width).toBe(copiedSideDto.width)
+		expect(sideSession!.open).toBe(copiedSideDto.open)
+		expect(sideSession!.width).toBe(copiedSideDto.width)
 	})
 })

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest"
 import FakeFileManager from "../modules/fs/FakeFileManager"
-import SettingsDto from "@shared/dto/SettingsDto"
+import type { SettingsDto } from "@shared/dto/SettingsDto"
 import SettingsService from "@main/services/SettingsService"
 import FakeSettingsRepository from "../modules/settings/FakeSettingsRepository"
 import FakeSettingsUtils from "../modules/settings/FakeSettingsUtils"
@@ -11,6 +11,7 @@ describe("Settings Service - Sync Settings Session", () => {
 	const settingsDto: SettingsDto = {
 		settingFontDto: {
 			size: 16,
+			family: 'sans-serif'
 		},
 		settingThemeDto: {},
 	}
@@ -36,6 +37,6 @@ describe("Settings Service - Sync Settings Session", () => {
 
 		// Then.
 		const session = await fakeSettingsRepository.readSettingsSession()
-		expect(session.settingFontSessionModel.size).toBe(copiedSettingsDto.settingFontDto.size)
+		expect(session!.settingFontSessionModel.size).toBe(copiedSettingsDto.settingFontDto.size)
 	})
 })

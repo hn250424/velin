@@ -1,6 +1,6 @@
-import SideSessionModel from "@main/models/SideSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ISideRepository from "@main/modules/contracts/ISideRepository"
+import type SideSessionModel from "@main/models/SideSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ISideRepository from "@main/modules/contracts/ISideRepository"
 
 export default class FakeSideRepository implements ISideRepository {
 	constructor(

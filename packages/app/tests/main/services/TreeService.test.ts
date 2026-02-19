@@ -1,6 +1,6 @@
-import TreeSessionModel from "@main/models/TreeSessionModel"
+import type TreeSessionModel from "@main/models/TreeSessionModel"
 import TreeService from "@services/TreeService"
-import TreeDto from "@shared/dto/TreeDto"
+import type { TreeDto } from "@shared/dto/TreeDto"
 import path from "path"
 import { beforeEach, describe, expect, test } from "vitest"
 import FakeFileManager from "../modules/fs/FakeFileManager"
@@ -54,7 +54,7 @@ describe("Tree Service - rename", () => {
 			fakeFileManager.setFilecontent(model.path, model.name)
 		})
 		await fakeTreeRepository.setTreeSession(copiedTreeSessionModel)
-		const oldPath = copiedTreeSessionModel.children[0].path
+		const oldPath = copiedTreeSessionModel!.children![0].path
 		const newPath = path.join(path.dirname(oldPath), "renamed")
 
 		// When.
@@ -62,14 +62,14 @@ describe("Tree Service - rename", () => {
 
 		// Then.
 		const session = await fakeTreeRepository.readTreeSession()
-		expect(path.normalize(session.children[0].path)).toBe(path.normalize(newPath))
+		expect(path.normalize(session!.children![0].path)).toBe(path.normalize(newPath))
 		const checkPaths = (model: TreeSessionModel) => {
 			expect(path.normalize(model.path).startsWith(path.normalize(newPath))).toBe(true)
 			for (const child of model.children ?? []) {
 				checkPaths(child)
 			}
 		}
-		checkPaths(session.children[0])
+		checkPaths(session!.children![0])
 	})
 
 	test("should append a numeric suffix to avoid duplicate file names during rename", async () => {
@@ -80,7 +80,7 @@ describe("Tree Service - rename", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		await fakeTreeRepository.setTreeSession(copiedTreeDto)
-		const prePath = copiedTreeDto.children[0].children[2].path
+		const prePath = copiedTreeDto!.children![0].children![2].path
 
 		// When.
 		const response = await treeService.rename(prePath, prePath)
@@ -111,11 +111,11 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const target = copiedTreeDto
-		const childrenToPaste = copiedTreeDto.children[0].children[0].children // Directory deep.
-		const originalPaths = childrenToPaste.map((c) => c.path) // For checking delete with cut mode.
+		const childrenToPaste = copiedTreeDto!.children![0].children![0].children // Directory deep.
+		const originalPaths = childrenToPaste!.map((c) => c.path) // For checking delete with cut mode.
 
 		// When.
-		const response = await treeService.paste(target, childrenToPaste, "cut")
+		const response = await treeService.paste(target, childrenToPaste!, "cut")
 
 		// Then.
 		expect(response.result).toBe(true)
@@ -123,7 +123,7 @@ describe("Tree Service - paste", () => {
 			const exists = await fakeFileManager.exists(oldPath)
 			expect(exists).toBe(false)
 		}
-		for (const pasted of childrenToPaste) {
+		for (const pasted of childrenToPaste!) {
 			const exists = await fakeFileManager.exists(pasted.path)
 			expect(exists).toBe(true)
 			const content = await fakeFileManager.read(pasted.path)
@@ -141,7 +141,7 @@ describe("Tree Service - paste", () => {
 		})
 
 		const originalCopy = fakeFileManager.copy.bind(fakeFileManager)
-		const failPath = path.join(copiedTreeDto.path, copiedTreeDto.children[0].children[0].children[0].name)
+		const failPath = path.join(copiedTreeDto.path, copiedTreeDto!.children![0].children![0].children![0].name)
 		fakeFileManager.copy = async (src: string, dest: string) => {
 			if (dest === failPath) {
 				throw new Error("Copy failed")
@@ -150,11 +150,11 @@ describe("Tree Service - paste", () => {
 		}
 
 		const target = copiedTreeDto
-		const childrenToPaste = copiedTreeDto.children[0].children[0].children // Directory deep.
-		const originalPaths = childrenToPaste.map((c) => c.path) // For checking delete with cut mode.
+		const childrenToPaste = copiedTreeDto!.children![0].children![0].children // Directory deep.
+		const originalPaths = childrenToPaste!.map((c) => c.path) // For checking delete with cut mode.
 
 		// When
-		const response = await treeService.paste(target, childrenToPaste, "cut")
+		const response = await treeService.paste(target, childrenToPaste!, "cut")
 
 		// Then
 		expect(response.result).toBe(false)
@@ -162,7 +162,7 @@ describe("Tree Service - paste", () => {
 			const exists = await fakeFileManager.exists(oldPath)
 			expect(exists).toBe(true)
 		}
-		for (const pasted of childrenToPaste) {
+		for (const pasted of childrenToPaste!) {
 			const pastedPath = path.join(target.path, pasted.name)
 			const exists = await fakeFileManager.exists(pastedPath)
 			expect(exists).toBe(false)
@@ -177,11 +177,11 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const target = copiedTreeDto
-		const childrenToPaste = copiedTreeDto.children[0].children[0].children // Directory deep.
-		const originalPaths = childrenToPaste.map((c) => c.path) // For checking original still exists.
+		const childrenToPaste = copiedTreeDto!.children![0].children![0].children // Directory deep.
+		const originalPaths = childrenToPaste!.map((c) => c.path) // For checking original still exists.
 
 		// When.
-		const response = await treeService.paste(target, childrenToPaste, "copy")
+		const response = await treeService.paste(target, childrenToPaste!, "copy")
 
 		// Then.
 		expect(response.result).toBe(true)
@@ -189,7 +189,7 @@ describe("Tree Service - paste", () => {
 			const exists = await fakeFileManager.exists(oldPath)
 			expect(exists).toBe(true)
 		}
-		for (const pasted of childrenToPaste) {
+		for (const pasted of childrenToPaste!) {
 			const exists = await fakeFileManager.exists(pasted.path)
 			expect(exists).toBe(true)
 			const content = await fakeFileManager.read(pasted.path)
@@ -206,7 +206,7 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const originalCopy = fakeFileManager.copy.bind(fakeFileManager)
-		const failPath = path.join(copiedTreeDto.path, copiedTreeDto.children[0].children[0].children[0].name)
+		const failPath = path.join(copiedTreeDto.path, copiedTreeDto!.children![0].children![0].children![0].name)
 		fakeFileManager.copy = async (src: string, dest: string) => {
 			if (dest === failPath) {
 				throw new Error("Copy failed")
@@ -214,11 +214,11 @@ describe("Tree Service - paste", () => {
 			return originalCopy(src, dest)
 		}
 		const target = copiedTreeDto
-		const childrenToPaste = copiedTreeDto.children[0].children[0].children
-		const originalPaths = childrenToPaste.map((c) => c.path)
+		const childrenToPaste = copiedTreeDto!.children![0].children![0].children
+		const originalPaths = childrenToPaste!.map((c) => c.path)
 
 		// When
-		const response = await treeService.paste(target, childrenToPaste, "copy")
+		const response = await treeService.paste(target, childrenToPaste!, "copy")
 
 		// Then
 		expect(response.result).toBe(false)
@@ -226,7 +226,7 @@ describe("Tree Service - paste", () => {
 			const exists = await fakeFileManager.exists(oldPath)
 			expect(exists).toBe(true)
 		}
-		for (const pasted of childrenToPaste) {
+		for (const pasted of childrenToPaste!) {
 			const pastedPath = path.join(target.path, pasted.name)
 			const exists = await fakeFileManager.exists(pastedPath)
 			expect(exists).toBe(false)
@@ -241,7 +241,7 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const selectedDtos = []
-		selectedDtos.push(copiedTreeDto.children[0].children[2])
+		selectedDtos.push(copiedTreeDto!.children![0].children![2])
 
 		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "copy")
@@ -259,7 +259,7 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const selectedDtos = []
-		selectedDtos.push(copiedTreeDto.children[0].children[3])
+		selectedDtos.push(copiedTreeDto!.children![0].children![3])
 
 		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut")
@@ -277,16 +277,16 @@ describe("Tree Service - paste", () => {
 			fakeFileManager.setFilecontent(dto.path, dto.name)
 		})
 		const selectedDtos = []
-		selectedDtos.push(copiedTreeDto.children[0].children[2])
-		selectedDtos.push(copiedTreeDto.children[0].children[3])
+		selectedDtos.push(copiedTreeDto!.children![0].children![2])
+		selectedDtos.push(copiedTreeDto!.children![0].children![3])
 
 		// When.
 		const response = await treeService.paste(copiedTreeDto, selectedDtos, "cut")
 
 		// Then.
 		expect(response.result).toBe(true)
-		expect(path.basename(response.data[0])).toBe(path.basename(copiedTreeDto.children[0].children[2].path))
-		expect(path.basename(response.data[1])).toBe(path.basename(copiedTreeDto.children[0].children[3].path))
+		expect(path.basename(response.data[0])).toBe(path.basename(copiedTreeDto!.children![0].children![2].path))
+		expect(path.basename(response.data[1])).toBe(path.basename(copiedTreeDto!.children![0].children![3].path))
 	})
 })
 
@@ -393,11 +393,11 @@ describe("Tree Service - syncTreeSessionFromRenderer", () => {
 		await treeService.syncTreeSessionFromRenderer(copiedDto)
 
 		// Then.
-		const session: TreeSessionModel = await fakeTreeRepository.readTreeSession()
+		const session = await fakeTreeRepository.readTreeSession()
 		const dtoPaths: string[] = []
 		traverse(copiedDto, (node) => dtoPaths.push(path.normalize(node.path)))
 		const sessionPaths: string[] = []
-		traverse(session, (node) => sessionPaths.push(path.normalize(node.path)))
+		traverse(session!, (node) => sessionPaths.push(path.normalize(node.path)))
 		expect(sessionPaths).toEqual(dtoPaths)
 	})
 })
@@ -423,7 +423,7 @@ describe("Tree Service - getSyncedTreeSession", () => {
 		const newFileData = "newFileData"
 		fakeFileManager.setPathExistence(newFilePath, true)
 		fakeFileManager.setFilecontent(newFilePath, newFileData)
-		copiedModel.children.push({
+		copiedModel!.children!.push({
 			path: newFilePath,
 			name: "newFilePath",
 			indent: 1,
@@ -438,7 +438,7 @@ describe("Tree Service - getSyncedTreeSession", () => {
 
 		// Then.
 		const session = await fakeTreeRepository.readTreeSession()
-		const hasNewFile = session.children?.some((child) => child.path === newFilePath)
+		const hasNewFile = session!.children?.some((child) => child.path === newFilePath)
 		expect(hasNewFile).toBe(true)
 	})
 
@@ -464,7 +464,7 @@ describe("Tree Service - getSyncedTreeSession", () => {
 
 		// Then.
 		const session = await fakeTreeRepository.readTreeSession()
-		const hasRemovedFile = session.children?.some((child) => child.path === removedFilePath)
+		const hasRemovedFile = session!.children?.some((child) => child.path === removedFilePath)
 		expect(hasRemovedFile).toBe(false)
 	})
 })

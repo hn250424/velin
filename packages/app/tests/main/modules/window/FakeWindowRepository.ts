@@ -1,6 +1,6 @@
-import { WindowSessionModel } from "@main/models/WindowSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import IWindowRepository from "@main/modules/contracts/IWindowRepository"
+import type { WindowSessionModel } from "@main/models/WindowSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type IWindowRepository from "@main/modules/contracts/IWindowRepository"
 
 export default class FakeWindowRepository implements IWindowRepository {
 	constructor(

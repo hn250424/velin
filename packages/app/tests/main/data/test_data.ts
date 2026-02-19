@@ -1,6 +1,6 @@
-import TreeSessionModel from "@main/models/TreeSessionModel"
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
-import TreeDto from "@shared/dto/TreeDto"
+import type TreeSessionModel from "@main/models/TreeSessionModel"
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+import type { TreeDto } from "@shared/dto/TreeDto"
 
 export const tabSessionPath = "/fake/path/tabSession.json"
 export const treeSessionPath = "/fake/path/treeSession.json"

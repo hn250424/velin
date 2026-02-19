@@ -1,10 +1,11 @@
-import SettingsSessionModel, {
+import type {
+	SettingsSessionModel,
 	SettingFontSessionModel,
 	SettingThemeSessionModel,
 } from "@main/models/SettingsSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ISettingsUtils from "@main/modules/contracts/ISettingsUtils"
-import SettingsDto, { SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ISettingsUtils from "@main/modules/contracts/ISettingsUtils"
+import type { SettingsDto, SettingFontDto, SettingThemeDto } from "@shared/dto/SettingsDto"
 
 export default class FakeSettingsUtils implements ISettingsUtils {
 	constructor(private fakeFileManager: IFileManager) {}

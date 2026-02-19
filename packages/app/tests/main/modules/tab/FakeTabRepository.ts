@@ -1,6 +1,6 @@
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ITabRepository from "@main/modules/contracts/ITabRepository"
-import { TabSessionModel } from "@main/models/TabSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ITabRepository from "@main/modules/contracts/ITabRepository"
+import type { TabSessionModel } from "@main/models/TabSessionModel"
 
 export default class FakeTabRepository implements ITabRepository {
 	constructor(

@@ -1,6 +1,6 @@
-import TreeSessionModel from "@main/models/TreeSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ITreeRepository from "@modules_contracts/ITreeRepository"
+import type TreeSessionModel from "@main/models/TreeSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ITreeRepository from "@modules_contracts/ITreeRepository"
 
 export default class FakeTreeRepository implements ITreeRepository {
 	constructor(

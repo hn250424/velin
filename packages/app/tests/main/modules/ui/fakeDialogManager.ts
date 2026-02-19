@@ -1,4 +1,4 @@
-import IDialogManager from "@main/modules/contracts/IDialogManager"
+import type IDialogManager from "@main/modules/contracts/IDialogManager"
 import { BrowserWindow } from "electron"
 
 let fakeConfirmResult = false
@@ -8,7 +8,7 @@ export function setFakeConfirmResult(result: boolean) {
 
 let fakeSaveDialogResult: Electron.SaveDialogReturnValue = {
 	canceled: false,
-	filePath: undefined,
+	filePath: undefined as any,
 }
 export function setFakeSaveDialogResult(result: Electron.SaveDialogReturnValue) {
 	fakeSaveDialogResult = result

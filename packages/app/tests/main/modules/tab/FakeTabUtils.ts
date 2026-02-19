@@ -1,7 +1,7 @@
-import { TabSessionModel } from "@main/models/TabSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ITabUtils from "@main/modules/contracts/ITabUtils"
-import { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+import type { TabSessionModel } from "@main/models/TabSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ITabUtils from "@main/modules/contracts/ITabUtils"
+import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 export default class FakeTabUtils implements ITabUtils {
 	constructor(private fakeFileManager: IFileManager) {}

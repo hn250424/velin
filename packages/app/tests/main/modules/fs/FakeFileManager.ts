@@ -1,6 +1,6 @@
-import IFileManager from "@main/modules/contracts/IFileManager"
+import type IFileManager from "@main/modules/contracts/IFileManager"
 import path from "path"
-import TrashMap from "@shared/types/TrashMap"
+import type TrashMap from "@shared/types/TrashMap"
 
 export default class FakeFileManager implements IFileManager {
 	pathExists: Record<string, boolean> = {}

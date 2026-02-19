@@ -45,7 +45,7 @@ describe("Tab Service - closeTab", () => {
 		// Then.
 		expect(response).toBe(true)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(0)
+		expect(session!.data.length).toBe(0)
 		const file = await fakeFileManager.read(data.filePath)
 		expect(file).toBe(data.content)
 	})
@@ -66,7 +66,7 @@ describe("Tab Service - closeTab", () => {
 		// Then.
 		expect(response).toBe(true)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(0)
+		expect(session!.data.length).toBe(0)
 	})
 
 	test("should save to new path, update session, and close tab when closing modified unsaved data", async () => {
@@ -89,7 +89,7 @@ describe("Tab Service - closeTab", () => {
 		// Then.
 		expect(response).toBe(true)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(0)
+		expect(session!.data.length).toBe(0)
 		const file = await fakeFileManager.read(newFilePath)
 		expect(file).toBe(data.content)
 	})
@@ -114,7 +114,7 @@ describe("Tab Service - closeTab", () => {
 		// Then.
 		expect(response).toBe(false)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(1)
+		expect(session!.data.length).toBe(1)
 	})
 
 	test("should close tab without saving if data is not modified", async () => {
@@ -132,7 +132,7 @@ describe("Tab Service - closeTab", () => {
 		// Then.
 		expect(response).toBe(true)
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data.length).toBe(0)
+		expect(session!.data.length).toBe(0)
 	})
 })
 
@@ -167,9 +167,9 @@ describe("Tab Service - closeOtherTabs", () => {
 		expect(spy).toHaveBeenCalledTimes(3)
 		expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(1)
-		expect(tabSession.data[0].id).toBe(exceptData.id)
-		expect(tabSession.data[0].filePath).toBe(exceptData.filePath)
+		expect(tabSession!.data.length).toBe(1)
+		expect(tabSession!.data[0].id).toBe(exceptData.id)
+		expect(tabSession!.data[0].filePath).toBe(exceptData.filePath)
 	})
 
 	test("should retain only selected tab and discard changes in other tabs if user declines save", async () => {
@@ -194,9 +194,9 @@ describe("Tab Service - closeOtherTabs", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(1)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(1)
-		expect(tabSession.data[0].id).toBe(exceptData.id)
-		expect(tabSession.data[0].filePath).toBe(exceptData.filePath)
+		expect(tabSession!.data.length).toBe(1)
+		expect(tabSession!.data[0].id).toBe(exceptData.id)
+		expect(tabSession!.data[0].filePath).toBe(exceptData.filePath)
 	})
 
 	test("should retain selected tab and tabs with unsaved changes if user cancels save dialog", async () => {
@@ -224,9 +224,9 @@ describe("Tab Service - closeOtherTabs", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(2)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(2)
-		expect(tabSession.data[0].id).toBe(exceptData.id)
-		expect(tabSession.data[0].filePath).toBe(exceptData.filePath)
+		expect(tabSession!.data.length).toBe(2)
+		expect(tabSession!.data[0].id).toBe(exceptData.id)
+		expect(tabSession!.data[0].filePath).toBe(exceptData.filePath)
 		expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
 	})
 })
@@ -262,9 +262,9 @@ describe("Tab Service - closeTabsToRight", () => {
 		expect(spy).toHaveBeenCalledTimes(3)
 		expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(2)
-		expect(tabSession.data[tabSession.data.length - 1].id).toBe(refData.id)
-		expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(refData.filePath)
+		expect(tabSession!.data.length).toBe(2)
+		expect(tabSession!.data[tabSession!.data.length - 1].id).toBe(refData.id)
+		expect(tabSession!.data[tabSession!.data.length - 1].filePath).toBe(refData.filePath)
 	})
 
 	test("should close tabs to the right of the reference tab and discard changes if user declines save", async () => {
@@ -289,9 +289,9 @@ describe("Tab Service - closeTabsToRight", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(1)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(2)
-		expect(tabSession.data[tabSession.data.length - 1].id).toBe(refData.id)
-		expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(refData.filePath)
+		expect(tabSession!.data.length).toBe(2)
+		expect(tabSession!.data[tabSession!.data.length - 1].id).toBe(refData.id)
+		expect(tabSession!.data[tabSession!.data.length - 1].filePath).toBe(refData.filePath)
 	})
 
 	test("should retain left tabs and unsaved right tabs if user cancels save dialog", async () => {
@@ -319,9 +319,9 @@ describe("Tab Service - closeTabsToRight", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(2)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(3)
-		expect(tabSession.data[tabSession.data.length - 1].id).toBe(copiedDto.data[3].id)
-		expect(tabSession.data[tabSession.data.length - 1].filePath).toBe(copiedDto.data[3].filePath)
+		expect(tabSession!.data.length).toBe(3)
+		expect(tabSession!.data[tabSession!.data.length - 1].id).toBe(copiedDto.data[3].id)
+		expect(tabSession!.data[tabSession!.data.length - 1].filePath).toBe(copiedDto.data[3].filePath)
 		expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
 	})
 })
@@ -356,7 +356,7 @@ describe("Tab Service - closeAllTabs", () => {
 		expect(spy).toHaveBeenCalledTimes(3)
 		expect(await fakeFileManager.read(newFilePath)).toBe(copiedDto.data[3].content)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(0)
+		expect(tabSession!.data.length).toBe(0)
 	})
 
 	test("should close all tabs and discard modified ones if user declines save", async () => {
@@ -380,7 +380,7 @@ describe("Tab Service - closeAllTabs", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(1)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(0)
+		expect(tabSession!.data.length).toBe(0)
 	})
 
 	test("should retain unsaved tabs if user confirms save but cancels save dialog", async () => {
@@ -407,7 +407,7 @@ describe("Tab Service - closeAllTabs", () => {
 		// Then.
 		expect(spy).toHaveBeenCalledTimes(2)
 		const tabSession = await fakeTabRepository.readTabSession()
-		expect(tabSession.data.length).toBe(1)
+		expect(tabSession!.data.length).toBe(1)
 		expect(await fakeFileManager.read(copiedDto.data[2].filePath)).toBe(copiedDto.data[2].content)
 	})
 })
@@ -435,7 +435,7 @@ describe("Tab Service - syncTabSession", () => {
 				filePath: d.filePath,
 			}
 		})
-		expect(dtoToSessionData).toEqual(session.data)
-		expect(copiedDto.activatedId).toBe(session.activatedId)
+		expect(dtoToSessionData).toEqual(session!.data)
+		expect(copiedDto.activatedId).toBe(session!.activatedId)
 	})
 })

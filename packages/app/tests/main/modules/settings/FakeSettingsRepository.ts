@@ -1,6 +1,6 @@
-import SettingsSessionModel from "@main/models/SettingsSessionModel"
-import IFileManager from "@main/modules/contracts/IFileManager"
-import ISettingsRepository from "@main/modules/contracts/ISettingsRepository"
+import type { SettingsSessionModel } from "@main/models/SettingsSessionModel"
+import type IFileManager from "@main/modules/contracts/IFileManager"
+import type ISettingsRepository from "@main/modules/contracts/ISettingsRepository"
 
 export default class FakeSettingsRepository implements ISettingsRepository {
 	constructor(

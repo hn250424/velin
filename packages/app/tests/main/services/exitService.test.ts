@@ -5,7 +5,7 @@ import FakeFileManager from "../modules/fs/FakeFileManager"
 import fakeDialogManager, { setFakeConfirmResult, setFakeSaveDialogResult } from "../modules/ui/fakeDialogManager"
 import FakeTabRepository from "../modules/tab/FakeTabRepository"
 import FakeTreeRepository from "../modules/tree/FakeTreeRepository"
-import { TabSessionModel } from "@main/models/TabSessionModel"
+import type { TabSessionModel } from "@main/models/TabSessionModel"
 import FakeTreeUtils from "../modules/tree/FakeTreeUtils"
 
 import { tabSessionPath, treeSessionPath, newFilePath, tabEidtorsDto, treeDto } from "../data/test_data"
@@ -70,8 +70,8 @@ describe("Exit Service", () => {
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.activatedId).toBe(copiedTabEditorDto.activatedId)
-		const sessionData = session.data
+		expect(session!.activatedId).toBe(copiedTabEditorDto.activatedId)
+		const sessionData = session!.data
 		expect(sessionData[0].filePath).toBe("")
 		expect(sessionData[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
 		const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
@@ -121,8 +121,8 @@ describe("Exit Service", () => {
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data[0].filePath).toBe("")
-		expect(session.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
+		expect(session!.data[0].filePath).toBe("")
+		expect(session!.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
 		const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
 		expect(file_2).toBe(copiedTabEditorDto.data[2].content)
 		const file_3 = await fakeFileManager.read(copiedTabEditorDto.data[3].filePath)
@@ -170,11 +170,11 @@ describe("Exit Service", () => {
 
 		// Then.
 		const session = await fakeTabRepository.readTabSession()
-		expect(session.data[0].filePath).toBe("")
-		expect(session.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
+		expect(session!.data[0].filePath).toBe("")
+		expect(session!.data[1].filePath).toBe(copiedTabEditorDto.data[1].filePath)
 		const file_2 = await fakeFileManager.read(copiedTabEditorDto.data[2].filePath)
 		expect(file_2).toBe(copiedTabEditorDto.data[2].content)
-		expect(session.data[3].filePath).toBe(newFilePath)
+		expect(session!.data[3].filePath).toBe(newFilePath)
 		const file_3 = await fakeFileManager.read(newFilePath)
 		expect(file_3).toBe(copiedTabEditorDto.data[3].content)
 		expect(spy).toHaveBeenCalledTimes(4)
