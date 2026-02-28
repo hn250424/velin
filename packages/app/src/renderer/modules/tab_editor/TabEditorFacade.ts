@@ -471,7 +471,7 @@ export class TabEditorFacade {
 		})
 	}
 
-	private removeTabAt(index: number) {
+	private _removeTabAt(index: number) {
 		const view = this.renderer.getTabEditorViewByIndex(index)
 		const id = view.getId()
 		const viewModel = this.store.getTabEditorViewModelById(id)!
@@ -482,77 +482,63 @@ export class TabEditorFacade {
 		this.renderer.removeTabAndEditor(index)
 	}
 
-	removeTab(id: number) {
+	private _syncTabAt(index: number) {
 		const views = this.renderer.tabEditorViews
 
-		for (let i = 0; i < views.length; i++) {
-			const view = views[i]
-			if (view.getId() === id) {
-				const wasActive = this.store.activeTabIndex >= i
+		if (views.length > 0 && index >= 0) {
+			const safeIndex = Math.min(index, views.length - 1)
+			const view = views[safeIndex]
 
-				this.removeTabAt(i)
-
-				if (wasActive || this.store.activeTabIndex > i) {
-					this.store.activeTabIndex = Math.max(0, this.activeTabIndex - 1)
-
-					if (views.length > 0) {
-						const view = views[this.store.activeTabIndex]
-						view.setActive()
-						this.store.activeTabId = view.getId()
-						this._processFindAndSelect(view)
-					} else {
-						this.store.activeTabId = -1
-					}
-				}
-
-				break
-			}
+			this.activeTabIndex = safeIndex
+			this.activeTabId = view.getId()
+			view.setActive()
+			this._processFindAndSelect(view)
+		} else {
+			this.activeTabIndex = -1
+			this.activeTabId = -1
 		}
+	}
+
+	removeTab(id: number) {
+		const views = this.renderer.tabEditorViews
+		const index = views.findIndex((view) => view.getId() === id)
+		const isAffected = this.store.activeTabIndex >= index
+
+		this._removeTabAt(index)
+		if (isAffected) this._syncTabAt(this.store.activeTabIndex - 1)
 	}
 
 	removeTabsExcept(results: boolean[]) {
 		for (let i = this.renderer.tabEditorViews.length - 1; i >= 0; i--) {
-			if (results[i]) this.removeTabAt(i)
+			if (results[i]) this._removeTabAt(i)
 		}
 
 		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId)
-		if (idx === -1) this.setLastTabAsActive()
+		if (idx === -1) this._syncTabAt(this.renderer.tabEditorViews.length - 1)
 		else this.activeTabIndex = idx
 	}
 
 	removeTabsToRight(results: boolean[]) {
 		for (let i = this.renderer.tabEditorViews.length - 1; i >= 0; i--) {
-			if (results[i]) this.removeTabAt(i)
+			if (results[i]) this._removeTabAt(i)
 		}
 
 		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId)
-		if (idx === -1) this.setLastTabAsActive()
+		if (idx === -1) this._syncTabAt(this.renderer.tabEditorViews.length - 1)
 		else this.activeTabIndex = idx
 	}
 
 	removeAllTabs(results: boolean[]) {
 		for (let i = this.renderer.tabEditorViews.length - 1; i >= 0; i--) {
-			if (results[i]) this.removeTabAt(i)
+			if (results[i]) this._removeTabAt(i)
 		}
 
 		const idx = this.renderer.tabEditorViews.findIndex((view) => view.getId() === this.activeTabId)
-		if (idx === -1) this.setLastTabAsActive()
+		if (idx === -1) this._syncTabAt(this.renderer.tabEditorViews.length - 1)
 		else this.activeTabIndex = idx
 	}
 
-	private setLastTabAsActive() {
-		const views = this.renderer.tabEditorViews
-		const lastIdx = views.length - 1
-
-		this.store.activeTabIndex = lastIdx
-		this.store.activeTabId = lastIdx >= 0 ? views[lastIdx].getId() : -1
-
-		const view = views[lastIdx]
-		if (view) {
-			view.setActive()
-			this._processFindAndSelect(view)
-		}
-	}
+	//
 
 	async rename(prePath: string, newPath: string, isDir: boolean) {
 		if (isDir) {
@@ -591,6 +577,8 @@ export class TabEditorFacade {
 		}
 	}
 
+	//
+
 	activateTabEditorById(id: number) {
 		const targetIndex = this.renderer.getTabEditorViewIndexById(id)
 		const preActiveindex = this.store.activeTabIndex
@@ -603,6 +591,8 @@ export class TabEditorFacade {
 		const view = this.getActiveTabEditorView()
 		this._processFindAndSelect(view)
 	}
+
+	//
 
 	private getTabEditorDataByView(view: TabEditorView): TabEditorDto {
 		const id = view.getId()
@@ -636,6 +626,8 @@ export class TabEditorFacade {
 			data: this.renderer.tabEditorViews.map((view: TabEditorView) => this.getTabEditorDataByView(view)),
 		}
 	}
+
+	//
 
 	findAndSelect(direction: "up" | "down" = this.findDirection) {
 		const tabEditorView = this.getActiveTabEditorView()
