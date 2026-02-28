@@ -20,44 +20,47 @@ type SearchState = {
 }
 
 export class TabEditorView {
-	private _editor: Editor | null
 	private _tabBox: HTMLElement
 	private _tabSpan: HTMLElement
 	private _tabButton: HTMLElement
+
 	private _editorBox: HTMLElement
+	private _editor: Editor | null
+	private _isBinary: boolean
+
+	private _onInput?: (view: TabEditorView) => void
+	private _onBlur?: (view: TabEditorView) => void
 
 	private _suppressInputEvent = false
 
 	private _searchState: SearchState | null = null
 	private _searchHighlightKey = new PluginKey("searchHighlight")
 
-	private _onEditorInputCallback?: () => void
-
 	constructor(
 		tabBox: HTMLElement,
 		tabSpan: HTMLElement,
 		tabButton: HTMLElement,
 		editorBox: HTMLElement,
-		editor: Editor | null
+		editor: Editor | null,
+		isBinary: boolean,
+		onInput: (view: TabEditorView) => void,
+		onBlur: (view: TabEditorView) => void
 	) {
 		this._tabBox = tabBox
 		this._tabSpan = tabSpan
 		this._tabButton = tabButton
 		this._editorBox = editorBox
 		this._editor = editor
+		this._isBinary = isBinary
+		this._onInput = onInput
+		this._onBlur = onBlur
+
+		if (!isBinary) this._initEditorObserver(onInput, onBlur)
 	}
 
 	//
 
-	getId(): number {
-		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID]!)
-	}
-
-	//
-
-	observeEditor(onInput: () => void, onBlur: () => void) {
-		this._onEditorInputCallback = onInput
-
+	_initEditorObserver(onInput: (view: TabEditorView) => void, onBlur: (view: TabEditorView) => void) {
 		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx)
 
@@ -68,17 +71,23 @@ export class TabEditorView {
 
 					if (tr.docChanged) {
 						if (this._suppressInputEvent) return
-						onInput()
+						onInput(this)
 					}
 				},
 				handleDOMEvents: {
 					blur: () => {
-						onBlur()
+						onBlur(this)
 						return false
 					},
 				},
 			})
 		})
+	}
+
+	//
+
+	getId(): number {
+		return parseInt(this._tabBox.dataset[DATASET_ATTR_TAB_ID]!)
 	}
 
 	//
@@ -158,7 +167,6 @@ export class TabEditorView {
 		this._editorBox.remove()
 		this._tabBox.remove()
 	}
-
 
 	//
 
@@ -308,8 +316,8 @@ export class TabEditorView {
 	}
 
 	markAsModified() {
-		if (this._onEditorInputCallback) {
-			this._onEditorInputCallback()
+		if (this._onInput) {
+			this._onInput(this)
 		}
 	}
 

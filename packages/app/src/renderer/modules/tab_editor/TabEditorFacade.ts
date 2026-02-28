@@ -74,7 +74,7 @@ export class TabEditorFacade {
 	//
 
 	get findReplaceOpen() {
-		return this.store.findReploceOpen
+		return this.store.findReplaceOpen
 	}
 
 	set findReplaceOpen(open: boolean) {
@@ -148,12 +148,12 @@ export class TabEditorFacade {
 
 	//
 
-	createGhostBox(fileName: string) {
-		return this.renderer.createGhostBox(fileName)
+	createGhostTab(fileName: string) {
+		return this.renderer.createGhostTab(fileName)
 	}
 
-	removeGhostBox() {
-		this.renderer.removeGhostBox()
+	removeGhostTab() {
+		this.renderer.removeGhostTab()
 	}
 
 	createIndicator() {
@@ -215,8 +215,8 @@ export class TabEditorFacade {
 		this.setTargetTabName(name)
 	}
 
-	moveGhostBox(x: number, y: number) {
-		const ghost = this.createGhostBox(this.getTargetTabName())
+	moveGhostTab(x: number, y: number) {
+		const ghost = this.createGhostTab(this.getTargetTabName())
 
 		ghost.style.left = `${x + 5}px`
 		ghost.style.top = `${y + 5}px`
@@ -268,7 +268,7 @@ export class TabEditorFacade {
 
 	clearDrag() {
 		this.endDrag()
-		this.removeGhostBox()
+		this.removeGhostTab()
 		this.removeIndicator()
 	}
 

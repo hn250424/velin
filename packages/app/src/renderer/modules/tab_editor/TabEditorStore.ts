@@ -10,7 +10,7 @@ export class TabEditorStore {
 	private _activeTabIndex = -1
 	private _contextTabId = -1
 
-	private _findReploceOpen = false
+	private _findReplaceOpen = false
 	private _findDirection: "up" | "down" = "down"
 
 	//
@@ -76,12 +76,12 @@ export class TabEditorStore {
 
 	//
 
-	get findReploceOpen() {
-		return this._findReploceOpen
+	get findReplaceOpen() {
+		return this._findReplaceOpen
 	}
 
 	set findReplaceOpen(open: boolean) {
-		this._findReploceOpen = open
+		this._findReplaceOpen = open
 	}
 
 	get findDirection() {

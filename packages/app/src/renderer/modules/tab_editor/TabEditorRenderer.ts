@@ -33,30 +33,25 @@ export class TabEditorRenderer {
 
 	//
 
-	private createTabBox(fileName: string) {
-		const div = document.createElement("div")
-		div.classList.add(CLASS_TAB)
+	private _createTabEl(id: string, filePath: string, fileName: string) {
+		const tabBox = document.createElement("div")
+		tabBox.classList.add(CLASS_TAB)
+		tabBox.dataset[DATASET_ATTR_TAB_ID] = id.toString()
 
-		const span = document.createElement("span")
-		span.textContent = fileName ? fileName : "Untitled"
+		const tabSpan = document.createElement("span")
+		tabSpan.title = filePath || ""
+		tabSpan.textContent = fileName || "Untitled"
 
-		const button = document.createElement("button")
-		button.textContent = NOT_MODIFIED_TEXT
+		const tabButton = document.createElement("button")
+		tabButton.textContent = NOT_MODIFIED_TEXT
 
-		div.appendChild(span)
-		div.appendChild(button)
+		tabBox.appendChild(tabSpan)
+		tabBox.appendChild(tabButton)
 
-		return { div, span, button }
+		return { tabBox, tabSpan, tabButton }
 	}
 
-	async createTabAndEditor(viewModel: TabEditorViewModel) {
-		const { id, isModified, isBinary, filePath, fileName, initialContent } = viewModel
-
-		const { div, span, button } = this.createTabBox(fileName)
-		div.dataset[DATASET_ATTR_TAB_ID] = id.toString()
-		span.title = filePath || ""
-		this.elements.tabContainer.appendChild(div)
-
+	private async _createEditorEl(isBinary: boolean, initialContent: string) {
 		const editorBox = document.createElement("div")
 		editorBox.className = CLASS_EDITOR_BOX
 
@@ -86,32 +81,42 @@ export class TabEditorRenderer {
 			})
 		}
 
+		return { editorBox, editor }
+	}
+
+	private _handleEditorInput(view: TabEditorView, vm: TabEditorViewModel) {
+		const current = view.getContent()
+		const isModified = current !== vm.initialContent
+
+		if (isModified && !vm.isModified) {
+			vm.isModified = true
+			view.setTabButtonTextContent(MODIFIED_TEXT)
+		} else if (!isModified && vm.isModified) {
+			vm.isModified = false
+			view.setTabButtonTextContent(NOT_MODIFIED_TEXT)
+		}
+	}
+
+	private _handleEditorBlur(view: TabEditorView, vm: TabEditorViewModel) {
+		if (!vm.filePath && vm.isModified) {
+			const firstLine = view.getEditorFirstLine()
+			view.setTabSpanTextContent(firstLine || "Untitled")
+		}
+	}
+
+	async createTabAndEditor(viewModel: TabEditorViewModel) {
+		const { id, isModified, isBinary, filePath, fileName, initialContent } = viewModel
+
+		const { tabBox, tabSpan, tabButton } = this._createTabEl(String(id), filePath, fileName)
+		const { editorBox, editor } = await this._createEditorEl(isBinary, initialContent)
+
+		this.elements.tabContainer.appendChild(tabBox)
 		this.elements.editorContainer.appendChild(editorBox)
 
-		const tabEditorView = new TabEditorView(div, span, button, editorBox, editor)
-
-		if (!isBinary) {
-			tabEditorView.observeEditor(
-				() => {
-					const current = tabEditorView.getContent()
-					const isModified = current !== viewModel.initialContent
-
-					if (isModified && !viewModel.isModified) {
-						viewModel.isModified = true
-						tabEditorView.setTabButtonTextContent(MODIFIED_TEXT)
-					} else if (!isModified && viewModel.isModified) {
-						viewModel.isModified = false
-						tabEditorView.setTabButtonTextContent(NOT_MODIFIED_TEXT)
-					}
-				},
-				() => {
-					if (!viewModel.filePath && viewModel.isModified) {
-						const firstLine = tabEditorView.getEditorFirstLine()
-						tabEditorView.setTabSpanTextContent(firstLine || "Untitled")
-					}
-				}
-			)
-		}
+		const tabEditorView = new TabEditorView(tabBox, tabSpan, tabButton, editorBox, editor, isBinary,
+			(view) => this._handleEditorInput(view, viewModel),
+			(view) => this._handleEditorBlur(view, viewModel)
+		)
 
 		this._tabEditorViews.push(tabEditorView)
 		this.setTabEditorViewByPath(filePath, tabEditorView)
@@ -200,16 +205,32 @@ export class TabEditorRenderer {
 
 	//
 
-	createGhostBox(fileName: string) {
+	createGhostTab(fileName: string) {
 		if (this._ghostTab) return this._ghostTab
-		const { div, span, button } = this.createTabBox(fileName)
+		const ghostTab = this._createGhostTabEl(fileName)
+		this._ghostTab = ghostTab
+		document.body.appendChild(ghostTab)
+		return ghostTab
+	}
+
+	private _createGhostTabEl(fileName: string) {
+		const div = document.createElement("div")
+		div.classList.add(CLASS_TAB)
 		div.classList.add(CLASS_TAB_GHOST)
-		this._ghostTab = div
-		document.body.appendChild(this._ghostTab)
+
+		const span = document.createElement("span")
+		span.textContent = fileName ? fileName : "Untitled"
+
+		const button = document.createElement("button")
+		button.textContent = NOT_MODIFIED_TEXT
+
+		div.appendChild(span)
+		div.appendChild(button)
+
 		return div
 	}
 
-	removeGhostBox() {
+	removeGhostTab() {
 		if (this._ghostTab) {
 			this._ghostTab.remove()
 			this._ghostTab = null

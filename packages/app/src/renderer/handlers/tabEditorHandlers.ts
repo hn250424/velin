@@ -163,7 +163,7 @@ function bindMouseMoveEventsForDrag(tabEditorFacade: TabEditorFacade) {
 			}
 		}
 
-		tabEditorFacade.moveGhostBox(e.clientX, e.clientY);
+		tabEditorFacade.moveGhostTab(e.clientX, e.clientY);
 		updateInsertion(e.clientX);
 	})
 }
