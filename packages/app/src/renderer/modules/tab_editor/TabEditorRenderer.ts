@@ -129,8 +129,8 @@ export class TabEditorRenderer {
 	}
 
 	removeTabAndEditor(index: number) {
-		this._tabEditorViews[index].destroy()
-		this._tabEditorViews.splice(index, 1)
+		const [ view ] = this._tabEditorViews.splice(index, 1)
+		view.destroy()
 	}
 
 	//
