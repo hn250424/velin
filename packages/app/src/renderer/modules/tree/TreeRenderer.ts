@@ -3,7 +3,7 @@ import type { TreeViewModel } from "../../viewmodels/TreeViewModel"
 import { inject, injectable } from "inversify"
 
 import fileSvg from "../../assets/icons/file.svg?raw"
-import folderSvg from "../../assets/icons/folder.svg?raw"
+import closedFolderSvg from "../../assets/icons/closed_folder.svg?raw"
 import openedFolderSvg from "../../assets/icons/opened_folder.svg?raw"
 import {
 	CLASS_FOCUSED,
@@ -80,12 +80,7 @@ export class TreeRenderer {
 			nodeType.innerHTML = fileSvg
 		} else {
 			nodeType.classList.add("folder")
-
-			if (viewModel.expanded) {
-				nodeType.innerHTML = openedFolderSvg
-			} else {
-				nodeType.innerHTML = folderSvg
-			}
+			nodeType.innerHTML = viewModel.expanded ? openedFolderSvg : closedFolderSvg
 		}
 
 		const text = document.createElement("span")
@@ -127,7 +122,7 @@ export class TreeRenderer {
 
 		if (directory) {
 			nodeType.classList.add("folder")
-			nodeType.innerHTML = folderSvg
+			nodeType.innerHTML = closedFolderSvg
 		} else {
 			nodeType.classList.add("file")
 			nodeType.innerHTML = fileSvg

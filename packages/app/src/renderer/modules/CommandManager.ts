@@ -6,7 +6,7 @@ import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
 import type { TreeDto } from "@shared/dto/TreeDto"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
-import folderSvg from "../assets/icons/folder.svg?raw"
+import closedFolderSvg from "../assets/icons/closed_folder.svg?raw"
 import openedFolderSvg from "../assets/icons/opened_folder.svg?raw"
 
 import DI_KEYS from "../constants/di_keys"
@@ -173,7 +173,7 @@ export class CommandManager {
 	private _updateUI(nodeType: HTMLElement, children: HTMLElement, viewModel: TreeViewModel, expanded: boolean) {
 		viewModel.expanded = expanded
 
-		nodeType.innerHTML = expanded ? openedFolderSvg : folderSvg
+		nodeType.innerHTML = expanded ? openedFolderSvg : closedFolderSvg
 
 		if (expanded) children.classList.add(CLASS_EXPANDED)
 		else children.classList.remove(CLASS_EXPANDED)
