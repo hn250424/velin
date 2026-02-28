@@ -6,7 +6,6 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import { redo, undo } from "prosemirror-history"
 import {
 	CLASS_TAB,
 	DATASET_ATTR_TAB_ID,
@@ -167,29 +166,19 @@ export class TabEditorRenderer {
 
 	//
 
-	undo(index: number) {
-		this._tabEditorViews[index].editor!.action((ctx) => {
-			const view = ctx.get(editorViewCtx)
-			const { state, dispatch } = view
-			undo(state, dispatch)
-		})
+	undoEditor(index: number) {
+		const view = this._tabEditorViews[index]
+		view.undoEditor()
 	}
 
-	redo(index: number) {
-		this._tabEditorViews[index].editor!.action((ctx) => {
-			const view = ctx.get(editorViewCtx)
-			const { state, dispatch } = view
-			redo(state, dispatch)
-		})
+	redoEditor(index: number) {
+		const view = this._tabEditorViews[index]
+		view.redoEditor()
 	}
 
-	paste(index: number, text: string) {
-		this._tabEditorViews[index].editor!.action((ctx) => {
-			const view = ctx.get(editorViewCtx)
-			const { state, dispatch } = view
-			view.focus()
-			dispatch(state.tr.insertText(text))
-		})
+	pasteInEditor(index: number, text: string) {
+		const view = this._tabEditorViews[index]
+		view.pasteInEditor(text)
 	}
 
 	//
@@ -216,14 +205,6 @@ export class TabEditorRenderer {
 
 	//
 
-	createGhostTab(fileName: string) {
-		if (this._ghostTab) return this._ghostTab
-		const ghostTab = this._createGhostTabEl(fileName)
-		this._ghostTab = ghostTab
-		document.body.appendChild(ghostTab)
-		return ghostTab
-	}
-
 	private _createGhostTabEl(fileName: string) {
 		const div = document.createElement("div")
 		div.classList.add(CLASS_TAB)
@@ -239,6 +220,14 @@ export class TabEditorRenderer {
 		div.appendChild(button)
 
 		return div
+	}
+
+	createGhostTab(fileName: string) {
+		if (this._ghostTab) return this._ghostTab
+		const ghostTab = this._createGhostTabEl(fileName)
+		this._ghostTab = ghostTab
+		document.body.appendChild(ghostTab)
+		return ghostTab
 	}
 
 	removeGhostTab() {

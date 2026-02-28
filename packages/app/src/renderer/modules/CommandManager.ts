@@ -56,7 +56,7 @@ export class CommandManager {
 	//
 
 	performUndoEditor() {
-		this.tabEditorFacade.undo()
+		this.tabEditorFacade.undoEditor()
 	}
 
 	async performUndoTree() {
@@ -76,7 +76,7 @@ export class CommandManager {
 	}
 
 	performRedoEditor() {
-		this.tabEditorFacade.redo()
+		this.tabEditorFacade.redoEditor()
 	}
 
 	async performRedoTree() {

@@ -115,19 +115,19 @@ export class TabEditorFacade {
 
 	//
 
-	undo() {
+	undoEditor() {
 		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.undo(activeTabIndex)
+		this.renderer.undoEditor(activeTabIndex)
 	}
 
-	redo() {
+	redoEditor() {
 		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.redo(activeTabIndex)
+		this.renderer.redoEditor(activeTabIndex)
 	}
 
 	paste(text: string) {
 		const activeTabIndex = this.store.activeTabIndex
-		this.renderer.paste(activeTabIndex, text)
+		this.renderer.pasteInEditor(activeTabIndex, text)
 	}
 
 	//
@@ -174,7 +174,7 @@ export class TabEditorFacade {
 		this.renderer.changeFontFamily(family)
 	}
 
-	//
+	// TODO
 
 	get findAndReplaceContainer() {
 		return this.renderer.findAndReplaceContainer
@@ -365,24 +365,23 @@ export class TabEditorFacade {
 	// orchestra
 
 	async loadTabs(dto: TabEditorsDto) {
-		this.store.activeTabId = dto.activatedId
+		const activatedId = dto.activatedId
 		const tabs = dto.data
 
+		this.store.activeTabId = activatedId
+
 		for (let i = 0; i < tabs.length; i++) {
-			if (tabs[i].id === this.store.activeTabId) {
-				await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, true)
-			} else {
-				await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, false)
-			}
+			await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, tabs[i].id === activatedId)
 		}
 	}
 
 	async syncTabs(dto: TabEditorsDto) {
-		this.store.activeTabId = dto.activatedId
+		const activatedId = dto.activatedId
 		const tabs = dto.data
 
-		const map: Map<number, TabEditorDto> = new Map()
+		this.store.activeTabId = activatedId
 
+		const map: Map<number, TabEditorDto> = new Map()
 		for (const tab of tabs) {
 			map.set(tab.id, tab)
 		}
@@ -396,9 +395,8 @@ export class TabEditorFacade {
 				if (dto.filePath !== viewModel.filePath) {
 					viewModel.filePath = dto.filePath
 					viewModel.fileName = dto.fileName
-
 					view.tabSpan.title = dto.filePath
-					view.tabSpan.textContent = this.resolveFileNameByView(view)
+					view.tabSpan.textContent = dto.fileName || view.getEditorFirstLine()
 				}
 			} else {
 				this.removeTab(id)
@@ -605,14 +603,6 @@ export class TabEditorFacade {
 		this._processFindAndSelect(view)
 	}
 
-	private resolveFileNameByView(view: TabEditorView): string {
-		const id = view.getId()
-		const data = this.getTabEditorViewModelById(id)!
-
-		if (!data.fileName) return view.getEditorFirstLine()
-		else return data.fileName
-	}
-
 	private getTabEditorDataByView(view: TabEditorView): TabEditorDto {
 		const id = view.getId()
 		const data = this.getTabEditorViewModelById(id)!
@@ -621,7 +611,7 @@ export class TabEditorFacade {
 			id: data.id,
 			isModified: data.isModified,
 			filePath: data.filePath,
-			fileName: this.resolveFileNameByView(view),
+			fileName: data.fileName || view.getEditorFirstLine(),
 			content: data.isBinary ? BINARY_FILE_WARNING : view.getContent(),
 			isBinary: data.isBinary,
 		}

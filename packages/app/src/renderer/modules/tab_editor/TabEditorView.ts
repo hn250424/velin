@@ -5,6 +5,7 @@ import { Editor, editorViewCtx, parserCtx } from "@milkdown/kit/core"
 import { TextSelection, Selection } from "prosemirror-state"
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view"
 import { Plugin, PluginKey } from "prosemirror-state"
+import { redo, undo } from "prosemirror-history"
 
 import { CLASS_SELECTED, DATASET_ATTR_TAB_ID } from "../../constants/dom"
 
@@ -116,6 +117,33 @@ export class TabEditorView {
 				const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, doc.content)
 				view.dispatch(tr)
 			}
+		})
+	}
+
+	//
+
+	undoEditor() {
+		this._editor!.action(ctx => {
+			const view = ctx.get(editorViewCtx)
+			const { state, dispatch } = view
+			undo(state, dispatch)
+		})
+	}
+
+	redoEditor() {
+		this._editor!.action(ctx => {
+			const view = ctx.get(editorViewCtx)
+			const { state, dispatch } = view
+			redo(state, dispatch)
+		})
+	}
+
+	pasteInEditor(text: string) {
+		this._editor!.action((ctx) => {
+			const view = ctx.get(editorViewCtx)
+			const { state, dispatch } = view
+			view.focus()
+			dispatch(state.tr.insertText(text))
 		})
 	}
 
