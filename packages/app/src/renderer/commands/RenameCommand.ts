@@ -25,7 +25,8 @@ export class RenameCommand implements ICommand {
 
 		this.treeNode.replaceChild(newSpan, this.treeNode.querySelector("input") as HTMLInputElement)
 
-		await this.tabEditorFacade.rename(this.prePath, this.newPath, this.isDir)
+		if (this.isDir) await this.tabEditorFacade.renameDirectory(this.prePath, this.newPath)
+		else await this.tabEditorFacade.renameFile(this.prePath, this.newPath)
 	}
 
 	async undo() {
@@ -38,6 +39,7 @@ export class RenameCommand implements ICommand {
 		const currentText = this.treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
 		if (currentText) this.treeNode.replaceChild(oldSpan, currentText)
 
-		await this.tabEditorFacade.rename(this.newPath, this.prePath, this.isDir)
+		if (this.isDir) await this.tabEditorFacade.renameDirectory(this.prePath, this.newPath)
+		else await this.tabEditorFacade.renameFile(this.prePath, this.newPath)
 	}
 }

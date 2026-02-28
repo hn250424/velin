@@ -540,41 +540,41 @@ export class TabEditorFacade {
 
 	//
 
-	async rename(prePath: string, newPath: string, isDir: boolean) {
-		if (isDir) {
-			for (const [filePath, view] of this.renderer.pathToTabEditorViewMap.entries()) {
-				const relative = window.utils.getRelativePath(prePath, filePath)
-				if (relative === "" || (!relative.startsWith("..") && !window.utils.isAbsolute(relative))) {
-					const newFilePath = window.utils.getJoinedPath(newPath, relative)
-					const preData = this.getTabEditorDataByView(view)
-					const newData = { ...preData, filePath: newFilePath }
-					const viewModel = this.toTabEditorViewModel(newData)
+	async renameDirectory(prePath: string, newPath: string) {
+		for (const [filePath, view] of this.renderer.pathToTabEditorViewMap.entries()) {
+			const relative = window.utils.getRelativePath(prePath, filePath)
+			if (relative === "" || (!relative.startsWith("..") && !window.utils.isAbsolute(relative))) {
+				const newFilePath = window.utils.getJoinedPath(newPath, relative)
+				const preData = this.getTabEditorDataByView(view)
+				const newData = { ...preData, filePath: newFilePath }
+				const viewModel = this.toTabEditorViewModel(newData)
 
-					this.store.setTabEditorViewModelById(viewModel.id, viewModel)
-					this.renderer.deleteTabEditorViewByPath(filePath)
-					this.renderer.setTabEditorViewByPath(newFilePath, view)
+				this.store.setTabEditorViewModelById(viewModel.id, viewModel)
+				this.renderer.deleteTabEditorViewByPath(filePath)
+				this.renderer.setTabEditorViewByPath(newFilePath, view)
 
-					view.tabSpan.title = viewModel.filePath
-				}
+				view.tabSpan.title = viewModel.filePath
 			}
-
-			const dto = this.getAllTabEditorData()
-			await window.rendererToMain.syncTabSessionFromRenderer(dto)
-		} else {
-			const view = this.getTabEditorViewByPath(prePath)!
-			const viewModel = this.getTabEditorViewModelById(view.getId())!
-			viewModel.filePath = newPath
-			viewModel.fileName = window.utils.getBaseName(newPath)
-
-			this.renderer.deleteTabEditorViewByPath(prePath)
-			this.renderer.setTabEditorViewByPath(viewModel.filePath, view)
-
-			view.tabSpan.title = viewModel.filePath
-			view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : "Untitled"
-
-			const dto = this.getAllTabEditorData()
-			await window.rendererToMain.syncTabSessionFromRenderer(dto)
 		}
+
+		const dto = this.getAllTabEditorData()
+		await window.rendererToMain.syncTabSessionFromRenderer(dto)
+	}
+
+	async renameFile(prePath: string, newPath: string) {
+		const view = this.getTabEditorViewByPath(prePath)!
+		const viewModel = this.getTabEditorViewModelById(view.getId())!
+		viewModel.filePath = newPath
+		viewModel.fileName = window.utils.getBaseName(newPath)
+
+		this.renderer.deleteTabEditorViewByPath(prePath)
+		this.renderer.setTabEditorViewByPath(viewModel.filePath, view)
+
+		view.tabSpan.title = viewModel.filePath
+		view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : "Untitled"
+
+		const dto = this.getAllTabEditorData()
+		await window.rendererToMain.syncTabSessionFromRenderer(dto)
 	}
 
 	//
