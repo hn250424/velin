@@ -113,7 +113,13 @@ export class TabEditorRenderer {
 		this.elements.tabContainer.appendChild(tabBox)
 		this.elements.editorContainer.appendChild(editorBox)
 
-		const tabEditorView = new TabEditorView(tabBox, tabSpan, tabButton, editorBox, editor, isBinary,
+		const tabEditorView = new TabEditorView(
+			tabBox,
+			tabSpan,
+			tabButton,
+			editorBox,
+			editor,
+			isBinary,
 			(view) => this._handleEditorInput(view, viewModel),
 			(view) => this._handleEditorBlur(view, viewModel)
 		)
@@ -196,11 +202,16 @@ export class TabEditorRenderer {
 	//
 
 	moveTabEditorView(fromIndex: number, toIndex: number) {
-		const view = this._tabEditorViews.splice(fromIndex, 1)[0]
+		if (fromIndex === toIndex) return
+
+		const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex
+
+		const [view] = this._tabEditorViews.splice(fromIndex, 1)
 		this._tabEditorViews.splice(toIndex, 0, view)
-		this.elements.tabContainer.removeChild(view.tabBox)
-		const refNode = this.elements.tabContainer.children[toIndex] ?? null
-		this.elements.tabContainer.insertBefore(view.tabBox, refNode)
+
+		const container = this.elements.tabContainer
+		const refNode = container.children[adjustedToIndex > fromIndex ? adjustedToIndex + 1 : adjustedToIndex];
+    container.insertBefore(view.tabBox, refNode || null);
 	}
 
 	//
