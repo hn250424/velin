@@ -371,7 +371,14 @@ export class TabEditorFacade {
 		this.store.activeTabId = activatedId
 
 		for (let i = 0; i < tabs.length; i++) {
-			await this.addTab(tabs[i].id, tabs[i].filePath, tabs[i].fileName, tabs[i].content, tabs[i].isBinary, tabs[i].id === activatedId)
+			await this.addTab(
+				tabs[i].id,
+				tabs[i].filePath,
+				tabs[i].fileName,
+				tabs[i].content,
+				tabs[i].isBinary,
+				tabs[i].id === activatedId
+			)
 		}
 	}
 
@@ -430,43 +437,37 @@ export class TabEditorFacade {
 		}
 	}
 
-	applySaveResult(result: TabEditorDto) {
-		if (result.isBinary) return false
-
-		let wasApplied = false
+	applySaveResult(dto: TabEditorDto) {
 		for (let i = 0; i < this.renderer.tabEditorViews.length; i++) {
-			const data = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId())
-			if (data && (data.id === result.id || data.filePath === result.filePath) && result.isModified === false) {
-				const tv = this.renderer.tabEditorViews[i]
-				const vm = this.store.getTabEditorViewModelById(tv.getId())!
+			const vm = this.getTabEditorViewModelById(this.renderer.tabEditorViews[i].getId())!
 
-				vm.initialContent = result.content
+			if ((vm.id === dto.id || vm.filePath === dto.filePath) && dto.isModified === false) {
+				const tv = this.renderer.tabEditorViews[i]
+
+				vm.initialContent = dto.content
 
 				tv.setSuppressInputEvent(true)
 				const selection = tv.getSelection()
 
 				// Prevents cursor jumping and content normalization issues after save.
-				// tv.setContent(result.content);
+				// tv.setContent(dto.content);
 
 				tv.setSelection(selection)
 				tv.setSuppressInputEvent(false)
 
-				tv.setTabSpanTextContent(result.fileName)
+				tv.setTabSpanTextContent(dto.fileName)
 				tv.setTabButtonTextContent(NOT_MODIFIED_TEXT)
 
-				data.isModified = false
-				data.filePath = result.filePath
-				data.fileName = result.fileName
-
-				wasApplied = true
+				vm.isModified = false
+				vm.filePath = dto.filePath
+				vm.fileName = dto.fileName
 			}
 		}
-		return wasApplied
 	}
 
-	applySaveAllResults(results: TabEditorsDto) {
-		results.data.forEach((result, i) => {
-			this.applySaveResult(result)
+	applySaveAllResults(tabEditorsDto: TabEditorsDto) {
+		tabEditorsDto.data.forEach((dto, i) => {
+			this.applySaveResult(dto)
 		})
 	}
 

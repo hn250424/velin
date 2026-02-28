@@ -195,17 +195,15 @@ export class CommandManager {
 		const data: TabEditorDto = this.tabEditorFacade.getActiveTabEditorData()
 		const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
 		if (response.result && response.data) {
-			const wasApplied = this.tabEditorFacade.applySaveResult(response.data)
-			if (!wasApplied) {
-				await this.tabEditorFacade.addTab(
-					response.data.id,
-					response.data.filePath,
-					response.data.fileName,
-					response.data.content,
-					response.data.isBinary,
-					true
-				)
-			}
+			this.tabEditorFacade.applySaveResult(response.data)
+			await this.tabEditorFacade.addTab(
+				response.data.id,
+				response.data.filePath,
+				response.data.fileName,
+				response.data.content,
+				response.data.isBinary,
+				true
+			)
 		}
 	}
 
@@ -227,16 +225,26 @@ export class CommandManager {
 	}
 
 	async performCloseOtherTabs() {
-		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(this.tabEditorFacade.contextTabId)
+		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(
+			this.tabEditorFacade.contextTabId
+		)
 		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeOtherTabs(tabEditorDtoToExclude, tabEditorsDto)
+		const response: Response<boolean[]> = await window.rendererToMain.closeOtherTabs(
+			tabEditorDtoToExclude,
+			tabEditorsDto
+		)
 		if (response.result) this.tabEditorFacade.removeTabsExcept(response.data)
 	}
 
 	async performCloseTabsToRight() {
-		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(this.tabEditorFacade.contextTabId)
+		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(
+			this.tabEditorFacade.contextTabId
+		)
 		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(tabEditorDtoAsReference, tabEditorsDto)
+		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(
+			tabEditorDtoAsReference,
+			tabEditorsDto
+		)
 		if (response.result) this.tabEditorFacade.removeTabsToRight(response.data)
 	}
 
