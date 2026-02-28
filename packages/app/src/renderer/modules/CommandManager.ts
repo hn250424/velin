@@ -124,7 +124,7 @@ export class CommandManager {
 			if (!openDirectoryResponse.data) return
 
 			// Close existing tab.
-			const tabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+			const tabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
 			const closeAllTabsResponse = await window.rendererToMain.closeAllTabs(tabEditorsDto)
 			if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data)
 
@@ -185,14 +185,14 @@ export class CommandManager {
 	}
 
 	async performSave() {
-		const data = this.tabEditorFacade.getActiveTabEditorData()
+		const data = this.tabEditorFacade.getActiveTabEditorDto()
 		if (!data.isModified) return
 		const response: Response<TabEditorDto> = await window.rendererToMain.save(data)
 		if (response.result && !response.data.isModified) this.tabEditorFacade.applySaveResult(response.data)
 	}
 
 	async performSaveAs() {
-		const data: TabEditorDto = this.tabEditorFacade.getActiveTabEditorData()
+		const data: TabEditorDto = this.tabEditorFacade.getActiveTabEditorDto()
 		const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
 		if (response.result && response.data) {
 			this.tabEditorFacade.applySaveResult(response.data)
@@ -208,15 +208,15 @@ export class CommandManager {
 	}
 
 	async performSaveAll() {
-		const tabsData: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
-		const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabsData)
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
+		const response: Response<TabEditorsDto> = await window.rendererToMain.saveAll(tabEditorsDto)
 		if (response.result) this.tabEditorFacade.applySaveAllResults(response.data)
 	}
 
 	//
 
 	async performCloseTab(id: number) {
-		const data = this.tabEditorFacade.getTabEditorDataById(id)
+		const data = this.tabEditorFacade.getTabEditorDtoById(id)
 
 		const response: Response<void> = await window.rendererToMain.closeTab(data)
 		if (response.result) this.tabEditorFacade.removeTab(data.id)
@@ -225,10 +225,10 @@ export class CommandManager {
 	}
 
 	async performCloseOtherTabs() {
-		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(
+		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDtoById(
 			this.tabEditorFacade.contextTabId
 		)
-		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
 		const response: Response<boolean[]> = await window.rendererToMain.closeOtherTabs(
 			tabEditorDtoToExclude,
 			tabEditorsDto
@@ -237,10 +237,10 @@ export class CommandManager {
 	}
 
 	async performCloseTabsToRight() {
-		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDataById(
+		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDtoById(
 			this.tabEditorFacade.contextTabId
 		)
-		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(
 			tabEditorDtoAsReference,
 			tabEditorsDto
@@ -249,8 +249,8 @@ export class CommandManager {
 	}
 
 	async performCloseAllTabs() {
-		const data: TabEditorsDto = this.tabEditorFacade.getAllTabEditorData()
-		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(data)
+		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
+		const response: Response<boolean[]> = await window.rendererToMain.closeAllTabs(tabEditorsDto)
 		if (response.result) this.tabEditorFacade.removeAllTabs(response.data)
 	}
 

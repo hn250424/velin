@@ -35,8 +35,8 @@ export class DeleteCommand implements ICommand {
 		this.treeFacade.delete(this.selectedIndices)
 		this.treeFacade.clearSelectedIndices()
 
-		const tabEditorDto = this.tabEditorFacade.getAllTabEditorData()
-		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorDto)
+		const tabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
+		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorsDto)
 
 		const viewModel = this.treeFacade.extractTreeViewModel()
 		const treeDto = this.treeFacade.toTreeDto(viewModel)

@@ -197,13 +197,6 @@ export class TabEditorRenderer {
 
 	//
 
-	activateTabEditorByIndex(targetIndex: number, preActiveindex: number) {
-		this._tabEditorViews[preActiveindex].setDeactive()
-		this._tabEditorViews[targetIndex].setActive()
-	}
-
-	//
-
 	moveTabEditorView(fromIndex: number, toIndex: number) {
 		if (fromIndex === toIndex) return
 

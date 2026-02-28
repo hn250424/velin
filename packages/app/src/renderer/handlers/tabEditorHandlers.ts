@@ -181,8 +181,8 @@ function bindMouseUpEventsForDrag(tabEditorFacade: TabEditorFacade) {
 
 		tabEditorFacade.clearDrag()
 
-		const dtos = tabEditorFacade.getAllTabEditorData()
-		const response = await window.rendererToMain.syncTabSessionFromRenderer(dtos)
+		const tabEditorsDto = tabEditorFacade.getTabEditorsDto()
+		const response = await window.rendererToMain.syncTabSessionFromRenderer(tabEditorsDto)
 
 		if (!response) tabEditorFacade.moveTabEditorViewAndUpdateActiveIndex(to, from)
 	})

@@ -174,7 +174,7 @@ export class TabEditorFacade {
 		this.renderer.changeFontFamily(family)
 	}
 
-	// TODO
+	//
 
 	get findAndReplaceContainer() {
 		return this.renderer.findAndReplaceContainer
@@ -190,6 +190,10 @@ export class TabEditorFacade {
 
 	get findInput() {
 		return this.renderer.findInput
+	}
+
+	get searchText() {
+		return this.findInput.value
 	}
 
 	get replaceInput() {
@@ -363,6 +367,13 @@ export class TabEditorFacade {
 	}
 
 	// orchestra
+
+	getActiveTabEditorView(): TabEditorView {
+		const activeIndex = this.activeTabIndex
+		return this.getTabEditorViewByIndex(activeIndex)
+	}
+
+	//
 
 	async loadTabs(dto: TabEditorsDto) {
 		const activatedId = dto.activatedId
@@ -545,7 +556,7 @@ export class TabEditorFacade {
 			const relative = window.utils.getRelativePath(prePath, filePath)
 			if (relative === "" || (!relative.startsWith("..") && !window.utils.isAbsolute(relative))) {
 				const newFilePath = window.utils.getJoinedPath(newPath, relative)
-				const preData = this.getTabEditorDataByView(view)
+				const preData = this._getTabEditorDtoByView(view)
 				const newData = { ...preData, filePath: newFilePath }
 				const viewModel = this.toTabEditorViewModel(newData)
 
@@ -557,8 +568,8 @@ export class TabEditorFacade {
 			}
 		}
 
-		const dto = this.getAllTabEditorData()
-		await window.rendererToMain.syncTabSessionFromRenderer(dto)
+		const tabEditorsDto = this.getTabEditorsDto()
+		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorsDto)
 	}
 
 	async renameFile(prePath: string, newPath: string) {
@@ -573,68 +584,71 @@ export class TabEditorFacade {
 		view.tabSpan.title = viewModel.filePath
 		view.tabSpan.textContent = viewModel.fileName ? viewModel.fileName : "Untitled"
 
-		const dto = this.getAllTabEditorData()
-		await window.rendererToMain.syncTabSessionFromRenderer(dto)
+		const tabEditorsDto = this.getTabEditorsDto()
+		await window.rendererToMain.syncTabSessionFromRenderer(tabEditorsDto)
 	}
 
 	//
 
 	activateTabEditorById(id: number) {
-		const targetIndex = this.renderer.getTabEditorViewIndexById(id)
-		const preActiveindex = this.store.activeTabIndex
+		const targetIndex = this.getTabEditorViewIndexById(id)
+		const activatedIndex = this.activeTabIndex
 
-		this.renderer.activateTabEditorByIndex(targetIndex, preActiveindex)
+		const views = this.renderer.tabEditorViews
+		const activatedTab = views[activatedIndex]
+		const targetTab = views[targetIndex]
 
-		this.store.activeTabId = id
-		this.store.activeTabIndex = targetIndex
+		activatedTab.setDeactive()
+		targetTab.setActive()
 
-		const view = this.getActiveTabEditorView()
-		this._processFindAndSelect(view)
+		this.activeTabId = id
+		this.activeTabIndex = targetIndex
+
+		this._processFindAndSelect(targetTab)
 	}
 
 	//
 
-	private getTabEditorDataByView(view: TabEditorView): TabEditorDto {
+	private _getTabEditorDtoByView(view: TabEditorView): TabEditorDto {
 		const id = view.getId()
-		const data = this.getTabEditorViewModelById(id)!
+		const vm = this.getTabEditorViewModelById(id)!
 
 		return {
-			id: data.id,
-			isModified: data.isModified,
-			filePath: data.filePath,
-			fileName: data.fileName || view.getEditorFirstLine(),
-			content: data.isBinary ? BINARY_FILE_WARNING : view.getContent(),
-			isBinary: data.isBinary,
+			id: vm.id,
+			isModified: vm.isModified,
+			filePath: vm.filePath,
+			fileName: vm.fileName || view.getEditorFirstLine(),
+			content: vm.isBinary ? BINARY_FILE_WARNING : view.getContent(),
+			isBinary: vm.isBinary,
 		}
 	}
 
-	getTabEditorDataById(id: number): TabEditorDto {
+	getTabEditorDtoById(id: number): TabEditorDto {
 		const viewModel = this.store.getTabEditorViewModelById(id)!
 		const view = this.renderer.getTabEditorViewByPath(viewModel.filePath)!
-		return this.getTabEditorDataByView(view)
+		return this._getTabEditorDtoByView(view)
 	}
 
-	getActiveTabEditorData(): TabEditorDto {
+	getActiveTabEditorDto(): TabEditorDto {
 		const activeIndex = this.store.activeTabIndex
 		const view = this.renderer.getTabEditorViewByIndex(activeIndex)
-		return this.getTabEditorDataByView(view)
+		return this._getTabEditorDtoByView(view)
 	}
 
-	getAllTabEditorData(): TabEditorsDto {
+	getTabEditorsDto(): TabEditorsDto {
 		return {
 			activatedId: this.store.activeTabId,
-			data: this.renderer.tabEditorViews.map((view: TabEditorView) => this.getTabEditorDataByView(view)),
+			data: this.renderer.tabEditorViews.map((view: TabEditorView) => this._getTabEditorDtoByView(view)),
 		}
 	}
 
-	//
+	// TODO
 
 	findAndSelect(direction: "up" | "down" = this.findDirection) {
 		const tabEditorView = this.getActiveTabEditorView()
-		const searchText = this.findInput.value
+		const searchText = this.searchText
 
-		const editor = tabEditorView.editor
-		const view = editor!.ctx.get(editorViewCtx)
+		const view = tabEditorView.editor!.ctx.get(editorViewCtx)
 		const state = view.state
 		const currentPos = state.selection.from
 
@@ -686,8 +700,7 @@ export class TabEditorFacade {
 
 		const { matches, currentIndex } = tabEditorView.searchState
 
-		const editor = tabEditorView.editor
-		const view = editor!.ctx.get(editorViewCtx)
+		const view = tabEditorView.editor!.ctx.get(editorViewCtx)
 		const state = view.state
 
 		const match = matches[currentIndex]
@@ -707,14 +720,5 @@ export class TabEditorFacade {
 				this.findAndSelect()
 			}
 		}
-	}
-
-	get searchText() {
-		return this.findInput.value
-	}
-
-	getActiveTabEditorView(): TabEditorView {
-		const activeIndex = this.store.activeTabIndex
-		return this.renderer.getTabEditorViewByIndex(activeIndex)
 	}
 }
