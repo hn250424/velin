@@ -78,5 +78,8 @@ export const SELECTOR_TAB_GHOST = `.${CLASS_TAB_GHOST}`
 export const CLASS_TREE_GHOST = "tree-ghost"
 export const SELECTOR_TREE_GHOST = `.${CLASS_TREE_GHOST}`
 
+export const CLASS_IS_MODIFIED = "is-modified"
+
 export const MODIFIED_TEXT = "•"
-export const NOT_MODIFIED_TEXT = "×"
+export const EXIT_TEXT = "×"
+

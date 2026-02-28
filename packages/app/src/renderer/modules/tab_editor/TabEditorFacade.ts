@@ -7,7 +7,7 @@ import { editorViewCtx } from "@milkdown/kit/core"
 import { TextSelection } from "prosemirror-state"
 
 import DI_KEYS from "../../constants/di_keys"
-import { DATASET_ATTR_TAB_ID, NOT_MODIFIED_TEXT } from "../../constants/dom"
+import { DATASET_ATTR_TAB_ID, EXIT_TEXT } from "../../constants/dom"
 import { TabEditorRenderer } from "./TabEditorRenderer"
 import { TabEditorStore } from "./TabEditorStore"
 import { TabEditorView } from "./TabEditorView"
@@ -456,7 +456,7 @@ export class TabEditorFacade {
 				tv.setSuppressInputEvent(false)
 
 				tv.setTabSpanTextContent(dto.fileName)
-				tv.setTabButtonTextContent(NOT_MODIFIED_TEXT)
+				tv.setTabButtonTextContent(EXIT_TEXT)
 
 				vm.isModified = false
 				vm.filePath = dto.filePath

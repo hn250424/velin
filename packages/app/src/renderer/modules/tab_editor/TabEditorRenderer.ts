@@ -11,9 +11,10 @@ import {
 	DATASET_ATTR_TAB_ID,
 	MODIFIED_TEXT,
 	CLASS_EDITOR_BOX,
-	NOT_MODIFIED_TEXT,
+	EXIT_TEXT,
 	CLASS_TAB_GHOST,
 	CLASS_BINARY,
+	CLASS_IS_MODIFIED,
 } from "../../constants/dom"
 import { TabEditorView } from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
@@ -42,7 +43,18 @@ export class TabEditorRenderer {
 		tabSpan.textContent = fileName || "Untitled"
 
 		const tabButton = document.createElement("button")
-		tabButton.textContent = NOT_MODIFIED_TEXT
+		tabButton.textContent = EXIT_TEXT
+		tabButton.addEventListener("mouseenter", () => {
+			if (tabBox.classList.contains(CLASS_IS_MODIFIED)) {
+				tabButton.textContent = EXIT_TEXT;
+			}
+		});
+
+		tabButton.addEventListener("mouseleave", () => {
+			if (tabBox.classList.contains(CLASS_IS_MODIFIED)) {
+				tabButton.textContent = MODIFIED_TEXT
+			}
+		});
 
 		tabBox.appendChild(tabSpan)
 		tabBox.appendChild(tabButton)
@@ -90,9 +102,11 @@ export class TabEditorRenderer {
 		if (isModified && !vm.isModified) {
 			vm.isModified = true
 			view.setTabButtonTextContent(MODIFIED_TEXT)
+			view.tabBox.classList.add(CLASS_IS_MODIFIED);
 		} else if (!isModified && vm.isModified) {
 			vm.isModified = false
-			view.setTabButtonTextContent(NOT_MODIFIED_TEXT)
+			view.setTabButtonTextContent(EXIT_TEXT)
+			view.tabBox.classList.remove(CLASS_IS_MODIFIED);
 		}
 	}
 
@@ -214,7 +228,7 @@ export class TabEditorRenderer {
 		span.textContent = fileName ? fileName : "Untitled"
 
 		const button = document.createElement("button")
-		button.textContent = NOT_MODIFIED_TEXT
+		button.textContent = EXIT_TEXT
 
 		div.appendChild(span)
 		div.appendChild(button)
