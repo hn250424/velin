@@ -71,7 +71,7 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 		if (e.shiftKey && treeFacade.lastSelectedIndex > 0) {
 			const startIndex = treeFacade.lastSelectedIndex
-			const endIndex = treeFacade.getFlattenArrayIndexByPath(path)!
+			const endIndex = treeFacade.getFlattenIndexByPath(path)!
 			treeFacade.setLastSelectedIndexByPath(path)
 			const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
@@ -81,7 +81,7 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 			}
 		} else if (e.ctrlKey) {
 			treeNode.classList.add(CLASS_SELECTED)
-			const index = treeFacade.getFlattenArrayIndexByPath(path)!
+			const index = treeFacade.getFlattenIndexByPath(path)!
 			treeFacade.setLastSelectedIndexByPath(path)
 			treeFacade.addSelectedIndices(index)
 		} else {
@@ -96,7 +96,7 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 			treeNode.classList.add(CLASS_SELECTED)
 			treeFacade.setLastSelectedIndexByPath(path)
-			treeFacade.addSelectedIndices(treeFacade.getFlattenArrayIndexByPath(path)!)
+			treeFacade.addSelectedIndices(treeFacade.getFlattenIndexByPath(path)!)
 		}
 	})
 }
@@ -174,7 +174,7 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
 
 function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return
-	if (treeFacade.lastSelectedIndex >= treeFacade.getFlattenTreeArrayLength() - 1) return
+	if (treeFacade.lastSelectedIndex >= treeFacade.getFlattenTreeLength() - 1) return
 	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, 1)
 }
 
@@ -213,7 +213,7 @@ function bindMouseDownEventsForDrag(treeFacade: TreeFacade) {
 			if (!node) return
 
 			const path = node.dataset[DATASET_ATTR_TREE_PATH]!
-			const idx = treeFacade.getFlattenArrayIndexByPath(path)!
+			const idx = treeFacade.getFlattenIndexByPath(path)!
 			treeFacade.lastSelectedIndex = idx
 			treeFacade.addSelectedIndices(idx)
 			count = 1

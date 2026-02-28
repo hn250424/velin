@@ -6,8 +6,8 @@ import { injectable } from "inversify"
 
 @injectable()
 export class TreeStore {
-	private _flattenTreeArray: TreeViewModel[] = []
-	private _pathToFlattenArrayIndexMap: Map<string, number> = new Map()
+	private _flattenTree: TreeViewModel[] = []
+	private _pathToFlattenTreeIndex: Map<string, number> = new Map()
 
 	private _contextTreeIndex = -1
 	private _lastSelectedIndex = -1
@@ -52,7 +52,47 @@ export class TreeStore {
 
 	//
 
-	flattenTree(tree: TreeViewModel): TreeViewModel[] {
+	getRootTreeViewModel(): TreeViewModel {
+		if (this._flattenTree.length === 0) return {} as TreeViewModel
+
+		const pathToNode = new Map<string, TreeViewModel>()
+		const root = this._flattenTree[0]
+		pathToNode.set(root.path, root)
+
+		for (let i = 1; i < this._flattenTree.length; i++) {
+			const node = this._flattenTree[i]
+			pathToNode.set(node.path, node)
+		}
+
+		for (let i = 1; i < this._flattenTree.length; i++) {
+			const node = pathToNode.get(this._flattenTree[i].path)!
+
+			for (let j = i - 1; j >= 0; j--) {
+				const possibleParent = this._flattenTree[j]
+
+				if (possibleParent.indent === node.indent - 1) {
+					const parent = pathToNode.get(possibleParent.path)!
+					if (!parent.children) parent.children = []
+					parent.children.push(node)
+					break
+				}
+			}
+		}
+
+		return root
+	}
+
+	syncPathToFlattenTreeIndex() {
+		this._pathToFlattenTreeIndex.clear()
+
+		for (let i = 0; i < this._flattenTree.length; i++) {
+			this._pathToFlattenTreeIndex.set(this._flattenTree[i].path, i)
+		}
+	}
+
+	//
+
+	toFlatList(tree: TreeViewModel): TreeViewModel[] {
 		const result: TreeViewModel[] = []
 
 		function dfs(node: TreeViewModel) {
@@ -68,73 +108,11 @@ export class TreeStore {
 		return result
 	}
 
-	extractTreeViewModel(): TreeViewModel {
-		if (this._flattenTreeArray.length === 0) return {} as TreeViewModel
-
-		const pathToNode = new Map<string, TreeViewModel>()
-		const root = this._flattenTreeArray[0]
-		pathToNode.set(root.path, root)
-
-		for (let i = 1; i < this._flattenTreeArray.length; i++) {
-			const node = this._flattenTreeArray[i]
-			pathToNode.set(node.path, node)
-		}
-
-		for (let i = 1; i < this._flattenTreeArray.length; i++) {
-			const node = pathToNode.get(this._flattenTreeArray[i].path)!
-
-			for (let j = i - 1; j >= 0; j--) {
-				const possibleParent = this._flattenTreeArray[j]
-
-				if (possibleParent.indent === node.indent - 1) {
-					const parent = pathToNode.get(possibleParent.path)!
-					if (!parent.children) parent.children = []
-					parent.children.push(node)
-					break
-				}
-			}
-		}
-
-		return root
-	}
-
-	//
-
-	expandNode(node: TreeViewModel) {
-		const index = this._flattenTreeArray.findIndex((dto) => dto.path === node.path)
-		if (index === -1) return
-
-		const childrenToInsert = this.flattenTree(node).slice(1) // Remove the first element (the node itself) using slice(1)
-		this._flattenTreeArray.splice(index + 1, 0, ...childrenToInsert)
-
-		this.rebuildPathToFlattenArrayIndexMap()
-	}
-
-	collapseNode(node: TreeViewModel) {
-		const index = this._flattenTreeArray.findIndex((dto) => dto.path === node.path)
-		if (index === -1) return
-
-		let removeCount = 0
-		for (let i = index + 1; i < this._flattenTreeArray.length; i++) {
-			if (this._flattenTreeArray[i].indent <= node.indent) break
-			removeCount++
-		}
-		this._flattenTreeArray.splice(index + 1, removeCount)
-
-		this.rebuildPathToFlattenArrayIndexMap()
-	}
-
-	//
-
-	spliceFlattenTreeArray(start: number, length: number) {
-		this._flattenTreeArray.splice(start, length)
-	}
-
 	findParentDirectoryIndex(index: number): number {
-		const indent = this._flattenTreeArray[index].indent
+		const indent = this._flattenTree[index].indent
 		let i = index - 1
 		while (i >= 0) {
-			if (this._flattenTreeArray[i].indent < indent) {
+			if (this._flattenTree[i].indent < indent) {
 				return i
 			}
 			i--
@@ -144,48 +122,67 @@ export class TreeStore {
 
 	//
 
-	get flattenTreeArray(): readonly TreeViewModel[] {
-		return this._flattenTreeArray
+	insertChildNodes(parent: TreeViewModel) {
+		const index = this._flattenTree.findIndex((item) => item.path === parent.path)
+		if (index === -1) return
+
+		const childrenToInsert = this.toFlatList(parent).slice(1) // Remove the first element (the node itself) using slice(1)
+		this._flattenTree.splice(index + 1, 0, ...childrenToInsert)
+
+		this.syncPathToFlattenTreeIndex()
 	}
 
-	setFlattenTree(arr: TreeViewModel[]) {
-		this._flattenTreeArray = arr
+	removeChildNodes(parent: TreeViewModel) {
+		const index = this._flattenTree.findIndex((item) => item.path === parent.path)
+		if (index === -1) return
+
+		let removeCount = 0
+		for (let i = index + 1; i < this._flattenTree.length; i++) {
+			if (this._flattenTree[i].indent <= parent.indent) break
+			removeCount++
+		}
+		this._flattenTree.splice(index + 1, removeCount)
+
+		this.syncPathToFlattenTreeIndex()
 	}
+
+	//
+
+	get flattenTree(): readonly TreeViewModel[] {
+		return this._flattenTree
+	}
+
+	set flattenTree(arr: TreeViewModel[]) {
+		this._flattenTree = arr
+	}
+
+	spliceFlattenTree(start: number, length: number) {
+		this._flattenTree.splice(start, length)
+	}
+
+	//
 
 	getTreeViewModelByIndex(index: number) {
-		return this._flattenTreeArray[index]
+		return this._flattenTree[index]
 	}
 
 	getTreeViewModelByPath(path: string) {
-		const idx = this._pathToFlattenArrayIndexMap.get(path)!
-		return this._flattenTreeArray[idx]
+		const idx = this._pathToFlattenTreeIndex.get(path)!
+		return this._flattenTree[idx]
 	}
 
 	//
 
-	rebuildPathToFlattenArrayIndexMap() {
-		this._pathToFlattenArrayIndexMap.clear()
-
-		for (let i = 0; i < this._flattenTreeArray.length; i++) {
-			const viewModel = this._flattenTreeArray[i]
-			const path = viewModel.path
-
-			this._pathToFlattenArrayIndexMap.set(path, i)
-		}
+	getFlattenIndexByPath(path: string) {
+		return this._pathToFlattenTreeIndex.get(path)
 	}
 
-	//
-
-	getFlattenArrayIndexByPath(path: string) {
-		return this._pathToFlattenArrayIndexMap.get(path)
+	setFlattenIndexByPath(path: string, index: number) {
+		this._pathToFlattenTreeIndex.set(path, index)
 	}
 
-	setFlattenArrayIndexByPath(path: string, index: number) {
-		this._pathToFlattenArrayIndexMap.set(path, index)
-	}
-
-	deleteFlattenArrayIndexByPath(path: string) {
-		this._pathToFlattenArrayIndexMap.delete(path)
+	deleteFlattenIndexByPath(path: string) {
+		this._pathToFlattenTreeIndex.delete(path)
 	}
 
 	//
@@ -242,6 +239,14 @@ export class TreeStore {
 
 	//
 
+	get clipboardMode() {
+		return this._clipboardMode
+	}
+
+	set clipboardMode(mode: ClipboardMode) {
+		this._clipboardMode = mode
+	}
+
 	addClipboardPaths(path: string) {
 		this._clipboardPaths.add(path)
 	}
@@ -252,13 +257,5 @@ export class TreeStore {
 
 	clearClipboardPaths() {
 		this._clipboardPaths.clear()
-	}
-
-	get clipboardMode() {
-		return this._clipboardMode
-	}
-
-	set clipboardMode(mode: ClipboardMode) {
-		this._clipboardMode = mode
 	}
 }

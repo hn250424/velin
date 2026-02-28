@@ -40,32 +40,46 @@ export class TreeFacade {
 
 	//
 
-	getFlattenTreeArrayLength(): number {
-		return this.store.flattenTreeArray.length
+	getRootTreeViewModel(): TreeViewModel {
+		return this.store.getRootTreeViewModel()
 	}
 
-	getFlattenArrayIndexByPath(path: string) {
-		return this.store.getFlattenArrayIndexByPath(path)
-	}
-
-	extractTreeViewModel(): TreeViewModel {
-		return this.store.extractTreeViewModel()
+	syncPathToFlattenTreeIndex() {
+		this.store.syncPathToFlattenTreeIndex()
 	}
 
 	//
 
-	expandNode(node: TreeViewModel) {
-		this.store.expandNode(node)
+	toFlatList(tree: TreeViewModel) {
+		return this.store.toFlatList(tree)
 	}
-
-	collapseNode(node: TreeViewModel) {
-		this.store.collapseNode(node)
-	}
-
-	//
 
 	findParentDirectoryIndex(index: number) {
 		return this.store.findParentDirectoryIndex(index)
+	}
+
+	//
+
+	insertChildNodes(node: TreeViewModel) {
+		this.store.insertChildNodes(node)
+	}
+
+	removeChildNodes(node: TreeViewModel) {
+		this.store.removeChildNodes(node)
+	}
+
+	//
+
+	get flattenTree(): readonly TreeViewModel[] {
+		return this.store.flattenTree
+	}
+
+	set flattenTree(arr: TreeViewModel[]) {
+		this.store.flattenTree = arr
+	}
+
+	spliceFlattenTree(start: number, length: number) {
+		this.store.spliceFlattenTree(start, length)
 	}
 
 	//
@@ -80,6 +94,20 @@ export class TreeFacade {
 
 	//
 
+	getFlattenIndexByPath(path: string) {
+		return this.store.getFlattenIndexByPath(path)
+	}
+
+	setFlattenIndexByPath(path: string, index: number) {
+		this.store.setFlattenIndexByPath(path, index)
+	}
+
+	deleteFlattenIndexByPath(path: string) {
+		this.store.deleteFlattenIndexByPath(path)
+	}
+
+	//
+
 	get lastSelectedIndex() {
 		return this.store.lastSelectedIndex
 	}
@@ -90,12 +118,12 @@ export class TreeFacade {
 		this.store.lastSelectedIndex = index
 	}
 
-	setLastSelectedIndexByPath(path: string) {
-		this.lastSelectedIndex = this.store.getFlattenArrayIndexByPath(path)!
-	}
-
 	removeLastSelectedIndex() {
 		this.store.lastSelectedIndex = -1
+	}
+
+	setLastSelectedIndexByPath(path: string) {
+		this.lastSelectedIndex = this.store.getFlattenIndexByPath(path)!
 	}
 
 	//
@@ -108,12 +136,12 @@ export class TreeFacade {
 		this.store.contextTreeIndex = index
 	}
 
-	setContextTreeIndexByPath(path: string) {
-		this.store.contextTreeIndex = this.store.getFlattenArrayIndexByPath(path)!
-	}
-
 	removeContextTreeIndex() {
 		this.store.removeContextTreeIndex()
+	}
+
+	setContextTreeIndexByPath(path: string) {
+		this.store.contextTreeIndex = this.store.getFlattenIndexByPath(path)!
 	}
 
 	//
@@ -122,9 +150,15 @@ export class TreeFacade {
 		return this.store.selectedDragIndex
 	}
 
-	setSelectedDragIndexByPath(path: string) {
-		this.store.selectedDragIndex = this.store.getFlattenArrayIndexByPath(path)!
+	set selectedDragIndex(index: number) {
+		this.store.selectedDragIndex = index
 	}
+
+	setSelectedDragIndexByPath(path: string) {
+		this.store.selectedDragIndex = this.store.getFlattenIndexByPath(path)!
+	}
+
+	//
 
 	addSelectedIndices(index: number) {
 		this.store.addSelectedIndices(index)
@@ -139,6 +173,14 @@ export class TreeFacade {
 	}
 
 	//
+
+	get clipboardMode() {
+		return this.store.clipboardMode
+	}
+
+	set clipboardMode(mode: ClipboardMode) {
+		this.store.clipboardMode = mode
+	}
 
 	addClipboardPaths(path: string) {
 		this.store.addClipboardPaths(path)
@@ -156,14 +198,6 @@ export class TreeFacade {
 		}
 
 		this.store.clearClipboardPaths()
-	}
-
-	get clipboardMode() {
-		return this.store.clipboardMode
-	}
-
-	set clipboardMode(mode: ClipboardMode) {
-		this.store.clipboardMode = mode
 	}
 
 	// renderer
@@ -213,7 +247,7 @@ export class TreeFacade {
 	}
 
 	//
-	
+
 	clearPathToTreeWrapperMap() {
 		this.renderer.clearPathToTreeWrapperMap()
 	}
@@ -408,9 +442,8 @@ export class TreeFacade {
 	}
 
 	loadFlattenArrayAndMaps(json: TreeViewModel) {
-		const arr = this.store.flattenTree(json)
-		this.store.setFlattenTree(arr)
-		this.store.rebuildPathToFlattenArrayIndexMap()
+		this.store.flattenTree = this.toFlatList(json)
+		this.syncPathToFlattenTreeIndex()
 	}
 
 	async rename(preBase: string, newBase: string) {
@@ -418,15 +451,15 @@ export class TreeFacade {
 		if (!response.result) return response
 		newBase = response.data
 
-		const start = this.store.getFlattenArrayIndexByPath(preBase)!
+		const start = this.store.getFlattenIndexByPath(preBase)!
 
-		for (let i = start; i < this.store.flattenTreeArray.length; i++) {
+		for (let i = start; i < this.store.flattenTree.length; i++) {
 			const node = this.getTreeViewModelByIndex(i)
 			if (node.path.startsWith(preBase)) {
 				const treeWrapper = this.renderer.getTreeWrapperByPath(node.path)!
-				const idx = this.store.getFlattenArrayIndexByPath(node.path)!
+				const idx = this.store.getFlattenIndexByPath(node.path)!
 				const treeNode = this.renderer.getTreeNodeByPath(node.path)
-				this.store.deleteFlattenArrayIndexByPath(node.path)
+				this.store.deleteFlattenIndexByPath(node.path)
 				this.renderer.deleteTreeWrapperByPath(node.path)
 				const relative = window.utils.getRelativePath(preBase, node.path)
 				const newPath = window.utils.getJoinedPath(newBase, relative)
@@ -434,7 +467,7 @@ export class TreeFacade {
 				node.name = window.utils.getBaseName(node.path)
 				treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
 				treeNode.title = newPath
-				this.store.setFlattenArrayIndexByPath(newPath, idx)
+				this.store.setFlattenIndexByPath(newPath, idx)
 				this.renderer.setTreeWrapperByPath(newPath, treeWrapper)
 			} else {
 				break
@@ -448,12 +481,12 @@ export class TreeFacade {
 		indices.sort((a, b) => b - a)
 
 		for (const index of indices) {
-			const target = this.store.flattenTreeArray[index]
+			const target = this.store.flattenTree[index]
 			const baseIndent = target.indent
 
 			let parentIndex = -1
 			for (let i = index - 1; i >= 0; i--) {
-				if (this.store.flattenTreeArray[i].indent === baseIndent - 1) {
+				if (this.store.flattenTree[i].indent === baseIndent - 1) {
 					parentIndex = i
 					break
 				}
@@ -462,14 +495,14 @@ export class TreeFacade {
 			const toDelete: TreeViewModel[] = []
 
 			// Collects the deletion target: Self + all children
-			for (let i = index; i < this.store.flattenTreeArray.length; i++) {
+			for (let i = index; i < this.store.flattenTree.length; i++) {
 				const node = this.store.getTreeViewModelByIndex(i)
 				if (i !== index && node.indent <= baseIndent) break
 				toDelete.push(node)
 			}
 
 			if (parentIndex >= 0) {
-				const parent = this.store.flattenTreeArray[parentIndex]
+				const parent = this.store.flattenTree[parentIndex]
 				if (parent.children) {
 					parent.children = parent.children.filter(
 						(child: any) => !toDelete.some((deleted) => deleted.path === child.path)
@@ -486,9 +519,9 @@ export class TreeFacade {
 				this.renderer.deleteTreeWrapperByPath(path)
 			}
 
-			this.store.spliceFlattenTreeArray(index, toDelete.length)
+			this.store.spliceFlattenTree(index, toDelete.length)
 		}
 
-		this.store.rebuildPathToFlattenArrayIndexMap()
+		this.syncPathToFlattenTreeIndex()
 	}
 }

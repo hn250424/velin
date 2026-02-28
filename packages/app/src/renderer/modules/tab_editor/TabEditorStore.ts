@@ -4,7 +4,7 @@ import { injectable } from "inversify"
 
 @injectable()
 export class TabEditorStore {
-	private _idToTabEditorViewModelMap: Map<number, TabEditorViewModel> = new Map()
+	private _idToTabEditorViewModel: Map<number, TabEditorViewModel> = new Map()
 
 	private _activeTabId = -1
 	private _activeTabIndex = -1
@@ -22,7 +22,7 @@ export class TabEditorStore {
 			filePath: dto.filePath,
 			fileName: dto.fileName,
 			isBinary: dto.isBinary,
-			initialContent: this._idToTabEditorViewModelMap.get(dto.id)!.initialContent,
+			initialContent: this._idToTabEditorViewModel.get(dto.id)!.initialContent,
 		}
 	}
 
@@ -58,20 +58,20 @@ export class TabEditorStore {
 
 	//
 
-	get idToTabEditorViewModelMap(): ReadonlyMap<number, TabEditorViewModel> {
-		return this._idToTabEditorViewModelMap
+	get idToTabEditorViewModel(): ReadonlyMap<number, TabEditorViewModel> {
+		return this._idToTabEditorViewModel
 	}
 
 	getTabEditorViewModelById(id: number) {
-		return this._idToTabEditorViewModelMap.get(id)
+		return this._idToTabEditorViewModel.get(id)
 	}
 
 	setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {
-		this._idToTabEditorViewModelMap.set(id, viewModel)
+		this._idToTabEditorViewModel.set(id, viewModel)
 	}
 
 	deleteTabEditorViewModelById(id: number) {
-		this._idToTabEditorViewModelMap.delete(id)
+		this._idToTabEditorViewModel.delete(id)
 	}
 
 	//

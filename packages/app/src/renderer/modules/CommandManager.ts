@@ -180,8 +180,8 @@ export class CommandManager {
 	}
 
 	private _syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
-		if (expanded) this.treeFacade.expandNode(viewModel)
-		else this.treeFacade.collapseNode(viewModel)
+		if (expanded) this.treeFacade.insertChildNodes(viewModel)
+		else this.treeFacade.removeChildNodes(viewModel)
 	}
 
 	async performSave() {
@@ -314,7 +314,7 @@ export class CommandManager {
 
 					const filePath = window.utils.getJoinedPath(viewModel.path, name)
 
-					const createdIdx = this.treeFacade.getFlattenArrayIndexByPath(filePath)!
+					const createdIdx = this.treeFacade.getFlattenIndexByPath(filePath)!
 					this.treeFacade.addSelectedIndices(createdIdx)
 					this.treeFacade.lastSelectedIndex = createdIdx
 
@@ -492,7 +492,7 @@ export class CommandManager {
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
 			if (viewModel.directory) {
-				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
+				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeLength(); i++) {
 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
 					if (viewModel.indent < isChildViewModel.indent) {
@@ -528,7 +528,7 @@ export class CommandManager {
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
 			if (viewModel.directory) {
-				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeArrayLength(); i++) {
+				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeLength(); i++) {
 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
 					if (viewModel.indent < isChildViewModel.indent) {
