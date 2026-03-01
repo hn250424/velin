@@ -25,6 +25,8 @@ export class SettingsStore {
 		this._draftSettings = JSON.parse(JSON.stringify(this._currentSettings))
 	}
 
+	//
+
 	toSettingsViewModel(dto: SettingsDto): SettingsViewModel {
 		return {
 			settingFontViewModel: dto.settingFontDto as SettingFontViewModel,
@@ -38,6 +40,8 @@ export class SettingsStore {
 			settingThemeDto: viewModel.settingThemeViewModel as SettingThemeDto,
 		}
 	}
+
+	//
 
 	getSettingsValue() {
 		return JSON.parse(JSON.stringify(this._currentSettings))
@@ -59,6 +63,8 @@ export class SettingsStore {
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	private _setSettingTheme(themeViewModel: SettingThemeViewModel) {}
 
+	//
+
 	getCurrentSettings() {
 		return JSON.parse(JSON.stringify(this._currentSettings))
 	}
@@ -66,6 +72,8 @@ export class SettingsStore {
 	getDraftSettings() {
 		return JSON.parse(JSON.stringify(this._draftSettings))
 	}
+
+	//
 
 	getChangeSet(): SettingsViewModel {
 		return {
@@ -92,6 +100,8 @@ export class SettingsStore {
 	applyChangeSet() {
 		this._currentSettings = JSON.parse(JSON.stringify(this._draftSettings))
 	}
+
+	//
 
 	onChangeFontSize(size: number) {
 		this._draftSettings.settingFontViewModel.size = size

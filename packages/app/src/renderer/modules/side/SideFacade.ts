@@ -12,15 +12,6 @@ export class SideFacade {
 		@inject(DI_KEYS.SideDragManager) public readonly drag: SideDragManager
 	) {}
 
-	// orchestra
-
-	async syncSession() {
-		await window.rendererToMain.syncSideSessionFromRenderer({
-			open: this.isSideOpen(),
-			width: this.getSideWidth(),
-		})
-	}
-
 	// store
 
 	isSideOpen(): boolean {
@@ -46,24 +37,6 @@ export class SideFacade {
 	}
 
 	// drag
-
-	initDrag() {
-		this.startDrag()
-		this.renderer.setResizingCursor(true)
-	}
-
-	calculateWidth(clientX: number) {
-		const sideLeft = this.renderer.elements.side.getBoundingClientRect().left
-		const offsetX = clientX - sideLeft
-    return Math.min(Math.max(offsetX, this.dragMinWidth), this.dragMaxWidth)
-	}
-
-	clearDrag() {
-		this.endDrag()
-		this.renderer.setResizingCursor(false)
-	}
-
-	//
 
 	isDragging(): boolean {
 		return this.drag.isDragging()
@@ -93,5 +66,32 @@ export class SideFacade {
 
 	get dragMaxWidth() {
 		return this.drag.maxWidth
+	}
+
+	// orchestra - drag
+
+	initDrag() {
+		this.startDrag()
+		this.renderer.setResizingCursor(true)
+	}
+
+	calculateWidth(clientX: number) {
+		const sideLeft = this.renderer.elements.side.getBoundingClientRect().left
+		const offsetX = clientX - sideLeft
+		return Math.min(Math.max(offsetX, this.dragMinWidth), this.dragMaxWidth)
+	}
+
+	clearDrag() {
+		this.endDrag()
+		this.renderer.setResizingCursor(false)
+	}
+
+	// orchestra
+
+	async syncSession() {
+		await window.rendererToMain.syncSideSessionFromRenderer({
+			open: this.isSideOpen(),
+			width: this.getSideWidth(),
+		})
 	}
 }

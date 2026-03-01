@@ -11,6 +11,8 @@ import type { SettingsElements } from "./SettingsElements"
 export class SettingsRenderer {
 	constructor(@inject(DI_KEYS.SettingsElements) readonly elements: SettingsElements) {}
 
+	//
+
 	openSettings() {
 		this.elements.overlay.style.display = "flex"
 	}
@@ -19,7 +21,9 @@ export class SettingsRenderer {
 		this.elements.overlay.style.display = "none"
 	}
 
-	renderSettingsValue(viewModel: SettingsViewModel) {
+	//
+
+	render(viewModel: SettingsViewModel) {
 		this._renderSettingFont(viewModel.settingFontViewModel)
 		this._renderSettingTheme(viewModel.settingThemeViewModel)
 	}
@@ -31,6 +35,8 @@ export class SettingsRenderer {
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	private _renderSettingTheme(themeViewModel: SettingThemeViewModel) {}
+
+	//
 
 	onChangeFontSize(callback: (size: number) => void) {
 		this.elements.fontSizeInput.addEventListener("change", () => {

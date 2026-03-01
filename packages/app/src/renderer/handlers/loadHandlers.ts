@@ -98,7 +98,7 @@ async function initSettings(dispatcher: Dispatcher, settingsFacade: SettingsFaca
 	contents[0].style.display = "block"
 
 	const viewModel = settingsFacade.getSettingsValue()
-	settingsFacade.renderSettingsValue(viewModel)
+	settingsFacade.render(viewModel)
 	await dispatcher.dispatch("applySettings", "programmatic", viewModel)
 }
 

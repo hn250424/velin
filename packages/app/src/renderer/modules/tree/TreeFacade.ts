@@ -251,62 +251,6 @@ export class TreeFacade {
 
 	// drag
 
-	initDrag(count: number, x: number, y: number) {
-		this.setMouseDown(true)
-		this.setDragTreeCount(count)
-		this.setStartPosition(x, y)
-	}
-
-	moveGhost(x: number, y: number) {
-		const ghost = this.createGhost(this.getDragTreeCount())
-		ghost.style.left = `${x + 5}px`
-		ghost.style.top = `${y + 5}px`
-	}
-
-	updateDragOverStatus(target: HTMLElement) {
-		const previousWrapper = this.getInsertWrapper()
-
-		let currentWrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
-		let isContainer = false
-
-		if (!currentWrapper) {
-			const container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
-			if (!container) {
-				this.clearDrag()
-				return
-			}
-			currentWrapper = container
-			isContainer = true
-		}
-
-		if (previousWrapper === currentWrapper) return
-
-		if (previousWrapper) previousWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
-
-		const path = isContainer
-			? currentWrapper.dataset[DATASET_ATTR_TREE_PATH]!
-			: (currentWrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement).dataset[DATASET_ATTR_TREE_PATH]!
-
-		const viewModel = this.getTreeViewModelByPath(path)
-
-		if (!viewModel || !viewModel.directory) {
-			this.setInsertWrapper(null)
-			this.setInsertPath("")
-			return
-		}
-
-		this.setInsertPath(viewModel.path)
-		this.setInsertWrapper(currentWrapper)
-		currentWrapper.classList.add(CLASS_TREE_DRAG_OVERLAY)
-	}
-
-	clearDrag() {
-		this.endDrag()
-		this.removeGhost()
-	}
-
-	//
-
 	isDrag(): boolean {
 		return this.drag.isDrag()
 	}
@@ -373,6 +317,62 @@ export class TreeFacade {
 
 	setInsertPath(path: string) {
 		this.drag.setInsertPath(path)
+	}
+
+	// orchestra - drag
+
+	initDrag(count: number, x: number, y: number) {
+		this.setMouseDown(true)
+		this.setDragTreeCount(count)
+		this.setStartPosition(x, y)
+	}
+
+	moveGhost(x: number, y: number) {
+		const ghost = this.createGhost(this.getDragTreeCount())
+		ghost.style.left = `${x + 5}px`
+		ghost.style.top = `${y + 5}px`
+	}
+
+	updateDragOverStatus(target: HTMLElement) {
+		const previousWrapper = this.getInsertWrapper()
+
+		let currentWrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
+		let isContainer = false
+
+		if (!currentWrapper) {
+			const container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+			if (!container) {
+				this.clearDrag()
+				return
+			}
+			currentWrapper = container
+			isContainer = true
+		}
+
+		if (previousWrapper === currentWrapper) return
+
+		if (previousWrapper) previousWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
+
+		const path = isContainer
+			? currentWrapper.dataset[DATASET_ATTR_TREE_PATH]!
+			: (currentWrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement).dataset[DATASET_ATTR_TREE_PATH]!
+
+		const viewModel = this.getTreeViewModelByPath(path)
+
+		if (!viewModel || !viewModel.directory) {
+			this.setInsertWrapper(null)
+			this.setInsertPath("")
+			return
+		}
+
+		this.setInsertPath(viewModel.path)
+		this.setInsertWrapper(currentWrapper)
+		currentWrapper.classList.add(CLASS_TREE_DRAG_OVERLAY)
+	}
+
+	clearDrag() {
+		this.endDrag()
+		this.removeGhost()
 	}
 
 	// orchestra

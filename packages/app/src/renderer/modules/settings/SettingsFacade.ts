@@ -20,6 +20,8 @@ export class SettingsFacade {
 		this._bindChangeEvents()
 	}
 
+	// renderer
+
 	openSettings() {
 		this.renderer.openSettings()
 	}
@@ -28,9 +30,13 @@ export class SettingsFacade {
 		this.renderer.closeSettings()
 	}
 
-	renderSettingsValue(viewModel: SettingsViewModel) {
-		this.renderer.renderSettingsValue(viewModel)
+	//
+
+	render(viewModel: SettingsViewModel) {
+		this.renderer.render(viewModel)
 	}
+
+	// store
 
 	toSettingsViewModel(dto: SettingsDto) {
 		return this.store.toSettingsViewModel(dto)
@@ -40,6 +46,8 @@ export class SettingsFacade {
 		return this.store.toSettingsDto(viewModel)
 	}
 
+	//
+
 	getSettingsValue() {
 		return this.store.getSettingsValue()
 	}
@@ -48,6 +56,8 @@ export class SettingsFacade {
 		this.store.setSettingsValue(viewModel)
 	}
 
+	//
+
 	getCurrentSettings() {
 		return this.store.getCurrentSettings()
 	}
@@ -55,6 +65,8 @@ export class SettingsFacade {
 	getDraftSettings() {
 		return this.store.getDraftSettings()
 	}
+
+	//
 
 	getChangeSet() {
 		return this.store.getChangeSet()

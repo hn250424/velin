@@ -206,78 +206,6 @@ export class TabEditorFacade {
 
 	// drag
 
-	initDrag(target: HTMLElement, x: number, y: number) {
-		const tabsSnapshot = Array.from(this.renderer.elements.tabContainer.children) as HTMLElement[]
-		const id = parseInt(target.dataset[DATASET_ATTR_TAB_ID]!)
-		const name = this.getTabEditorViewModelById(id)!.fileName
-
-		this.setTabs(tabsSnapshot)
-		this.setMouseDown(true)
-		this.setTargetTab(target)
-		this.setStartPosition(x, y)
-		this.setTargetTabId(id)
-		this.setTargetTabName(name)
-	}
-
-	moveGhostTab(x: number, y: number) {
-		const ghost = this.createGhostTab(this.getTargetTabName())
-
-		ghost.style.left = `${x + 5}px`
-		ghost.style.top = `${y + 5}px`
-	}
-
-	getInsertIndexFromMouseX(mouseX: number): number {
-		const tabs = this.getTabs()
-		assert(tabs, "Can not call getInsertIndexFromMouseX() before initDrag()")
-
-		for (let i = 0; i < tabs.length; i++) {
-			const rect = tabs[i].getBoundingClientRect()
-			const middleX = rect.left + rect.width / 2
-
-			if (mouseX < middleX) {
-				return i
-			}
-		}
-
-		return tabs.length
-	}
-
-	updateDragIndicator(insertIndex: number) {
-		const indicator = this.createIndicator()
-		const { tabContainer } = this.renderer.elements
-		const containerRect = tabContainer.getBoundingClientRect()
-
-		const targetTab = this.getTabEditorViewByIndex(insertIndex)
-		let leftPosition = 0
-
-		if (targetTab) {
-			const tabRect = targetTab.tabBox.getBoundingClientRect()
-			leftPosition = tabRect.left - containerRect.left + tabContainer.scrollLeft
-		} else {
-			const lastTab = this.getTabEditorViewByIndex(insertIndex - 1)
-			if (lastTab) {
-				const lastRect = lastTab.tabBox.getBoundingClientRect()
-				leftPosition = lastRect.right - containerRect.left + tabContainer.scrollLeft
-			} else {
-				leftPosition = 0
-			}
-		}
-
-		indicator.style.left = `${leftPosition}px`
-
-		if (!tabContainer.contains(indicator)) {
-			tabContainer.appendChild(indicator)
-		}
-	}
-
-	clearDrag() {
-		this.endDrag()
-		this.removeGhostTab()
-		this.removeIndicator()
-	}
-
-	//
-
 	isDrag(): boolean {
 		return this.drag.isDrag()
 	}
@@ -364,6 +292,78 @@ export class TabEditorFacade {
 
 	setInsertIndex(index: number) {
 		this.drag.setInsertIndex(index)
+	}
+
+	// orchestra - drag
+
+	initDrag(target: HTMLElement, x: number, y: number) {
+		const tabsSnapshot = Array.from(this.renderer.elements.tabContainer.children) as HTMLElement[]
+		const id = parseInt(target.dataset[DATASET_ATTR_TAB_ID]!)
+		const name = this.getTabEditorViewModelById(id)!.fileName
+
+		this.setTabs(tabsSnapshot)
+		this.setMouseDown(true)
+		this.setTargetTab(target)
+		this.setStartPosition(x, y)
+		this.setTargetTabId(id)
+		this.setTargetTabName(name)
+	}
+
+	moveGhostTab(x: number, y: number) {
+		const ghost = this.createGhostTab(this.getTargetTabName())
+
+		ghost.style.left = `${x + 5}px`
+		ghost.style.top = `${y + 5}px`
+	}
+
+	getInsertIndexFromMouseX(mouseX: number): number {
+		const tabs = this.getTabs()
+		assert(tabs, "Can not call getInsertIndexFromMouseX() before initDrag()")
+
+		for (let i = 0; i < tabs.length; i++) {
+			const rect = tabs[i].getBoundingClientRect()
+			const middleX = rect.left + rect.width / 2
+
+			if (mouseX < middleX) {
+				return i
+			}
+		}
+
+		return tabs.length
+	}
+
+	updateDragIndicator(insertIndex: number) {
+		const indicator = this.createIndicator()
+		const { tabContainer } = this.renderer.elements
+		const containerRect = tabContainer.getBoundingClientRect()
+
+		const targetTab = this.getTabEditorViewByIndex(insertIndex)
+		let leftPosition = 0
+
+		if (targetTab) {
+			const tabRect = targetTab.tabBox.getBoundingClientRect()
+			leftPosition = tabRect.left - containerRect.left + tabContainer.scrollLeft
+		} else {
+			const lastTab = this.getTabEditorViewByIndex(insertIndex - 1)
+			if (lastTab) {
+				const lastRect = lastTab.tabBox.getBoundingClientRect()
+				leftPosition = lastRect.right - containerRect.left + tabContainer.scrollLeft
+			} else {
+				leftPosition = 0
+			}
+		}
+
+		indicator.style.left = `${leftPosition}px`
+
+		if (!tabContainer.contains(indicator)) {
+			tabContainer.appendChild(indicator)
+		}
+	}
+
+	clearDrag() {
+		this.endDrag()
+		this.removeGhostTab()
+		this.removeIndicator()
 	}
 
 	// orchestra
