@@ -5,21 +5,7 @@ import { inject, injectable } from "inversify"
 import fileSvg from "../../assets/icons/file.svg?raw"
 import closedFolderSvg from "../../assets/icons/closed_folder.svg?raw"
 import openedFolderSvg from "../../assets/icons/opened_folder.svg?raw"
-import {
-	CLASS_FOCUSED,
-	CLASS_EXPANDED,
-	CLASS_TREE_GHOST,
-	CLASS_TREE_NODE,
-	CLASS_TREE_NODE_CHILDREN,
-	CLASS_TREE_NODE_TYPE,
-	CLASS_TREE_NODE_INPUT,
-	CLASS_TREE_NODE_TEXT,
-	CLASS_TREE_NODE_WRAPPER,
-	DATASET_ATTR_TREE_PATH,
-	SELECTOR_TREE_NODE,
-	CLASS_SELECTED,
-} from "../../constants/dom"
-import DI_KEYS from "@renderer/constants/di_keys"
+import { DI, DOM } from "@renderer/constants"
 import type { TreeElements } from "./TreeElements"
 
 @injectable()
@@ -28,7 +14,7 @@ export class TreeRenderer {
 
 	private _pathToTreeWrapper: Map<string, HTMLElement> = new Map()
 
-	constructor(@inject(DI_KEYS.TreeElements) readonly elements: TreeElements) {}
+	constructor(@inject(DI.TreeElements) readonly elements: TreeElements) {}
 
 	//
 
@@ -42,7 +28,7 @@ export class TreeRenderer {
 
 	private _renderElement(container: HTMLElement, viewModel: TreeViewModel) {
 		const type = document.createElement("div")
-		type.classList.add(CLASS_TREE_NODE_TYPE)
+		type.classList.add(DOM.CLASS_TREE_NODE_TYPE)
 
 		if (!viewModel.directory) {
 			type.classList.add("file")
@@ -53,22 +39,22 @@ export class TreeRenderer {
 		}
 
 		const text = document.createElement("span")
-		text.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
+		text.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
 		text.textContent = viewModel.name
 
 		const node = document.createElement("div")
-		node.classList.add(CLASS_TREE_NODE)
+		node.classList.add(DOM.CLASS_TREE_NODE)
 		node.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
-		node.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
+		node.dataset[DOM.DATASET_ATTR_TREE_PATH] = viewModel.path
 		node.title = viewModel.path
 		node.tabIndex = -1
 
 		const children = document.createElement("div")
-		children.classList.add(CLASS_TREE_NODE_CHILDREN)
-		children.classList.toggle(CLASS_EXPANDED, viewModel.expanded)
+		children.classList.add(DOM.CLASS_TREE_NODE_CHILDREN)
+		children.classList.toggle(DOM.CLASS_EXPANDED, viewModel.expanded)
 
 		const wrapper = document.createElement("div")
-		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
+		wrapper.classList.add(DOM.CLASS_TREE_NODE_WRAPPER)
 
 		node.appendChild(type)
 		node.appendChild(text)
@@ -91,7 +77,7 @@ export class TreeRenderer {
 			container = this.elements.treeNodeContainer
 
 			this._pathToTreeWrapper.set(viewModel.path, container)
-			container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
+			container.dataset[DOM.DATASET_ATTR_TREE_PATH] = viewModel.path
 		}
 
 		this.clean(container)
@@ -107,7 +93,7 @@ export class TreeRenderer {
 
 	createInput(directory: boolean, indent: number) {
 		const type = document.createElement("div")
-		type.classList.add(CLASS_TREE_NODE_TYPE)
+		type.classList.add(DOM.CLASS_TREE_NODE_TYPE)
 
 		if (directory) {
 			type.classList.add("folder")
@@ -120,14 +106,14 @@ export class TreeRenderer {
 		const input = document.createElement("input")
 		input.type = "text"
 		input.value = ""
-		input.classList.add(CLASS_TREE_NODE_INPUT)
+		input.classList.add(DOM.CLASS_TREE_NODE_INPUT)
 
 		const node = document.createElement("div")
 		node.classList.add("tree-node-temp")
 		node.style.paddingLeft = `${indent * 16}px`
 
 		const wrapper = document.createElement("div")
-		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
+		wrapper.classList.add(DOM.CLASS_TREE_NODE_WRAPPER)
 
 		node.appendChild(type)
 		node.appendChild(input)
@@ -140,7 +126,7 @@ export class TreeRenderer {
 		if (this._ghost) return this._ghost
 
 		const div = document.createElement("div")
-		div.classList.add(CLASS_TREE_GHOST)
+		div.classList.add(DOM.CLASS_TREE_GHOST)
 		div.textContent = `${count} items`
 
 		this._ghost = div
@@ -164,7 +150,7 @@ export class TreeRenderer {
 
 	getTreeNodeByPath(path: string) {
 		const wrapper = this._pathToTreeWrapper.get(path)!
-		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+		return wrapper.querySelector(DOM.SELECTOR_TREE_NODE) as HTMLElement
 	}
 
 	getTreeWrapperByPath(path: string) {

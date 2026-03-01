@@ -1,9 +1,6 @@
 import "@milkdown/theme-nord/style.css"
 
-import type Response from "@shared/types/Response"
-import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
-
-import { CLASS_SELECTED, DATASET_ATTR_TAB_ID, SELECTOR_TAB } from "../constants/dom"
+import { DOM } from "../constants"
 import { ShortcutRegistry } from "../core"
 import { TabEditorFacade } from "../modules"
 import { throttle } from "../utils/throttle"
@@ -36,14 +33,14 @@ function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFa
 
 	tabContainer.addEventListener("click", async (e: MouseEvent) => {
 		const target = e.target as HTMLElement
-		const tabBox = target.closest(SELECTOR_TAB) as HTMLElement
+		const tabBox = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tabBox) return
 
 		if (target.tagName === "BUTTON") {
-			const id = parseInt(tabBox.dataset[DATASET_ATTR_TAB_ID]!)
+			const id = parseInt(tabBox.dataset[DOM.DATASET_ATTR_TAB_ID]!)
 			await dispatcher.dispatch("closeTab", "button", id)
 		} else if (target.tagName === "SPAN") {
-			const id = tabBox.dataset[DATASET_ATTR_TAB_ID]!
+			const id = tabBox.dataset[DOM.DATASET_ATTR_TAB_ID]!
 			tabEditorFacade.activateTabEditorById(parseInt(id))
 		}
 	})
@@ -55,13 +52,13 @@ function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
 	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
 
 	tabContainer.addEventListener("contextmenu", (e: MouseEvent) => {
-		const tab = (e.target as HTMLElement).closest(SELECTOR_TAB) as HTMLElement
+		const tab = (e.target as HTMLElement).closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tab) return
 
-		tabContextMenu.classList.add(CLASS_SELECTED)
+		tabContextMenu.classList.add(DOM.CLASS_SELECTED)
 		tabContextMenu.style.left = `${e.clientX}px`
 		tabContextMenu.style.top = `${e.clientY}px`
-		tabEditorFacade.contextTabId = parseInt(tab.dataset[DATASET_ATTR_TAB_ID]!)
+		tabEditorFacade.contextTabId = parseInt(tab.dataset[DOM.DATASET_ATTR_TAB_ID]!)
 	})
 }
 
@@ -133,7 +130,7 @@ function bindMouseDownEventsForDrag(tabEditorFacade: TabEditorFacade) {
 
 	tabContainer.addEventListener("mousedown", (e: MouseEvent) => {
 		const target = e.target as HTMLElement
-		const tab = target.closest(SELECTOR_TAB) as HTMLElement
+		const tab = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tab) return
 		tabEditorFacade.initDrag(tab, e.clientX, e.clientY)
 	})

@@ -1,17 +1,17 @@
-import DI_KEYS from "@renderer/constants/di_keys"
+import { DI } from "@renderer/constants/id"
 import { inject, injectable } from "inversify"
 import { SideElements } from "./SideElements"
 
 @injectable()
 export class SideRenderer {
-	constructor(@inject(DI_KEYS.SideElements) readonly elements: SideElements) {}
+	constructor(@inject(DI.SideElements) readonly elements: SideElements) {}
 
 	updateSideWidth(width: number) {
-		this.elements.tree.style.width = `${width}px`;
+		this.elements.tree.style.width = `${width}px`
 	}
 
 	setResizingCursor(isResizing: boolean) {
-		document.body.style.cursor = isResizing ? "ew-resize" : "";
-    document.body.style.userSelect = isResizing ? "none" : "";
+		document.body.style.cursor = isResizing ? "ew-resize" : ""
+		document.body.style.userSelect = isResizing ? "none" : ""
 	}
 }

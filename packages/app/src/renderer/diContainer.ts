@@ -1,5 +1,5 @@
 import "reflect-metadata"
-import DI_KEYS from "./constants/di_keys"
+import { DI } from "./constants/id"
 import { Container } from "inversify"
 
 import { FocusManager } from "./core/FocusManager"
@@ -46,46 +46,46 @@ import { Dispatcher } from "./dispatch"
 
 const diContainer = new Container()
 
-diContainer.bind(DI_KEYS.FocusManager).to(FocusManager).inSingletonScope()
-diContainer.bind(DI_KEYS.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope()
+diContainer.bind(DI.FocusManager).to(FocusManager).inSingletonScope()
+diContainer.bind(DI.ShortcutRegistry).to(ShortcutRegistry).inSingletonScope()
 
-diContainer.bind(DI_KEYS.MenuElements).to(MenuElements).inSingletonScope()
+diContainer.bind(DI.MenuElements).to(MenuElements).inSingletonScope()
 
-diContainer.bind(DI_KEYS.TabEditorFacade).to(TabEditorFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.TabEditorStore).to(TabEditorStore).inSingletonScope()
-diContainer.bind(DI_KEYS.TabEditorRenderer).to(TabEditorRenderer).inSingletonScope()
-diContainer.bind(DI_KEYS.TabEditorElements).to(TabEditorElements).inSingletonScope()
-diContainer.bind(DI_KEYS.TabDragManager).to(TabDragManager).inSingletonScope()
+diContainer.bind(DI.TabEditorFacade).to(TabEditorFacade).inSingletonScope()
+diContainer.bind(DI.TabEditorStore).to(TabEditorStore).inSingletonScope()
+diContainer.bind(DI.TabEditorRenderer).to(TabEditorRenderer).inSingletonScope()
+diContainer.bind(DI.TabEditorElements).to(TabEditorElements).inSingletonScope()
+diContainer.bind(DI.TabDragManager).to(TabDragManager).inSingletonScope()
 
-diContainer.bind(DI_KEYS.SideFacade).to(SideFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.SideStore).to(SideStore).inSingletonScope()
-diContainer.bind(DI_KEYS.SideRenderer).to(SideRenderer).inSingletonScope()
-diContainer.bind(DI_KEYS.SideElements).to(SideElements).inSingletonScope()
-diContainer.bind(DI_KEYS.SideDragManager).to(SideDragManager).inSingletonScope()
+diContainer.bind(DI.SideFacade).to(SideFacade).inSingletonScope()
+diContainer.bind(DI.SideStore).to(SideStore).inSingletonScope()
+diContainer.bind(DI.SideRenderer).to(SideRenderer).inSingletonScope()
+diContainer.bind(DI.SideElements).to(SideElements).inSingletonScope()
+diContainer.bind(DI.SideDragManager).to(SideDragManager).inSingletonScope()
 
-diContainer.bind(DI_KEYS.TreeFacade).to(TreeFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.TreeStore).to(TreeStore).inSingletonScope()
-diContainer.bind(DI_KEYS.TreeRenderer).to(TreeRenderer).inSingletonScope()
-diContainer.bind(DI_KEYS.TreeElements).to(TreeElements).inSingletonScope()
-diContainer.bind(DI_KEYS.TreeDragManager).to(TreeDragManager).inSingletonScope()
+diContainer.bind(DI.TreeFacade).to(TreeFacade).inSingletonScope()
+diContainer.bind(DI.TreeStore).to(TreeStore).inSingletonScope()
+diContainer.bind(DI.TreeRenderer).to(TreeRenderer).inSingletonScope()
+diContainer.bind(DI.TreeElements).to(TreeElements).inSingletonScope()
+diContainer.bind(DI.TreeDragManager).to(TreeDragManager).inSingletonScope()
 
-diContainer.bind(DI_KEYS.SettingsFacade).to(SettingsFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.SettingsStore).to(SettingsStore).inSingletonScope()
-diContainer.bind(DI_KEYS.SettingsRenderer).to(SettingsRenderer).inSingletonScope()
-diContainer.bind(DI_KEYS.SettingsElements).to(SettingsElements).inSingletonScope()
+diContainer.bind(DI.SettingsFacade).to(SettingsFacade).inSingletonScope()
+diContainer.bind(DI.SettingsStore).to(SettingsStore).inSingletonScope()
+diContainer.bind(DI.SettingsRenderer).to(SettingsRenderer).inSingletonScope()
+diContainer.bind(DI.SettingsElements).to(SettingsElements).inSingletonScope()
 
-diContainer.bind(DI_KEYS.WindowFacade).to(WindowFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.WindowStore).to(WindowStore).inSingletonScope()
-diContainer.bind(DI_KEYS.WindowRenderer).to(WindowRenderer).inSingletonScope()
-diContainer.bind(DI_KEYS.WindowElements).to(WindowElements).inSingletonScope()
+diContainer.bind(DI.WindowFacade).to(WindowFacade).inSingletonScope()
+diContainer.bind(DI.WindowStore).to(WindowStore).inSingletonScope()
+diContainer.bind(DI.WindowRenderer).to(WindowRenderer).inSingletonScope()
+diContainer.bind(DI.WindowElements).to(WindowElements).inSingletonScope()
 
-diContainer.bind(DI_KEYS.InfoFacade).to(InfoFacade).inSingletonScope()
-diContainer.bind(DI_KEYS.InfoElements).to(InfoElements).inSingletonScope()
+diContainer.bind(DI.InfoFacade).to(InfoFacade).inSingletonScope()
+diContainer.bind(DI.InfoElements).to(InfoElements).inSingletonScope()
 
-diContainer.bind(DI_KEYS.ZoomManager).to(ZoomManager).inSingletonScope()
+diContainer.bind(DI.ZoomManager).to(ZoomManager).inSingletonScope()
 
-diContainer.bind(DI_KEYS.CommandManager).to(CommandManager).inSingletonScope()
+diContainer.bind(DI.CommandManager).to(CommandManager).inSingletonScope()
 
-diContainer.bind(DI_KEYS.Dispatcher).to(Dispatcher).inSingletonScope()
+diContainer.bind(DI.Dispatcher).to(Dispatcher).inSingletonScope()
 
 export default diContainer

@@ -2,7 +2,7 @@ import type { SettingsDto } from "@shared/dto/SettingsDto"
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 
 import { inject, injectable } from "inversify"
-import DI_KEYS from "../../constants/di_keys"
+import { DI } from "../../constants/id"
 import { SettingsStore } from "./SettingsStore"
 import { SettingsRenderer } from "./SettingsRenderer"
 
@@ -14,8 +14,8 @@ type Binding<T> = {
 injectable()
 export class SettingsFacade {
 	constructor(
-		@inject(DI_KEYS.SettingsRenderer) public readonly renderer: SettingsRenderer,
-		@inject(DI_KEYS.SettingsStore) public readonly store: SettingsStore
+		@inject(DI.SettingsRenderer) public readonly renderer: SettingsRenderer,
+		@inject(DI.SettingsStore) public readonly store: SettingsStore
 	) {
 		this._bindChangeEvents()
 	}

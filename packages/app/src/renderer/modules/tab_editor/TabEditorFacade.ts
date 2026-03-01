@@ -6,7 +6,7 @@ import { inject, injectable } from "inversify"
 import { editorViewCtx } from "@milkdown/kit/core"
 import { TextSelection } from "prosemirror-state"
 
-import DI_KEYS from "../../constants/di_keys"
+import { DI } from "../../constants/id"
 import { DATASET_ATTR_TAB_ID, EXIT_TEXT } from "../../constants/dom"
 import { TabEditorRenderer } from "./TabEditorRenderer"
 import { TabEditorStore } from "./TabEditorStore"
@@ -20,9 +20,9 @@ export const BINARY_FILE_WARNING = `Can't read this file`
 @injectable()
 export class TabEditorFacade {
 	constructor(
-		@inject(DI_KEYS.TabEditorStore) public readonly store: TabEditorStore,
-		@inject(DI_KEYS.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
-		@inject(DI_KEYS.TabDragManager) public readonly drag: TabDragManager
+		@inject(DI.TabEditorStore) public readonly store: TabEditorStore,
+		@inject(DI.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
+		@inject(DI.TabDragManager) public readonly drag: TabDragManager
 	) {}
 
 	// store

@@ -1,14 +1,4 @@
-import {
-	CLASS_FOCUSED,
-	CLASS_SELECTED,
-	SELECTOR_MENU_ITEM,
-	SELECTOR_SIDE,
-	SELECTOR_TAB_CONTEXT_MENU,
-	SELECTOR_TREE_CONTEXT_MENU,
-	SELECTOR_TREE_NODE,
-	SELECTOR_TREE_NODE_CONTAINER,
-	SELECTOR_TREE_TOP,
-} from "@renderer/constants/dom"
+import { DOM } from "@renderer/constants"
 import { FocusManager, ShortcutRegistry } from "@renderer/core"
 import type { Dispatcher } from "@renderer/dispatch"
 import { MenuElements, TabEditorFacade, TreeFacade } from "@renderer/modules"
@@ -31,9 +21,29 @@ function bindDocumentClickEvent(tabEditorFacade: TabEditorFacade, treeFacade: Tr
 	const { tabContextMenu } = tabEditorFacade.renderer.elements
 	const { treeContextMenu } = treeFacade.renderer.elements
 
-	document.addEventListener("click", () => {
-		tabContextMenu.classList.remove(CLASS_SELECTED)
-		treeContextMenu.classList.remove(CLASS_SELECTED)
+	document.addEventListener("click", (e) => {
+		const target = e.target as HTMLElement
+
+		const {
+			isInMenuItem,
+			isInTabContextMenu,
+			isInTreeContextMenu,
+			isInTreeNode,
+			isInSide,
+			isInTreeTop,
+			isInTreeNodeContainer,
+			isInsideTreeSystem,
+		} = _getDiscriminationFlags(target)
+
+		tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
+		treeContextMenu.classList.remove(DOM.CLASS_SELECTED)
+
+		if (isInTreeNodeContainer) {
+			const treeEvent = new CustomEvent("click:in-tree-container", {
+				detail: { originalEvent: e },
+			})
+			document.dispatchEvent(treeEvent)
+		}
 	})
 }
 
@@ -48,27 +58,26 @@ function bindDocumentMousedownEvnet(
 	const { treeContextMenu } = treeFacade.renderer.elements
 
 	document.addEventListener("mousedown", (e) => {
-		// const isRightClick = e.button === 2
-
 		const target = e.target as HTMLElement
 		focusManager.trackRelevantFocus(target)
 
-		const isInMenuItem = !!target.closest(SELECTOR_MENU_ITEM)
-		const isInTabContextMenu = !!target.closest(SELECTOR_TAB_CONTEXT_MENU)
-		const isInTreeContextMenu = !!target.closest(SELECTOR_TREE_CONTEXT_MENU)
-		const isInTreeNode = !!target.closest(SELECTOR_TREE_NODE)
-		const isInSide = !!target.closest(SELECTOR_SIDE)
-		const isInTreeTop = !!target.closest(SELECTOR_TREE_TOP)
-		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
-		const isInsideTreeSystem = isInTreeContextMenu || isInSide
+		const {
+			isInMenuItem,
+			isInTabContextMenu,
+			isInTreeContextMenu,
+			isInTreeNode,
+			isInSide,
+			isInTreeTop,
+			isInTreeNodeContainer,
+			isInsideTreeSystem,
+		} = _getDiscriminationFlags(target)
 
-		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED))
-		if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED)
-		if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED)
+		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(DOM.CLASS_SELECTED))
+		if (!isInTabContextMenu) tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
+		if (!isInTreeContextMenu) treeContextMenu.classList.remove(DOM.CLASS_SELECTED)
 
 		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId()
 
-		// TODO
 		if (!isInsideTreeSystem) {
 			treeFacade.blur(treeFacade.lastSelectedIndex)
 			treeFacade.removeLastSelectedIndex()
@@ -76,10 +85,6 @@ function bindDocumentMousedownEvnet(
 		} else if (isInTreeTop) {
 			treeFacade.blur(treeFacade.lastSelectedIndex)
 			treeFacade.clearTreeSelected()
-		} else if (isInTreeNode) {
-			// treeFacade.blur(treeFacade.lastSelectedIndex)
-		} else if (isInTreeNodeContainer) {
-			// treeFacade.renderer.elements.treeNodeContainer.classList.add(CLASS_FOCUSED)
 		}
 	})
 }
@@ -93,4 +98,26 @@ function bindDocumentKeydownEvent(shortcutRegistry: ShortcutRegistry) {
 function bindShortcutEvent(dispatcher: Dispatcher, shortcutRegistry: ShortcutRegistry) {
 	shortcutRegistry.register("ESC", async () => await dispatcher.dispatch("esc", "shortcut"))
 	shortcutRegistry.register("ENTER", async () => await dispatcher.dispatch("enter", "shortcut"))
+}
+
+function _getDiscriminationFlags(target: HTMLElement) {
+	const isInMenuItem = !!target.closest(DOM.SELECTOR_MENU_ITEM)
+	const isInTabContextMenu = !!target.closest(DOM.SELECTOR_TAB_CONTEXT_MENU)
+	const isInTreeContextMenu = !!target.closest(DOM.SELECTOR_TREE_CONTEXT_MENU)
+	const isInTreeNode = !!target.closest(DOM.SELECTOR_TREE_NODE)
+	const isInSide = !!target.closest(DOM.SELECTOR_SIDE)
+	const isInTreeTop = !!target.closest(DOM.SELECTOR_TREE_TOP)
+	const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
+	const isInsideTreeSystem = isInTreeContextMenu || isInSide
+
+	return {
+		isInMenuItem,
+		isInTabContextMenu,
+		isInTreeContextMenu,
+		isInTreeNode,
+		isInSide,
+		isInTreeTop,
+		isInTreeNodeContainer,
+		isInsideTreeSystem,
+	}
 }

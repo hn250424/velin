@@ -4,7 +4,7 @@ import type { WindowDto } from "@shared/dto/WindowDto"
 import type { SettingsDto } from "@shared/dto/SettingsDto"
 import type { SideDto } from "@shared/dto/SideDto"
 
-import { CLASS_SELECTED } from "@renderer/constants/dom"
+import { DOM } from "@renderer/constants"
 
 import { toggleSide } from "@renderer/actions"
 import { Dispatcher } from "../dispatch"
@@ -94,7 +94,7 @@ function processTreeSession(facade: TreeFacade, dto: TreeDto) {
 
 async function initSettings(dispatcher: Dispatcher, settingsFacade: SettingsFacade) {
 	const { menus, contents } = settingsFacade.renderer.elements
-	menus[0].classList.add(CLASS_SELECTED)
+	menus[0].classList.add(DOM.CLASS_SELECTED)
 	contents[0].style.display = "block"
 
 	const viewModel = settingsFacade.getSettingsValue()

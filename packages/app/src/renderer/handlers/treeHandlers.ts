@@ -1,12 +1,6 @@
 import "@milkdown/theme-nord/style.css"
 import { TreeFacade } from "../modules"
-import {
-	DATASET_ATTR_TREE_PATH,
-	CLASS_FOCUSED,
-	CLASS_SELECTED,
-	SELECTOR_TREE_NODE,
-	SELECTOR_TREE_NODE_CONTAINER,
-} from "../constants/dom"
+import { DOM } from "../constants"
 import { FocusManager, ShortcutRegistry } from "../core"
 import { Dispatcher } from "@renderer/dispatch"
 import { throttle } from "@renderer/utils"
@@ -58,21 +52,21 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
 
 		const target = e.target as HTMLElement
-		const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
+		const treeNode = target.closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
 
 		if (!treeNode) {
-			if (target.closest(SELECTOR_TREE_NODE_CONTAINER)) {
-				treeNodeContainer.classList.add(CLASS_FOCUSED)
+			if (target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)) {
+				treeNodeContainer.classList.add(DOM.CLASS_FOCUSED)
 				treeFacade.clearTreeSelected()
 				treeFacade.lastSelectedIndex = 0
 			}
 			return
 		}
 
-		treeNodeContainer.classList.remove(CLASS_FOCUSED)
-		treeNode.classList.add(CLASS_FOCUSED)
+		treeNodeContainer.classList.remove(DOM.CLASS_FOCUSED)
+		treeNode.classList.add(DOM.CLASS_FOCUSED)
 
-		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 
 		if (e.shiftKey && treeFacade.lastSelectedIndex > 0) {
 			const startIndex = treeFacade.lastSelectedIndex
@@ -82,10 +76,10 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 			for (let i = start; i <= end; i++) {
 				treeFacade.addSelectedIndices(i)
-				treeFacade.getTreeNodeByIndex(i).classList.add(CLASS_SELECTED)
+				treeFacade.getTreeNodeByIndex(i).classList.add(DOM.CLASS_SELECTED)
 			}
 		} else if (e.ctrlKey) {
-			treeNode.classList.add(CLASS_SELECTED)
+			treeNode.classList.add(DOM.CLASS_SELECTED)
 			const index = treeFacade.getFlattenIndexByPath(path)!
 			treeFacade.setLastSelectedIndexByPath(path)
 			treeFacade.addSelectedIndices(index)
@@ -99,7 +93,7 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 				await dispatcher.dispatch("openFile", "element", path)
 			}
 
-			treeNode.classList.add(CLASS_SELECTED)
+			treeNode.classList.add(DOM.CLASS_SELECTED)
 			treeFacade.setLastSelectedIndexByPath(path)
 			treeFacade.addSelectedIndices(treeFacade.getFlattenIndexByPath(path)!)
 		}
@@ -117,14 +111,14 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 		if (contextIndex !== -1) treeFacade.blur(contextIndex)
 		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
 
-		const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
+		const treeNode = (e.target as HTMLElement).closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
 		if (!treeNode) {
 			treeFacade.contextTreeIndex = -1
 			return
 		}
 
-		treeNode.classList.add(CLASS_FOCUSED)
-		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		treeNode.classList.add(DOM.CLASS_FOCUSED)
+		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 
 		treeFacade.setContextTreeIndexByPath(path)
 		treeFacade.showContextmenu(treeNode, e.clientX, e.clientY)
@@ -192,21 +186,21 @@ function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade:
 
 function _moveFocus(e: KeyboardEvent, treeFacade: TreeFacade, lastIndex: number, delta: number) {
 	const preNode = treeFacade.getTreeNodeByIndex(lastIndex)
-	preNode.classList.remove(CLASS_FOCUSED)
+	preNode.classList.remove(DOM.CLASS_FOCUSED)
 
 	lastIndex = lastIndex += delta
 	treeFacade.lastSelectedIndex = lastIndex
 
 	const newTreeNode = treeFacade.getTreeNodeByIndex(lastIndex)
-	newTreeNode.classList.add(CLASS_FOCUSED)
+	newTreeNode.classList.add(DOM.CLASS_FOCUSED)
 
 	if (e.shiftKey) {
-		newTreeNode.classList.add(CLASS_SELECTED)
+		newTreeNode.classList.add(DOM.CLASS_SELECTED)
 		treeFacade.addSelectedIndices(lastIndex)
 		treeFacade.lastSelectedIndex = lastIndex
 	} else {
 		treeFacade.clearTreeSelected()
-		newTreeNode.classList.add(CLASS_SELECTED)
+		newTreeNode.classList.add(DOM.CLASS_SELECTED)
 		treeFacade.addSelectedIndices(lastIndex)
 		treeFacade.lastSelectedIndex = lastIndex
 	}
@@ -221,10 +215,10 @@ function bindMouseDownEventsForDrag(treeFacade: TreeFacade) {
 		let count = treeFacade.getSelectedIndices().length
 		if (count === 0) {
 			const target = e.target as HTMLElement
-			const node = target.closest(SELECTOR_TREE_NODE) as HTMLElement
+			const node = target.closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
 			if (!node) return
 
-			const path = node.dataset[DATASET_ATTR_TREE_PATH]!
+			const path = node.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 			const idx = treeFacade.getFlattenIndexByPath(path)!
 			treeFacade.lastSelectedIndex = idx
 			treeFacade.addSelectedIndices(idx)

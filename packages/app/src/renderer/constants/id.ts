@@ -1,4 +1,4 @@
-const DI_KEYS = {
+export const DI = {
 	MenuElements: Symbol("MenuElements"),
 
 	FocusManager: Symbol("FocusManager"),
@@ -41,5 +41,3 @@ const DI_KEYS = {
 	CommandManager: Symbol("CommandManager"),
 	Dispatcher: Symbol("Dispatcher"),
 }
-
-export default DI_KEYS

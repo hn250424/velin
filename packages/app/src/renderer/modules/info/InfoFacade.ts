@@ -1,10 +1,10 @@
-import DI_KEYS from "@renderer/constants/di_keys";
+import { DI } from "@renderer/constants/id"
 import { inject, injectable } from "inversify"
-import type { InfoElements } from "./InfoElements";
+import type { InfoElements } from "./InfoElements"
 
 @injectable()
 export class InfoFacade {
-	constructor(@inject(DI_KEYS.InfoElements) public readonly elements: InfoElements) {}
+	constructor(@inject(DI.InfoElements) public readonly elements: InfoElements) {}
 
 	showInformation() {
 		this.elements.overlay.style.display = "flex"

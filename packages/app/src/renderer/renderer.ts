@@ -1,7 +1,7 @@
 import "./index.scss"
 import "@milkdown/theme-nord/style.css"
 
-import DI_KEYS from "./constants/di_keys"
+import DI_KEYS from "./constants/id"
 import diContainer from "./diContainer"
 
 import { FocusManager, ShortcutRegistry } from "./core"

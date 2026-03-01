@@ -1,21 +1,9 @@
 import type ClipboardMode from "@shared/types/ClipboardMode"
-import type Response from "@shared/types/Response"
 import type { TreeDto } from "@shared/dto/TreeDto"
 import type { TreeViewModel } from "../../viewmodels/TreeViewModel"
 
 import { inject, injectable } from "inversify"
-import DI_KEYS from "../../constants/di_keys"
-import {
-	DATASET_ATTR_TREE_PATH,
-	SELECTOR_TREE_NODE,
-	CLASS_FOCUSED,
-	CLASS_SELECTED,
-	CLASS_CUT,
-	CLASS_DEACTIVE,
-	CLASS_TREE_DRAG_OVERLAY,
-	SELECTOR_TREE_NODE_WRAPPER,
-	SELECTOR_TREE_NODE_CONTAINER,
-} from "../../constants/dom"
+import { DI, DOM } from "../../constants"
 import { TreeRenderer } from "./TreeRenderer"
 import { TreeStore } from "./TreeStore"
 import { TreeDragManager } from "./TreeDragManager"
@@ -23,9 +11,9 @@ import { TreeDragManager } from "./TreeDragManager"
 @injectable()
 export class TreeFacade {
 	constructor(
-		@inject(DI_KEYS.TreeStore) public readonly store: TreeStore,
-		@inject(DI_KEYS.TreeRenderer) public readonly renderer: TreeRenderer,
-		@inject(DI_KEYS.TreeDragManager) public readonly drag: TreeDragManager
+		@inject(DI.TreeStore) public readonly store: TreeStore,
+		@inject(DI.TreeRenderer) public readonly renderer: TreeRenderer,
+		@inject(DI.TreeDragManager) public readonly drag: TreeDragManager
 	) {}
 
 	// store
@@ -203,7 +191,7 @@ export class TreeFacade {
 		const paths = this.store.getClipboardPaths()
 		for (const path of paths) {
 			const wrapper = this.getTreeWrapperByPath(path)
-			wrapper?.classList.remove(CLASS_CUT)
+			wrapper?.classList.remove(DOM.CLASS_CUT)
 		}
 
 		this.store.clearClipboardPaths()
@@ -345,11 +333,11 @@ export class TreeFacade {
 	updateDragOverStatus(target: HTMLElement) {
 		const previousWrapper = this.getInsertWrapper()
 
-		let currentWrapper = target.closest(SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
+		let currentWrapper = target.closest(DOM.SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
 		let isContainer = false
 
 		if (!currentWrapper) {
-			const container = target.closest(SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
+			const container = target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
 			if (!container) {
 				this.clearDrag()
 				return
@@ -360,11 +348,11 @@ export class TreeFacade {
 
 		if (previousWrapper === currentWrapper) return
 
-		if (previousWrapper) previousWrapper.classList.remove(CLASS_TREE_DRAG_OVERLAY)
+		if (previousWrapper) previousWrapper.classList.remove(DOM.CLASS_TREE_DRAG_OVERLAY)
 
 		const path = isContainer
-			? currentWrapper.dataset[DATASET_ATTR_TREE_PATH]!
-			: (currentWrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement).dataset[DATASET_ATTR_TREE_PATH]!
+			? currentWrapper.dataset[DOM.DATASET_ATTR_TREE_PATH]!
+			: (currentWrapper.querySelector(DOM.SELECTOR_TREE_NODE) as HTMLElement).dataset[DOM.DATASET_ATTR_TREE_PATH]!
 
 		const viewModel = this.getTreeViewModelByPath(path)
 
@@ -376,7 +364,7 @@ export class TreeFacade {
 
 		this.setInsertPath(viewModel.path)
 		this.setInsertWrapper(currentWrapper)
-		currentWrapper.classList.add(CLASS_TREE_DRAG_OVERLAY)
+		currentWrapper.classList.add(DOM.CLASS_TREE_DRAG_OVERLAY)
 	}
 
 	clearDrag() {
@@ -393,7 +381,7 @@ export class TreeFacade {
 
 	getTreeNodeByIndex(index: number) {
 		const wrapper = this.getTreeWrapperByIndex(index)!
-		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+		return wrapper.querySelector(DOM.SELECTOR_TREE_NODE) as HTMLElement
 	}
 
 	//
@@ -401,24 +389,24 @@ export class TreeFacade {
 	showContextmenu(treeNode: HTMLElement, x: number, y: number) {
 		const { treeContextMenu, treeContextPaste } = this.renderer.elements
 
-		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 		const viewModel = this.getTreeViewModelByPath(path)
 
 		const isPasteDisabled =
 			this.clipboardMode === "none" || !viewModel.directory || this.getSelectedIndices().length === 0
 
-		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
-		treeContextMenu.classList.add(CLASS_SELECTED)
+		treeContextPaste.classList.toggle(DOM.CLASS_DEACTIVE, isPasteDisabled)
+		treeContextMenu.classList.add(DOM.CLASS_SELECTED)
 		treeContextMenu.style.left = `${x}px`
 		treeContextMenu.style.top = `${y}px`
 	}
 
 	blur(index: number) {
 		if (index === 0) {
-			this.renderer.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
+			this.renderer.elements.treeNodeContainer.classList.remove(DOM.CLASS_FOCUSED)
 		} else {
 			const node = this.getTreeNodeByIndex(index)
-			node.classList.remove(CLASS_FOCUSED)
+			node.classList.remove(DOM.CLASS_FOCUSED)
 		}
 	}
 
@@ -426,7 +414,7 @@ export class TreeFacade {
 		const selectedIndices = this.getSelectedIndices()
 		for (const i of selectedIndices) {
 			const div = this.getTreeNodeByIndex(i)
-			div.classList.remove(CLASS_SELECTED)
+			div.classList.remove(DOM.CLASS_SELECTED)
 		}
 		this.clearSelectedIndices()
 	}
@@ -457,7 +445,7 @@ export class TreeFacade {
 
 				this.setFlattenIndexByPath(newPath, idx)
 				this.setTreeWrapperByPath(newPath, wrapper)
-				node.dataset[DATASET_ATTR_TREE_PATH] = newPath
+				node.dataset[DOM.DATASET_ATTR_TREE_PATH] = newPath
 				node.title = newPath
 			} else {
 				break

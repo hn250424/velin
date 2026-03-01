@@ -1,4 +1,4 @@
-import { CLASS_SELECTED } from "../constants/dom"
+import { DOM } from "../constants"
 import { SettingsFacade } from "../modules"
 import { Dispatcher } from "../dispatch"
 
@@ -7,10 +7,10 @@ export function handleSettings(dispatcher: Dispatcher, settingsFacade: SettingsF
 
 	menus.forEach((el, idx) => {
 		el.addEventListener("click", () => {
-			menus.forEach((m) => m.classList.remove(CLASS_SELECTED))
+			menus.forEach((m) => m.classList.remove(DOM.CLASS_SELECTED))
 			contents.forEach((c) => (c.style.display = "none"))
 
-			el.classList.add(CLASS_SELECTED)
+			el.classList.add(DOM.CLASS_SELECTED)
 			contents[idx].style.display = "block"
 		})
 	})

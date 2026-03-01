@@ -1,4 +1,4 @@
-import DI_KEYS from "@renderer/constants/di_keys"
+import { DI } from "@renderer/constants/id"
 import type {
 	SettingsViewModel,
 	SettingFontViewModel,
@@ -9,7 +9,7 @@ import type { SettingsElements } from "./SettingsElements"
 
 @injectable()
 export class SettingsRenderer {
-	constructor(@inject(DI_KEYS.SettingsElements) readonly elements: SettingsElements) {}
+	constructor(@inject(DI.SettingsElements) readonly elements: SettingsElements) {}
 
 	//
 

@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify"
 import type { Focus } from "../core"
 import { FocusManager } from "../core"
-import DI_KEYS from "../constants/di_keys"
+import DI_KEYS from "../constants/id"
 import { CommandManager } from "../modules"
 import { assert } from "../utils"
 import type { DispatchEventsWithArgs, GetArgs, Source } from "./types"

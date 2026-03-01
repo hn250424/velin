@@ -6,19 +6,9 @@ import { history } from "@milkdown/kit/plugin/history"
 import { commonmark } from "@milkdown/kit/preset/commonmark"
 import { nord } from "@milkdown/theme-nord"
 import "@milkdown/theme-nord/style.css"
-import {
-	CLASS_TAB,
-	DATASET_ATTR_TAB_ID,
-	MODIFIED_TEXT,
-	CLASS_EDITOR_BOX,
-	EXIT_TEXT,
-	CLASS_TAB_GHOST,
-	CLASS_BINARY,
-	CLASS_IS_MODIFIED,
-} from "../../constants/dom"
 import { TabEditorView } from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
-import DI_KEYS from "@renderer/constants/di_keys"
+import { DI, DOM } from "@renderer/constants"
 import type { TabEditorElements } from "./TabEditorElements"
 
 @injectable()
@@ -29,32 +19,32 @@ export class TabEditorRenderer {
 	private _ghostTab: HTMLElement | null = null
 	private _indicator: HTMLElement | null = null
 
-	constructor(@inject(DI_KEYS.TabEditorElements) readonly elements: TabEditorElements) {}
+	constructor(@inject(DI.TabEditorElements) readonly elements: TabEditorElements) {}
 
 	//
 
 	private _createTabEl(id: string, filePath: string, fileName: string) {
 		const tabBox = document.createElement("div")
-		tabBox.classList.add(CLASS_TAB)
-		tabBox.dataset[DATASET_ATTR_TAB_ID] = id.toString()
+		tabBox.classList.add(DOM.CLASS_TAB)
+		tabBox.dataset[DOM.DATASET_ATTR_TAB_ID] = id.toString()
 
 		const tabSpan = document.createElement("span")
 		tabSpan.title = filePath || ""
 		tabSpan.textContent = fileName || "Untitled"
 
 		const tabButton = document.createElement("button")
-		tabButton.textContent = EXIT_TEXT
+		tabButton.textContent = DOM.EXIT_TEXT
 		tabButton.addEventListener("mouseenter", () => {
-			if (tabBox.classList.contains(CLASS_IS_MODIFIED)) {
-				tabButton.textContent = EXIT_TEXT;
+			if (tabBox.classList.contains(DOM.CLASS_IS_MODIFIED)) {
+				tabButton.textContent = DOM.EXIT_TEXT
 			}
-		});
+		})
 
 		tabButton.addEventListener("mouseleave", () => {
-			if (tabBox.classList.contains(CLASS_IS_MODIFIED)) {
-				tabButton.textContent = MODIFIED_TEXT
+			if (tabBox.classList.contains(DOM.CLASS_IS_MODIFIED)) {
+				tabButton.textContent = DOM.MODIFIED_TEXT
 			}
-		});
+		})
 
 		tabBox.appendChild(tabSpan)
 		tabBox.appendChild(tabButton)
@@ -64,13 +54,13 @@ export class TabEditorRenderer {
 
 	private async _createEditorEl(isBinary: boolean, initialContent: string) {
 		const editorBox = document.createElement("div")
-		editorBox.className = CLASS_EDITOR_BOX
+		editorBox.className = DOM.CLASS_EDITOR_BOX
 
 		let editor = null
 
 		if (isBinary) {
 			editorBox.innerText = BINARY_FILE_WARNING
-			editorBox.classList.add(CLASS_BINARY)
+			editorBox.classList.add(DOM.CLASS_BINARY)
 		} else {
 			editor = await Editor.make()
 				.config((ctx) => {
@@ -101,12 +91,12 @@ export class TabEditorRenderer {
 
 		if (isModified && !vm.isModified) {
 			vm.isModified = true
-			view.setTabButtonTextContent(MODIFIED_TEXT)
-			view.tabBox.classList.add(CLASS_IS_MODIFIED);
+			view.setTabButtonTextContent(DOM.MODIFIED_TEXT)
+			view.tabBox.classList.add(DOM.CLASS_IS_MODIFIED)
 		} else if (!isModified && vm.isModified) {
 			vm.isModified = false
-			view.setTabButtonTextContent(EXIT_TEXT)
-			view.tabBox.classList.remove(CLASS_IS_MODIFIED);
+			view.setTabButtonTextContent(DOM.EXIT_TEXT)
+			view.tabBox.classList.remove(DOM.CLASS_IS_MODIFIED)
 		}
 	}
 
@@ -142,7 +132,7 @@ export class TabEditorRenderer {
 	}
 
 	removeTabAndEditor(index: number) {
-		const [ view ] = this._tabEditorViews.splice(index, 1)
+		const [view] = this._tabEditorViews.splice(index, 1)
 		view.destroy()
 	}
 
@@ -206,22 +196,22 @@ export class TabEditorRenderer {
 		this._tabEditorViews.splice(toIndex, 0, view)
 
 		const container = this.elements.tabContainer
-		const refNode = container.children[adjustedToIndex > fromIndex ? adjustedToIndex + 1 : adjustedToIndex];
-    container.insertBefore(view.tabBox, refNode || null);
+		const refNode = container.children[adjustedToIndex > fromIndex ? adjustedToIndex + 1 : adjustedToIndex]
+		container.insertBefore(view.tabBox, refNode || null)
 	}
 
 	//
 
 	private _createGhostTabEl(fileName: string) {
 		const div = document.createElement("div")
-		div.classList.add(CLASS_TAB)
-		div.classList.add(CLASS_TAB_GHOST)
+		div.classList.add(DOM.CLASS_TAB)
+		div.classList.add(DOM.CLASS_TAB_GHOST)
 
 		const span = document.createElement("span")
 		span.textContent = fileName ? fileName : "Untitled"
 
 		const button = document.createElement("button")
-		button.textContent = EXIT_TEXT
+		button.textContent = DOM.EXIT_TEXT
 
 		div.appendChild(span)
 		div.appendChild(button)

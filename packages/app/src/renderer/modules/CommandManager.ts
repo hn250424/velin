@@ -9,7 +9,7 @@ import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import closedFolderSvg from "../assets/icons/closed_folder.svg?raw"
 import openedFolderSvg from "../assets/icons/opened_folder.svg?raw"
 
-import DI_KEYS from "../constants/di_keys"
+import { DI, DOM } from "../constants"
 
 import { FocusManager } from "../core"
 
@@ -21,30 +21,16 @@ import { CreateCommand, DeleteCommand, PasteCommand, RenameCommand } from "../co
 import { debounce } from "../utils/debounce"
 import { sleep } from "../utils/sleep"
 
-import {
-	CLASS_EXPANDED,
-	CLASS_TREE_NODE_CHILDREN,
-	CLASS_TREE_NODE_TEXT,
-	SELECTOR_TREE_NODE_TEXT,
-	DATASET_ATTR_TREE_PATH,
-	CLASS_TREE_NODE_INPUT,
-	CLASS_SELECTED,
-	CLASS_CUT,
-	SELECTOR_TREE_NODE_TYPE,
-	CLASS_FOCUSED,
-	SELECTOR_TREE_NODE_CHILDREN,
-} from "../constants/dom"
-
 @injectable()
 export class CommandManager {
 	private undoStack: ICommand[] = []
 	private redoStack: ICommand[] = []
 
 	constructor(
-		@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager,
-		@inject(DI_KEYS.SettingsFacade) private readonly settingsFacade: SettingsFacade,
-		@inject(DI_KEYS.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
-		@inject(DI_KEYS.TreeFacade) private readonly treeFacade: TreeFacade
+		@inject(DI.FocusManager) private readonly focusManager: FocusManager,
+		@inject(DI.SettingsFacade) private readonly settingsFacade: SettingsFacade,
+		@inject(DI.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
+		@inject(DI.TreeFacade) private readonly treeFacade: TreeFacade
 	) {
 		this.tabEditorFacade.findInput.addEventListener(
 			"input",
@@ -137,12 +123,12 @@ export class CommandManager {
 		}
 
 		// When click directory in tree area.
-		const dirPath = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		const dirPath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 		const viewModel = this.treeFacade.getTreeViewModelByPath(dirPath)
 		const maybeChildren = treeNode.nextElementSibling
-		if (!maybeChildren || !maybeChildren.classList.contains(CLASS_TREE_NODE_CHILDREN)) return
+		if (!maybeChildren || !maybeChildren.classList.contains(DOM.CLASS_TREE_NODE_CHILDREN)) return
 
-		const nodeType = treeNode.querySelector(SELECTOR_TREE_NODE_TYPE) as HTMLElement
+		const nodeType = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TYPE) as HTMLElement
 		const treeNodeChildren = maybeChildren as HTMLElement
 
 		if (viewModel.expanded) {
@@ -176,8 +162,8 @@ export class CommandManager {
 
 		nodeType.innerHTML = expanded ? openedFolderSvg : closedFolderSvg
 
-		if (expanded) children.classList.add(CLASS_EXPANDED)
-		else children.classList.remove(CLASS_EXPANDED)
+		if (expanded) children.classList.add(DOM.CLASS_EXPANDED)
+		else children.classList.remove(DOM.CLASS_EXPANDED)
 	}
 
 	private _syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
@@ -274,7 +260,7 @@ export class CommandManager {
 			parentContainer = this.treeFacade.renderer.elements.treeNodeContainer
 		} else {
 			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
-			parentContainer = parentWrapper.querySelector(SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
+			parentContainer = parentWrapper.querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
 		}
 
 		const { wrapper, input } = this.treeFacade.createInput(directory, viewModel.indent)
@@ -320,8 +306,8 @@ export class CommandManager {
 					this.treeFacade.lastSelectedIndex = createdIdx
 
 					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx)
-					createdNode.classList.add(CLASS_FOCUSED)
-					createdNode.classList.add(CLASS_SELECTED)
+					createdNode.classList.add(DOM.CLASS_FOCUSED)
+					createdNode.classList.add(DOM.CLASS_SELECTED)
 
 					if (!directory) {
 						// await this.performOpenFile("programmatic", filePath)
@@ -355,15 +341,15 @@ export class CommandManager {
 
 		const lastSelectedIndex = this.treeFacade.lastSelectedIndex
 		const treeNode = this.treeFacade.getTreeNodeByIndex(lastSelectedIndex)
-		const treeSpan = treeNode.querySelector(SELECTOR_TREE_NODE_TEXT)
+		const treeSpan = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TEXT)
 		if (!treeSpan) return
 
 		const treeInput = document.createElement("input")
 		treeInput.type = "text"
 		treeInput.value = treeSpan.textContent ?? ""
-		treeInput.classList.add(CLASS_TREE_NODE_INPUT)
+		treeInput.classList.add(DOM.CLASS_TREE_NODE_INPUT)
 
-		treeNode.classList.remove(CLASS_FOCUSED)
+		treeNode.classList.remove(DOM.CLASS_FOCUSED)
 		treeNode.replaceChild(treeInput, treeSpan)
 		treeInput.focus()
 
@@ -394,7 +380,7 @@ export class CommandManager {
 			treeInput.removeEventListener("keydown", onKeyDown)
 			treeInput.removeEventListener("blur", onBlur)
 
-			const prePath = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+			const prePath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 			const newName = treeInput.value.trim()
 			const dir = window.utils.getDirName(prePath)
 			const newPath = window.utils.getJoinedPath(dir, newName)
@@ -402,13 +388,13 @@ export class CommandManager {
 			// Skip unique name generation for unchanged rename (unlike create or paste)
 			if (prePath === newPath) {
 				const restoreSpan = document.createElement("span")
-				restoreSpan.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
+				restoreSpan.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
 				restoreSpan.textContent = window.utils.getBaseName(newPath)
 				treeNode.replaceChild(restoreSpan, treeInput)
 				return
 			}
 
-			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DATASET_ATTR_TREE_PATH]!)
+			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!)
 
 			const cmd = new RenameCommand(
 				this.treeFacade,
@@ -488,7 +474,7 @@ export class CommandManager {
 		const selectedIndices = this.treeFacade.getSelectedIndices()
 
 		for (const idx of selectedIndices) {
-			this.treeFacade.getTreeWrapperByIndex(idx)!.classList.add(CLASS_CUT)
+			this.treeFacade.getTreeWrapperByIndex(idx)!.classList.add(DOM.CLASS_CUT)
 			this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
