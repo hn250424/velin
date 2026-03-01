@@ -1,23 +1,25 @@
-import { DOM } from "@renderer/constants"
+import { DOM, CUSTOM_EVENTS } from "@renderer/constants"
 import { FocusManager, ShortcutRegistry } from "@renderer/core"
 import type { Dispatcher } from "@renderer/dispatch"
 import { MenuElements, TabEditorFacade, TreeFacade } from "@renderer/modules"
+import { EventEmitter } from "events"
 
 export function handleGlobalInput(
 	dispatcher: Dispatcher,
+	emitter: EventEmitter,
 	focusManager: FocusManager,
 	menuElements: MenuElements,
 	tabEditorFacade: TabEditorFacade,
 	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindDocumentClickEvent(tabEditorFacade, treeFacade)
+	bindDocumentClickEvent(emitter, tabEditorFacade, treeFacade)
 	bindDocumentMousedownEvnet(focusManager, menuElements, tabEditorFacade, treeFacade)
 	bindDocumentKeydownEvent(shortcutRegistry)
 	bindShortcutEvent(dispatcher, shortcutRegistry)
 }
 
-function bindDocumentClickEvent(tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
+function bindDocumentClickEvent(emitter: EventEmitter, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
 	const { tabContextMenu } = tabEditorFacade.renderer.elements
 	const { treeContextMenu } = treeFacade.renderer.elements
 
@@ -39,10 +41,7 @@ function bindDocumentClickEvent(tabEditorFacade: TabEditorFacade, treeFacade: Tr
 		treeContextMenu.classList.remove(DOM.CLASS_SELECTED)
 
 		if (isInTreeNodeContainer) {
-			const treeEvent = new CustomEvent("click:in-tree-container", {
-				detail: { originalEvent: e },
-			})
-			document.dispatchEvent(treeEvent)
+			emitter.emit(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, e)
 		}
 	})
 }

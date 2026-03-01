@@ -1,11 +1,12 @@
 import "./index.scss"
 import "@milkdown/theme-nord/style.css"
 
-import DI_KEYS from "./constants/id"
+import { DI } from "./constants"
 import diContainer from "./diContainer"
 
 import { FocusManager, ShortcutRegistry } from "./core"
 import { Dispatcher } from "./dispatch"
+import { EventEmitter } from "events"
 
 import {
 	MenuElements,
@@ -36,22 +37,23 @@ import {
 } from "./handlers"
 
 window.addEventListener("DOMContentLoaded", () => {
-	const menuElements = diContainer.get<MenuElements>(DI_KEYS.MenuElements)
+	const menuElements = diContainer.get<MenuElements>(DI.MenuElements)
 
-	const focusManager = diContainer.get<FocusManager>(DI_KEYS.FocusManager)
-	const zoomManager = diContainer.get<ZoomManager>(DI_KEYS.ZoomManager)
-	const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI_KEYS.ShortcutRegistry)
+	const focusManager = diContainer.get<FocusManager>(DI.FocusManager)
+	const zoomManager = diContainer.get<ZoomManager>(DI.ZoomManager)
+	const shortcutRegistry = diContainer.get<ShortcutRegistry>(DI.ShortcutRegistry)
 
-	const infoFacade = diContainer.get<InfoFacade>(DI_KEYS.InfoFacade)
-	const settingsFacade = diContainer.get<SettingsFacade>(DI_KEYS.SettingsFacade)
-	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI_KEYS.TabEditorFacade)
-	const treeFacade = diContainer.get<TreeFacade>(DI_KEYS.TreeFacade)
-	const sideFacade = diContainer.get<SideFacade>(DI_KEYS.SideFacade)
-	const windowFacade = diContainer.get<WindowFacade>(DI_KEYS.WindowFacade)
+	const infoFacade = diContainer.get<InfoFacade>(DI.InfoFacade)
+	const settingsFacade = diContainer.get<SettingsFacade>(DI.SettingsFacade)
+	const tabEditorFacade = diContainer.get<TabEditorFacade>(DI.TabEditorFacade)
+	const treeFacade = diContainer.get<TreeFacade>(DI.TreeFacade)
+	const sideFacade = diContainer.get<SideFacade>(DI.SideFacade)
+	const windowFacade = diContainer.get<WindowFacade>(DI.WindowFacade)
 
-	const dispatcher = diContainer.get<Dispatcher>(DI_KEYS.Dispatcher)
+	const dispatcher = diContainer.get<Dispatcher>(DI.Dispatcher)
+	const emitter = diContainer.get<EventEmitter>(DI.EventEmitter)
 
-	handleGlobalInput(dispatcher, focusManager, menuElements, tabEditorFacade, treeFacade, shortcutRegistry)
+	handleGlobalInput(dispatcher, emitter, focusManager, menuElements, tabEditorFacade, treeFacade, shortcutRegistry)
 	handleMenuItems(menuElements)
 	handleFileMenu(dispatcher, shortcutRegistry, menuElements, settingsFacade, tabEditorFacade, treeFacade)
 	handleEditMenu(dispatcher, shortcutRegistry, menuElements)
@@ -61,7 +63,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleTabEditor(dispatcher, tabEditorFacade, shortcutRegistry)
 	handleInfo(infoFacade)
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
-	handleTree(dispatcher, focusManager, treeFacade, shortcutRegistry)
+	handleTree(dispatcher, emitter, focusManager, treeFacade, shortcutRegistry)
 	handleSide(sideFacade)
 	handleSettings(dispatcher, settingsFacade)
 	handleSync(tabEditorFacade, treeFacade)

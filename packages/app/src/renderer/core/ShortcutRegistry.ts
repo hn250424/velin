@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify"
-import DI_KEYS from "../constants/id"
+import { DI } from "../constants/id"
 import { FocusManager } from "./index"
 
 @injectable()
 export class ShortcutRegistry {
 	private shortcutMap = new Map<string, (e: KeyboardEvent) => any>()
 
-	constructor(@inject(DI_KEYS.FocusManager) private readonly focusManager: FocusManager) {}
+	constructor(@inject(DI.FocusManager) private readonly focusManager: FocusManager) {}
 
 	register(key: string, handler: (e: KeyboardEvent) => any) {
 		this.shortcutMap.set(key, handler)

@@ -1,19 +1,21 @@
 import "@milkdown/theme-nord/style.css"
 import { TreeFacade } from "../modules"
-import { DOM } from "../constants"
+import { DOM, CUSTOM_EVENTS } from "../constants"
 import { FocusManager, ShortcutRegistry } from "../core"
 import { Dispatcher } from "@renderer/dispatch"
+import { EventEmitter } from "events"
 import { throttle } from "@renderer/utils"
 
 export function handleTree(
 	dispatcher: Dispatcher,
+	emitter: EventEmitter,
 	focusManager: FocusManager,
 	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
 	bindTreeTopMenuEvents(dispatcher, treeFacade)
 
-	bindTreeClickEvents(dispatcher, treeFacade)
+	bindTreeClickEvents(dispatcher, emitter, treeFacade)
 
 	bindTreeContextmenuToggleEvents(treeFacade)
 	bindTreeContextmenuClickEvents(dispatcher, treeFacade)
@@ -42,10 +44,11 @@ function bindTreeTopMenuEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 //
 
-function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
+function bindTreeClickEvents(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
-	treeNodeContainer.addEventListener("click", async (e) => {
+	// treeNodeContainer.addEventListener("click", async (e) => {
+	emitter.on(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, async (e: MouseEvent) => {
 		const contextIndex = treeFacade.contextTreeIndex
 		const lastSelectedIndex = treeFacade.lastSelectedIndex
 		if (contextIndex !== -1) treeFacade.blur(contextIndex)

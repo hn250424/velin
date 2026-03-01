@@ -41,8 +41,8 @@ import { InfoElements } from "./modules/info/InfoElements"
 import { ZoomManager } from "./modules/zoom/ZoomManager"
 
 import { CommandManager } from "./modules/CommandManager"
-
 import { Dispatcher } from "./dispatch"
+import { EventEmitter } from 'events';
 
 const diContainer = new Container()
 
@@ -85,7 +85,7 @@ diContainer.bind(DI.InfoElements).to(InfoElements).inSingletonScope()
 diContainer.bind(DI.ZoomManager).to(ZoomManager).inSingletonScope()
 
 diContainer.bind(DI.CommandManager).to(CommandManager).inSingletonScope()
-
 diContainer.bind(DI.Dispatcher).to(Dispatcher).inSingletonScope()
+diContainer.bind(DI.EventEmitter).to(EventEmitter).inSingletonScope()
 
 export default diContainer
