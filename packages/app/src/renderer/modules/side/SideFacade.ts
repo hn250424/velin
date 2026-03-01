@@ -52,14 +52,6 @@ export class SideFacade {
 
 	//
 
-	get dragAnimationFrameId() {
-		return this.drag.animationFrameId
-	}
-
-	set dragAnimationFrameId(id: number | null) {
-		this.drag.animationFrameId = id
-	}
-
 	get dragMinWidth() {
 		return this.drag.minWidth
 	}

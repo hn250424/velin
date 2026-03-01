@@ -6,7 +6,6 @@ export class SideDragManager {
 	readonly maxWidth = 500
 
 	private _isDragging = false
-	private _animationFrameId: number | null = null
 
 	//
 
@@ -20,19 +19,5 @@ export class SideDragManager {
 
 	endDrag() {
 		this._isDragging = false
-		if (this.animationFrameId) {
-			cancelAnimationFrame(this.animationFrameId)
-			this.animationFrameId = null
-		}
-	}
-
-	//
-
-	get animationFrameId() {
-		return this._animationFrameId
-	}
-
-	set animationFrameId(id: number | null) {
-		this._animationFrameId = id
 	}
 }

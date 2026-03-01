@@ -1,6 +1,8 @@
+import { CUSTOM_EVENTS } from "@renderer/constants"
 import type { SideFacade } from "@renderer/modules"
+import { EventEmitter } from "events"
 
-export function handleSide(sideFacade: SideFacade) {
+export function handleSide(emitter: EventEmitter, sideFacade: SideFacade) {
 	const { resizer } = sideFacade.renderer.elements
 
 	resizer.addEventListener("mousedown", (e) => {
@@ -8,18 +10,14 @@ export function handleSide(sideFacade: SideFacade) {
 		sideFacade.initDrag()
 	})
 
-	document.addEventListener("mousemove", (e) => {
+	emitter.on(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, (e) => {
 		if (!sideFacade.isDragging()) return
-		if (sideFacade.dragAnimationFrameId) return
 
-		sideFacade.dragAnimationFrameId = requestAnimationFrame(() => {
-			const width = sideFacade.calculateWidth(e.clientX)
-			sideFacade.updateSideWidth(width)
-			sideFacade.dragAnimationFrameId = null
-		})
+		const width = sideFacade.calculateWidth(e.clientX)
+		sideFacade.updateSideWidth(width)
 	})
 
-	document.addEventListener("mouseup", async (e) => {
+	emitter.on(CUSTOM_EVENTS.DRAG.MOUSE_UP, (e) => {
 		if (!sideFacade.isDragging()) return
 
 		sideFacade.clearDrag()
@@ -29,7 +27,7 @@ export function handleSide(sideFacade: SideFacade) {
 		sideFacade.syncSession()
 	})
 
-	document.addEventListener("mouseleave", async () => {
+	emitter.on(CUSTOM_EVENTS.DRAG.MOUSE_LEAVE, (e) => {
 		if (!sideFacade.isDragging()) return
 		sideFacade.clearDrag()
 	})

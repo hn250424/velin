@@ -60,11 +60,11 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)
 	handleHelpMenu(shortcutRegistry, menuElements, infoFacade)
 
-	handleTabEditor(dispatcher, tabEditorFacade, shortcutRegistry)
+	handleTabEditor(dispatcher, emitter, tabEditorFacade, shortcutRegistry)
 	handleInfo(infoFacade)
 	handleWindow(windowFacade, tabEditorFacade, treeFacade)
 	handleTree(dispatcher, emitter, focusManager, treeFacade, shortcutRegistry)
-	handleSide(sideFacade)
+	handleSide(emitter, sideFacade)
 	handleSettings(dispatcher, settingsFacade)
 	handleSync(tabEditorFacade, treeFacade)
 

@@ -4,7 +4,6 @@ import { DOM, CUSTOM_EVENTS } from "../constants"
 import { FocusManager, ShortcutRegistry } from "../core"
 import { Dispatcher } from "@renderer/dispatch"
 import { EventEmitter } from "events"
-import { throttle } from "@renderer/utils"
 
 export function handleTree(
 	dispatcher: Dispatcher,
@@ -22,10 +21,10 @@ export function handleTree(
 
 	bindShortcutEvents(dispatcher, shortcutRegistry, focusManager, treeFacade)
 
-	bindMouseDownEventsForDrag(treeFacade)
-	bindMouseMoveEventsForDrag(treeFacade)
-	bindMouseUpEventsForDrag(dispatcher, treeFacade)
-	bindMouseLeaveEventsForDrag(treeFacade)
+	bindMouseDownEventsForDrag(emitter, treeFacade)
+	bindMouseMoveEventsForDrag(emitter, treeFacade)
+	bindMouseUpEventsForDrag(dispatcher, emitter, treeFacade)
+	bindMouseLeaveEventsForDrag(emitter, treeFacade)
 }
 
 //
@@ -211,10 +210,8 @@ function _moveFocus(e: KeyboardEvent, treeFacade: TreeFacade, lastIndex: number,
 
 //
 
-function bindMouseDownEventsForDrag(treeFacade: TreeFacade) {
-	const { treeNodeContainer } = treeFacade.renderer.elements
-
-	treeNodeContainer.addEventListener("mousedown", (e) => {
+function bindMouseDownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_DOWN, (e) => {
 		let count = treeFacade.getSelectedIndices().length
 		if (count === 0) {
 			const target = e.target as HTMLElement
@@ -232,13 +229,8 @@ function bindMouseDownEventsForDrag(treeFacade: TreeFacade) {
 	})
 }
 
-function bindMouseMoveEventsForDrag(treeFacade: TreeFacade) {
-	const updateOverStatus = throttle((target: HTMLElement) => {
-		if (!treeFacade.isDrag()) return
-		treeFacade.updateDragOverStatus(target)
-	}, 100)
-
-	document.addEventListener("mousemove", (e: MouseEvent) => {
+function bindMouseMoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, (e) => {
 		if (!treeFacade.isMouseDown()) return
 
 		if (!treeFacade.isDrag()) {
@@ -251,12 +243,12 @@ function bindMouseMoveEventsForDrag(treeFacade: TreeFacade) {
 		}
 
 		treeFacade.moveGhost(e.clientX, e.clientY)
-		updateOverStatus(e.target as HTMLElement)
+		treeFacade.updateDragOverStatus(e.target)
 	})
 }
 
-function bindMouseUpEventsForDrag(dispatcher: Dispatcher, treeFacade: TreeFacade) {
-	document.addEventListener("mouseup", async () => {
+function bindMouseUpEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, async (e) => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
 			return
@@ -275,8 +267,8 @@ function bindMouseUpEventsForDrag(dispatcher: Dispatcher, treeFacade: TreeFacade
 	})
 }
 
-function bindMouseLeaveEventsForDrag(treeFacade: TreeFacade) {
-	document.addEventListener("mouseleave", () => {
+function bindMouseLeaveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_LEAVE, (e) => {
 		if (treeFacade.isDrag()) {
 			treeFacade.clearDrag()
 		}

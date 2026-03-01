@@ -1,13 +1,14 @@
 import "@milkdown/theme-nord/style.css"
 
-import { DOM } from "../constants"
+import { CUSTOM_EVENTS, DOM } from "../constants"
 import { ShortcutRegistry } from "../core"
 import { TabEditorFacade } from "../modules"
-import { throttle } from "../utils/throttle"
 import { Dispatcher } from "@renderer/dispatch"
+import { EventEmitter } from "events"
 
 export function handleTabEditor(
 	dispatcher: Dispatcher,
+	emitter: EventEmitter,
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
@@ -20,10 +21,10 @@ export function handleTabEditor(
 
 	bindShortcutEvents(dispatcher, shortcutRegistry, tabEditorFacade)
 
-	bindMouseDownEventsForDrag(tabEditorFacade)
-	bindMouseMoveEventsForDrag(tabEditorFacade)
-	bindMouseUpEventsForDrag(tabEditorFacade)
-	bindMouseLeaveEventsForDrag(tabEditorFacade)
+	bindMouseDownEventsForDrag(emitter, tabEditorFacade)
+	bindMouseMoveEventsForDrag(emitter, tabEditorFacade)
+	bindMouseUpEventsForDrag(emitter, tabEditorFacade)
+	bindMouseLeaveEventsForDrag(emitter, tabEditorFacade)
 }
 
 //
@@ -125,10 +126,8 @@ function bindShortcutEvents(
 
 //
 
-function bindMouseDownEventsForDrag(tabEditorFacade: TabEditorFacade) {
-	const { tabContainer } = tabEditorFacade.renderer.elements
-
-	tabContainer.addEventListener("mousedown", (e: MouseEvent) => {
+function bindMouseDownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_DOWN, (e) => {
 		const target = e.target as HTMLElement
 		const tab = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tab) return
@@ -136,19 +135,8 @@ function bindMouseDownEventsForDrag(tabEditorFacade: TabEditorFacade) {
 	})
 }
 
-function bindMouseMoveEventsForDrag(tabEditorFacade: TabEditorFacade) {
-	const updateInsertion = throttle((clientX: number) => {
-		if (!tabEditorFacade.isDrag()) return
-
-		const newIndex = tabEditorFacade.getInsertIndexFromMouseX(clientX)
-
-		if (tabEditorFacade.getInsertIndex() !== newIndex) {
-      tabEditorFacade.setInsertIndex(newIndex)
-      tabEditorFacade.updateDragIndicator(newIndex)
-    }
-	}, 100)
-
-	document.addEventListener("mousemove", (e: MouseEvent) => {
+function bindMouseMoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, (e) => {
 		if (!tabEditorFacade.isMouseDown()) return
 
 		if (!tabEditorFacade.isDrag()) {
@@ -160,13 +148,18 @@ function bindMouseMoveEventsForDrag(tabEditorFacade: TabEditorFacade) {
 			}
 		}
 
-		tabEditorFacade.moveGhostTab(e.clientX, e.clientY);
-		updateInsertion(e.clientX);
+		tabEditorFacade.moveGhostTab(e.clientX, e.clientY)
+
+		const newIndex = tabEditorFacade.getInsertIndexFromMouseX(e.clientX)
+		if (tabEditorFacade.getInsertIndex() !== newIndex) {
+      tabEditorFacade.setInsertIndex(newIndex)
+      tabEditorFacade.updateDragIndicator(newIndex)
+    }
 	})
 }
 
-function bindMouseUpEventsForDrag(tabEditorFacade: TabEditorFacade) {
-	document.addEventListener("mouseup", async (e: MouseEvent) => {
+function bindMouseUpEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, async (e) => {
 		if (!tabEditorFacade.isDrag()) {
 			tabEditorFacade.setMouseDown(false)
 			return
@@ -185,8 +178,8 @@ function bindMouseUpEventsForDrag(tabEditorFacade: TabEditorFacade) {
 	})
 }
 
-function bindMouseLeaveEventsForDrag(tabEditorFacade: TabEditorFacade) {
-  document.addEventListener("mouseleave", () => {
+function bindMouseLeaveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+  emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, (e) => {
     if (tabEditorFacade.isDrag()) {
       tabEditorFacade.clearDrag()
     }
