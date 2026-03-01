@@ -44,8 +44,17 @@ export class TreeFacade {
 		return this.store.getRootTreeViewModel()
 	}
 
+	// TODO: expense
+	setRootTreeViewModel(root: TreeViewModel) {
+		this.store.setRootTreeViewModel(root)
+	}
+
 	syncPathToFlattenTreeIndex() {
 		this.store.syncPathToFlattenTreeIndex()
+	}
+
+	updatePathToFlattenTreeIndex(startIndex: number) {
+		this.store.updatePathToFlattenTreeIndex(startIndex)
 	}
 
 	//
@@ -387,8 +396,24 @@ export class TreeFacade {
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
 	}
 
-	blur() {
-		const index = this.lastSelectedIndex
+	//
+
+	showContextmenu(treeNode: HTMLElement, x: number, y: number) {
+		const { treeContextMenu, treeContextPaste } = this.renderer.elements
+
+		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+		const viewModel = this.getTreeViewModelByPath(path)
+
+		const isPasteDisabled =
+			this.clipboardMode === "none" || !viewModel.directory || this.getSelectedIndices().length === 0
+
+		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
+		treeContextMenu.classList.add(CLASS_SELECTED)
+		treeContextMenu.style.left = `${x}px`
+		treeContextMenu.style.top = `${y}px`
+	}
+
+	blur(index: number) {
 		if (index === 0) {
 			this.renderer.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
 		} else {
@@ -406,83 +431,43 @@ export class TreeFacade {
 		this.clearSelectedIndices()
 	}
 
-	removeLastSelectedTreeNodeFocus() {
-		if (this.lastSelectedIndex > 0) {
-			const lastSelectedTreeNode = this.getTreeNodeByIndex(this.lastSelectedIndex)
-			lastSelectedTreeNode.classList.remove(CLASS_FOCUSED)
-		}
-	}
+	//
 
-	removeContextSelectedTreeNodeFocus() {
-		if (this.contextTreeIndex !== -1) {
-			const contextSelectedTreeNode = this.getTreeNodeByIndex(this.contextTreeIndex)
-			contextSelectedTreeNode.classList.remove(CLASS_FOCUSED)
-		}
-	}
+	async applyRename(preBase: string, newBase: string) {
+		const start = this.getFlattenIndexByPath(preBase)!
 
-	focusContainer() {
-		const { treeNodeContainer } = this.renderer.elements
-		treeNodeContainer.classList.add(CLASS_FOCUSED)
-		this.clearTreeSelected()
-		this.lastSelectedIndex = 0
-	}
+		for (let i = start; i < this.flattenTree.length; i++) {
+			const vm = this.getTreeViewModelByIndex(i)
 
-	renderContextmenuAndUpdateContextIndex(treeNode: HTMLElement, x: number, y: number) {
-		const { treeContextMenu, treeContextPaste } = this.renderer.elements
+			if (vm.path.startsWith(preBase)) {
+				const oldPath = vm.path
 
-		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
-		const viewModel = this.getTreeViewModelByPath(path)
+				const idx = this.getFlattenIndexByPath(oldPath)!
+				const wrapper = this.getTreeWrapperByPath(oldPath)!
+				const node = this.getTreeNodeByPath(oldPath)
 
-		const isPasteDisabled =
-			this.clipboardMode === "none" || !viewModel.directory || this.getSelectedIndices().length === 0
+				this.deleteFlattenIndexByPath(oldPath)
+				this.deleteTreeWrapperByPath(oldPath)
 
-		treeContextPaste.classList.toggle(CLASS_DEACTIVE, isPasteDisabled)
-		treeContextMenu.classList.add(CLASS_SELECTED)
-		treeContextMenu.style.left = `${x}px`
-		treeContextMenu.style.top = `${y}px`
-		treeNode.classList.add(CLASS_FOCUSED)
-
-		this.setContextTreeIndexByPath(path)
-	}
-
-	loadFlattenArrayAndMaps(json: TreeViewModel) {
-		this.store.flattenTree = this.toFlatList(json)
-		this.syncPathToFlattenTreeIndex()
-	}
-
-	async rename(preBase: string, newBase: string) {
-		const response: Response<string> = await window.rendererToMain.rename(preBase, newBase)
-		if (!response.result) return response
-		newBase = response.data
-
-		const start = this.store.getFlattenIndexByPath(preBase)!
-
-		for (let i = start; i < this.store.flattenTree.length; i++) {
-			const node = this.getTreeViewModelByIndex(i)
-			if (node.path.startsWith(preBase)) {
-				const treeWrapper = this.renderer.getTreeWrapperByPath(node.path)!
-				const idx = this.store.getFlattenIndexByPath(node.path)!
-				const treeNode = this.renderer.getTreeNodeByPath(node.path)
-				this.store.deleteFlattenIndexByPath(node.path)
-				this.deleteTreeWrapperByPath(node.path)
-				const relative = window.utils.getRelativePath(preBase, node.path)
+				const relative = window.utils.getRelativePath(preBase, oldPath)
 				const newPath = window.utils.getJoinedPath(newBase, relative)
-				node.path = newPath
-				node.name = window.utils.getBaseName(node.path)
-				treeNode.dataset[DATASET_ATTR_TREE_PATH] = newPath
-				treeNode.title = newPath
-				this.store.setFlattenIndexByPath(newPath, idx)
-				this.renderer.setTreeWrapperByPath(newPath, treeWrapper)
+
+				vm.path = newPath
+				vm.name = window.utils.getBaseName(newPath)
+
+				this.setFlattenIndexByPath(newPath, idx)
+				this.setTreeWrapperByPath(newPath, wrapper)
+				node.dataset[DATASET_ATTR_TREE_PATH] = newPath
+				node.title = newPath
 			} else {
 				break
 			}
 		}
-
-		return response
 	}
 
 	delete(indices: number[]) {
 		indices.sort((a, b) => b - a)
+		const minIndex = indices[indices.length - 1]
 
 		for (const index of indices) {
 			const target = this.store.flattenTree[index]
@@ -500,13 +485,14 @@ export class TreeFacade {
 
 			// Collects the deletion target: Self + all children
 			for (let i = index; i < this.store.flattenTree.length; i++) {
-				const node = this.store.getTreeViewModelByIndex(i)
+				const node = this.getTreeViewModelByIndex(i)
 				if (i !== index && node.indent <= baseIndent) break
 				toDelete.push(node)
+				this.deleteFlattenIndexByPath(node.path)
 			}
 
 			if (parentIndex >= 0) {
-				const parent = this.store.flattenTree[parentIndex]
+				const parent = this.flattenTree[parentIndex]
 				if (parent.children) {
 					parent.children = parent.children.filter(
 						(child: any) => !toDelete.some((deleted) => deleted.path === child.path)
@@ -517,15 +503,15 @@ export class TreeFacade {
 			for (const node of toDelete) {
 				const path = node.path
 
-				const wrapper = this.renderer.getTreeWrapperByPath(path)
+				const wrapper = this.getTreeWrapperByPath(path)
 				wrapper?.remove()
 
 				this.deleteTreeWrapperByPath(path)
 			}
 
-			this.store.spliceFlattenTree(index, toDelete.length)
+			this.spliceFlattenTree(index, toDelete.length)
 		}
 
-		this.syncPathToFlattenTreeIndex()
+		this.updatePathToFlattenTreeIndex(minIndex)
 	}
 }

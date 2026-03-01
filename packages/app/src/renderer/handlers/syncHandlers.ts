@@ -17,7 +17,7 @@ export function handleSync(tabEditorFacade: TabEditorFacade, treeFacade: TreeFac
 			treeFacade.removeLastSelectedIndex()
 			treeFacade.clearSelectedIndices()
 			treeFacade.clearClipboardPaths()
-			treeFacade.loadFlattenArrayAndMaps(viewModel)
+			treeFacade.setRootTreeViewModel(viewModel)
 		}
 	})
 }

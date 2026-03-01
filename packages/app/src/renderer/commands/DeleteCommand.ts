@@ -51,7 +51,7 @@ export class DeleteCommand implements ICommand {
 		if (newTreeSession) {
 			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
 			this.treeFacade.render(viewModel)
-			this.treeFacade.loadFlattenArrayAndMaps(viewModel)
+			this.treeFacade.setRootTreeViewModel(viewModel)
 		}
 	}
 

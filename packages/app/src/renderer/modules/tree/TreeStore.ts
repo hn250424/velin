@@ -82,10 +82,21 @@ export class TreeStore {
 		return root
 	}
 
+	setRootTreeViewModel(root: TreeViewModel) {
+		this.flattenTree = this.toFlatList(root)
+		this.syncPathToFlattenTreeIndex()
+	}
+
 	syncPathToFlattenTreeIndex() {
 		this._pathToFlattenTreeIndex.clear()
 
 		for (let i = 0; i < this._flattenTree.length; i++) {
+			this._pathToFlattenTreeIndex.set(this._flattenTree[i].path, i)
+		}
+	}
+
+	updatePathToFlattenTreeIndex(startIndex: number) {
+		for (let i = startIndex; i < this._flattenTree.length; i++) {
 			this._pathToFlattenTreeIndex.set(this._flattenTree[i].path, i)
 		}
 	}
@@ -123,27 +134,28 @@ export class TreeStore {
 	//
 
 	insertChildNodes(parent: TreeViewModel) {
-		const index = this._flattenTree.findIndex((item) => item.path === parent.path)
-		if (index === -1) return
+		const index = this._pathToFlattenTreeIndex.get(parent.path)!
 
 		const childrenToInsert = this.toFlatList(parent).slice(1) // Remove the first element (the node itself) using slice(1)
 		this._flattenTree.splice(index + 1, 0, ...childrenToInsert)
 
-		this.syncPathToFlattenTreeIndex()
+		this.updatePathToFlattenTreeIndex(index + 1)
 	}
 
 	removeChildNodes(parent: TreeViewModel) {
-		const index = this._flattenTree.findIndex((item) => item.path === parent.path)
-		if (index === -1) return
+		const index = this._pathToFlattenTreeIndex.get(parent.path)!
 
 		let removeCount = 0
 		for (let i = index + 1; i < this._flattenTree.length; i++) {
 			if (this._flattenTree[i].indent <= parent.indent) break
+			this._pathToFlattenTreeIndex.delete(this._flattenTree[i].path)
 			removeCount++
 		}
-		this._flattenTree.splice(index + 1, removeCount)
 
-		this.syncPathToFlattenTreeIndex()
+		if (removeCount > 0) {
+			this._flattenTree.splice(index + 1, removeCount)
+			this.updatePathToFlattenTreeIndex(index + 1)
+		}
 	}
 
 	//

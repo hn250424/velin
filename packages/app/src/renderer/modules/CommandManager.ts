@@ -131,7 +131,7 @@ export class CommandManager {
 
 			const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data)
 			this.treeFacade.render(responseViewModel)
-			this.treeFacade.loadFlattenArrayAndMaps(responseViewModel)
+			this.treeFacade.setRootTreeViewModel(responseViewModel)
 
 			return
 		}
@@ -258,7 +258,6 @@ export class CommandManager {
 	//
 
 	async performCreate(directory: boolean) {
-		console.log("this.treeFacade.lastSelectedIndex: ", this.treeFacade.lastSelectedIndex)
 		let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
 		let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
@@ -277,9 +276,6 @@ export class CommandManager {
 			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
 			parentContainer = parentWrapper.querySelector(SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
 		}
-
-		console.log("idx: ", idx)
-		console.log("parentContainer: ", parentContainer)
 
 		const { wrapper, input } = this.treeFacade.createInput(directory, viewModel.indent)
 		parentContainer.appendChild(wrapper)

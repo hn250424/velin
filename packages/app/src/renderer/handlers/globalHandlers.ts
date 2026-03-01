@@ -1,4 +1,5 @@
 import {
+	CLASS_FOCUSED,
 	CLASS_SELECTED,
 	SELECTOR_MENU_ITEM,
 	SELECTOR_SIDE,
@@ -6,6 +7,7 @@ import {
 	SELECTOR_TREE_CONTEXT_MENU,
 	SELECTOR_TREE_NODE,
 	SELECTOR_TREE_NODE_CONTAINER,
+	SELECTOR_TREE_TOP,
 } from "@renderer/constants/dom"
 import { FocusManager, ShortcutRegistry } from "@renderer/core"
 import type { Dispatcher } from "@renderer/dispatch"
@@ -46,7 +48,7 @@ function bindDocumentMousedownEvnet(
 	const { treeContextMenu } = treeFacade.renderer.elements
 
 	document.addEventListener("mousedown", (e) => {
-		const isRightClick = e.button === 2
+		// const isRightClick = e.button === 2
 
 		const target = e.target as HTMLElement
 		focusManager.trackRelevantFocus(target)
@@ -55,8 +57,9 @@ function bindDocumentMousedownEvnet(
 		const isInTabContextMenu = !!target.closest(SELECTOR_TAB_CONTEXT_MENU)
 		const isInTreeContextMenu = !!target.closest(SELECTOR_TREE_CONTEXT_MENU)
 		const isInTreeNode = !!target.closest(SELECTOR_TREE_NODE)
-		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
 		const isInSide = !!target.closest(SELECTOR_SIDE)
+		const isInTreeTop = !!target.closest(SELECTOR_TREE_TOP)
+		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
 		const isInsideTreeSystem = isInTreeContextMenu || isInSide
 
 		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED))
@@ -67,9 +70,16 @@ function bindDocumentMousedownEvnet(
 
 		// TODO
 		if (!isInsideTreeSystem) {
-			treeFacade.blur()
+			treeFacade.blur(treeFacade.lastSelectedIndex)
 			treeFacade.removeLastSelectedIndex()
 			treeFacade.clearTreeSelected()
+		} else if (isInTreeTop) {
+			treeFacade.blur(treeFacade.lastSelectedIndex)
+			treeFacade.clearTreeSelected()
+		} else if (isInTreeNode) {
+			// treeFacade.blur(treeFacade.lastSelectedIndex)
+		} else if (isInTreeNodeContainer) {
+			// treeFacade.renderer.elements.treeNodeContainer.classList.add(CLASS_FOCUSED)
 		}
 	})
 }

@@ -52,14 +52,19 @@ function bindTreeClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("click", async (e) => {
-		treeFacade.removeLastSelectedTreeNodeFocus()
+		const contextIndex = treeFacade.contextTreeIndex
+		const lastSelectedIndex = treeFacade.lastSelectedIndex
+		if (contextIndex !== -1) treeFacade.blur(contextIndex)
+		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
 
 		const target = e.target as HTMLElement
 		const treeNode = target.closest(SELECTOR_TREE_NODE) as HTMLElement
 
 		if (!treeNode) {
 			if (target.closest(SELECTOR_TREE_NODE_CONTAINER)) {
-				treeFacade.focusContainer()
+				treeNodeContainer.classList.add(CLASS_FOCUSED)
+				treeFacade.clearTreeSelected()
+				treeFacade.lastSelectedIndex = 0
 			}
 			return
 		}
@@ -107,7 +112,10 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("contextmenu", (e) => {
-		treeFacade.removeContextSelectedTreeNodeFocus()
+		const contextIndex = treeFacade.contextTreeIndex
+		const lastSelectedIndex = treeFacade.lastSelectedIndex
+		if (contextIndex !== -1) treeFacade.blur(contextIndex)
+		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
 
 		const treeNode = (e.target as HTMLElement).closest(SELECTOR_TREE_NODE) as HTMLElement
 		if (!treeNode) {
@@ -115,7 +123,11 @@ function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
 			return
 		}
 
-		treeFacade.renderContextmenuAndUpdateContextIndex(treeNode, e.clientX, e.clientY)
+		treeNode.classList.add(CLASS_FOCUSED)
+		const path = treeNode.dataset[DATASET_ATTR_TREE_PATH]!
+
+		treeFacade.setContextTreeIndexByPath(path)
+		treeFacade.showContextmenu(treeNode, e.clientX, e.clientY)
 	})
 }
 
