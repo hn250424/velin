@@ -320,16 +320,26 @@ export class TabEditorFacade {
 		const tabs = this.getTabs()
 		assert(tabs, "Can not call getInsertIndexFromMouseX() before initDrag()")
 
+		const strTargetTabId = String(this.getTargetTabId())
+
+		let visualIndex = 0
+
 		for (let i = 0; i < tabs.length; i++) {
-			const rect = tabs[i].getBoundingClientRect()
+			const tab = tabs[i]
+			if (tab.dataset.id === strTargetTabId) continue
+
+			const rect = tab.getBoundingClientRect()
 			const middleX = rect.left + rect.width / 2
 
 			if (mouseX < middleX) {
-				return i
+				return visualIndex
 			}
+
+			visualIndex++
 		}
 
-		return tabs.length
+		return visualIndex
+		// return tabs.length
 	}
 
 	updateDragIndicator(insertIndex: number) {
