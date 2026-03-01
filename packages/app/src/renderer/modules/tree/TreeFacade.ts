@@ -206,50 +206,31 @@ export class TreeFacade {
 		this.renderer.clean(container)
 	}
 
-	removeTreeFocus() {
-		const idx = this.lastSelectedIndex
-		if (idx < 0) return
+	//
 
-		if (idx === 0) {
-			this.renderer.removeContainerFocus()
-		} else {
-			const treeNode = this.getTreeNodeByIndex(idx)
-			treeNode.classList.remove(CLASS_FOCUSED)
-		}
-	}
-
-	clearTreeSelected() {
-		const selectedIndices = this.getSelectedIndices()
-		for (const i of selectedIndices) {
-			const div = this.getTreeNodeByIndex(i)
-			div.classList.remove(CLASS_SELECTED)
-		}
-
-		this.clearSelectedIndices()
+	// TODO: expense
+	render(viewModel: TreeViewModel, container?: HTMLElement) {
+		this.renderer.render(viewModel, container)
 	}
 
 	//
 
-	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
-		this.renderer.renderTreeData(viewModel, container)
+	createInput(directory: boolean, indent: number) {
+		return this.renderer.createInput(directory, indent)
 	}
 
-	createInputbox(directory: boolean, indent: number) {
-		return this.renderer.createInputbox(directory, indent)
+	createGhost(count: number) {
+		return this.renderer.createGhost(count)
 	}
 
-	createGhostBox(count: number) {
-		return this.renderer.createGhostBox(count)
-	}
-
-	removeGhostBox() {
-		this.renderer.removeGhostBox()
+	removeGhost() {
+		this.renderer.removeGhost()
 	}
 
 	//
 
-	clearPathToTreeWrapperMap() {
-		this.renderer.clearPathToTreeWrapperMap()
+	clearPathToTreeWrapper() {
+		this.renderer.clearPathToTreeWrapper()
 	}
 
 	getTreeNodeByPath(path: string) {
@@ -264,14 +245,8 @@ export class TreeFacade {
 		this.renderer.setTreeWrapperByPath(path, wrapper)
 	}
 
-	getTreeWrapperByIndex(index: number) {
-		const viewModel = this.store.getTreeViewModelByIndex(index)
-		return this.renderer.getTreeWrapperByPath(viewModel.path)
-	}
-
-	getTreeNodeByIndex(index: number) {
-		const wrapper = this.getTreeWrapperByIndex(index)!
-		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+	deleteTreeWrapperByPath(path: string) {
+		this.renderer.deleteTreeWrapperByPath(path)
 	}
 
 	// drag
@@ -282,8 +257,8 @@ export class TreeFacade {
 		this.setStartPosition(x, y)
 	}
 
-	moveGhostBox(x: number, y: number) {
-		const ghost = this.createGhostBox(this.getDragTreeCount())
+	moveGhost(x: number, y: number) {
+		const ghost = this.createGhost(this.getDragTreeCount())
 		ghost.style.left = `${x + 5}px`
 		ghost.style.top = `${y + 5}px`
 	}
@@ -327,7 +302,7 @@ export class TreeFacade {
 
 	clearDrag() {
 		this.endDrag()
-		this.removeGhostBox()
+		this.removeGhost()
 	}
 
 	//
@@ -402,6 +377,35 @@ export class TreeFacade {
 
 	// orchestra
 
+	getTreeWrapperByIndex(index: number) {
+		const viewModel = this.store.getTreeViewModelByIndex(index)
+		return this.renderer.getTreeWrapperByPath(viewModel.path)
+	}
+
+	getTreeNodeByIndex(index: number) {
+		const wrapper = this.getTreeWrapperByIndex(index)!
+		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
+	}
+
+	blur() {
+		const index = this.lastSelectedIndex
+		if (index === 0) {
+			this.renderer.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
+		} else {
+			const node = this.getTreeNodeByIndex(index)
+			node.classList.remove(CLASS_FOCUSED)
+		}
+	}
+
+	clearTreeSelected() {
+		const selectedIndices = this.getSelectedIndices()
+		for (const i of selectedIndices) {
+			const div = this.getTreeNodeByIndex(i)
+			div.classList.remove(CLASS_SELECTED)
+		}
+		this.clearSelectedIndices()
+	}
+
 	removeLastSelectedTreeNodeFocus() {
 		if (this.lastSelectedIndex > 0) {
 			const lastSelectedTreeNode = this.getTreeNodeByIndex(this.lastSelectedIndex)
@@ -460,7 +464,7 @@ export class TreeFacade {
 				const idx = this.store.getFlattenIndexByPath(node.path)!
 				const treeNode = this.renderer.getTreeNodeByPath(node.path)
 				this.store.deleteFlattenIndexByPath(node.path)
-				this.renderer.deleteTreeWrapperByPath(node.path)
+				this.deleteTreeWrapperByPath(node.path)
 				const relative = window.utils.getRelativePath(preBase, node.path)
 				const newPath = window.utils.getJoinedPath(newBase, relative)
 				node.path = newPath
@@ -516,7 +520,7 @@ export class TreeFacade {
 				const wrapper = this.renderer.getTreeWrapperByPath(path)
 				wrapper?.remove()
 
-				this.renderer.deleteTreeWrapperByPath(path)
+				this.deleteTreeWrapperByPath(path)
 			}
 
 			this.store.spliceFlattenTree(index, toDelete.length)

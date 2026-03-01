@@ -51,6 +51,9 @@ export const SELECTOR_EDITOR_BOX = `.${CLASS_EDITOR_BOX}`
 export const ID_TREE = "tree"
 export const SELECTOR_TREE = `#${ID_TREE}`
 
+export const ID_SIDE = "side"
+export const SELECTOR_SIDE = `#${ID_SIDE}`
+
 export const ID_TREE_NODE_CONTAINER = "tree-node-container"
 export const SELECTOR_TREE_NODE_CONTAINER = `#${ID_TREE_NODE_CONTAINER}`
 

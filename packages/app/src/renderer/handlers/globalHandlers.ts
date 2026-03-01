@@ -1,8 +1,10 @@
 import {
 	CLASS_SELECTED,
 	SELECTOR_MENU_ITEM,
+	SELECTOR_SIDE,
 	SELECTOR_TAB_CONTEXT_MENU,
 	SELECTOR_TREE_CONTEXT_MENU,
+	SELECTOR_TREE_NODE,
 	SELECTOR_TREE_NODE_CONTAINER,
 } from "@renderer/constants/dom"
 import { FocusManager, ShortcutRegistry } from "@renderer/core"
@@ -44,21 +46,28 @@ function bindDocumentMousedownEvnet(
 	const { treeContextMenu } = treeFacade.renderer.elements
 
 	document.addEventListener("mousedown", (e) => {
+		const isRightClick = e.button === 2
+
 		const target = e.target as HTMLElement
-		const isInTreeContextMenu = !!target.closest(SELECTOR_TREE_CONTEXT_MENU)
-		const isInTabContextMenu = !!target.closest(SELECTOR_TAB_CONTEXT_MENU)
-		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
+		focusManager.trackRelevantFocus(target)
+
 		const isInMenuItem = !!target.closest(SELECTOR_MENU_ITEM)
+		const isInTabContextMenu = !!target.closest(SELECTOR_TAB_CONTEXT_MENU)
+		const isInTreeContextMenu = !!target.closest(SELECTOR_TREE_CONTEXT_MENU)
+		const isInTreeNode = !!target.closest(SELECTOR_TREE_NODE)
+		const isInTreeNodeContainer = !!target.closest(SELECTOR_TREE_NODE_CONTAINER)
+		const isInSide = !!target.closest(SELECTOR_SIDE)
+		const isInsideTreeSystem = isInTreeContextMenu || isInSide
 
 		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(CLASS_SELECTED))
 		if (!isInTabContextMenu) tabContextMenu.classList.remove(CLASS_SELECTED)
 		if (!isInTreeContextMenu) treeContextMenu.classList.remove(CLASS_SELECTED)
 
-		focusManager.trackRelevantFocus(e.target as HTMLElement)
-
 		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId()
-		if (!isInTreeContextMenu && !isInTreeNodeContainer) {
-			treeFacade.removeTreeFocus()
+
+		// TODO
+		if (!isInsideTreeSystem) {
+			treeFacade.blur()
 			treeFacade.removeLastSelectedIndex()
 			treeFacade.clearTreeSelected()
 		}

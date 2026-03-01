@@ -24,9 +24,9 @@ import type { TreeElements } from "./TreeElements"
 
 @injectable()
 export class TreeRenderer {
-	private ghostBox: HTMLElement | null = null
+	private _ghost: HTMLElement | null = null
 
-	private _pathToTreeWrapperMap: Map<string, HTMLElement> = new Map()
+	private _pathToTreeWrapper: Map<string, HTMLElement> = new Map()
 
 	constructor(@inject(DI_KEYS.TreeElements) readonly elements: TreeElements) {}
 
@@ -38,20 +38,59 @@ export class TreeRenderer {
 		}
 	}
 
-	removeContainerFocus() {
-		this.elements.treeNodeContainer.classList.remove(CLASS_FOCUSED)
-	}
-
 	//
 
-	// Each DOM element with class `tree_node` has a dataset attribute for its path.
-	// The root node uses the container `tree_node_container` to hold its path in the dataset.
-	renderTreeData(viewModel: TreeViewModel, container?: HTMLElement) {
+	private _renderElement(container: HTMLElement, viewModel: TreeViewModel) {
+		const type = document.createElement("div")
+		type.classList.add(CLASS_TREE_NODE_TYPE)
+
+		if (!viewModel.directory) {
+			type.classList.add("file")
+			type.innerHTML = fileSvg
+		} else {
+			type.classList.add("folder")
+			type.innerHTML = viewModel.expanded ? openedFolderSvg : closedFolderSvg
+		}
+
+		const text = document.createElement("span")
+		text.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
+		text.textContent = viewModel.name
+
+		const node = document.createElement("div")
+		node.classList.add(CLASS_TREE_NODE)
+		node.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
+		node.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
+		node.title = viewModel.path
+		node.tabIndex = -1
+
+		const children = document.createElement("div")
+		children.classList.add(CLASS_TREE_NODE_CHILDREN)
+		children.classList.toggle(CLASS_EXPANDED, viewModel.expanded)
+
+		const wrapper = document.createElement("div")
+		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
+
+		node.appendChild(type)
+		node.appendChild(text)
+		wrapper.appendChild(node)
+		wrapper.appendChild(children)
+		container.appendChild(wrapper)
+
+		this._pathToTreeWrapper.set(viewModel.path, wrapper)
+
+		if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
+			for (const child of viewModel.children) {
+				this._renderElement(children, child)
+			}
+		}
+	}
+
+	render(viewModel: TreeViewModel, container?: HTMLElement) {
 		if (!container) {
 			this.elements.treeTopName.textContent = viewModel.name
 			container = this.elements.treeNodeContainer
 
-			this._pathToTreeWrapperMap.set(viewModel.path, container)
+			this._pathToTreeWrapper.set(viewModel.path, container)
 			container.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
 		}
 
@@ -59,73 +98,23 @@ export class TreeRenderer {
 
 		if (viewModel.children) {
 			for (const child of viewModel.children) {
-				this._renderNode(container, child)
-			}
-		}
-	}
-
-	private _renderNode(container: HTMLElement, viewModel: TreeViewModel) {
-		const box = document.createElement("div")
-		box.classList.add(CLASS_TREE_NODE)
-		box.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
-		box.dataset[DATASET_ATTR_TREE_PATH] = viewModel.path
-		box.title = viewModel.path
-		box.tabIndex = -1
-
-		const nodeType = document.createElement("div")
-		nodeType.classList.add(CLASS_TREE_NODE_TYPE)
-
-		if (!viewModel.directory) {
-			nodeType.classList.add("file")
-			nodeType.innerHTML = fileSvg
-		} else {
-			nodeType.classList.add("folder")
-			nodeType.innerHTML = viewModel.expanded ? openedFolderSvg : closedFolderSvg
-		}
-
-		const text = document.createElement("span")
-		text.classList.add(CLASS_TREE_NODE_TEXT, "ellipsis")
-		text.textContent = viewModel.name
-
-		const childrenContainer = document.createElement("div")
-		childrenContainer.classList.add(CLASS_TREE_NODE_CHILDREN)
-		if (viewModel.expanded) childrenContainer.classList.add(CLASS_EXPANDED)
-		else childrenContainer.classList.remove(CLASS_EXPANDED)
-
-		box.appendChild(nodeType)
-		box.appendChild(text)
-
-		const wrapper = document.createElement("div")
-		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-		wrapper.appendChild(box)
-		wrapper.appendChild(childrenContainer)
-
-		this._pathToTreeWrapperMap.set(viewModel.path, wrapper)
-		container.appendChild(wrapper)
-
-		if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
-			for (const child of viewModel.children) {
-				this._renderNode(childrenContainer, child)
+				this._renderElement(container, child)
 			}
 		}
 	}
 
 	//
 
-	createInputbox(directory: boolean, indent: number) {
-		const box = document.createElement("div")
-		box.classList.add("tree-node-temp")
-		box.style.paddingLeft = `${indent * 16}px`
-
-		const nodeType = document.createElement("div")
-		nodeType.classList.add(CLASS_TREE_NODE_TYPE)
+	createInput(directory: boolean, indent: number) {
+		const type = document.createElement("div")
+		type.classList.add(CLASS_TREE_NODE_TYPE)
 
 		if (directory) {
-			nodeType.classList.add("folder")
-			nodeType.innerHTML = closedFolderSvg
+			type.classList.add("folder")
+			type.innerHTML = closedFolderSvg
 		} else {
-			nodeType.classList.add("file")
-			nodeType.innerHTML = fileSvg
+			type.classList.add("file")
+			type.innerHTML = fileSvg
 		}
 
 		const input = document.createElement("input")
@@ -133,56 +122,60 @@ export class TreeRenderer {
 		input.value = ""
 		input.classList.add(CLASS_TREE_NODE_INPUT)
 
-		box.appendChild(nodeType)
-		box.appendChild(input)
+		const node = document.createElement("div")
+		node.classList.add("tree-node-temp")
+		node.style.paddingLeft = `${indent * 16}px`
 
 		const wrapper = document.createElement("div")
 		wrapper.classList.add(CLASS_TREE_NODE_WRAPPER)
-		wrapper.appendChild(box)
+
+		node.appendChild(type)
+		node.appendChild(input)
+		wrapper.appendChild(node)
 
 		return { wrapper, input }
 	}
 
-	createGhostBox(count: number) {
-		if (this.ghostBox) return this.ghostBox
+	createGhost(count: number) {
+		if (this._ghost) return this._ghost
 
 		const div = document.createElement("div")
 		div.classList.add(CLASS_TREE_GHOST)
 		div.textContent = `${count} items`
 
-		this.ghostBox = div
+		this._ghost = div
 		document.body.appendChild(div)
 
-		return this.ghostBox
+		return this._ghost
 	}
 
-	removeGhostBox() {
-		if (this.ghostBox) {
-			this.ghostBox.remove()
-			this.ghostBox = null
+	removeGhost() {
+		if (this._ghost) {
+			this._ghost.remove()
+			this._ghost = null
 		}
 	}
 
 	//
 
-	clearPathToTreeWrapperMap() {
-		this._pathToTreeWrapperMap.clear()
+	clearPathToTreeWrapper() {
+		this._pathToTreeWrapper.clear()
 	}
 
 	getTreeNodeByPath(path: string) {
-		const wrapper = this._pathToTreeWrapperMap.get(path)!
+		const wrapper = this._pathToTreeWrapper.get(path)!
 		return wrapper.querySelector(SELECTOR_TREE_NODE) as HTMLElement
 	}
 
 	getTreeWrapperByPath(path: string) {
-		return this._pathToTreeWrapperMap.get(path)
+		return this._pathToTreeWrapper.get(path)
 	}
 
 	setTreeWrapperByPath(path: string, wrapper: HTMLElement) {
-		this._pathToTreeWrapperMap.set(path, wrapper)
+		this._pathToTreeWrapper.set(path, wrapper)
 	}
 
 	deleteTreeWrapperByPath(path: string) {
-		this._pathToTreeWrapperMap.delete(path)
+		this._pathToTreeWrapper.delete(path)
 	}
 }

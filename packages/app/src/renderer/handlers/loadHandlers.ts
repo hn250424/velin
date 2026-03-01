@@ -85,7 +85,7 @@ async function processTabEditorSession(facade: TabEditorFacade, dto: TabEditorsD
 function processTreeSession(facade: TreeFacade, dto: TreeDto) {
 	if (dto) {
 		const viewModel = facade.toTreeViewModel(dto)
-		facade.renderTreeData(viewModel)
+		facade.render(viewModel)
 		facade.loadFlattenArrayAndMaps(viewModel)
 	}
 }

@@ -174,7 +174,7 @@ function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: T
 
 function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
 	if (focusManager.getFocus() !== "tree") return
-	if (treeFacade.lastSelectedIndex >= treeFacade.getFlattenTreeLength() - 1) return
+	if (treeFacade.lastSelectedIndex >= treeFacade.flattenTree.length - 1) return
 	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, 1)
 }
 
@@ -241,7 +241,7 @@ function bindMouseMoveEventsForDrag(treeFacade: TreeFacade) {
 			}
 		}
 
-		treeFacade.moveGhostBox(e.clientX, e.clientY)
+		treeFacade.moveGhost(e.clientX, e.clientY)
 		updateOverStatus(e.target as HTMLElement)
 	})
 }

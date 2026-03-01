@@ -32,6 +32,7 @@ import {
 	CLASS_CUT,
 	SELECTOR_TREE_NODE_TYPE,
 	CLASS_FOCUSED,
+	SELECTOR_TREE_NODE_CHILDREN,
 } from "../constants/dom"
 
 @injectable()
@@ -129,7 +130,7 @@ export class CommandManager {
 			if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data)
 
 			const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data)
-			this.treeFacade.renderTreeData(responseViewModel)
+			this.treeFacade.render(responseViewModel)
 			this.treeFacade.loadFlattenArrayAndMaps(responseViewModel)
 
 			return
@@ -152,7 +153,7 @@ export class CommandManager {
 
 		if (viewModel.children && viewModel.children.length > 0) {
 			if (treeNodeChildren.children.length === 0) {
-				this.treeFacade.renderTreeData(viewModel, treeNodeChildren)
+				this.treeFacade.render(viewModel, treeNodeChildren)
 			}
 			this._updateUI(nodeType, treeNodeChildren, viewModel, true)
 			this._syncFlattenTreeArray(viewModel, true)
@@ -165,7 +166,7 @@ export class CommandManager {
 		const responseTreeData = this.treeFacade.toTreeViewModel(response.data)
 
 		viewModel.children = responseTreeData.children
-		this.treeFacade.renderTreeData(responseTreeData, treeNodeChildren)
+		this.treeFacade.render(responseTreeData, treeNodeChildren)
 		this._updateUI(nodeType, treeNodeChildren, viewModel, true)
 		this._syncFlattenTreeArray(viewModel, true)
 	}
@@ -257,6 +258,7 @@ export class CommandManager {
 	//
 
 	async performCreate(directory: boolean) {
+		console.log("this.treeFacade.lastSelectedIndex: ", this.treeFacade.lastSelectedIndex)
 		let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
 		let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
@@ -273,10 +275,13 @@ export class CommandManager {
 			parentContainer = this.treeFacade.renderer.elements.treeNodeContainer
 		} else {
 			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
-			parentContainer = parentWrapper.querySelector(".tree-node-children") as HTMLElement
+			parentContainer = parentWrapper.querySelector(SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
 		}
 
-		const { wrapper, input } = this.treeFacade.createInputbox(directory, viewModel.indent)
+		console.log("idx: ", idx)
+		console.log("parentContainer: ", parentContainer)
+
+		const { wrapper, input } = this.treeFacade.createInput(directory, viewModel.indent)
 		parentContainer.appendChild(wrapper)
 		input.focus()
 
@@ -492,7 +497,7 @@ export class CommandManager {
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
 			if (viewModel.directory) {
-				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeLength(); i++) {
+				for (let i = idx + 1; i < this.treeFacade.flattenTree.length; i++) {
 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
 					if (viewModel.indent < isChildViewModel.indent) {
@@ -528,7 +533,7 @@ export class CommandManager {
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
 			if (viewModel.directory) {
-				for (let i = idx + 1; i < this.treeFacade.getFlattenTreeLength(); i++) {
+				for (let i = idx + 1; i < this.treeFacade.flattenTree.length; i++) {
 					const isChildViewModel = this.treeFacade.getTreeViewModelByIndex(i)
 
 					if (viewModel.indent < isChildViewModel.indent) {

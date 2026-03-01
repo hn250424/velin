@@ -11,8 +11,8 @@ export function handleSync(tabEditorFacade: TabEditorFacade, treeFacade: TreeFac
 		if (treeDto) {
 			const viewModel = treeFacade.toTreeViewModel(treeDto)
 
-			treeFacade.clearPathToTreeWrapperMap() // Must clear map manually before renderTreeData (no built-in clear).
-			treeFacade.renderTreeData(viewModel)
+			treeFacade.clearPathToTreeWrapper() // Must clear map manually before render (no built-in clear).
+			treeFacade.render(viewModel)
 
 			treeFacade.removeLastSelectedIndex()
 			treeFacade.clearSelectedIndices()

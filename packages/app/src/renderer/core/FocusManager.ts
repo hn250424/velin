@@ -15,12 +15,16 @@ export class FocusManager {
 	}
 
 	trackRelevantFocus(target: HTMLElement) {
-		if (target.closest(SELECTOR_EDITOR_CONTAINER)) {
-			this.setFocus("editor")
-		} else if (target.closest(SELECTOR_TREE)) {
-			this.setFocus("tree")
-		} else if (target.closest(SELECTOR_FIND_REPLACE_CONTAINER)) {
+		if (target.closest(SELECTOR_FIND_REPLACE_CONTAINER)) {
 			this.setFocus("find-replace")
+		}
+
+		else if (target.closest(SELECTOR_EDITOR_CONTAINER)) {
+			this.setFocus("editor")
+		}
+
+		else if (target.closest(SELECTOR_TREE)) {
+			this.setFocus("tree")
 		}
 	}
 }

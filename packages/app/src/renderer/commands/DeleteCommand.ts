@@ -50,7 +50,7 @@ export class DeleteCommand implements ICommand {
 		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
 		if (newTreeSession) {
 			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-			this.treeFacade.renderTreeData(viewModel)
+			this.treeFacade.render(viewModel)
 			this.treeFacade.loadFlattenArrayAndMaps(viewModel)
 		}
 	}
