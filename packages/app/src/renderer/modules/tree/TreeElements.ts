@@ -11,6 +11,7 @@ export class TreeElements {
 	public readonly treeContextDelete: HTMLElement
 
 	public readonly treeNodeContainer: HTMLElement
+	public readonly treeTop: HTMLElement
 	public readonly treeTopName: HTMLElement
 	public readonly treeTopAddFile: HTMLElement
 	public readonly treeTopAddDirectory: HTMLElement
@@ -25,6 +26,7 @@ export class TreeElements {
 		this.treeContextDelete = document.querySelector("#tree-context-delete") as HTMLElement
 
 		this.treeNodeContainer = document.querySelector("#tree-node-container") as HTMLElement
+		this.treeTop = document.querySelector("#tree-top") as HTMLElement
 		this.treeTopName = document.querySelector("#tree-top-name") as HTMLElement
 		this.treeTopAddFile = document.querySelector("#tree-top-add-file") as HTMLElement
 		this.treeTopAddDirectory = document.querySelector("#tree-top-add-directory") as HTMLElement

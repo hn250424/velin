@@ -18,6 +18,9 @@ export const SELECTOR_TREE_CONTEXT_MENU = `#${ID_TREE_CONTEXT_MENU}`
 export const CLASS_MENU_ITEM = "menu-item"
 export const SELECTOR_MENU_ITEM = `.${CLASS_MENU_ITEM}`
 
+export const ID_WINDOW = "window"
+export const SELECTOR_WINDOW = `#${ID_WINDOW}`
+
 export const ID_FIND_REPLACE_CONTAINER = "find-replace-container"
 export const SELECTOR_FIND_REPLACE_CONTAINER = `#${ID_FIND_REPLACE_CONTAINER}`
 

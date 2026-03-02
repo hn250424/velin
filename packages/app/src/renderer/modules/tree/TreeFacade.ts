@@ -386,10 +386,17 @@ export class TreeFacade {
 
 	//
 
-	showContextmenu(treeNode: HTMLElement, x: number, y: number) {
-		const { treeContextMenu, treeContextPaste } = this.renderer.elements
+	handleShowContextmenu(e: MouseEvent) {
+		const treeNode = (e.target as HTMLElement).closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
+		if (!treeNode) return
+
+		treeNode.classList.add(DOM.CLASS_FOCUSED)
 
 		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
+		this.setContextTreeIndexByPath(path)
+
+		const { treeContextMenu, treeContextPaste } = this.renderer.elements
+
 		const viewModel = this.getTreeViewModelByPath(path)
 
 		const isPasteDisabled =
@@ -397,17 +404,20 @@ export class TreeFacade {
 
 		treeContextPaste.classList.toggle(DOM.CLASS_DEACTIVE, isPasteDisabled)
 		treeContextMenu.classList.add(DOM.CLASS_SELECTED)
-		treeContextMenu.style.left = `${x}px`
-		treeContextMenu.style.top = `${y}px`
+		treeContextMenu.style.left = `${e.clientX}px`
+		treeContextMenu.style.top = `${e.clientY}px`
 	}
 
-	hideContextmenu() {
-		this.renderer.elements.treeContextMenu.classList.remove(CLASS_SELECTED)
+	handleHideContextmenu() {
+		if (this.contextTreeIndex !== -1) {
+			this.contextTreeIndex = -1
+			this.renderer.elements.treeContextMenu.classList.remove(CLASS_SELECTED)
+		}
 	}
 
 	blur(index: number) {
 		if (index === -1) return
-		
+
 		if (index === 0) {
 			this.renderer.elements.treeNodeContainer.classList.remove(DOM.CLASS_FOCUSED)
 		} else {

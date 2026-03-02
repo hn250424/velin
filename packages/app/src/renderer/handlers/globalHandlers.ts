@@ -1,7 +1,6 @@
 import { DOM, CUSTOM_EVENTS } from "@renderer/constants"
 import { FocusManager, ShortcutRegistry } from "@renderer/core"
 import type { Dispatcher } from "@renderer/dispatch"
-import { MenuElements, TabEditorFacade, TreeFacade } from "@renderer/modules"
 import { EventEmitter } from "events"
 
 const state = {
@@ -13,13 +12,9 @@ export function handleGlobalInput(
 	dispatcher: Dispatcher,
 	emitter: EventEmitter,
 	focusManager: FocusManager,
-	menuElements: MenuElements,
-	tabEditorFacade: TabEditorFacade,
-	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindDocumentMousedownEvnet(focusManager, emitter, menuElements, tabEditorFacade, treeFacade)
-	bindDocumentClickEvent(emitter)
+	bindDocumentMousedownEvnet(focusManager, emitter)
 
 	bindDocumentMousedownEvnetForDrag(emitter)
 	bindDocumentMousemoveEvnetForDrag(emitter)
@@ -32,88 +27,35 @@ export function handleGlobalInput(
 
 //
 
-function _getDiscriminationFlags(target: HTMLElement) {
-	const isInMenuItem = !!target.closest(DOM.SELECTOR_MENU_ITEM)
-	const isInTabContextMenu = !!target.closest(DOM.SELECTOR_TAB_CONTEXT_MENU)
-	const isInTreeContextMenu = !!target.closest(DOM.SELECTOR_TREE_CONTEXT_MENU)
-	const isInTabContainer = !!target.closest(DOM.SELECTOR_TAB_CONTAINER)
-	const isInTreeNode = !!target.closest(DOM.SELECTOR_TREE_NODE)
-	const isInSide = !!target.closest(DOM.SELECTOR_SIDE)
-	const isInTreeTop = !!target.closest(DOM.SELECTOR_TREE_TOP)
-	const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
-	const isInsideTreeSystem = isInTreeContextMenu || isInSide
+const OUT_EVENT_RULES = [
+	{ inZone: DOM.SELECTOR_EDITOR_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.EDITOR_CONTAINER },
+	{ inZone: DOM.SELECTOR_SIDE, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.SIDE },
+	{ inZone: DOM.SELECTOR_TAB_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TAB_CONTAINER },
+	{ inZone: DOM.SELECTOR_TREE_CONTEXT_MENU, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TREE_CONTEXTMENU },
+	{ inZone: DOM.SELECTOR_TAB_CONTEXT_MENU, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TAB_CONTEXTMENU },
+	{ inZone: DOM.SELECTOR_FIND_REPLACE_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.FIND_REPLACE_CONTAINER },
+	{ inZone: DOM.SELECTOR_MENU_ITEM, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.MENU_ITEM },
+	{ inZone: DOM.SELECTOR_WINDOW, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.WINDOW },
+]
 
-	return {
-		isInMenuItem,
-		isInTabContextMenu,
-		isInTreeContextMenu,
-		isInTabContainer,
-		isInTreeNode,
-		isInSide,
-		isInTreeTop,
-		isInTreeNodeContainer,
-		isInsideTreeSystem,
-	}
-}
-
-//
-
-function bindDocumentMousedownEvnet(
-	focusManager: FocusManager,
-	emitter: EventEmitter,
-	menuElements: MenuElements,
-	tabEditorFacade: TabEditorFacade,
-	treeFacade: TreeFacade
-) {
-	const { menuItems } = menuElements
-	const { tabContextMenu } = tabEditorFacade.renderer.elements
-	const { treeContextMenu } = treeFacade.renderer.elements
-
+function bindDocumentMousedownEvnet(focusManager: FocusManager, emitter: EventEmitter) {
 	document.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement
 		focusManager.trackRelevantFocus(target)
 
-		const {
-			isInMenuItem,
-			isInTabContextMenu,
-			isInTreeContextMenu,
-			isInTabContainer,
-			isInTreeNode,
-			isInSide,
-			isInTreeTop,
-			isInTreeNodeContainer,
-			isInsideTreeSystem,
-		} = _getDiscriminationFlags(target)
-
-		if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(DOM.CLASS_SELECTED))
-		if (!isInTabContextMenu) tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
-		if (!isInTreeContextMenu) treeContextMenu.classList.remove(DOM.CLASS_SELECTED)
-
-		if (!isInTabContextMenu) tabEditorFacade.removeContextTabId()
-
-		if (!isInsideTreeSystem) {
-			treeFacade.blur(treeFacade.lastSelectedIndex)
-			treeFacade.removeLastSelectedIndex()
-			treeFacade.clearTreeSelected()
-		} else if (isInTreeTop) {
-			treeFacade.blur(treeFacade.lastSelectedIndex)
-			treeFacade.clearTreeSelected()
+		let activeItem = null
+		for (const item of OUT_EVENT_RULES) {
+			if (target.closest(item.inZone)) {
+				activeItem = item
+				break
+			}
 		}
-	})
-}
 
-//
-
-function bindDocumentClickEvent(emitter: EventEmitter) {
-	document.addEventListener("click", (e) => {
-		emitter.emit(CUSTOM_EVENTS.CLICK.DEFAULT, e)
-
-		const target = e.target as HTMLElement
-		const isInTabContainer = !!target.closest(DOM.SELECTOR_TAB_CONTAINER)
-		const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
-
-		if (isInTabContainer) emitter.emit(CUSTOM_EVENTS.CLICK.IN.TAB_CONTAINER, e)
-		else if (isInTreeNodeContainer) emitter.emit(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, e)
+		OUT_EVENT_RULES.forEach((item) => {
+			if (item !== activeItem) {
+				emitter.emit(item.outEvent, e)
+			}
+		})
 	})
 }
 
@@ -167,5 +109,3 @@ function bindShortcutEvent(dispatcher: Dispatcher, shortcutRegistry: ShortcutReg
 	shortcutRegistry.register("ESC", async () => await dispatcher.dispatch("esc", "shortcut"))
 	shortcutRegistry.register("ENTER", async () => await dispatcher.dispatch("enter", "shortcut"))
 }
-
-//

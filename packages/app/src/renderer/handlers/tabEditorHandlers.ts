@@ -12,35 +12,27 @@ export function handleTabEditor(
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindClickDefaultEvents(emitter, tabEditorFacade)
-	bindClickInContainerEvents(emitter, dispatcher, tabEditorFacade)
+	bindContainerClickEvent(dispatcher, tabEditorFacade)
 
-	bindTabContextmenuToggleEvent(tabEditorFacade)
-	bindTabContextmenuClickEvents(dispatcher, tabEditorFacade)
+	bindContextmenuToggleEvents(emitter, tabEditorFacade)
+	bindContextmenuClickEvents(dispatcher, tabEditorFacade)
 
 	bindFindReplaceEvnets(dispatcher, tabEditorFacade)
 
 	bindShortcutEvents(dispatcher, shortcutRegistry, tabEditorFacade)
 
-	bindMouseDownEventsForDrag(emitter, tabEditorFacade)
-	bindMouseMoveEventsForDrag(emitter, tabEditorFacade)
-	bindMouseUpEventsForDrag(emitter, tabEditorFacade)
-	bindMouseLeaveEventsForDrag(emitter, tabEditorFacade)
+	bindMousedownEventsForDrag(emitter, tabEditorFacade)
+	bindMousemoveEventsForDrag(emitter, tabEditorFacade)
+	bindMouseupEventsForDrag(emitter, tabEditorFacade)
+	bindMouseleaveEventsForDrag(emitter, tabEditorFacade)
 }
 
 //
 
-function bindClickDefaultEvents(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-	emitter.on(CUSTOM_EVENTS.CLICK.DEFAULT, (e) => {
-		if (tabEditorFacade.contextTabId !== -1) {
-			tabEditorFacade.contextTabId = -1
-			tabEditorFacade.hideContextmenu()
-		}
-	})
-}
+function bindContainerClickEvent(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
+	const { tabContainer } = tabEditorFacade.renderer.elements
 
-function bindClickInContainerEvents(emitter: EventEmitter, dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
-	emitter.on(CUSTOM_EVENTS.CLICK.IN.TAB_CONTAINER, async (e) => {
+	tabContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement
 		const tabBox = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tabBox) return
@@ -49,42 +41,48 @@ function bindClickInContainerEvents(emitter: EventEmitter, dispatcher: Dispatche
 			const id = parseInt(tabBox.dataset[DOM.DATASET_ATTR_TAB_ID]!)
 			await dispatcher.dispatch("closeTab", "button", id)
 		} else if (target.tagName === "SPAN") {
-			const id = tabBox.dataset[DOM.DATASET_ATTR_TAB_ID]!
-			tabEditorFacade.activateTabEditorById(parseInt(id))
+			const id = parseInt(tabBox.dataset[DOM.DATASET_ATTR_TAB_ID]!)
+			tabEditorFacade.activateTabEditorById(id)
 		}
 	})
 }
 
 //
 
-function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
+function bindContextmenuToggleEvents(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
 	const { tabContainer } = tabEditorFacade.renderer.elements
 
 	tabContainer.addEventListener("contextmenu", (e: MouseEvent) => {
-		const tab = (e.target as HTMLElement).closest(DOM.SELECTOR_TAB) as HTMLElement
-		if (!tab) return
-		tabEditorFacade.showContextmenu(tab, e.clientX, e.clientY)
+		tabEditorFacade.handleShowContextmenu(e)
+	})
+
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.OUT.TAB_CONTEXTMENU, (e) => {
+		tabEditorFacade.handleHideContextmenu()
 	})
 }
 
-function bindTabContextmenuClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
+function bindContextmenuClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
 	const { tabContextClose, tabContextCloseOthers, tabContextCloseRight, tabContextCloseAll } =
 		tabEditorFacade.renderer.elements
 
 	tabContextClose.addEventListener("click", async () => {
 		await dispatcher.dispatch("closeTab", "context-menu", tabEditorFacade.contextTabId)
+		tabEditorFacade.handleHideContextmenu()
 	})
 
 	tabContextCloseOthers.addEventListener("click", async () => {
 		await dispatcher.dispatch("closeOtherTabs", "context-menu")
+		tabEditorFacade.handleHideContextmenu()
 	})
 
 	tabContextCloseRight.addEventListener("click", async () => {
 		await dispatcher.dispatch("closeTabsToRight", "context-menu")
+		tabEditorFacade.handleHideContextmenu()
 	})
 
 	tabContextCloseAll.addEventListener("click", async () => {
 		await dispatcher.dispatch("closeAllTabs", "context-menu")
+		tabEditorFacade.handleHideContextmenu()
 	})
 }
 
@@ -130,7 +128,7 @@ function bindShortcutEvents(
 
 //
 
-function bindMouseDownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+function bindMousedownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.DEFAULT, (e) => {
 		const target = e.target as HTMLElement
 		const tab = target.closest(DOM.SELECTOR_TAB) as HTMLElement
@@ -139,7 +137,7 @@ function bindMouseDownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabE
 	})
 }
 
-function bindMouseMoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+function bindMousemoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_MOVE.DEFAULT, (e) => {
 		if (!tabEditorFacade.isMouseDown()) return
 
@@ -162,7 +160,7 @@ function bindMouseMoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabE
 	})
 }
 
-function bindMouseUpEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+function bindMouseupEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, async (e) => {
 		if (!tabEditorFacade.isDrag()) {
 			tabEditorFacade.setMouseDown(false)
@@ -182,8 +180,8 @@ function bindMouseUpEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEdi
 	})
 }
 
-function bindMouseLeaveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-  emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, (e) => {
+function bindMouseleaveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+  emitter.on(CUSTOM_EVENTS.MOUSE_LEAVE.DEFAULT, (e) => {
     if (tabEditorFacade.isDrag()) {
       tabEditorFacade.clearDrag()
     }

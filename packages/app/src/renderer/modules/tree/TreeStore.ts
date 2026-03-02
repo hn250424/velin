@@ -179,14 +179,14 @@ export class TreeStore {
 	}
 
 	getTreeViewModelByPath(path: string) {
-		const idx = this._pathToFlattenTreeIndex.get(path)!
+		const idx = this.getFlattenIndexByPath(path)
 		return this._flattenTree[idx]
 	}
 
 	//
 
 	getFlattenIndexByPath(path: string) {
-		return this._pathToFlattenTreeIndex.get(path)
+		return this._pathToFlattenTreeIndex.get(path)!
 	}
 
 	setFlattenIndexByPath(path: string, index: number) {

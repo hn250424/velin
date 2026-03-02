@@ -53,8 +53,8 @@ window.addEventListener("DOMContentLoaded", () => {
 	const dispatcher = diContainer.get<Dispatcher>(DI.Dispatcher)
 	const emitter = diContainer.get<EventEmitter>(DI.EventEmitter)
 
-	handleGlobalInput(dispatcher, emitter, focusManager, menuElements, tabEditorFacade, treeFacade, shortcutRegistry)
-	handleMenuItems(menuElements)
+	handleGlobalInput(dispatcher, emitter, focusManager, shortcutRegistry)
+	handleMenuItems(emitter, menuElements)
 	handleFileMenu(dispatcher, shortcutRegistry, menuElements, settingsFacade, tabEditorFacade, treeFacade)
 	handleEditMenu(dispatcher, shortcutRegistry, menuElements)
 	handleViewMenu(shortcutRegistry, menuElements, zoomManager, sideFacade)

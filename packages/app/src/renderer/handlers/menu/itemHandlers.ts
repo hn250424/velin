@@ -1,7 +1,9 @@
 import type { MenuElements } from "@renderer/modules"
 import { CLASS_SELECTED } from "../../constants/dom"
+import { CUSTOM_EVENTS, DOM } from "@renderer/constants"
+import type { EventEmitter } from "events"
 
-export function handleMenuItems(menuElements: MenuElements) {
+export function handleMenuItems(emitter: EventEmitter, menuElements: MenuElements) {
 	const { menuItems } = menuElements
 
 	menuItems.forEach((item) => {
@@ -20,5 +22,12 @@ export function handleMenuItems(menuElements: MenuElements) {
 				item.classList.add(CLASS_SELECTED)
 			}
 		})
+	})
+
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.OUT.MENU_ITEM, (e) => {
+		menuItems.forEach((i) => i.classList.remove(DOM.CLASS_SELECTED))
+		// const target = e.target as HTMLElement
+		// const isInMenuItem = !!target.closest(DOM.SELECTOR_MENU_ITEM)
+		// if (!isInMenuItem) menuItems.forEach((i) => i.classList.remove(DOM.CLASS_SELECTED))
 	})
 }

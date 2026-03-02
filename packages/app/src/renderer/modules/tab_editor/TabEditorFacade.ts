@@ -379,16 +379,24 @@ export class TabEditorFacade {
 
 	// orchestra
 
-	showContextmenu(tab: HTMLElement, clientX: number, clientY: number) {
+	handleShowContextmenu(e: MouseEvent) {
+		const tab = (e.target as HTMLElement).closest(DOM.SELECTOR_TAB) as HTMLElement
+		if (!tab) return
+
 		const { tabContextMenu } = this.renderer.elements
+
 		tabContextMenu.classList.add(DOM.CLASS_SELECTED)
-		tabContextMenu.style.left = `${clientX}px`
-		tabContextMenu.style.top = `${clientY}px`
+		tabContextMenu.style.left = `${e.clientX}px`
+		tabContextMenu.style.top = `${e.clientY}px`
+
 		this.contextTabId = parseInt(tab.dataset[DOM.DATASET_ATTR_TAB_ID]!)
 	}
 
-	hideContextmenu() {
-		this.renderer.elements.tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
+	handleHideContextmenu() {
+		if (this.contextTabId !== -1) {
+			this.contextTabId = -1
+			this.renderer.elements.tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
+		}
 	}
 
 	//

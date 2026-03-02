@@ -12,20 +12,38 @@ export function handleTree(
 	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
+	bindMousedownEvents(emitter, treeFacade)
+
 	bindTreeTopMenuEvents(dispatcher, treeFacade)
 
-	bindClickDefaultEvents(emitter, treeFacade)
-	bindClickInContainerEvents(dispatcher, emitter, treeFacade)
+	bindContainerClickEvent(dispatcher, treeFacade)
 
-	bindTreeContextmenuToggleEvents(treeFacade)
-	bindTreeContextmenuClickEvents(dispatcher, treeFacade)
+	bindContextmenuToggleEvents(emitter, treeFacade)
+	bindContextmenuClickEvents(dispatcher, treeFacade)
 
 	bindShortcutEvents(dispatcher, shortcutRegistry, focusManager, treeFacade)
 
-	bindMouseDownEventsForDrag(emitter, treeFacade)
-	bindMouseMoveEventsForDrag(emitter, treeFacade)
-	bindMouseUpEventsForDrag(dispatcher, emitter, treeFacade)
-	bindMouseLeaveEventsForDrag(emitter, treeFacade)
+	bindMousedownEventsForDrag(emitter, treeFacade)
+	bindMousemoveEventsForDrag(emitter, treeFacade)
+	bindMouseupEventsForDrag(dispatcher, emitter, treeFacade)
+	bindMouseleaveEventsForDrag(emitter, treeFacade)
+}
+
+function bindMousedownEvents(emitter: EventEmitter, treeFacade: TreeFacade) {
+	treeFacade.renderer.elements.treeNodeContainer.addEventListener("mousedown", (e) => {
+		treeFacade.blur(treeFacade.lastSelectedIndex)
+		treeFacade.blur(treeFacade.contextTreeIndex)
+	})
+
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.OUT.SIDE, (e) => {
+		const target = e.target as HTMLElement
+		const isInTreeContextMenu = !!target.closest(DOM.SELECTOR_TREE_CONTEXT_MENU)
+		if (!isInTreeContextMenu) {
+			// out of tree system.
+			treeFacade.blur(treeFacade.contextTreeIndex)
+			treeFacade.blur(treeFacade.lastSelectedIndex)
+		}
+	})
 }
 
 //
@@ -44,120 +62,103 @@ function bindTreeTopMenuEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 //
 
-function bindClickDefaultEvents(emitter: EventEmitter, treeFacade: TreeFacade) {
-	emitter.on(CUSTOM_EVENTS.CLICK.DEFAULT, (e) => {
-		if (treeFacade.contextTreeIndex !== -1) {
-			treeFacade.contextTreeIndex = -1
-			treeFacade.hideContextmenu()
-		}
-	})
-}
-
-function bindClickInContainerEvents(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindContainerClickEvent(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
-	emitter.on(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, async (e: MouseEvent) => {
-		const contextIndex = treeFacade.contextTreeIndex
-		const lastSelectedIndex = treeFacade.lastSelectedIndex
-		if (contextIndex !== -1) treeFacade.blur(contextIndex)
-		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
-
+	treeNodeContainer.addEventListener("click", async (e) => {
 		const target = e.target as HTMLElement
-		const treeNode = target.closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
+		const el = target.closest(`${DOM.SELECTOR_TREE_NODE}, ${DOM.SELECTOR_TREE_NODE_CONTAINER}`)! as HTMLElement
 
-		if (!treeNode) {
-			if (target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)) {
-				treeNodeContainer.classList.add(DOM.CLASS_FOCUSED)
-				treeFacade.clearTreeSelected()
-				treeFacade.lastSelectedIndex = 0
-			}
-			return
-		}
+		if (el.matches(DOM.SELECTOR_TREE_NODE_CONTAINER)) _processContainer()
+		else await _processNode(e, el)
+	})
 
-		treeNodeContainer.classList.remove(DOM.CLASS_FOCUSED)
+	function _processContainer() {
+		treeNodeContainer.classList.add(DOM.CLASS_FOCUSED)
+		treeFacade.clearTreeSelected()
+		treeFacade.lastSelectedIndex = 0
+	}
+
+	async function _processNode(e: MouseEvent, treeNode: HTMLElement, ) {
 		treeNode.classList.add(DOM.CLASS_FOCUSED)
-
 		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 
 		if (e.shiftKey && treeFacade.lastSelectedIndex > 0) {
 			const startIndex = treeFacade.lastSelectedIndex
-			const endIndex = treeFacade.getFlattenIndexByPath(path)!
+			const endIndex = treeFacade.getFlattenIndexByPath(path)
 			treeFacade.setLastSelectedIndexByPath(path)
-			const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 
+			const [start, end] = [startIndex, endIndex].sort((a, b) => a - b)
 			for (let i = start; i <= end; i++) {
 				treeFacade.addSelectedIndices(i)
 				treeFacade.getTreeNodeByIndex(i).classList.add(DOM.CLASS_SELECTED)
 			}
+
 		} else if (e.ctrlKey) {
 			treeNode.classList.add(DOM.CLASS_SELECTED)
-			const index = treeFacade.getFlattenIndexByPath(path)!
+
 			treeFacade.setLastSelectedIndexByPath(path)
+
+			const index = treeFacade.getFlattenIndexByPath(path)
 			treeFacade.addSelectedIndices(index)
+
 		} else {
 			treeFacade.clearTreeSelected()
+			treeNode.classList.add(DOM.CLASS_SELECTED)
 
 			const viewModel = treeFacade.getTreeViewModelByPath(path)
-			if (viewModel.directory) {
-				await dispatcher.dispatch("openDirectory", "element", treeNode)
-			} else {
-				await dispatcher.dispatch("openFile", "element", path)
-			}
+			if (viewModel.directory) await dispatcher.dispatch("openDirectory", "element", treeNode)
+			else await dispatcher.dispatch("openFile", "element", path)
 
-			treeNode.classList.add(DOM.CLASS_SELECTED)
 			treeFacade.setLastSelectedIndexByPath(path)
-			treeFacade.addSelectedIndices(treeFacade.getFlattenIndexByPath(path)!)
+
+			const index = treeFacade.getFlattenIndexByPath(path)
+			treeFacade.addSelectedIndices(index)
 		}
-	})
+	}
 }
 
 //
 
-function bindTreeContextmenuToggleEvents(treeFacade: TreeFacade) {
+function bindContextmenuToggleEvents(emitter: EventEmitter, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
 	treeNodeContainer.addEventListener("contextmenu", (e) => {
-		const contextIndex = treeFacade.contextTreeIndex
-		const lastSelectedIndex = treeFacade.lastSelectedIndex
-		if (contextIndex !== -1) treeFacade.blur(contextIndex)
-		if (lastSelectedIndex !== -1) treeFacade.blur(lastSelectedIndex)
+		treeFacade.handleShowContextmenu(e)
+	})
 
-		const treeNode = (e.target as HTMLElement).closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
-		if (!treeNode) {
-			treeFacade.contextTreeIndex = -1
-			return
-		}
-
-		treeNode.classList.add(DOM.CLASS_FOCUSED)
-		const path = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
-
-		treeFacade.setContextTreeIndexByPath(path)
-		treeFacade.showContextmenu(treeNode, e.clientX, e.clientY)
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.OUT.TREE_CONTEXTMENU, (e) => {
+		treeFacade.handleHideContextmenu()
 	})
 }
 
-function bindTreeContextmenuClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
+function bindContextmenuClickEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 	const { treeContextCut, treeContextCopy, treeContextPaste, treeContextRename, treeContextDelete } =
 		treeFacade.renderer.elements
 
 	treeContextCut.addEventListener("click", async () => {
 		await dispatcher.dispatch("cut", "context-menu")
+		treeFacade.handleHideContextmenu()
 	})
 
 	treeContextCopy.addEventListener("click", async () => {
 		await dispatcher.dispatch("copy", "context-menu")
+		treeFacade.handleHideContextmenu()
 	})
 
 	treeContextPaste.addEventListener("click", async () => {
 		await dispatcher.dispatch("paste", "context-menu")
+		treeFacade.handleHideContextmenu()
 	})
 
 	treeContextRename.addEventListener("click", async () => {
 		await dispatcher.dispatch("rename", "context-menu")
+		treeFacade.handleHideContextmenu()
 	})
 
 	treeContextDelete.addEventListener("click", async () => {
 		await dispatcher.dispatch("delete", "context-menu")
+		treeFacade.handleHideContextmenu()
 	})
 }
 
@@ -219,7 +220,7 @@ function _moveFocus(e: KeyboardEvent, treeFacade: TreeFacade, lastIndex: number,
 
 //
 
-function bindMouseDownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindMousedownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.DEFAULT, (e) => {
 		let count = treeFacade.getSelectedIndices().length
 		if (count === 0) {
@@ -238,7 +239,7 @@ function bindMouseDownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacad
 	})
 }
 
-function bindMouseMoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindMousemoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_MOVE.DEFAULT, (e) => {
 		if (!treeFacade.isMouseDown()) return
 
@@ -256,7 +257,7 @@ function bindMouseMoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacad
 	})
 }
 
-function bindMouseUpEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindMouseupEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, async (e) => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
@@ -276,7 +277,7 @@ function bindMouseUpEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter,
 	})
 }
 
-function bindMouseLeaveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindMouseleaveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
 	emitter.on(CUSTOM_EVENTS.MOUSE_LEAVE.DEFAULT, (e) => {
 		if (treeFacade.isDrag()) {
 			treeFacade.clearDrag()
