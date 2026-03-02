@@ -452,7 +452,7 @@ export class TreeFacade {
 		}
 	}
 
-	delete(indices: number[]) {
+	applyDelete(indices: number[]) {
 		indices.sort((a, b) => b - a)
 		const minIndex = indices[indices.length - 1]
 

@@ -32,7 +32,7 @@ export class DeleteCommand implements ICommand {
 		for (let i = 0; i < idsToDelete.length; i++) {
 			this.tabEditorFacade.removeTab(idsToDelete[i])
 		}
-		this.treeFacade.delete(this.selectedIndices)
+		this.treeFacade.applyDelete(this.selectedIndices)
 		this.treeFacade.clearSelectedIndices()
 
 		const tabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
