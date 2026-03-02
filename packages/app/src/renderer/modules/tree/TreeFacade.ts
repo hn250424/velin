@@ -333,36 +333,35 @@ export class TreeFacade {
 	updateDragOverStatus(target: HTMLElement) {
 		const previousWrapper = this.getInsertWrapper()
 
-		let currentWrapper = target.closest(DOM.SELECTOR_TREE_NODE_WRAPPER) as HTMLElement
-		let isContainer = false
+		let currentWrapper = (target.closest(DOM.SELECTOR_TREE_NODE_WRAPPER) ||
+			target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)) as HTMLElement
 
 		if (!currentWrapper) {
-			const container = target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER) as HTMLElement
-			if (!container) {
-				this.clearDrag()
-				return
-			}
-			currentWrapper = container
-			isContainer = true
-		}
-
-		if (previousWrapper === currentWrapper) return
-
-		if (previousWrapper) previousWrapper.classList.remove(DOM.CLASS_TREE_DRAG_OVERLAY)
-
-		const path = isContainer
-			? currentWrapper.dataset[DOM.DATASET_ATTR_TREE_PATH]!
-			: (currentWrapper.querySelector(DOM.SELECTOR_TREE_NODE) as HTMLElement).dataset[DOM.DATASET_ATTR_TREE_PATH]!
-
-		const viewModel = this.getTreeViewModelByPath(path)
-
-		if (!viewModel || !viewModel.directory) {
-			this.setInsertWrapper(null)
-			this.setInsertPath("")
+			this.clearDrag()
 			return
 		}
 
-		this.setInsertPath(viewModel.path)
+		const isInitialContainer = currentWrapper.matches(DOM.SELECTOR_TREE_NODE_CONTAINER)
+		const initialPath = isInitialContainer
+			? currentWrapper.dataset[DOM.DATASET_ATTR_TREE_PATH]!
+			: (currentWrapper.querySelector(DOM.SELECTOR_TREE_NODE) as HTMLElement).dataset[DOM.DATASET_ATTR_TREE_PATH]!
+
+		let targetViewModel = this.getTreeViewModelByPath(initialPath)!
+
+		if (!targetViewModel.directory) {
+			const currentIndex = this.getFlattenIndexByPath(initialPath)!
+			const parentIndex = this.findParentDirectoryIndex(currentIndex)
+
+			targetViewModel = this.flattenTree[parentIndex]!
+			currentWrapper = this.getTreeWrapperByPath(targetViewModel.path)!
+		}
+
+		if (previousWrapper === currentWrapper) return
+		if (previousWrapper) previousWrapper.classList.remove(DOM.CLASS_TREE_DRAG_OVERLAY)
+
+		const finalPath = targetViewModel.path
+
+		this.setInsertPath(finalPath)
 		this.setInsertWrapper(currentWrapper)
 		currentWrapper.classList.add(DOM.CLASS_TREE_DRAG_OVERLAY)
 	}
