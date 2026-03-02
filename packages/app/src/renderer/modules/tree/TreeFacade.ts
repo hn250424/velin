@@ -7,6 +7,7 @@ import { DI, DOM } from "../../constants"
 import { TreeRenderer } from "./TreeRenderer"
 import { TreeStore } from "./TreeStore"
 import { TreeDragManager } from "./TreeDragManager"
+import { CLASS_SELECTED } from "@renderer/constants/dom"
 
 @injectable()
 export class TreeFacade {
@@ -400,7 +401,13 @@ export class TreeFacade {
 		treeContextMenu.style.top = `${y}px`
 	}
 
+	hideContextmenu() {
+		this.renderer.elements.treeContextMenu.classList.remove(CLASS_SELECTED)
+	}
+
 	blur(index: number) {
+		if (index === -1) return
+		
 		if (index === 0) {
 			this.renderer.elements.treeNodeContainer.classList.remove(DOM.CLASS_FOCUSED)
 		} else {

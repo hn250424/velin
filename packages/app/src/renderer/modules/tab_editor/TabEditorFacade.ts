@@ -13,6 +13,7 @@ import { TabEditorStore } from "./TabEditorStore"
 import { TabEditorView } from "./TabEditorView"
 import { TabDragManager } from "./TabDragManager"
 import { assert } from "@renderer/utils"
+import { DOM } from "@renderer/constants"
 
 // export const BINARY_FILE_WARNING = '❌'
 export const BINARY_FILE_WARNING = `Can't read this file`
@@ -377,6 +378,20 @@ export class TabEditorFacade {
 	}
 
 	// orchestra
+
+	showContextmenu(tab: HTMLElement, clientX: number, clientY: number) {
+		const { tabContextMenu } = this.renderer.elements
+		tabContextMenu.classList.add(DOM.CLASS_SELECTED)
+		tabContextMenu.style.left = `${clientX}px`
+		tabContextMenu.style.top = `${clientY}px`
+		this.contextTabId = parseInt(tab.dataset[DOM.DATASET_ATTR_TAB_ID]!)
+	}
+
+	hideContextmenu() {
+		this.renderer.elements.tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
+	}
+
+	//
 
 	getActiveTabEditorView(): TabEditorView {
 		const activeIndex = this.activeTabIndex

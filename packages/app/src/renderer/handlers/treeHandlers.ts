@@ -14,7 +14,8 @@ export function handleTree(
 ) {
 	bindTreeTopMenuEvents(dispatcher, treeFacade)
 
-	bindTreeClickEvents(dispatcher, emitter, treeFacade)
+	bindClickDefaultEvents(emitter, treeFacade)
+	bindClickInContainerEvents(dispatcher, emitter, treeFacade)
 
 	bindTreeContextmenuToggleEvents(treeFacade)
 	bindTreeContextmenuClickEvents(dispatcher, treeFacade)
@@ -43,10 +44,18 @@ function bindTreeTopMenuEvents(dispatcher: Dispatcher, treeFacade: TreeFacade) {
 
 //
 
-function bindTreeClickEvents(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
+function bindClickDefaultEvents(emitter: EventEmitter, treeFacade: TreeFacade) {
+	emitter.on(CUSTOM_EVENTS.CLICK.DEFAULT, (e) => {
+		if (treeFacade.contextTreeIndex !== -1) {
+			treeFacade.contextTreeIndex = -1
+			treeFacade.hideContextmenu()
+		}
+	})
+}
+
+function bindClickInContainerEvents(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
 	const { treeNodeContainer } = treeFacade.renderer.elements
 
-	// treeNodeContainer.addEventListener("click", async (e) => {
 	emitter.on(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, async (e: MouseEvent) => {
 		const contextIndex = treeFacade.contextTreeIndex
 		const lastSelectedIndex = treeFacade.lastSelectedIndex
@@ -211,7 +220,7 @@ function _moveFocus(e: KeyboardEvent, treeFacade: TreeFacade, lastIndex: number,
 //
 
 function bindMouseDownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_DOWN, (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.DEFAULT, (e) => {
 		let count = treeFacade.getSelectedIndices().length
 		if (count === 0) {
 			const target = e.target as HTMLElement
@@ -230,7 +239,7 @@ function bindMouseDownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacad
 }
 
 function bindMouseMoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_MOVE.DEFAULT, (e) => {
 		if (!treeFacade.isMouseDown()) return
 
 		if (!treeFacade.isDrag()) {
@@ -248,7 +257,7 @@ function bindMouseMoveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacad
 }
 
 function bindMouseUpEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter, treeFacade: TreeFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, async (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, async (e) => {
 		if (!treeFacade.isDrag()) {
 			treeFacade.setMouseDown(false)
 			return
@@ -268,7 +277,7 @@ function bindMouseUpEventsForDrag(dispatcher: Dispatcher, emitter: EventEmitter,
 }
 
 function bindMouseLeaveEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_LEAVE, (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_LEAVE.DEFAULT, (e) => {
 		if (treeFacade.isDrag()) {
 			treeFacade.clearDrag()
 		}

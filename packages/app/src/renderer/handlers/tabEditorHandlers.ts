@@ -12,7 +12,8 @@ export function handleTabEditor(
 	tabEditorFacade: TabEditorFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindTabClickEvents(dispatcher, tabEditorFacade)
+	bindClickDefaultEvents(emitter, tabEditorFacade)
+	bindClickInContainerEvents(emitter, dispatcher, tabEditorFacade)
 
 	bindTabContextmenuToggleEvent(tabEditorFacade)
 	bindTabContextmenuClickEvents(dispatcher, tabEditorFacade)
@@ -29,10 +30,17 @@ export function handleTabEditor(
 
 //
 
-function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
-	const { tabContainer } = tabEditorFacade.renderer.elements
+function bindClickDefaultEvents(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
+	emitter.on(CUSTOM_EVENTS.CLICK.DEFAULT, (e) => {
+		if (tabEditorFacade.contextTabId !== -1) {
+			tabEditorFacade.contextTabId = -1
+			tabEditorFacade.hideContextmenu()
+		}
+	})
+}
 
-	tabContainer.addEventListener("click", async (e: MouseEvent) => {
+function bindClickInContainerEvents(emitter: EventEmitter, dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
+	emitter.on(CUSTOM_EVENTS.CLICK.IN.TAB_CONTAINER, async (e) => {
 		const target = e.target as HTMLElement
 		const tabBox = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tabBox) return
@@ -50,16 +58,12 @@ function bindTabClickEvents(dispatcher: Dispatcher, tabEditorFacade: TabEditorFa
 //
 
 function bindTabContextmenuToggleEvent(tabEditorFacade: TabEditorFacade) {
-	const { tabContainer, tabContextMenu } = tabEditorFacade.renderer.elements
+	const { tabContainer } = tabEditorFacade.renderer.elements
 
 	tabContainer.addEventListener("contextmenu", (e: MouseEvent) => {
 		const tab = (e.target as HTMLElement).closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tab) return
-
-		tabContextMenu.classList.add(DOM.CLASS_SELECTED)
-		tabContextMenu.style.left = `${e.clientX}px`
-		tabContextMenu.style.top = `${e.clientY}px`
-		tabEditorFacade.contextTabId = parseInt(tab.dataset[DOM.DATASET_ATTR_TAB_ID]!)
+		tabEditorFacade.showContextmenu(tab, e.clientX, e.clientY)
 	})
 }
 
@@ -127,7 +131,7 @@ function bindShortcutEvents(
 //
 
 function bindMouseDownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_DOWN, (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_DOWN.DEFAULT, (e) => {
 		const target = e.target as HTMLElement
 		const tab = target.closest(DOM.SELECTOR_TAB) as HTMLElement
 		if (!tab) return
@@ -136,7 +140,7 @@ function bindMouseDownEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabE
 }
 
 function bindMouseMoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_MOVE.DEFAULT, (e) => {
 		if (!tabEditorFacade.isMouseDown()) return
 
 		if (!tabEditorFacade.isDrag()) {
@@ -159,7 +163,7 @@ function bindMouseMoveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabE
 }
 
 function bindMouseUpEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-	emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, async (e) => {
+	emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, async (e) => {
 		if (!tabEditorFacade.isDrag()) {
 			tabEditorFacade.setMouseDown(false)
 			return
@@ -179,7 +183,7 @@ function bindMouseUpEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEdi
 }
 
 function bindMouseLeaveEventsForDrag(emitter: EventEmitter, tabEditorFacade: TabEditorFacade) {
-  emitter.addListener(CUSTOM_EVENTS.DRAG.MOUSE_UP, (e) => {
+  emitter.on(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, (e) => {
     if (tabEditorFacade.isDrag()) {
       tabEditorFacade.clearDrag()
     }

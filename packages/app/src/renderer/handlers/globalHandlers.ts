@@ -18,8 +18,8 @@ export function handleGlobalInput(
 	treeFacade: TreeFacade,
 	shortcutRegistry: ShortcutRegistry
 ) {
-	bindDocumentClickEvent(emitter, tabEditorFacade, treeFacade)
 	bindDocumentMousedownEvnet(focusManager, emitter, menuElements, tabEditorFacade, treeFacade)
+	bindDocumentClickEvent(emitter)
 
 	bindDocumentMousedownEvnetForDrag(emitter)
 	bindDocumentMousemoveEvnetForDrag(emitter)
@@ -30,32 +30,33 @@ export function handleGlobalInput(
 	bindShortcutEvent(dispatcher, shortcutRegistry)
 }
 
-function bindDocumentClickEvent(emitter: EventEmitter, tabEditorFacade: TabEditorFacade, treeFacade: TreeFacade) {
-	const { tabContextMenu } = tabEditorFacade.renderer.elements
-	const { treeContextMenu } = treeFacade.renderer.elements
+//
 
-	document.addEventListener("click", (e) => {
-		const target = e.target as HTMLElement
+function _getDiscriminationFlags(target: HTMLElement) {
+	const isInMenuItem = !!target.closest(DOM.SELECTOR_MENU_ITEM)
+	const isInTabContextMenu = !!target.closest(DOM.SELECTOR_TAB_CONTEXT_MENU)
+	const isInTreeContextMenu = !!target.closest(DOM.SELECTOR_TREE_CONTEXT_MENU)
+	const isInTabContainer = !!target.closest(DOM.SELECTOR_TAB_CONTAINER)
+	const isInTreeNode = !!target.closest(DOM.SELECTOR_TREE_NODE)
+	const isInSide = !!target.closest(DOM.SELECTOR_SIDE)
+	const isInTreeTop = !!target.closest(DOM.SELECTOR_TREE_TOP)
+	const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
+	const isInsideTreeSystem = isInTreeContextMenu || isInSide
 
-		const {
-			isInMenuItem,
-			isInTabContextMenu,
-			isInTreeContextMenu,
-			isInTreeNode,
-			isInSide,
-			isInTreeTop,
-			isInTreeNodeContainer,
-			isInsideTreeSystem,
-		} = _getDiscriminationFlags(target)
-
-		tabContextMenu.classList.remove(DOM.CLASS_SELECTED)
-		treeContextMenu.classList.remove(DOM.CLASS_SELECTED)
-
-		if (isInTreeNodeContainer) {
-			emitter.emit(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, e)
-		}
-	})
+	return {
+		isInMenuItem,
+		isInTabContextMenu,
+		isInTreeContextMenu,
+		isInTabContainer,
+		isInTreeNode,
+		isInSide,
+		isInTreeTop,
+		isInTreeNodeContainer,
+		isInsideTreeSystem,
+	}
 }
+
+//
 
 function bindDocumentMousedownEvnet(
 	focusManager: FocusManager,
@@ -76,6 +77,7 @@ function bindDocumentMousedownEvnet(
 			isInMenuItem,
 			isInTabContextMenu,
 			isInTreeContextMenu,
+			isInTabContainer,
 			isInTreeNode,
 			isInSide,
 			isInTreeTop,
@@ -102,11 +104,26 @@ function bindDocumentMousedownEvnet(
 
 //
 
+function bindDocumentClickEvent(emitter: EventEmitter) {
+	document.addEventListener("click", (e) => {
+		emitter.emit(CUSTOM_EVENTS.CLICK.DEFAULT, e)
+
+		const target = e.target as HTMLElement
+		const isInTabContainer = !!target.closest(DOM.SELECTOR_TAB_CONTAINER)
+		const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
+
+		if (isInTabContainer) emitter.emit(CUSTOM_EVENTS.CLICK.IN.TAB_CONTAINER, e)
+		else if (isInTreeNodeContainer) emitter.emit(CUSTOM_EVENTS.CLICK.IN.TREE_NODE_CONTAINER, e)
+	})
+}
+
+//
+
 function bindDocumentMousedownEvnetForDrag(emitter: EventEmitter) {
 	document.addEventListener("mousedown", (e) => {
 		if (e.button !== 0) return
 		state.down = true
-		emitter.emit(CUSTOM_EVENTS.DRAG.MOUSE_DOWN, e)
+		emitter.emit(CUSTOM_EVENTS.MOUSE_DOWN.DEFAULT, e)
 	})
 }
 
@@ -115,7 +132,7 @@ function bindDocumentMousemoveEvnetForDrag(emitter: EventEmitter) {
 		if (!state.ticking) {
 			state.ticking = true
 			window.requestAnimationFrame(() => {
-				emitter.emit(CUSTOM_EVENTS.DRAG.MOUSE_MOVE, e)
+				emitter.emit(CUSTOM_EVENTS.MOUSE_MOVE.DEFAULT, e)
 				state.ticking = false
 			})
 		}
@@ -125,7 +142,7 @@ function bindDocumentMousemoveEvnetForDrag(emitter: EventEmitter) {
 function bindDocumentMouseupEvnetForDrag(emitter: EventEmitter) {
 	document.addEventListener("mouseup", (e) => {
 		if (state.down) {
-			emitter.emit(CUSTOM_EVENTS.DRAG.MOUSE_UP, e)
+			emitter.emit(CUSTOM_EVENTS.MOUSE_UP.DEFAULT, e)
 			state.down = false
 		}
 	})
@@ -134,7 +151,7 @@ function bindDocumentMouseupEvnetForDrag(emitter: EventEmitter) {
 function bindDocumentMouseleaveEvnetForDrag(emitter: EventEmitter) {
 	document.addEventListener("mouseleave", (e) => {
 		if (state.down) state.down = false
-		emitter.emit(CUSTOM_EVENTS.DRAG.MOUSE_LEAVE, e)
+		emitter.emit(CUSTOM_EVENTS.MOUSE_LEAVE.DEFAULT, e)
 	})
 }
 
@@ -152,25 +169,3 @@ function bindShortcutEvent(dispatcher: Dispatcher, shortcutRegistry: ShortcutReg
 }
 
 //
-
-function _getDiscriminationFlags(target: HTMLElement) {
-	const isInMenuItem = !!target.closest(DOM.SELECTOR_MENU_ITEM)
-	const isInTabContextMenu = !!target.closest(DOM.SELECTOR_TAB_CONTEXT_MENU)
-	const isInTreeContextMenu = !!target.closest(DOM.SELECTOR_TREE_CONTEXT_MENU)
-	const isInTreeNode = !!target.closest(DOM.SELECTOR_TREE_NODE)
-	const isInSide = !!target.closest(DOM.SELECTOR_SIDE)
-	const isInTreeTop = !!target.closest(DOM.SELECTOR_TREE_TOP)
-	const isInTreeNodeContainer = !!target.closest(DOM.SELECTOR_TREE_NODE_CONTAINER)
-	const isInsideTreeSystem = isInTreeContextMenu || isInSide
-
-	return {
-		isInMenuItem,
-		isInTabContextMenu,
-		isInTreeContextMenu,
-		isInTreeNode,
-		isInSide,
-		isInTreeTop,
-		isInTreeNodeContainer,
-		isInsideTreeSystem,
-	}
-}

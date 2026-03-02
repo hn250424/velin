@@ -42,6 +42,9 @@ export const SELECTOR_TREE_CONTEXT_PASTE = `#${ID_TREE_CONTEXT_PASTE}`
 export const CLASS_TAB = "tab"
 export const SELECTOR_TAB = `.${CLASS_TAB}`
 
+export const ID_TAB_CONTAINER = "tab-container"
+export const SELECTOR_TAB_CONTAINER = `#${ID_TAB_CONTAINER}`
+
 export const ID_EDITOR_CONTAINER = "editor-container"
 export const SELECTOR_EDITOR_CONTAINER = `#${ID_EDITOR_CONTAINER}`
 

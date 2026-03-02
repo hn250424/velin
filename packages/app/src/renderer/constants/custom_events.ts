@@ -1,14 +1,26 @@
 export const CUSTOM_EVENTS = {
 	CLICK: {
+		DEFAULT: Symbol("click-default"),
+
 		IN: {
-			TREE_NODE_CONTAINER: "treeNodeContainer"
+			TAB_CONTAINER: Symbol("click-in-tabContainer"),
+			TREE_NODE_CONTAINER: Symbol("click-in-treeNodeContainer")
 		}
 	},
 
-	DRAG: {
-		MOUSE_DOWN: "mousedown",
-		MOUSE_MOVE: "mousemove",
-		MOUSE_UP: "mouseup",
-		MOUSE_LEAVE: "mouseleave",
-	}
+	MOUSE_DOWN: {
+		DEFAULT: Symbol("mousedown-default"),
+	},
+
+	MOUSE_MOVE: {
+		DEFAULT: Symbol("mousemove-default"),
+	},
+
+	MOUSE_UP: {
+		DEFAULT: Symbol("mouseup-default"),
+	},
+
+	MOUSE_LEAVE: {
+		DEFAULT: Symbol("mouseleave-default"),
+	},
 }
