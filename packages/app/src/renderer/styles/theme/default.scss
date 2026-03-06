@@ -50,7 +50,7 @@ $theme-default: (
 	--search-highlight-current: colors.$yellow-3,
 
 	--scrollbar-thumb: $primary-emphasis,
-	--scrollbar-thumb-hover: $accent,
+	--scrollbar-thumb-hover: #{$accent}b3,
 
 	--tab-bg: $primary-muted,
 	--tab-ghost-bg: $sub,

@@ -1,20 +1,23 @@
 import { injectable } from "inversify"
+import SimpleBar from "simplebar"
 
 @injectable()
 export class TreeElements {
-	public readonly treeContextMenu: HTMLElement
+	readonly treeContextMenu: HTMLElement
 
-	public readonly treeContextCut: HTMLElement
-	public readonly treeContextCopy: HTMLElement
-	public readonly treeContextPaste: HTMLElement
-	public readonly treeContextRename: HTMLElement
-	public readonly treeContextDelete: HTMLElement
+	readonly treeContextCut: HTMLElement
+	readonly treeContextCopy: HTMLElement
+	readonly treeContextPaste: HTMLElement
+	readonly treeContextRename: HTMLElement
+	readonly treeContextDelete: HTMLElement
 
-	public readonly treeNodeContainer: HTMLElement
-	public readonly treeTop: HTMLElement
-	public readonly treeTopName: HTMLElement
-	public readonly treeTopAddFile: HTMLElement
-	public readonly treeTopAddDirectory: HTMLElement
+	readonly treeNodeContainer: HTMLElement
+	readonly treeTop: HTMLElement
+	readonly treeTopName: HTMLElement
+	readonly treeTopAddFile: HTMLElement
+	readonly treeTopAddDirectory: HTMLElement
+
+	readonly simpleBar: SimpleBar
 
 	constructor() {
 		this.treeContextMenu = document.querySelector("#tree-context-menu") as HTMLElement
@@ -30,5 +33,7 @@ export class TreeElements {
 		this.treeTopName = document.querySelector("#tree-top-name") as HTMLElement
 		this.treeTopAddFile = document.querySelector("#tree-top-add-file") as HTMLElement
 		this.treeTopAddDirectory = document.querySelector("#tree-top-add-directory") as HTMLElement
+
+		this.simpleBar = new SimpleBar(this.treeNodeContainer)
 	}
 }

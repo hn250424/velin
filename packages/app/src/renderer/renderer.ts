@@ -1,5 +1,6 @@
-import "./index.scss"
+import "./styles/index.scss"
 import "@milkdown/theme-nord/style.css"
+import 'simplebar/dist/simplebar.css'
 
 import { DI } from "./constants"
 import diContainer from "./diContainer"

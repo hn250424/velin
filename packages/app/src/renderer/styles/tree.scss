@@ -50,37 +50,32 @@ $tree-top-min-height: 25px;
 	background-color: var(--tree-top-icon-hover);
 }
 
+
 #tree-node-container {
 	flex: 1;
-	overflow: overlay;
-	border: 1px solid transparent;
-	padding: 0 $tree-horizontal-gap;
+	overflow: auto;
 
-	&::-webkit-scrollbar {
-		width: $scrollbar-size;
-		height: $scrollbar-size;
-	}
+	// border: 1px solid transparent;
 
-	&::-webkit-scrollbar-track {
-		background: transparent;
-	}
+	height: 100%;
+  position: relative;
 
-	&::-webkit-scrollbar-thumb {
-		background-color: transparent;
-	}
+	// Required for SimpleBar to initialize
+  overflow: auto;
 
-	&::-webkit-scrollbar-thumb:hover {
-		cursor: pointer;
-		background-color: var(--scrollbar-thumb-hover);
-	}
+	// Remove default scrollbar size
+  &::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
 }
 
-#tree-node-container.focused {
-	border: 1px solid var(--tree-node-focused);
-}
+// #tree-node-container.focused {
+// 	border: 1px solid var(--tree-node-focused);
+// }
 
 .tree-node-wrapper {
-	// width: 100%;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -106,7 +101,8 @@ $tree-top-min-height: 25px;
 }
 
 .tree-node.focused {
-	border: 1px solid var(--tree-node-focused);
+	border-top: 1px solid var(--tree-node-focused);
+	border-bottom: 1px solid var(--tree-node-focused);
 }
 
 .tree-node:hover {
@@ -166,4 +162,51 @@ $tree-top-min-height: 25px;
 
 .tree-drag-overlay {
 	background-color: var(--tree-wrapper-drag-overlay);
+}
+
+// Simple Bar
+
+// Prevent event passthrough
+.simplebar-track,
+.simplebar-scrollbar {
+  pointer-events: all !important;
+
+  &::before {
+    pointer-events: all !important;
+  }
+}
+
+.simplebar-track.simplebar-vertical {
+  width: $scrollbar-size;
+  background: transparent;
+  right: 0 !important;
+}
+
+.simplebar-scrollbar {
+  &::before {
+		// SimpleBar applies styles to the ::before pseudo-element
+    background-color: transparent !important;
+    transition: background-color 0.2s linear;
+
+    // Reset default padding/offsets
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+
+		// Override SimpleBar's default fade-out behavior
+    opacity: 1 !important;
+
+    border-radius: 0 !important;
+  }
+
+  &.simplebar-visible::before {
+    background-color: var(--scrollbar-thumb-hover) !important;
+    cursor: pointer;
+  }
+}
+
+// Hide horizontal scrollbar
+.simplebar-track.simplebar-horizontal {
+  display: none !important;
 }

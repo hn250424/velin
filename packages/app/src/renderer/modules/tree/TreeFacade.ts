@@ -200,15 +200,12 @@ export class TreeFacade {
 
 	// renderer
 
-	clean(container: HTMLElement) {
-		this.renderer.clean(container)
-	}
-
-	//
-
 	// TODO: expense
 	render(viewModel: TreeViewModel, container?: HTMLElement) {
 		this.renderer.render(viewModel, container)
+
+		// new SimpleBar(this.renderer.elements.treeNodeContainer).recalculate()
+		// this.renderer.elements.simpleBar.recalculate()
 	}
 
 	//

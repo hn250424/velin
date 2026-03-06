@@ -18,14 +18,6 @@ export class TreeRenderer {
 
 	//
 
-	clean(container: HTMLElement) {
-		while (container.firstChild) {
-			container.removeChild(container.firstChild)
-		}
-	}
-
-	//
-
 	private _renderElement(container: HTMLElement, viewModel: TreeViewModel) {
 		const type = document.createElement("div")
 		type.classList.add(DOM.CLASS_TREE_NODE_TYPE)
@@ -44,7 +36,7 @@ export class TreeRenderer {
 
 		const node = document.createElement("div")
 		node.classList.add(DOM.CLASS_TREE_NODE)
-		node.style.paddingLeft = `${(viewModel.indent - 1) * 16}px`
+		node.style.paddingLeft = `${4 + (viewModel.indent - 1) * 16}px`
 		node.dataset[DOM.DATASET_ATTR_TREE_PATH] = viewModel.path
 		node.title = viewModel.path
 		node.tabIndex = -1
@@ -74,19 +66,25 @@ export class TreeRenderer {
 	render(viewModel: TreeViewModel, container?: HTMLElement) {
 		if (!container) {
 			this.elements.treeTopName.textContent = viewModel.name
-			container = this.elements.treeNodeContainer
+
+			// container = this.elements.treeNodeContainer
+			container = this.elements.simpleBar.getContentElement() as HTMLElement;
 
 			this._pathToTreeWrapper.set(viewModel.path, container)
 			container.dataset[DOM.DATASET_ATTR_TREE_PATH] = viewModel.path
 		}
 
-		this.clean(container)
+		while (container.firstChild) {
+			container.removeChild(container.firstChild)
+		}
 
 		if (viewModel.children) {
 			for (const child of viewModel.children) {
 				this._renderElement(container, child)
 			}
 		}
+
+		this.elements.simpleBar.recalculate()
 	}
 
 	//
