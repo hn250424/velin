@@ -35,7 +35,7 @@ function bindMenuEvents(
 	})
 
 	openDirectory.addEventListener("click", async () => {
-		await dispatcher.dispatch("openDirectory", "menu")
+		await dispatcher.dispatch("openDirectoryByDialog", "menu")
 	})
 
 	save.addEventListener("click", async () => {
@@ -66,7 +66,7 @@ function bindShortcutEvents(
 ) {
 	shortcutRegistry.register("Ctrl+T", async () => await dispatcher.dispatch("newTab", "shortcut"))
 	shortcutRegistry.register("Ctrl+O", async () => await dispatcher.dispatch("openFile", "shortcut"))
-	shortcutRegistry.register("Ctrl+Shift+O", async () => await dispatcher.dispatch("openDirectory", "shortcut"))
+	shortcutRegistry.register("Ctrl+Shift+O", async () => await dispatcher.dispatch("openDirectoryByDialog", "shortcut"))
 	shortcutRegistry.register("Ctrl+S", async () => await dispatcher.dispatch("save", "shortcut"))
 	shortcutRegistry.register("Ctrl+Shift+S", async () => await dispatcher.dispatch("saveAs", "shortcut"))
 	shortcutRegistry.register("Ctrl+,", () => settingsFacade.openSettings())

@@ -107,7 +107,7 @@ function bindContainerClickEvent(dispatcher: Dispatcher, treeFacade: TreeFacade)
 			treeNode.classList.add(DOM.CLASS_SELECTED)
 
 			const viewModel = treeFacade.getTreeViewModelByPath(path)
-			if (viewModel.directory) await dispatcher.dispatch("openDirectory", "element", treeNode)
+			if (viewModel.directory) await dispatcher.dispatch("openDirectoryByTreeNode", "element", treeNode)
 			else await dispatcher.dispatch("openFile", "element", path)
 
 			treeFacade.setLastSelectedIndexByPath(path)

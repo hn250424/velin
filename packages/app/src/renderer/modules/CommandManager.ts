@@ -95,70 +95,49 @@ export class CommandManager {
 		}
 	}
 
-	async performOpenDirectory(treeNode?: HTMLElement) {
-		// New open when shortcut or file menu.
-		if (!treeNode) {
-			const openDirectoryResponse: Response<TreeDto> = await window.rendererToMain.openDirectory()
-			if (!openDirectoryResponse.data) return
+	async performOpenDirectoryByDialog() {
+		const openDirectoryResponse: Response<TreeDto> = await window.rendererToMain.openDirectory()
+		if (!openDirectoryResponse.data) return
 
-			// Close existing tab.
-			const tabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
-			const closeAllTabsResponse = await window.rendererToMain.closeAllTabs(tabEditorsDto)
-			if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data)
+		const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data)
+		this.treeFacade.render(responseViewModel)
+		this.treeFacade.setRootTreeViewModel(responseViewModel)
 
-			const responseViewModel = this.treeFacade.toTreeViewModel(openDirectoryResponse.data)
-			this.treeFacade.render(responseViewModel)
-			this.treeFacade.setRootTreeViewModel(responseViewModel)
+		// Cleanup previous tabs.
+		const tabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
+		const closeAllTabsResponse = await window.rendererToMain.closeAllTabs(tabEditorsDto)
+		if (closeAllTabsResponse.result) this.tabEditorFacade.removeAllTabs(closeAllTabsResponse.data)
+	}
 
-			return
-		}
-
-		// When click directory in tree area.
+	async performOpenDirectoryByTreeNode(treeNode: HTMLElement) {
 		const dirPath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 		const viewModel = this.treeFacade.getTreeViewModelByPath(dirPath)
-		const maybeChildren = treeNode.nextElementSibling
-		if (!maybeChildren || !maybeChildren.classList.contains(DOM.CLASS_TREE_NODE_CHILDREN)) return
 
-		const nodeType = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TYPE) as HTMLElement
-		const treeNodeChildren = maybeChildren as HTMLElement
+		const treeNodeChildren = treeNode.nextElementSibling as HTMLElement
+		const treeNodeType = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TYPE) as HTMLElement
 
-		if (viewModel.expanded) {
-			this._updateUI(nodeType, treeNodeChildren, viewModel, false)
-			this._syncFlattenTreeArray(viewModel, false)
-			return
-		}
+		const previousExpandedStatus = viewModel.expanded
+		if (!previousExpandedStatus) {
+			if (!viewModel.children?.length) {
+				const response: Response<TreeDto> = await window.rendererToMain.openDirectory(viewModel)
+				if (!response.data) return
 
-		if (viewModel.children && viewModel.children.length > 0) {
+				const newViewModel = this.treeFacade.toTreeViewModel(response.data)
+
+				viewModel.children = newViewModel.children
+				this.treeFacade.render(newViewModel, treeNodeChildren)
+			}
+
 			if (treeNodeChildren.children.length === 0) {
 				this.treeFacade.render(viewModel, treeNodeChildren)
 			}
-			this._updateUI(nodeType, treeNodeChildren, viewModel, true)
-			this._syncFlattenTreeArray(viewModel, true)
-			return
 		}
 
-		const response: Response<TreeDto> = await window.rendererToMain.openDirectory(viewModel)
-		if (!response.data) return
-
-		const responseTreeData = this.treeFacade.toTreeViewModel(response.data)
-
-		viewModel.children = responseTreeData.children
-		this.treeFacade.render(responseTreeData, treeNodeChildren)
-		this._updateUI(nodeType, treeNodeChildren, viewModel, true)
-		this._syncFlattenTreeArray(viewModel, true)
-	}
-
-	private _updateUI(nodeType: HTMLElement, children: HTMLElement, viewModel: TreeViewModel, expanded: boolean) {
-		viewModel.expanded = expanded
-
-		nodeType.innerHTML = expanded ? openedFolderSvg : closedFolderSvg
-
-		if (expanded) children.classList.add(DOM.CLASS_EXPANDED)
-		else children.classList.remove(DOM.CLASS_EXPANDED)
-	}
-
-	private _syncFlattenTreeArray(viewModel: TreeViewModel, expanded: boolean) {
-		if (expanded) this.treeFacade.insertChildNodes(viewModel)
+		const nextExpandedStatus = !previousExpandedStatus
+		viewModel.expanded = nextExpandedStatus
+		treeNodeType.innerHTML = nextExpandedStatus ? openedFolderSvg : closedFolderSvg
+		treeNodeChildren.classList.toggle(DOM.CLASS_EXPANDED, nextExpandedStatus)
+		if (nextExpandedStatus) this.treeFacade.insertChildNodes(viewModel)
 		else this.treeFacade.removeChildNodes(viewModel)
 	}
 
@@ -242,8 +221,7 @@ export class CommandManager {
 			idx = this.treeFacade.findParentDirectoryIndex(idx)
 			viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 		} else {
-			// if (!viewModel.expanded) await this.performOpenDirectory("programmatic", this.treeFacade.getTreeNodeByIndex(idx))
-			if (!viewModel.expanded) await this.performOpenDirectory(this.treeFacade.getTreeNodeByIndex(idx))
+			if (!viewModel.expanded) await this.performOpenDirectoryByTreeNode(this.treeFacade.getTreeNodeByIndex(idx))
 		}
 
 		let parentContainer: HTMLElement
@@ -701,7 +679,7 @@ export class CommandManager {
 
 			if (viewModel.directory) {
 				const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
-				await this.performOpenDirectory(treeNode)
+				await this.performOpenDirectoryByTreeNode(treeNode)
 			} else {
 				await this.performOpenFile(viewModel.path)
 			}

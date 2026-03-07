@@ -44,9 +44,14 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: [filePath?: string]
 		}
 	}
-	openDirectory: {
+	openDirectoryByDialog: {
 		default: {
-			default: [treeNode?: HTMLElement]
+			default: []
+		}
+	}
+	openDirectoryByTreeNode: {
+		default: {
+			default: [treeNode: HTMLElement]
 		}
 	}
 	save: {

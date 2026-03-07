@@ -45,7 +45,8 @@ export class Dispatcher {
 
 			newTab: { default: { default: async () => await this.commandManager.performNewTab() } },
 			openFile: { default: { default: (path) => this.commandManager.performOpenFile(path) } },
-			openDirectory: { default: { default: (node) => this.commandManager.performOpenDirectory(node) } },
+			openDirectoryByDialog: { default: { default: async () => await this.commandManager.performOpenDirectoryByDialog() } },
+			openDirectoryByTreeNode: { default: { default: async (node) => await this.commandManager.performOpenDirectoryByTreeNode(node) } },
 			save: { default: { default: async () => await this.commandManager.performSave() } },
 			saveAs: { default: { default: async () => await this.commandManager.performSaveAs() } },
 			saveAll: { default: { default: async () => await this.commandManager.performSaveAll() } },
