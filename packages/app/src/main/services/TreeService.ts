@@ -171,7 +171,7 @@ export default class TreeService {
 		await this.fileManager.deletePermanently(path)
 	}
 
-	async create(targetPath: string, directory: boolean) {
+	async create(targetPath: string, directory: boolean): Promise<Response<string>> {
 		const dir = path.dirname(targetPath)
 		const base = path.basename(targetPath)
 		const existingNames = new Set(await this.fileManager.readDir(dir))
@@ -179,7 +179,11 @@ export default class TreeService {
 		const uniqueName = res[0]
 		const uniquePath = path.join(dir, uniqueName)
 
-		await this.fileManager.create(uniquePath, directory)
+		const result = await this.fileManager.create(uniquePath, directory)
+		return {
+			result: result,
+			data: uniquePath
+		}
 	}
 
 	async syncTreeSessionFromRenderer(dto: TreeDto): Promise<boolean> {

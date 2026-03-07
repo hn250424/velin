@@ -14,7 +14,7 @@ export default interface IFileManager {
 	restoreFromTrash(trashMap: TrashMap[] | null): Promise<boolean>
 	cleanTrash(): Promise<void>
 	deletePermanently(path: string): Promise<void>
-	create(targetPath: string, directory: boolean): Promise<void>
+	create(targetPath: string, directory: boolean): Promise<boolean>
 	getUniqueFileNames(existingNames: Set<string>, fileNames: string[]): string[]
 	isBinaryContent(buffer: Buffer, sampleSize?: number): boolean
 }

@@ -63,7 +63,7 @@ export class TabEditorStore {
 	}
 
 	getTabEditorViewModelById(id: number) {
-		return this._idToTabEditorViewModel.get(id)
+		return this._idToTabEditorViewModel.get(id)!
 	}
 
 	setTabEditorViewModelById(id: number, viewModel: TabEditorViewModel) {

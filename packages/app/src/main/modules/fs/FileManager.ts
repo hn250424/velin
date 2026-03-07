@@ -127,13 +127,18 @@ export default class FileManager implements IFileManager {
 		await fs.promises.rm(path, { force: true, recursive: true })
 	}
 
-	async create(targetPath: string, directory: boolean): Promise<void> {
-		if (directory) {
-			await fs.promises.mkdir(targetPath, { recursive: true })
-		} else {
-			const dirName = path.dirname(targetPath)
-			await fs.promises.mkdir(dirName, { recursive: true })
-			await fs.promises.writeFile(targetPath, "")
+	async create(targetPath: string, directory: boolean): Promise<boolean> {
+		try {
+			if (directory) {
+				await fs.promises.mkdir(targetPath, { recursive: true })
+			} else {
+				const dirName = path.dirname(targetPath)
+				await fs.promises.mkdir(dirName, { recursive: true })
+				await fs.promises.writeFile(targetPath, "")
+			}
+			return true
+		} catch (e) {
+			return false
 		}
 	}
 

@@ -1,5 +1,6 @@
 import type { ICommand } from "./index"
 import { TabEditorFacade, TreeFacade } from "../modules"
+import type Response from "@shared/types/Response"
 
 export class CreateCommand implements ICommand {
 	private createdPath = ""
@@ -14,8 +15,11 @@ export class CreateCommand implements ICommand {
 	) {}
 
 	async execute() {
-		this.createdPath = window.utils.getJoinedPath(this.parentPath, this.name)
-		await window.rendererToMain.create(this.createdPath, this.isDirectory)
+		const requestPath = window.utils.getJoinedPath(this.parentPath, this.name)
+		const response: Response<string> = await window.rendererToMain.create(requestPath, this.isDirectory)
+		if (!response.result) return
+
+		this.createdPath = response.data
 
 		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
 		if (newTreeSession) {
@@ -38,10 +42,14 @@ export class CreateCommand implements ICommand {
 		}
 
 		if (this.openedTabId !== null) {
-			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)!
-			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)!
+			const tabEditorViewModel = this.tabEditorFacade.getTabEditorViewModelById(this.openedTabId)
+			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)
 			this.tabEditorFacade.removeTab(tabEditorView.getId())
 		}
+	}
+
+	getCreatedPath() {
+		return this.createdPath
 	}
 
 	setOpenedTabId(id: number) {

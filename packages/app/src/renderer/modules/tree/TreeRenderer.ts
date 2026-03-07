@@ -152,7 +152,7 @@ export class TreeRenderer {
 	}
 
 	getTreeWrapperByPath(path: string) {
-		return this._pathToTreeWrapper.get(path)
+		return this._pathToTreeWrapper.get(path)!
 	}
 
 	setTreeWrapperByPath(path: string, wrapper: HTMLElement) {

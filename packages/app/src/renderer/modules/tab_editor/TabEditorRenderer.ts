@@ -175,7 +175,7 @@ export class TabEditorRenderer {
 	}
 
 	getTabEditorViewByPath(path: string) {
-		return this._pathToTabEditorViewMap.get(path)
+		return this._pathToTabEditorViewMap.get(path)!
 	}
 
 	setTabEditorViewByPath(path: string, tabEditorVeiw: TabEditorView) {

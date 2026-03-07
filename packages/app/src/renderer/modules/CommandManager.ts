@@ -207,94 +207,112 @@ export class CommandManager {
 
 	//
 
-	async performCreate(directory: boolean) {
+	async performCreate(isDirectory: boolean) {
+		const parentInfo = await this._resolveParentDirectory()
+		if (!parentInfo) return
+
+		const { idx, viewModel, container } = parentInfo
+		if (!viewModel.expanded) await this.performOpenDirectoryByTreeNode(this.treeFacade.getTreeNodeByIndex(idx))
+
+		const name = await this._promptForName(container, isDirectory, viewModel.indent)
+		if (!name) return
+
+		const cmd = await this._executeCreation(viewModel.path, name, isDirectory)
+		const filePath  = cmd.getCreatedPath()
+
+		if (filePath) {
+			await this._selectTreeNodeAfterCreate(filePath)
+			if (!isDirectory) this._openTabEditorAfterCreate(filePath, cmd)
+		}
+	}
+
+	private async _resolveParentDirectory() {
 		let idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
 		let viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
 		if (!viewModel.directory) {
 			idx = this.treeFacade.findParentDirectoryIndex(idx)
 			viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-		} else {
-			if (!viewModel.expanded) await this.performOpenDirectoryByTreeNode(this.treeFacade.getTreeNodeByIndex(idx))
 		}
 
-		let parentContainer: HTMLElement
-		if (idx === 0) {
-			parentContainer = this.treeFacade.renderer.elements.treeNodeContainer
-		} else {
-			const parentWrapper = this.treeFacade.getTreeWrapperByIndex(idx)!
-			parentContainer = parentWrapper.querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
-		}
+		const container =
+			idx === 0
+				? this.treeFacade.renderer.elements.treeNodeContainer
+				: (this.treeFacade.getTreeWrapperByIndex(idx).querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement)
 
-		const { wrapper, input } = this.treeFacade.createInput(directory, viewModel.indent)
-		parentContainer.appendChild(wrapper)
-		input.focus()
+		return { idx, viewModel, container }
+	}
 
-		let alreadyFinished = false
+	private _promptForName(container: HTMLElement, isDirectory: boolean, indent: number): Promise<string | null> {
+		return new Promise((resolve) => {
+			const { wrapper, input } = this.treeFacade.createInput(isDirectory, indent)
+			let finished = false
 
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Enter") finalize()
-			else if (e.key === "Escape") cancel()
-		}
-		const onBlur = () => finalize()
+			const cleanup = () => {
+				if (finished) return
+				finished = true
+				input.removeEventListener("keydown", onKeyDown)
+				input.removeEventListener("blur", onBlur)
+				wrapper.remove()
+			}
 
-		input.addEventListener("keydown", onKeyDown)
-		input.addEventListener("blur", onBlur)
-
-		const finalize = async () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
-
-			input.removeEventListener("keydown", onKeyDown)
-			input.removeEventListener("blur", onBlur)
-
-			wrapper.remove()
-
-			const name = input.value.trim()
-			if (name) {
-				const cmd = new CreateCommand(this.treeFacade, this.tabEditorFacade, viewModel.path, name, directory)
-
-				try {
-					window.rendererToMain.setWatchSkipState(true)
-					await cmd.execute()
-					this.undoStack.push(cmd)
-					this.redoStack.length = 0
-
-					this.treeFacade.clearTreeSelected()
-
-					const filePath = window.utils.getJoinedPath(viewModel.path, name)
-
-					const createdIdx = this.treeFacade.getFlattenIndexByPath(filePath)!
-					this.treeFacade.addSelectedIndices(createdIdx)
-					this.treeFacade.lastSelectedIndex = createdIdx
-
-					const createdNode = this.treeFacade.getTreeNodeByIndex(createdIdx)
-					createdNode.classList.add(DOM.CLASS_FOCUSED)
-					createdNode.classList.add(DOM.CLASS_SELECTED)
-
-					if (!directory) {
-						await this.performOpenFile(filePath)
-						this.focusManager.setFocus("editor")
-						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!
-						cmd.setOpenedTabId(createdTabView.getId())
-					}
-				} catch (error) {
-					// intentionally empty
-				} finally {
-					await sleep(300)
-					window.rendererToMain.setWatchSkipState(false)
+			const onKeyDown = (e: KeyboardEvent) => {
+				if (e.key === "Enter") {
+					const value = input.value.trim()
+					cleanup()
+					resolve(value || null)
+				} else if (e.key === "Escape") {
+					cleanup()
+					resolve(null)
 				}
 			}
+
+			const onBlur = () => {
+				const value = input.value.trim()
+				cleanup()
+				resolve(value || null)
+			}
+
+			container.appendChild(wrapper)
+			input.addEventListener("keydown", onKeyDown)
+			input.addEventListener("blur", onBlur)
+			input.focus()
+			input.select()
+		})
+	}
+
+	private async _executeCreation(parentPath: string, name: string, isDirectory: boolean) {
+		const cmd = new CreateCommand(this.treeFacade, this.tabEditorFacade, parentPath, name, isDirectory)
+
+		try {
+			window.rendererToMain.setWatchSkipState(true)
+			await cmd.execute()
+			this.undoStack.push(cmd)
+			this.redoStack.length = 0
+		} catch (error) {
+			// intentionally empty
+		} finally {
+			await sleep(300)
+			window.rendererToMain.setWatchSkipState(false)
 		}
 
-		const cancel = () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
+		return cmd
+	}
 
-			input.removeEventListener("keydown", onKeyDown)
-			input.removeEventListener("blur", onBlur)
-			wrapper.remove()
-		}
+	async _selectTreeNodeAfterCreate(filePath: string) {
+		this.treeFacade.clearTreeSelected()
+		const idx = this.treeFacade.getFlattenIndexByPath(filePath)
+		this.treeFacade.addSelectedIndices(idx)
+		this.treeFacade.lastSelectedIndex = idx
+		const node = this.treeFacade.getTreeNodeByIndex(idx)
+		node.classList.add(DOM.CLASS_FOCUSED, DOM.CLASS_SELECTED)
+	}
+
+	async _openTabEditorAfterCreate(filePath: string, cmd: CreateCommand) {
+		await this.performOpenFile(filePath)
+		this.focusManager.setFocus("editor")
+		const tabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)
+		cmd.setOpenedTabId(tabView.getId())
 	}
 
 	async performRename() {
