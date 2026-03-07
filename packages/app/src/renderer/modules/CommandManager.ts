@@ -142,15 +142,15 @@ export class CommandManager {
 	}
 
 	async performSave() {
-		const data = this.tabEditorFacade.getActiveTabEditorDto()
-		if (!data.isModified) return
-		const response: Response<TabEditorDto> = await window.rendererToMain.save(data)
+		const dto = this.tabEditorFacade.getActiveTabEditorDto()
+		if (!dto.isModified) return
+		const response: Response<TabEditorDto> = await window.rendererToMain.save(dto)
 		if (response.result && !response.data.isModified) this.tabEditorFacade.applySaveResult(response.data)
 	}
 
 	async performSaveAs() {
-		const data: TabEditorDto = this.tabEditorFacade.getActiveTabEditorDto()
-		const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(data)
+		const dto: TabEditorDto = this.tabEditorFacade.getActiveTabEditorDto()
+		const response: Response<TabEditorDto> = await window.rendererToMain.saveAs(dto)
 		if (response.result && response.data) {
 			this.tabEditorFacade.applySaveResult(response.data)
 			await this.tabEditorFacade.addTab(
@@ -173,18 +173,14 @@ export class CommandManager {
 	//
 
 	async performCloseTab(id: number) {
-		const data = this.tabEditorFacade.getTabEditorDtoById(id)
-
-		const response: Response<void> = await window.rendererToMain.closeTab(data)
-		if (response.result) this.tabEditorFacade.removeTab(data.id)
-
+		const dto = this.tabEditorFacade.getTabEditorDtoById(id)
+		const response: Response<void> = await window.rendererToMain.closeTab(dto)
+		if (response.result) this.tabEditorFacade.removeTab(dto.id)
 		if (this.tabEditorFacade.activeTabId === -1) this.performCloseFindReplaceBox()
 	}
 
 	async performCloseOtherTabs() {
-		const tabEditorDtoToExclude: TabEditorDto = this.tabEditorFacade.getTabEditorDtoById(
-			this.tabEditorFacade.contextTabId
-		)
+		const tabEditorDtoToExclude = this.tabEditorFacade.getTabEditorDtoById(this.tabEditorFacade.contextTabId)
 		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
 		const response: Response<boolean[]> = await window.rendererToMain.closeOtherTabs(
 			tabEditorDtoToExclude,
@@ -194,9 +190,7 @@ export class CommandManager {
 	}
 
 	async performCloseTabsToRight() {
-		const tabEditorDtoAsReference: TabEditorDto = this.tabEditorFacade.getTabEditorDtoById(
-			this.tabEditorFacade.contextTabId
-		)
+		const tabEditorDtoAsReference = this.tabEditorFacade.getTabEditorDtoById(this.tabEditorFacade.contextTabId)
 		const tabEditorsDto: TabEditorsDto = this.tabEditorFacade.getTabEditorsDto()
 		const response: Response<boolean[]> = await window.rendererToMain.closeTabsToRight(
 			tabEditorDtoAsReference,
