@@ -10,6 +10,7 @@ import { TabEditorView } from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
 import { DI, DOM } from "@renderer/constants"
 import type { TabEditorElements } from "./TabEditorElements"
+import { debounce } from "@renderer/utils"
 
 @injectable()
 export class TabEditorRenderer {
@@ -19,7 +20,24 @@ export class TabEditorRenderer {
 	private _ghostTab: HTMLElement | null = null
 	private _indicator: HTMLElement | null = null
 
+	public onSearch!: () => void
+
 	constructor(@inject(DI.TabEditorElements) readonly elements: TabEditorElements) {}
+
+	//
+
+	public init(actions: {
+		onSearch: () => void
+		// onFindNext?: () => void
+		// onReplaceAll?: (find: string, replace: string) => void
+	}) {
+		this.elements.findInput.addEventListener(
+			"input",
+			debounce((e) => {
+				actions.onSearch()
+			}, 300)
+		)
+	}
 
 	//
 

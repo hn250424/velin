@@ -1,24 +1,22 @@
 import { inject, injectable } from "inversify"
 
 import type Response from "@shared/types/Response"
-import type { TreeViewModel } from "../viewmodels/TreeViewModel"
-import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
 import type { TreeDto } from "@shared/dto/TreeDto"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+
+import type { ICommand } from "../commands/"
+import type { TreeViewModel } from "../viewmodels/TreeViewModel"
+import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
+
+import { DI, DOM } from "../constants"
 
 import closedFolderSvg from "../assets/icons/closed_folder.svg?raw"
 import openedFolderSvg from "../assets/icons/opened_folder.svg?raw"
 
-import { DI, DOM } from "../constants"
-
 import { FocusManager } from "../core"
-
 import { TabEditorFacade, TreeFacade, SettingsFacade } from "./index"
-
-import type { ICommand } from "../commands/"
 import { CreateCommand, DeleteCommand, PasteCommand, RenameCommand } from "../commands"
 
-import { debounce } from "../utils/debounce"
 import { sleep } from "../utils/sleep"
 
 @injectable()
@@ -31,14 +29,7 @@ export class CommandManager {
 		@inject(DI.SettingsFacade) private readonly settingsFacade: SettingsFacade,
 		@inject(DI.TabEditorFacade) private readonly tabEditorFacade: TabEditorFacade,
 		@inject(DI.TreeFacade) private readonly treeFacade: TreeFacade
-	) {
-		this.tabEditorFacade.findInput.addEventListener(
-			"input",
-			debounce(() => {
-				this.performFind(this.tabEditorFacade.findDirection)
-			}, 300)
-		)
-	}
+	) {}
 
 	//
 
@@ -310,7 +301,6 @@ export class CommandManager {
 					createdNode.classList.add(DOM.CLASS_SELECTED)
 
 					if (!directory) {
-						// await this.performOpenFile("programmatic", filePath)
 						await this.performOpenFile(filePath)
 						this.focusManager.setFocus("editor")
 						const createdTabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)!

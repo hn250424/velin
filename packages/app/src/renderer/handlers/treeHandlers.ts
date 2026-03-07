@@ -226,9 +226,7 @@ function bindMousedownEventsForDrag(emitter: EventEmitter, treeFacade: TreeFacad
 		if (count === 0) {
 			const target = e.target as HTMLElement
 			const node = target.closest(DOM.SELECTOR_TREE_NODE) as HTMLElement
-			console.log('리턴 전')
 			if (!node) return
-			console.log('리턴 후')
 
 			const path = node.dataset[DOM.DATASET_ATTR_TREE_PATH]!
 			const idx = treeFacade.getFlattenIndexByPath(path)!

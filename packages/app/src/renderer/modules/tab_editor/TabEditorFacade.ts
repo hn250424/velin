@@ -24,7 +24,17 @@ export class TabEditorFacade {
 		@inject(DI.TabEditorStore) public readonly store: TabEditorStore,
 		@inject(DI.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
 		@inject(DI.TabDragManager) public readonly drag: TabDragManager
-	) {}
+	) {
+		this._init()
+	}
+
+	//
+
+	private _init() {
+		this.renderer.init({
+			onSearch: () => this.findAndSelect(this.findDirection)
+		})
+	}
 
 	// store
 
