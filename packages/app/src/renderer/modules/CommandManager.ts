@@ -315,99 +315,119 @@ export class CommandManager {
 		cmd.setOpenedTabId(tabView.getId())
 	}
 
+	//
+
 	async performRename() {
-		const focus = this.focusManager.getFocus()
-		if (focus !== "tree") return
+    const focus = this.focusManager.getFocus()
+    if (focus !== "tree") return
 
-		const lastSelectedIndex = this.treeFacade.lastSelectedIndex
-		const treeNode = this.treeFacade.getTreeNodeByIndex(lastSelectedIndex)
-		const treeSpan = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TEXT)
-		if (!treeSpan) return
+    const targetInfo = this._resolveRenameTarget()
+    if (!targetInfo) return
 
-		const treeInput = document.createElement("input")
-		treeInput.type = "text"
-		treeInput.value = treeSpan.textContent ?? ""
-		treeInput.classList.add(DOM.CLASS_TREE_NODE_INPUT)
+    const { treeNode, oldPath, isDirectory } = targetInfo
 
-		treeNode.classList.remove(DOM.CLASS_FOCUSED)
-		treeNode.replaceChild(treeInput, treeSpan)
-		treeInput.focus()
+    const newName = await this._promptForRename(treeNode)
+    if (!newName) return
 
-		// Except ext name.
-		const fileName = treeInput.value
-		const lastDotIndex = fileName.lastIndexOf(".")
-		if (lastDotIndex > 0) {
-			treeInput.setSelectionRange(0, lastDotIndex)
-		} else {
-			treeInput.select()
-		}
+    const dir = window.utils.getDirName(oldPath)
+    const newPath = window.utils.getJoinedPath(dir, newName)
 
-		let alreadyFinished = false
+    if (oldPath === newPath) {
+      this._restoreTreeSpan(treeNode, newPath)
+      return
+    }
 
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Enter") finishRename()
-			else if (e.key === "Escape") cancelRename()
-		}
-		const onBlur = () => finishRename()
+    await this._executeRename(treeNode, isDirectory, oldPath, newPath)
+  }
 
-		treeInput.addEventListener("keydown", onKeyDown)
-		treeInput.addEventListener("blur", onBlur)
+  private _resolveRenameTarget() {
+    const treeNode = this.treeFacade.getTreeNodeByIndex(this.treeFacade.lastSelectedIndex)
+		const oldPath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
+    const viewModel = this.treeFacade.getTreeViewModelByPath(oldPath)
+		return { treeNode, oldPath, isDirectory: viewModel.directory }
+  }
 
-		const finishRename = async () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
+  private _promptForRename(treeNode: HTMLElement): Promise<string | null> {
+    return new Promise((resolve) => {
+			const treeNodeSpan = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TEXT) as HTMLElement
 
-			treeInput.removeEventListener("keydown", onKeyDown)
-			treeInput.removeEventListener("blur", onBlur)
+      const treeNodeInput = document.createElement("input")
+      treeNodeInput.type = "text"
+      treeNodeInput.value = treeNodeSpan.textContent ?? ""
+      treeNodeInput.classList.add(DOM.CLASS_TREE_NODE_INPUT)
 
-			const prePath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
-			const newName = treeInput.value.trim()
-			const dir = window.utils.getDirName(prePath)
-			const newPath = window.utils.getJoinedPath(dir, newName)
+      treeNode.classList.remove(DOM.CLASS_FOCUSED)
+      treeNode.replaceChild(treeNodeInput, treeNodeSpan)
+      treeNodeInput.focus()
 
-			// Skip unique name generation for unchanged rename (unlike create or paste)
-			if (prePath === newPath) {
-				const restoreSpan = document.createElement("span")
-				restoreSpan.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
-				restoreSpan.textContent = window.utils.getBaseName(newPath)
-				treeNode.replaceChild(restoreSpan, treeInput)
-				return
-			}
+      const lastDotIndex = treeNodeInput.value.lastIndexOf(".")
+      if (lastDotIndex > 0) treeNodeInput.setSelectionRange(0, lastDotIndex)
+      else treeNodeInput.select()
 
-			const viewModel = this.treeFacade.getTreeViewModelByPath(treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!)
+      let finished = false
 
-			const cmd = new RenameCommand(
-				this.treeFacade,
-				this.tabEditorFacade,
-				treeNode,
-				viewModel.directory,
-				prePath,
-				newPath
-			)
+      const cleanup = () => {
+        if (finished) return
+        finished = true
+        treeNodeInput.removeEventListener("keydown", onKeyDown)
+        treeNodeInput.removeEventListener("blur", onBlur)
+      }
 
-			try {
-				window.rendererToMain.setWatchSkipState(true)
-				await cmd.execute()
-				this.undoStack.push(cmd)
-				this.redoStack.length = 0
-			} catch {
-				treeNode.replaceChild(treeSpan, treeInput)
-			} finally {
-				await sleep(300)
-				window.rendererToMain.setWatchSkipState(false)
-			}
-		}
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          const val = treeNodeInput.value.trim()
+          cleanup()
+          resolve(val || null)
+        } else if (e.key === "Escape") {
+          cleanup()
+          treeNode.replaceChild(treeNodeSpan, treeNodeInput) // 원복
+          resolve(null)
+        }
+      }
 
-		const cancelRename = () => {
-			if (alreadyFinished) return
-			alreadyFinished = true
+      const onBlur = () => {
+        const val = treeNodeInput.value.trim()
+        cleanup()
+        resolve(val || null)
+      }
 
-			treeInput.removeEventListener("keydown", onKeyDown)
-			treeInput.removeEventListener("blur", onBlur)
+      treeNodeInput.addEventListener("keydown", onKeyDown)
+      treeNodeInput.addEventListener("blur", onBlur)
+    })
+  }
 
-			treeNode.replaceChild(treeSpan, treeInput)
-		}
-	}
+  private async _executeRename(treeNode: HTMLElement, isDirectory: boolean, prePath: string, newPath: string) {
+    const cmd = new RenameCommand(
+      this.treeFacade,
+      this.tabEditorFacade,
+      treeNode,
+      isDirectory,
+      prePath,
+      newPath
+    )
+
+    try {
+      window.rendererToMain.setWatchSkipState(true)
+      await cmd.execute()
+      this.undoStack.push(cmd)
+      this.redoStack.length = 0
+    } catch (error) {
+      // intentionally empty
+    } finally {
+      await sleep(300)
+      window.rendererToMain.setWatchSkipState(false)
+    }
+  }
+
+  private _restoreTreeSpan(treeNode: HTMLElement, path: string) {
+    const treeNodeInput = treeNode.querySelector(`.${DOM.CLASS_TREE_NODE_INPUT}`) as HTMLElement
+    const restoreSpan = document.createElement("span")
+    restoreSpan.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
+    restoreSpan.textContent = window.utils.getBaseName(path)
+    treeNode.replaceChild(restoreSpan, treeNodeInput)
+  }
+
+	//
 
 	async performDelete() {
 		const focus = this.focusManager.getFocus()
