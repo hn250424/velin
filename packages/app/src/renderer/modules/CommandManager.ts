@@ -474,7 +474,7 @@ export class CommandManager {
 		const selectedIndices = this.treeFacade.getSelectedIndices()
 
 		for (const idx of selectedIndices) {
-			this.treeFacade.getTreeWrapperByIndex(idx)!.classList.add(DOM.CLASS_CUT)
+			this.treeFacade.getTreeWrapperByIndex(idx).classList.add(DOM.CLASS_CUT)
 			this.treeFacade.addClipboardPaths(this.treeFacade.getTreeViewModelByIndex(idx).path)
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 
@@ -493,8 +493,6 @@ export class CommandManager {
 				}
 			}
 		}
-
-		return
 	}
 
 	async performCopyEditor() {
@@ -574,9 +572,9 @@ export class CommandManager {
 	private async performPasteTree(targetIndex: number) {
 		if (targetIndex === -1) return
 
-		let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex!)
+		let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
 		if (!targetViewModel.directory) {
-			targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex!)
+			targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex)
 			targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
 		}
 
@@ -606,8 +604,6 @@ export class CommandManager {
 			await sleep(300)
 			window.rendererToMain.setWatchSkipState(false)
 		}
-
-		return
 	}
 
 	//
