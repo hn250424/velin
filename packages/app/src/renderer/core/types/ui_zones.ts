@@ -35,7 +35,7 @@ export const UI_ZONES = {
 		id: "find-replace-container",
     dom: DOM.SELECTOR_FIND_REPLACE_CONTAINER,
     outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.FIND_REPLACE_CONTAINER,
-		task: "editor",
+		task: "find-replace",
   },
   MENU_ITEM: {
 		id: "menu-item",

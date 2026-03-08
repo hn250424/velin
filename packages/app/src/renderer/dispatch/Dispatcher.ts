@@ -24,15 +24,19 @@ export class Dispatcher {
 
 			undo: {
 				editor: {
-					shortcut: () => { /* intentional no-op */ },
-					default: async () => await this.commandManager.performUndoEditor(),
+					shortcut: () => {
+						/* intentional no-op */
+					},
+					default: async () => this.commandManager.performUndoEditor(),
 				},
 				tree: { default: async () => await this.commandManager.performUndoTree() },
 			},
 			redo: {
 				editor: {
-					shortcut: () => { /* intentional no-op */ },
-					default: async () => await this.commandManager.performRedoEditor(),
+					shortcut: () => {
+						/* intentional no-op */
+					},
+					default: async () => this.commandManager.performRedoEditor(),
 				},
 				tree: { default: async () => await this.commandManager.performRedoTree() },
 			},
@@ -41,8 +45,12 @@ export class Dispatcher {
 
 			newTab: { default: { default: async () => await this.commandManager.performNewTab() } },
 			openFile: { default: { default: (path) => this.commandManager.performOpenFile(path) } },
-			openDirectoryByDialog: { default: { default: async () => await this.commandManager.performOpenDirectoryByDialog() } },
-			openDirectoryByTreeNode: { default: { default: async (node) => await this.commandManager.performOpenDirectoryByTreeNode(node) } },
+			openDirectoryByDialog: {
+				default: { default: async () => await this.commandManager.performOpenDirectoryByDialog() },
+			},
+			openDirectoryByTreeNode: {
+				default: { default: async (node) => await this.commandManager.performOpenDirectoryByTreeNode(node) },
+			},
 			save: { default: { default: async () => await this.commandManager.performSave() } },
 			saveAs: { default: { default: async () => await this.commandManager.performSaveAs() } },
 			saveAll: { default: { default: async () => await this.commandManager.performSaveAll() } },
@@ -92,22 +100,24 @@ export class Dispatcher {
 
 			cut: {
 				editor: {
-					shortcut: async () => await this.commandManager.performCutEditor(),
-					default: async () => await this.commandManager.performCutEditorManual(),
+					shortcut: async () => this.commandManager.performCutEditor(),
+					menu: async () => await this.commandManager.performCutEditorManual(),
 				},
-				tree: { default: async () => await this.commandManager.performCutTree() },
+				tree: { default: async () => this.commandManager.performCutTree() },
 			},
 			copy: {
 				editor: {
-					shortcut: () => { /* intentional no-op */ },
-					default: async () => await this.commandManager.performCopyEditor(),
+					shortcut: () => {
+						/* intentional no-op */
+					},
+					menu: async () => await this.commandManager.performCopyEditor(),
 				},
-				tree: { default: async () => await this.commandManager.performCopyTree() },
+				tree: { default: async () => this.commandManager.performCopyTree() },
 			},
 			paste: {
 				editor: {
-					shortcut: async () => await this.commandManager.performPasteEditor(),
-					default: async () => await this.commandManager.performPasteEditorManual(),
+					shortcut: async () => this.commandManager.performPasteEditor(),
+					menu: async () => await this.commandManager.performPasteEditorManual(),
 				},
 				tree: {
 					"context-menu": async () => await this.commandManager.performPasteTreeWithContextmenu(),
@@ -130,17 +140,17 @@ export class Dispatcher {
 			},
 			replace: {
 				default: {
-					default: async () => await this.commandManager.performReplace(),
+					default: async () => this.commandManager.performReplace(),
 				},
 			},
 			replaceAll: {
 				default: {
-					default: async () => await this.commandManager.performReplaceAll(),
+					default: async () => this.commandManager.performReplaceAll(),
 				},
 			},
 			closeFindReplace: {
 				default: {
-					default: async () => await this.commandManager.performCloseFindReplaceBox(),
+					default: async () => this.commandManager.performCloseFindReplaceBox(),
 				},
 			},
 
@@ -148,7 +158,7 @@ export class Dispatcher {
 
 			applySettings: {
 				none: {
-					default: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel),
+					programmatic: (viewModel: SettingsViewModel) => this.commandManager.performApplySettings(viewModel),
 				},
 			},
 			applyAndSaveSettings: {
@@ -160,13 +170,19 @@ export class Dispatcher {
 			//
 
 			esc: {
-				default: {
-					default: async () => await this.commandManager.performESC(),
+				"find-replace": {
+					shortcut: async () => this.commandManager.performCloseFindReplaceBox(),
+				},
+				editor: {
+					shortcut: async () => this.commandManager.performCloseFindReplaceBox(),
 				},
 			},
 			enter: {
-				default: {
-					default: async () => await this.commandManager.performENTER(),
+				"find-replace": {
+					shortcut: async () => this.commandManager.performFindOrReplaceByActiveElement(),
+				},
+				tree: {
+					shortcut: async () => await this.commandManager.performOpenFileOrDirectoryByLastSelectedIndex(),
 				},
 			},
 		}
@@ -174,9 +190,6 @@ export class Dispatcher {
 
 	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: GetArgs<E>) {
 		const task = this.focusManager.getFocusedTask()
-
-		console.log("current zone: ", this.focusManager.getFocusedZone())
-		console.log("current task: ", this.focusManager.getFocusedTask())
 
 		const eventNode = this._handlers[event]
 		assert(eventNode, `Missing event: ${event}`)

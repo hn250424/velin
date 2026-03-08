@@ -175,7 +175,7 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 
 	applySettings: {
 		none: {
-			default: [viewModel: SettingsViewModel]
+			programmatic: [viewModel: SettingsViewModel]
 		}
 	}
 	applyAndSaveSettings: {
@@ -187,13 +187,19 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 	//
 
 	esc: {
-		default: {
-			default: []
+		"find-replace": {
+			shortcut: []
+		}
+		"editor": {
+			shortcut: []
 		}
 	}
 	enter: {
-		default: {
-			default: []
+		"find-replace": {
+			shortcut: []
+		}
+		tree: {
+			shortcut: []
 		}
 	}
 }>

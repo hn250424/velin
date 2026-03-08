@@ -140,6 +140,26 @@ export class CommandManager {
 		else this.treeFacade.removeChildNodes(viewModel)
 	}
 
+	//
+
+	async performOpenFileOrDirectoryByLastSelectedIndex() {
+		const idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
+		const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
+
+		if (viewModel.directory) {
+			const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
+			await this.performOpenDirectoryByTreeNode(treeNode)
+		} else {
+			await this.performOpenFile(viewModel.path)
+		}
+
+		// Re-focus the tree node to reclaim focus lost to the editor during the opening process.
+		const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
+		treeNode.focus()
+	}
+
+	//
+
 	async performSave() {
 		const dto = this.tabEditorFacade.getActiveTabEditorDto()
 		if (!dto.isModified) return
@@ -217,7 +237,7 @@ export class CommandManager {
 		if (!name) return
 
 		const cmd = await this._executeCreation(viewModel.path, name, isDirectory)
-		const filePath  = cmd.getCreatedPath()
+		const filePath = cmd.getCreatedPath()
 
 		if (filePath) {
 			await this._selectTreeNodeAfterCreate(filePath)
@@ -317,114 +337,107 @@ export class CommandManager {
 	//
 
 	async performRename() {
-    const focus = this.focusManager.getFocusedTask()
-    if (focus !== "tree") return
+		const focus = this.focusManager.getFocusedTask()
+		if (focus !== "tree") return
 
-    const targetInfo = this._resolveRenameTarget()
-    if (!targetInfo) return
+		const targetInfo = this._resolveRenameTarget()
+		if (!targetInfo) return
 
-    const { treeNode, oldPath, isDirectory } = targetInfo
+		const { treeNode, oldPath, isDirectory } = targetInfo
 
-    const newName = await this._promptForRename(treeNode)
-    if (!newName) return
+		const newName = await this._promptForRename(treeNode)
+		if (!newName) return
 
-    const dir = window.utils.getDirName(oldPath)
-    const newPath = window.utils.getJoinedPath(dir, newName)
+		const dir = window.utils.getDirName(oldPath)
+		const newPath = window.utils.getJoinedPath(dir, newName)
 
-    if (oldPath === newPath) {
-      this._restoreTreeSpan(treeNode, newPath)
-      return
-    }
+		if (oldPath === newPath) {
+			this._restoreTreeSpan(treeNode, newPath)
+			return
+		}
 
-    await this._executeRename(treeNode, isDirectory, oldPath, newPath)
-  }
+		await this._executeRename(treeNode, isDirectory, oldPath, newPath)
+	}
 
-  private _resolveRenameTarget() {
-    const treeNode = this.treeFacade.getTreeNodeByIndex(this.treeFacade.lastSelectedIndex)
+	private _resolveRenameTarget() {
+		const treeNode = this.treeFacade.getTreeNodeByIndex(this.treeFacade.lastSelectedIndex)
 		const oldPath = treeNode.dataset[DOM.DATASET_ATTR_TREE_PATH]!
-    const viewModel = this.treeFacade.getTreeViewModelByPath(oldPath)
+		const viewModel = this.treeFacade.getTreeViewModelByPath(oldPath)
 		return { treeNode, oldPath, isDirectory: viewModel.directory }
-  }
+	}
 
-  private _promptForRename(treeNode: HTMLElement): Promise<string | null> {
-    return new Promise((resolve) => {
+	private _promptForRename(treeNode: HTMLElement): Promise<string | null> {
+		return new Promise((resolve) => {
 			const treeNodeSpan = treeNode.querySelector(DOM.SELECTOR_TREE_NODE_TEXT) as HTMLElement
 
-      const treeNodeInput = document.createElement("input")
-      treeNodeInput.type = "text"
-      treeNodeInput.value = treeNodeSpan.textContent ?? ""
-      treeNodeInput.classList.add(DOM.CLASS_TREE_NODE_INPUT)
+			const treeNodeInput = document.createElement("input")
+			treeNodeInput.type = "text"
+			treeNodeInput.value = treeNodeSpan.textContent ?? ""
+			treeNodeInput.classList.add(DOM.CLASS_TREE_NODE_INPUT)
 
-      treeNode.classList.remove(DOM.CLASS_FOCUSED)
-      treeNode.replaceChild(treeNodeInput, treeNodeSpan)
-      treeNodeInput.focus()
+			treeNode.classList.remove(DOM.CLASS_FOCUSED)
+			treeNode.replaceChild(treeNodeInput, treeNodeSpan)
+			treeNodeInput.focus()
 
-      const lastDotIndex = treeNodeInput.value.lastIndexOf(".")
-      if (lastDotIndex > 0) treeNodeInput.setSelectionRange(0, lastDotIndex)
-      else treeNodeInput.select()
+			const lastDotIndex = treeNodeInput.value.lastIndexOf(".")
+			if (lastDotIndex > 0) treeNodeInput.setSelectionRange(0, lastDotIndex)
+			else treeNodeInput.select()
 
-      let finished = false
+			let finished = false
 
-      const cleanup = () => {
-        if (finished) return
-        finished = true
-        treeNodeInput.removeEventListener("keydown", onKeyDown)
-        treeNodeInput.removeEventListener("blur", onBlur)
-      }
+			const cleanup = () => {
+				if (finished) return
+				finished = true
+				treeNodeInput.removeEventListener("keydown", onKeyDown)
+				treeNodeInput.removeEventListener("blur", onBlur)
+			}
 
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Enter") {
-          const val = treeNodeInput.value.trim()
-          cleanup()
-          resolve(val || null)
-        } else if (e.key === "Escape") {
-          cleanup()
-          treeNode.replaceChild(treeNodeSpan, treeNodeInput) // 원복
-          resolve(null)
-        }
-      }
+			const onKeyDown = (e: KeyboardEvent) => {
+				if (e.key === "Enter") {
+					const val = treeNodeInput.value.trim()
+					cleanup()
+					resolve(val || null)
+				} else if (e.key === "Escape") {
+					cleanup()
+					treeNode.replaceChild(treeNodeSpan, treeNodeInput) // 원복
+					resolve(null)
+				}
+			}
 
-      const onBlur = () => {
-        const val = treeNodeInput.value.trim()
-        cleanup()
-        resolve(val || null)
-      }
+			const onBlur = () => {
+				const val = treeNodeInput.value.trim()
+				cleanup()
+				resolve(val || null)
+			}
 
-      treeNodeInput.addEventListener("keydown", onKeyDown)
-      treeNodeInput.addEventListener("blur", onBlur)
-    })
-  }
+			treeNodeInput.addEventListener("keydown", onKeyDown)
+			treeNodeInput.addEventListener("blur", onBlur)
+		})
+	}
 
-  private async _executeRename(treeNode: HTMLElement, isDirectory: boolean, prePath: string, newPath: string) {
-    const cmd = new RenameCommand(
-      this.treeFacade,
-      this.tabEditorFacade,
-      treeNode,
-      isDirectory,
-      prePath,
-      newPath
-    )
+	private async _executeRename(treeNode: HTMLElement, isDirectory: boolean, prePath: string, newPath: string) {
+		const cmd = new RenameCommand(this.treeFacade, this.tabEditorFacade, treeNode, isDirectory, prePath, newPath)
 
-    try {
-      window.rendererToMain.setWatchSkipState(true)
-      await cmd.execute()
-      this.undoStack.push(cmd)
-      this.redoStack.length = 0
-    } catch (error) {
-      // intentionally empty
-    } finally {
-      await sleep(300)
-      window.rendererToMain.setWatchSkipState(false)
-    }
-  }
+		try {
+			window.rendererToMain.setWatchSkipState(true)
+			await cmd.execute()
+			this.undoStack.push(cmd)
+			this.redoStack.length = 0
+		} catch (error) {
+			// intentionally empty
+		} finally {
+			await sleep(300)
+			window.rendererToMain.setWatchSkipState(false)
+		}
+	}
 
-  private _restoreTreeSpan(treeNode: HTMLElement, path: string) {
-    const treeNodeInput = treeNode.querySelector(`.${DOM.CLASS_TREE_NODE_INPUT}`) as HTMLElement
-    const restoreSpan = document.createElement("span")
-    restoreSpan.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
-    restoreSpan.textContent = window.utils.getBaseName(path)
-    treeNode.replaceChild(restoreSpan, treeNodeInput)
-  }
+	private _restoreTreeSpan(treeNode: HTMLElement, path: string) {
+		const treeNodeInput = treeNode.querySelector(`.${DOM.CLASS_TREE_NODE_INPUT}`) as HTMLElement
+		const restoreSpan = document.createElement("span")
+		restoreSpan.classList.add(DOM.CLASS_TREE_NODE_TEXT, "ellipsis")
+		restoreSpan.textContent = window.utils.getBaseName(path)
+		treeNode.replaceChild(restoreSpan, treeNodeInput)
+	}
 
 	//
 
@@ -552,20 +565,20 @@ export class CommandManager {
 
 	async performPasteTreeWithContextmenu() {
 		const targetIndex = this.treeFacade.contextTreeIndex
-		await this.performPasteTree(targetIndex)
+		await this._performPasteTree(targetIndex)
 	}
 
 	async performPasteTreeWithShortcut() {
 		const targetIndex = this.treeFacade.lastSelectedIndex
-		await this.performPasteTree(targetIndex)
+		await this._performPasteTree(targetIndex)
 	}
 
 	async performPasteTreeWithDrag() {
 		const targetIndex = this.treeFacade.selectedDragIndex
-		await this.performPasteTree(targetIndex)
+		await this._performPasteTree(targetIndex)
 	}
 
-	private async performPasteTree(targetIndex: number) {
+	private async _performPasteTree(targetIndex: number) {
 		if (targetIndex === -1) return
 
 		let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
@@ -607,9 +620,6 @@ export class CommandManager {
 	toggleFindReplaceBox(showReplace: boolean) {
 		if (this.tabEditorFacade.activeTabId === -1) return
 
-		this.focusManager.setFocusedZone("find-replace-container")
-		this.focusManager.setFocusedTask("editor")
-
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "flex"
 		this.tabEditorFacade.replaceBox.style.display = showReplace ? "flex" : "none"
 		this.tabEditorFacade.findReplaceOpen = true
@@ -636,9 +646,6 @@ export class CommandManager {
 	}
 
 	performReplaceAll() {
-		const focus = this.focusManager.getFocusedTask()
-		if (focus !== "editor") return
-
 		const findInput = this.tabEditorFacade.findInput.value
 		const replaceInput = this.tabEditorFacade.replaceInput.value
 
@@ -647,14 +654,26 @@ export class CommandManager {
 	}
 
 	performCloseFindReplaceBox() {
-		this.focusManager.setFocusedZone("none")
-		this.focusManager.setFocusedTask("none")
+		if (!this.tabEditorFacade.findReplaceOpen) return
+
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "none"
 
 		const activeView = this.tabEditorFacade.getActiveTabEditorView()
 		if (activeView) activeView.clearSearch()
 
 		this.tabEditorFacade.findReplaceOpen = false
+	}
+
+	//
+
+	performFindOrReplaceByActiveElement() {
+		const activateElement = document.activeElement
+
+		if (activateElement === this.tabEditorFacade.findInput) {
+			this.performFind(this.tabEditorFacade.findDirection)
+		} else if (activateElement === this.tabEditorFacade.replaceInput) {
+			this.performReplace()
+		}
 	}
 
 	//
@@ -672,49 +691,5 @@ export class CommandManager {
 		this.performApplySettings(viewModel)
 		const settingsDto = this.settingsFacade.toSettingsDto(this.settingsFacade.getDraftSettings())
 		await window.rendererToMain.syncSettingsSessionFromRenderer(settingsDto)
-	}
-
-	//
-
-	async performESC() {
-		const zone = this.focusManager.getFocusedZone()
-
-		if (zone === "editor-container" || zone === "find-replace-container") {
-			this.performCloseFindReplaceBox()
-		}
-	}
-
-	async performENTER() {
-		const zone = this.focusManager.getFocusedZone()
-
-		if (zone === "find-replace-container") {
-			const activateElement = document.activeElement
-
-			if (activateElement === this.tabEditorFacade.findInput) {
-				this.performFind(this.tabEditorFacade.findDirection)
-			} else if (activateElement === this.tabEditorFacade.replaceInput) {
-				this.performReplace()
-			}
-
-			return
-		}
-
-		if (zone === "side") {
-			const idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
-			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
-
-			if (viewModel.directory) {
-				const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
-				await this.performOpenDirectoryByTreeNode(treeNode)
-			} else {
-				await this.performOpenFile(viewModel.path)
-			}
-
-			// Re-focus the tree node to reclaim focus lost to the editor during the opening process.
-			const treeNode = this.treeFacade.getTreeNodeByIndex(idx)
-			treeNode.focus()
-
-			return
-		}
 	}
 }
