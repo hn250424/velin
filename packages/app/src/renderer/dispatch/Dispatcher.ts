@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify"
-import type { Focus } from "../core"
+import type { Task } from "../core"
 import { FocusManager } from "../core"
 import { DI } from "../constants/id"
 import { CommandManager } from "../modules"
@@ -11,7 +11,7 @@ import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 export class Dispatcher {
 	private readonly _handlers: {
 		[E in keyof DispatchEventsWithArgs]: Partial<
-			Record<Focus | "default", Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>>
+			Record<Task | "default", Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>>
 		>
 	}
 
@@ -24,18 +24,14 @@ export class Dispatcher {
 
 			undo: {
 				editor: {
-					shortcut: () => {
-						/* intentional no-op */
-					},
+					shortcut: () => { /* intentional no-op */ },
 					default: async () => await this.commandManager.performUndoEditor(),
 				},
 				tree: { default: async () => await this.commandManager.performUndoTree() },
 			},
 			redo: {
 				editor: {
-					shortcut: () => {
-						/* intentional no-op */
-					},
+					shortcut: () => { /* intentional no-op */ },
 					default: async () => await this.commandManager.performRedoEditor(),
 				},
 				tree: { default: async () => await this.commandManager.performRedoTree() },
@@ -59,17 +55,17 @@ export class Dispatcher {
 				},
 			},
 			closeOtherTabs: {
-				default: {
+				tab: {
 					default: () => this.commandManager.performCloseOtherTabs(),
 				},
 			},
 			closeTabsToRight: {
-				default: {
+				tab: {
 					default: () => this.commandManager.performCloseTabsToRight(),
 				},
 			},
 			closeAllTabs: {
-				default: {
+				tab: {
 					default: () => this.commandManager.performCloseAllTabs(),
 				},
 			},
@@ -77,17 +73,17 @@ export class Dispatcher {
 			//
 
 			create: {
-				default: {
+				tree: {
 					default: (directory: boolean) => this.commandManager.performCreate(directory),
 				},
 			},
 			rename: {
-				default: {
+				tree: {
 					default: async () => await this.commandManager.performRename(),
 				},
 			},
 			delete: {
-				default: {
+				tree: {
 					default: async () => await this.commandManager.performDelete(),
 				},
 			},
@@ -103,9 +99,7 @@ export class Dispatcher {
 			},
 			copy: {
 				editor: {
-					shortcut: () => {
-						/* intentional no-op */
-					},
+					shortcut: () => { /* intentional no-op */ },
 					default: async () => await this.commandManager.performCopyEditor(),
 				},
 				tree: { default: async () => await this.commandManager.performCopyTree() },
@@ -179,16 +173,19 @@ export class Dispatcher {
 	}
 
 	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: GetArgs<E>) {
-		const focus = this.focusManager.getFocus()
+		const task = this.focusManager.getFocusedTask()
+
+		console.log("current zone: ", this.focusManager.getFocusedZone())
+		console.log("current task: ", this.focusManager.getFocusedTask())
 
 		const eventNode = this._handlers[event]
 		assert(eventNode, `Missing event: ${event}`)
 
-		const focusNode = eventNode[focus] || eventNode["default"]
-		assert(focusNode, `Missing focus node: ${event} > ${focus}`)
+		const taskNode = eventNode[task] || eventNode["default"]
+		assert(taskNode, `Missing task node: ${event} > ${task}`)
 
-		const handler = focusNode[source] || focusNode["default"]
-		assert(handler, `Missing handler: ${event} > ${focus} > ${source}`)
+		const handler = taskNode[source] || taskNode["default"]
+		assert(handler, `Missing handler: ${event} > ${task} > ${source}`)
 
 		await handler(...args)
 	}

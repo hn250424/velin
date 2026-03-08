@@ -1,30 +1,24 @@
 import { injectable } from "inversify"
-import type { Focus } from "./types/Focus"
-import { SELECTOR_EDITOR_CONTAINER, SELECTOR_FIND_REPLACE_CONTAINER, SELECTOR_TREE } from "@renderer/constants/dom"
+import type { Zone, Task } from "./types"
 
 @injectable()
 export class FocusManager {
-	private focusedTarget: Focus = "none"
+	private focusedZone: Zone = "none"
+	private focusedTask: Task = "none"
 
-	setFocus(focusedTarget: Focus) {
-		this.focusedTarget = focusedTarget
+	setFocusedZone(zone: Zone) {
+		this.focusedZone = zone
 	}
 
-	getFocus() {
-		return this.focusedTarget
+	getFocusedZone() {
+		return this.focusedZone
 	}
 
-	trackRelevantFocus(target: HTMLElement) {
-		if (target.closest(SELECTOR_FIND_REPLACE_CONTAINER)) {
-			this.setFocus("find-replace")
-		}
+	setFocusedTask(task: Task) {
+		this.focusedTask = task
+	}
 
-		else if (target.closest(SELECTOR_EDITOR_CONTAINER)) {
-			this.setFocus("editor")
-		}
-
-		else if (target.closest(SELECTOR_TREE)) {
-			this.setFocus("tree")
-		}
+	getFocusedTask() {
+		return this.focusedTask
 	}
 }

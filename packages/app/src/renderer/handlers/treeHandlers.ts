@@ -185,13 +185,13 @@ function bindShortcutEvents(
 //
 
 function moveUpFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
-	if (focusManager.getFocus() !== "tree") return
+	if (focusManager.getFocusedTask() !== "tree") return
 	if (treeFacade.lastSelectedIndex <= 0) return
 	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, -1)
 }
 
 function moveDownFocus(e: KeyboardEvent, focusManager: FocusManager, treeFacade: TreeFacade) {
-	if (focusManager.getFocus() !== "tree") return
+	if (focusManager.getFocusedTask() !== "tree") return
 	if (treeFacade.lastSelectedIndex >= treeFacade.flattenTree.length - 1) return
 	_moveFocus(e, treeFacade, treeFacade.lastSelectedIndex, 1)
 }

@@ -1,9 +1,9 @@
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
-import type { Focus } from "../../core"
-import type { Source } from "."
+import type { Task } from "../../core"
+import type { Source } from "./index"
 
 type DispatchEventSchema = {
-	[F in Focus | "default"]?: {
+	[T in Task | "default"]?: {
 		[S in Source | "default"]?: any[]
 	}
 }
@@ -78,17 +78,17 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 		}
 	}
 	closeOtherTabs: {
-		default: {
+		tab: {
 			default: []
 		}
 	}
 	closeTabsToRight: {
-		default: {
+		tab: {
 			default: []
 		}
 	}
 	closeAllTabs: {
-		default: {
+		tab: {
 			default: []
 		}
 	}
@@ -96,17 +96,17 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 	//
 
 	create: {
-		default: {
+		tree: {
 			default: [directory: boolean]
 		}
 	}
 	rename: {
-		default: {
+		tree: {
 			default: []
 		}
 	}
 	delete: {
-		default: {
+		tree: {
 			default: []
 		}
 	}

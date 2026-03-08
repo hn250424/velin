@@ -5,7 +5,6 @@ import type { TreeDto } from "@shared/dto/TreeDto"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 
 import type { ICommand } from "../commands/"
-import type { TreeViewModel } from "../viewmodels/TreeViewModel"
 import type { SettingsViewModel } from "../viewmodels/SettingsViewModel"
 
 import { DI, DOM } from "../constants"
@@ -310,7 +309,7 @@ export class CommandManager {
 
 	async _openTabEditorAfterCreate(filePath: string, cmd: CreateCommand) {
 		await this.performOpenFile(filePath)
-		this.focusManager.setFocus("editor")
+		this.focusManager.setFocusedTask("editor")
 		const tabView = this.tabEditorFacade.getTabEditorViewByPath(filePath)
 		cmd.setOpenedTabId(tabView.getId())
 	}
@@ -318,7 +317,7 @@ export class CommandManager {
 	//
 
 	async performRename() {
-    const focus = this.focusManager.getFocus()
+    const focus = this.focusManager.getFocusedTask()
     if (focus !== "tree") return
 
     const targetInfo = this._resolveRenameTarget()
@@ -430,9 +429,6 @@ export class CommandManager {
 	//
 
 	async performDelete() {
-		const focus = this.focusManager.getFocus()
-		if (focus !== "tree") return
-
 		const selectedIndices = this.treeFacade.getSelectedIndices()
 
 		const cmd = new DeleteCommand(this.treeFacade, this.tabEditorFacade, selectedIndices)
@@ -611,7 +607,8 @@ export class CommandManager {
 	toggleFindReplaceBox(showReplace: boolean) {
 		if (this.tabEditorFacade.activeTabId === -1) return
 
-		this.focusManager.setFocus("find-replace")
+		this.focusManager.setFocusedZone("find-replace-container")
+		this.focusManager.setFocusedTask("editor")
 
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "flex"
 		this.tabEditorFacade.replaceBox.style.display = showReplace ? "flex" : "none"
@@ -639,8 +636,8 @@ export class CommandManager {
 	}
 
 	performReplaceAll() {
-		const focus = this.focusManager.getFocus()
-		if (focus !== "find-replace") return
+		const focus = this.focusManager.getFocusedTask()
+		if (focus !== "editor") return
 
 		const findInput = this.tabEditorFacade.findInput.value
 		const replaceInput = this.tabEditorFacade.replaceInput.value
@@ -650,7 +647,8 @@ export class CommandManager {
 	}
 
 	performCloseFindReplaceBox() {
-		this.focusManager.setFocus("none")
+		this.focusManager.setFocusedZone("none")
+		this.focusManager.setFocusedTask("none")
 		this.tabEditorFacade.findAndReplaceContainer.style.display = "none"
 
 		const activeView = this.tabEditorFacade.getActiveTabEditorView()
@@ -679,17 +677,17 @@ export class CommandManager {
 	//
 
 	async performESC() {
-		const focus = this.focusManager.getFocus()
+		const zone = this.focusManager.getFocusedZone()
 
-		if (focus === "editor" || focus === "find-replace") {
+		if (zone === "editor-container" || zone === "find-replace-container") {
 			this.performCloseFindReplaceBox()
 		}
 	}
 
 	async performENTER() {
-		const focus = this.focusManager.getFocus()
+		const zone = this.focusManager.getFocusedZone()
 
-		if (focus === "find-replace") {
+		if (zone === "find-replace-container") {
 			const activateElement = document.activeElement
 
 			if (activateElement === this.tabEditorFacade.findInput) {
@@ -701,7 +699,7 @@ export class CommandManager {
 			return
 		}
 
-		if (focus === "tree") {
+		if (zone === "side") {
 			const idx = Math.max(this.treeFacade.lastSelectedIndex, 0)
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 

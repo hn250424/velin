@@ -1,5 +1,5 @@
-import { DOM, CUSTOM_EVENTS } from "@renderer/constants"
-import { FocusManager, ShortcutRegistry } from "@renderer/core"
+import { CUSTOM_EVENTS } from "@renderer/constants"
+import { FocusManager, ShortcutRegistry, UI_ZONES_VALUES } from "@renderer/core"
 import type { Dispatcher } from "@renderer/dispatch"
 import { EventEmitter } from "events"
 
@@ -27,31 +27,19 @@ export function handleGlobalInput(
 
 //
 
-const OUT_EVENT_RULES = [
-	{ inZone: DOM.SELECTOR_EDITOR_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.EDITOR_CONTAINER },
-	{ inZone: DOM.SELECTOR_SIDE, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.SIDE },
-	{ inZone: DOM.SELECTOR_TAB_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TAB_CONTAINER },
-	{ inZone: DOM.SELECTOR_TREE_CONTEXT_MENU, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TREE_CONTEXTMENU },
-	{ inZone: DOM.SELECTOR_TAB_CONTEXT_MENU, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.TAB_CONTEXTMENU },
-	{ inZone: DOM.SELECTOR_FIND_REPLACE_CONTAINER, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.FIND_REPLACE_CONTAINER },
-	{ inZone: DOM.SELECTOR_MENU_ITEM, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.MENU_ITEM },
-	{ inZone: DOM.SELECTOR_WINDOW, outEvent: CUSTOM_EVENTS.MOUSE_DOWN.OUT.WINDOW },
-]
-
 function bindDocumentMousedownEvnet(focusManager: FocusManager, emitter: EventEmitter) {
 	document.addEventListener("mousedown", (e) => {
 		const target = e.target as HTMLElement
-		focusManager.trackRelevantFocus(target)
 
-		let activeItem = null
-		for (const item of OUT_EVENT_RULES) {
-			if (target.closest(item.inZone)) {
-				activeItem = item
-				break
-			}
+		const activeItem = UI_ZONES_VALUES.find(item => target.closest(item.dom))
+		if (activeItem) {
+			focusManager.setFocusedZone(activeItem.id)
+
+			// Keep the previous task if the current zone has no specific task.
+			if (activeItem.task !== "") focusManager.setFocusedTask(activeItem.task)
 		}
 
-		OUT_EVENT_RULES.forEach((item) => {
+		UI_ZONES_VALUES.forEach((item) => {
 			if (item !== activeItem) {
 				emitter.emit(item.outEvent, e)
 			}
