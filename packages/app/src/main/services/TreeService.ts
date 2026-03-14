@@ -88,13 +88,21 @@ export default class TreeService {
 	async paste(targetDto: TreeDto, selectedDtos: TreeDto[], clipboardMode: ClipboardMode): Promise<Response<string[]>> {
 		const copiedPaths: string[] = []
 		const cutPaths: string[] = []
-		const originalNames = selectedDtos.map((dto) => dto.name)
 		const targetDir = targetDto.path
+
+		const targetsToProcess =
+			clipboardMode === "cut" ? selectedDtos.filter((dto) => path.dirname(dto.path) !== targetDir) : selectedDtos
+
+		if (targetsToProcess.length === 0) {
+			return { result: true, data: [] }
+		}
+
+		const originalNames = targetsToProcess.map((dto) => dto.name)
 		const existingNames = new Set(await this.fileManager.readDir(targetDir))
 		const uniqueNames = this.fileManager.getUniqueFileNames(existingNames, originalNames)
 
 		try {
-			for (const [index, dto] of selectedDtos.entries()) {
+			for (const [index, dto] of targetsToProcess.entries()) {
 				const oldPath = dto.path
 				const uniqueName = uniqueNames[index]
 				const newPath = path.join(targetDir, uniqueName)
@@ -116,9 +124,7 @@ export default class TreeService {
 			}
 
 			if (clipboardMode === "cut") {
-				for (const p of cutPaths) {
-					await this.fileManager.deletePermanently(p)
-				}
+				await Promise.all(cutPaths.map((p) => this.fileManager.deletePermanently(p)))
 			}
 
 			return {
@@ -126,13 +132,10 @@ export default class TreeService {
 				data: copiedPaths,
 			}
 		} catch (err) {
-			for (const p of copiedPaths) {
-				try {
-					await this.fileManager.deletePermanently(p)
-				} catch (deleteErr) {
-					console.error("Rollback failed to delete:", p, deleteErr)
-				}
+			if (copiedPaths.length > 0) {
+				await Promise.allSettled(copiedPaths.map((p) => this.fileManager.deletePermanently(p)))
 			}
+			
 			return {
 				result: false,
 				data: [],
@@ -182,7 +185,7 @@ export default class TreeService {
 		const result = await this.fileManager.create(uniquePath, directory)
 		return {
 			result: result,
-			data: uniquePath
+			data: uniquePath,
 		}
 	}
 
