@@ -133,6 +133,16 @@ export class Dispatcher {
 					default: (replace) => this.commandManager.toggleFindReplaceBox(replace),
 				},
 			},
+			searchQueryChanged: {
+				default: {
+					menu: (query: string) => this.commandManager.performSearchQueryChanged(query),
+				},
+			},
+			replaceQueryChanged: {
+				default: {
+					menu: (query: string) => this.commandManager.performReplaceQueryChanged(query),
+				},
+			},
 			find: {
 				default: {
 					default: (direction: "up" | "down") => this.commandManager.performFind(direction),

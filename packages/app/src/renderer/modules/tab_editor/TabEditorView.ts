@@ -221,7 +221,7 @@ export class TabEditorView {
 
 	//
 
-	findMatches(searchText: string): SearchMatch[] {
+	findAllMatches(searchText: string): SearchMatch[] {
 		const view = this._editor!.ctx.get(editorViewCtx)
 		const { doc } = view.state
 
@@ -249,8 +249,59 @@ export class TabEditorView {
 		return matches
 	}
 
-	updateSearchState(state: SearchState) {
+	updateSearchState(state: SearchState | null) {
 		this._searchState = state
+	}
+
+	searchNextMatch(query: string, direction: "up" | "down"): number {
+		const matches = this.findAllMatches(query)
+		if (!matches.length) {
+			this.clearSearch()
+			return -1
+		}
+
+		const view = this._editor!.ctx.get(editorViewCtx)
+		const state = view.state
+		const currentPos = state.selection.from
+
+		let targetIndex = -1
+
+		if (direction === "down") {
+			targetIndex = matches.findIndex((match) => match.from > currentPos)
+			if (targetIndex === -1) targetIndex = 0
+		} else {
+			for (let i = matches.length - 1; i >= 0; i--) {
+				if (matches[i].to <= currentPos) {
+					targetIndex = i
+					break
+				}
+			}
+			if (targetIndex === -1) targetIndex = matches.length - 1
+		}
+
+		this.updateSearchState({
+			query,
+			matches,
+			currentIndex: targetIndex,
+		})
+
+		this.focusCurrentMatch()
+		return targetIndex
+	}
+
+	focusCurrentMatch() {
+		if (!this._searchState) return
+
+		const { matches, currentIndex } = this._searchState
+
+		const view = this._editor!.ctx.get(editorViewCtx)
+		const state = view.state
+
+		const match = matches[currentIndex]
+		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to))
+		view.dispatch(tr)
+
+		this.applySearchHighlight(view)
 	}
 
 	applySearchHighlight(view: EditorView) {
@@ -286,7 +337,7 @@ export class TabEditorView {
 		view.updateState(newState)
 	}
 
-	replaceCurrent(searchText: string, replaceText: string): boolean {
+	replaceCurrentMatch(replaceText: string): boolean {
 		if (!this._searchState) return false
 
 		const { matches, currentIndex } = this._searchState
@@ -312,7 +363,7 @@ export class TabEditorView {
 		return replaced
 	}
 
-	replaceAll(searchText: string, replaceText: string): number {
+	replaceAllMatches(searchText: string, replaceText: string): number {
 		if (!searchText) return 0
 
 		let replacedCount = 0
@@ -320,22 +371,21 @@ export class TabEditorView {
 		this._editor!.action((ctx) => {
 			const view = ctx.get(editorViewCtx)
 			const state = view.state
-			const parser = ctx.get(parserCtx)
-			const serializer = ctx.get(serializerCtx)
-			const content = serializer(state.doc)
-			const regex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")
-			const newContent = content.replace(regex, () => {
+			
+			const matches = this.findAllMatches(searchText)
+			if (!matches.length) return
+			
+			let tr = state.tr
+			
+			// Replace backwards to avoid shifting positional indices for upcoming matches
+			for (let i = matches.length - 1; i >= 0; i--) {
+				const { from, to } = matches[i]
+				tr = tr.replaceWith(from, to, state.schema.text(replaceText))
 				replacedCount++
-				return replaceText
-			})
+			}
 
-			if (newContent !== content) {
-				const newDoc = parser(newContent)
-				if (newDoc) {
-					const tr = state.tr.replaceWith(0, state.doc.content.size, newDoc.content)
-					view.dispatch(tr)
-				}
-
+			if (replacedCount > 0) {
+				view.dispatch(tr)
 				this.markAsModified()
 			}
 		})

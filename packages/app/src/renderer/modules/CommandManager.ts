@@ -630,27 +630,35 @@ export class CommandManager {
 		this.performFind(this.tabEditorFacade.findDirection)
 	}
 
+	performSearchQueryChanged(query: string) {
+		this.tabEditorFacade.searchQuery = query
+		this.performFind(this.tabEditorFacade.findDirection)
+	}
+
+	performReplaceQueryChanged(query: string) {
+		this.tabEditorFacade.replaceQuery = query
+	}
+
 	performFind(direction: "up" | "down") {
-		this.tabEditorFacade.findAndSelect(direction)
+		this.tabEditorFacade.findNextMatch(direction)
 	}
 
 	performReplace() {
-		const findInput = this.tabEditorFacade.findInput.value
-		const replaceInput = this.tabEditorFacade.replaceInput.value
+		const replaceInput = this.tabEditorFacade.replaceQuery
 		const view = this.tabEditorFacade.getActiveTabEditorView()
 
-		const replaced = view.replaceCurrent(findInput, replaceInput)
+		const replaced = view.replaceCurrentMatch(replaceInput)
 		if (!replaced) return
 
-		this.tabEditorFacade.findAndSelect()
+		this.tabEditorFacade.findNextMatch()
 	}
 
 	performReplaceAll() {
-		const findInput = this.tabEditorFacade.findInput.value
-		const replaceInput = this.tabEditorFacade.replaceInput.value
+		const findInput = this.tabEditorFacade.searchQuery
+		const replaceInput = this.tabEditorFacade.replaceQuery
 
 		const view = this.tabEditorFacade.getActiveTabEditorView()
-		view.replaceAll(findInput, replaceInput)
+		view.replaceAllMatches(findInput, replaceInput)
 	}
 
 	performCloseFindReplaceBox() {

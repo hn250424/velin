@@ -150,6 +150,16 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			default: [replace: boolean]
 		}
 	}
+	searchQueryChanged: {
+		default: {
+			menu: [query: string]
+		}
+	}
+	replaceQueryChanged: {
+		default: {
+			menu: [query: string]
+		}
+	}
 	find: {
 		default: {
 			default: [direction: "up" | "down"]

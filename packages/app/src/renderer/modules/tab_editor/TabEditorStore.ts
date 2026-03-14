@@ -13,6 +13,9 @@ export class TabEditorStore {
 	private _findReplaceOpen = false
 	private _findDirection: "up" | "down" = "down"
 
+	private _searchQuery = ""
+	private _replaceQuery = ""
+
 	//
 
 	toTabEditorViewModel(dto: TabEditorDto): TabEditorViewModel {
@@ -90,5 +93,21 @@ export class TabEditorStore {
 
 	set findDirection(direction: "up" | "down") {
 		this._findDirection = direction
+	}
+
+	get searchQuery() {
+		return this._searchQuery
+	}
+
+	set searchQuery(query: string) {
+		this._searchQuery = query
+	}
+
+	get replaceQuery() {
+		return this._replaceQuery
+	}
+
+	set replaceQuery(query: string) {
+		this._replaceQuery = query
 	}
 }

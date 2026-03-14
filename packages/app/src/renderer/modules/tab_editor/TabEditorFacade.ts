@@ -3,8 +3,6 @@ import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
 import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel"
 
 import { inject, injectable } from "inversify"
-import { editorViewCtx } from "@milkdown/kit/core"
-import { TextSelection } from "prosemirror-state"
 
 import { DI } from "../../constants/id"
 import { DATASET_ATTR_TAB_ID, EXIT_TEXT } from "../../constants/dom"
@@ -24,17 +22,9 @@ export class TabEditorFacade {
 		@inject(DI.TabEditorStore) public readonly store: TabEditorStore,
 		@inject(DI.TabEditorRenderer) public readonly renderer: TabEditorRenderer,
 		@inject(DI.TabDragManager) public readonly drag: TabDragManager
-	) {
-		this._init()
-	}
+	) {}
 
 	//
-
-	private _init() {
-		this.renderer.init({
-			onSearch: () => this.findAndSelect(this.findDirection)
-		})
-	}
 
 	// store
 
@@ -98,6 +88,22 @@ export class TabEditorFacade {
 
 	set findDirection(direction: "up" | "down") {
 		this.store.findDirection = direction
+	}
+
+	get searchQuery() {
+		return this.store.searchQuery
+	}
+
+	set searchQuery(query: string) {
+		this.store.searchQuery = query
+	}
+
+	get replaceQuery() {
+		return this.store.replaceQuery
+	}
+
+	set replaceQuery(query: string) {
+		this.store.replaceQuery = query
 	}
 
 	// renderer
@@ -201,10 +207,6 @@ export class TabEditorFacade {
 
 	get findInput() {
 		return this.renderer.findInput
-	}
-
-	get searchText() {
-		return this.findInput.value
 	}
 
 	get replaceInput() {
@@ -687,50 +689,21 @@ export class TabEditorFacade {
 
 	// TODO
 
-	findAndSelect(direction: "up" | "down" = this.findDirection) {
+	findNextMatch(direction: "up" | "down" = this.findDirection) {
 		const tabEditorView = this.getActiveTabEditorView()
-		const searchText = this.searchText
+		const searchText = this.searchQuery
 
-		const view = tabEditorView.editor!.ctx.get(editorViewCtx)
-		const state = view.state
-		const currentPos = state.selection.from
-
-		const matches = tabEditorView.findMatches(searchText)
-		if (!matches.length) {
+		if (!searchText) {
 			tabEditorView.clearSearch()
 			this.findInfo.textContent = `No results`
-			return null
+			return
 		}
 
-		let targetIndex = -1
+		const targetIndex = tabEditorView.searchNextMatch(searchText, direction)
+		const matchesCount = tabEditorView.searchState?.matches.length || 0
 
-		if (direction === "down") {
-			targetIndex = matches.findIndex((match) => match.from > currentPos)
-			if (targetIndex === -1) targetIndex = 0
-		} else {
-			for (let i = matches.length - 1; i >= 0; i--) {
-				if (matches[i].to <= currentPos) {
-					targetIndex = i
-					break
-				}
-			}
-			if (targetIndex === -1) targetIndex = matches.length - 1
-		}
-
-		tabEditorView.updateSearchState({
-			query: searchText,
-			matches: matches,
-			currentIndex: targetIndex,
-		})
-
-		const match = matches[targetIndex]
-		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to))
-		view.dispatch(tr)
-
-		tabEditorView.applySearchHighlight(view)
-
-		if (matches.length >= 1) {
-			this.findInfo.textContent = `${targetIndex + 1} of ${matches.length}`
+		if (targetIndex !== -1 && matchesCount > 0) {
+			this.findInfo.textContent = `${targetIndex + 1} of ${matchesCount}`
 		} else {
 			this.findInfo.textContent = `No results`
 		}
@@ -738,29 +711,23 @@ export class TabEditorFacade {
 		this.findDirection = direction
 	}
 
-	restoreSearchResult(tabEditorView: TabEditorView) {
-		if (!tabEditorView.searchState) return
+	focusCurrentMatch(tabEditorView: TabEditorView) {
+		tabEditorView.focusCurrentMatch()
 
-		const { matches, currentIndex } = tabEditorView.searchState
-
-		const view = tabEditorView.editor!.ctx.get(editorViewCtx)
-		const state = view.state
-
-		const match = matches[currentIndex]
-		const tr = state.tr.setSelection(TextSelection.create(state.doc, match.from, match.to))
-		view.dispatch(tr)
-
-		tabEditorView.applySearchHighlight(view)
-
-		this.findInfo.textContent = `${currentIndex + 1} of ${matches.length}`
+		const state = tabEditorView.searchState
+		if (state && state.matches.length > 0) {
+			this.findInfo.textContent = `${state.currentIndex + 1} of ${state.matches.length}`
+		} else {
+			this.findInfo.textContent = `No results`
+		}
 	}
 
 	private _processFindAndSelect(view: TabEditorView) {
-		if (this.findReplaceOpen && this.searchText) {
-			if (view.searchState?.query === this.searchText) {
-				this.restoreSearchResult(view)
+		if (this.findReplaceOpen && this.searchQuery) {
+			if (view.searchState?.query === this.searchQuery) {
+				this.focusCurrentMatch(view)
 			} else {
-				this.findAndSelect()
+				this.findNextMatch()
 			}
 		}
 	}

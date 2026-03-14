@@ -5,6 +5,7 @@ import { ShortcutRegistry } from "../core"
 import { TabEditorFacade } from "../modules"
 import { Dispatcher } from "@renderer/dispatch"
 import { EventEmitter } from "events"
+import { debounce } from "@renderer/utils"
 
 export function handleTabEditor(
 	dispatcher: Dispatcher,
@@ -89,7 +90,7 @@ function bindContextmenuClickEvents(dispatcher: Dispatcher, tabEditorFacade: Tab
 //
 
 function bindFindReplaceEvnets(dispatcher: Dispatcher, tabEditorFacade: TabEditorFacade) {
-	const { findUp, findDown, replaceCurrent, replaceAll, closeFindReplace } = tabEditorFacade.renderer.elements
+	const { findUp, findDown, replaceCurrent, replaceAll, closeFindReplace, findInput, replaceInput } = tabEditorFacade.renderer.elements
 
 	findUp.addEventListener("click", async () => {
 		await dispatcher.dispatch("find", "menu", "up")
@@ -110,6 +111,22 @@ function bindFindReplaceEvnets(dispatcher: Dispatcher, tabEditorFacade: TabEdito
 	closeFindReplace.addEventListener("click", async () => {
 		await dispatcher.dispatch("closeFindReplace", "menu")
 	})
+
+	findInput.addEventListener(
+		"input",
+		debounce(async (e: Event) => {
+			const value = (e.target as HTMLInputElement).value
+			await dispatcher.dispatch("searchQueryChanged", "menu", value)
+		}, 300)
+	)
+
+	replaceInput.addEventListener(
+		"input",
+		async (e: Event) => {
+			const value = (e.target as HTMLInputElement).value
+			await dispatcher.dispatch("replaceQueryChanged", "menu", value)
+		}
+	)
 }
 
 //
