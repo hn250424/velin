@@ -30,7 +30,17 @@ export function handleTree(
 }
 
 function bindMousedownEvents(emitter: EventEmitter, treeFacade: TreeFacade) {
-	treeFacade.renderer.elements.treeNodeContainer.addEventListener("mousedown", (e) => {
+	const {
+		treeNodeContainer,
+		treeTop,
+	} = treeFacade.renderer.elements
+
+	treeNodeContainer.addEventListener("mousedown", (e) => {
+		treeFacade.blur(treeFacade.lastSelectedIndex)
+		treeFacade.blur(treeFacade.contextTreeIndex)
+	})
+
+	treeTop.addEventListener("mousedown", (e) => {
 		treeFacade.blur(treeFacade.lastSelectedIndex)
 		treeFacade.blur(treeFacade.contextTreeIndex)
 	})
