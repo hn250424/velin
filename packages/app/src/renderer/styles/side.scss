@@ -5,6 +5,7 @@ $risizer-size: 3px;
 	display: flex;
 	flex-shrink: 0;
 	user-select: none;
+	position: relative;
 }
 
 #view-menu-file-tree.selected {
@@ -26,6 +27,10 @@ $risizer-size: 3px;
 }
 
 #side-resizer {
+	position: absolute;
+	top: 0;
+	right: calc(-1 * $risizer-size / 2);
+	z-index: 100;
 	width: $risizer-size;
 	height: 100%;
 	cursor: ew-resize;
