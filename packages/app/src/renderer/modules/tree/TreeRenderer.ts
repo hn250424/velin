@@ -108,7 +108,7 @@ export class TreeRenderer {
 
 		const node = document.createElement("div")
 		node.classList.add("tree-node-temp")
-		node.style.paddingLeft = `${indent * 16}px`
+		node.style.paddingLeft = `${4 + indent * 16}px`
 
 		const wrapper = document.createElement("div")
 		wrapper.classList.add(DOM.CLASS_TREE_NODE_WRAPPER)

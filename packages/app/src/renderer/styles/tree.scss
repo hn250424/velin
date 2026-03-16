@@ -97,7 +97,9 @@ $tree-top-min-height: 25px;
 
 .tree-node > input,
 .tree-node-temp > input {
-	border: 1px solid var(--tree-node-focused);
+	border: none;
+	outline: 1px solid var(--tree-node-focused);
+	margin-left: 1px;
 }
 
 .tree-node.focused {
