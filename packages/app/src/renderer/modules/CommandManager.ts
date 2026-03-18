@@ -254,10 +254,14 @@ export class CommandManager {
 			viewModel = this.treeFacade.getTreeViewModelByIndex(idx)
 		}
 
+		// If idx is 0 (the root directory), we use the wrapper mapped in TreeRenderer.
+		// TreeRenderer maps the root path to simpleBar.getContentElement().
+		// Using treeNodeContainer directly would append the input outside SimpleBar's scrollable content.
+		const wrapper = this.treeFacade.getTreeWrapperByIndex(idx)
 		const container =
 			idx === 0
-				? this.treeFacade.renderer.elements.treeNodeContainer
-				: (this.treeFacade.getTreeWrapperByIndex(idx).querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement)
+				? wrapper
+				: (wrapper.querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement)
 
 		return { idx, viewModel, container }
 	}
