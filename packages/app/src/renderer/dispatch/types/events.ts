@@ -200,7 +200,10 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 		"find-replace": {
 			shortcut: []
 		}
-		"editor": {
+		editor: {
+			shortcut: []
+		}
+		default: {
 			shortcut: []
 		}
 	}
@@ -209,6 +212,9 @@ export type DispatchEventsWithArgs = EnforceSchema<{
 			shortcut: []
 		}
 		tree: {
+			shortcut: []
+		}
+		default: {
 			shortcut: []
 		}
 	}

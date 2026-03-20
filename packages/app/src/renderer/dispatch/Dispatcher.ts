@@ -186,6 +186,9 @@ export class Dispatcher {
 				editor: {
 					shortcut: async () => this.commandManager.performCloseFindReplaceBox(),
 				},
+				default: {
+          shortcut: () => { /* intentional no-op */ }
+        }
 			},
 			enter: {
 				"find-replace": {
@@ -194,6 +197,9 @@ export class Dispatcher {
 				tree: {
 					shortcut: async () => await this.commandManager.performOpenFileOrDirectoryByLastSelectedIndex(),
 				},
+				default: {
+          shortcut: () => { /* intentional no-op */ }
+        }
 			},
 		}
 	}
