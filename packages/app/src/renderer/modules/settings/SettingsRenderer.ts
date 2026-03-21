@@ -33,8 +33,9 @@ export class SettingsRenderer {
 		this.elements.fontFamilyInput.value = fontViewModel.family.toString()
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	private _renderSettingTheme(themeViewModel: SettingThemeViewModel) {}
+	private _renderSettingTheme(themeViewModel: SettingThemeViewModel) {
+		this.elements.themeSelect.value = themeViewModel.theme
+	}
 
 	//
 
@@ -47,6 +48,12 @@ export class SettingsRenderer {
 	onChangeFontFamily(callback: (family: string) => void) {
 		this.elements.fontFamilyInput.addEventListener("change", () => {
 			callback(this.elements.fontFamilyInput.value)
+		})
+	}
+
+	onChangeTheme(callback: (theme: string) => void) {
+		this.elements.themeSelect.addEventListener("change", () => {
+			callback(this.elements.themeSelect.value)
 		})
 	}
 }

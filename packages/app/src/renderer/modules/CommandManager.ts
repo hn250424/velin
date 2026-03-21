@@ -692,9 +692,16 @@ export class CommandManager {
 
 	performApplySettings(viewModel: SettingsViewModel) {
 		const font = viewModel.settingFontViewModel
+		const theme = viewModel.settingThemeViewModel.theme
 
 		font.size && this.tabEditorFacade.changeFontSize(font.size)
 		font.family && this.tabEditorFacade.changeFontFamily(font.family)
+
+		if (theme) {
+			const html = document.documentElement
+			html.classList.remove("light", "solarized", "slate")
+			html.classList.add(theme)
+		}
 
 		this.settingsFacade.applyChangeSet()
 	}

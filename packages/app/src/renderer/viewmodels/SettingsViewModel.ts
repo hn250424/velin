@@ -8,5 +8,6 @@ export interface SettingFontViewModel {
 	family: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SettingThemeViewModel {}
+export interface SettingThemeViewModel {
+	theme: string
+}

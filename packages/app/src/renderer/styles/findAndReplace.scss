@@ -46,8 +46,8 @@ $info-horizontal-padding: 4px;
 	margin: 0 $button-horizontal-margin;
 }
 
-#find > button:hover,
-#replace > button:hover {
+#find button:hover,
+#replace button:hover {
 	background-color: var(--find-replace-button-hover);
 }
 

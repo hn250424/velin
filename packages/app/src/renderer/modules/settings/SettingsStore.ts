@@ -19,7 +19,9 @@ export class SettingsStore {
 				family: "sans-serif",
 			},
 
-			settingThemeViewModel: {},
+			settingThemeViewModel: {
+				theme: "light",
+			},
 		}
 
 		this._draftSettings = JSON.parse(JSON.stringify(this._currentSettings))
@@ -60,8 +62,10 @@ export class SettingsStore {
 			fontViewModel.family ?? this._currentSettings.settingFontViewModel.family
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	private _setSettingTheme(themeViewModel: SettingThemeViewModel) {}
+	private _setSettingTheme(themeViewModel: SettingThemeViewModel) {
+		this._currentSettings.settingThemeViewModel.theme =
+			themeViewModel?.theme ?? this._currentSettings.settingThemeViewModel.theme
+	}
 
 	//
 
@@ -89,7 +93,12 @@ export class SettingsStore {
 						: "sans-serif",
 			},
 
-			settingThemeViewModel: {},
+			settingThemeViewModel: {
+				theme:
+					this._currentSettings.settingThemeViewModel.theme !== this._draftSettings.settingThemeViewModel.theme
+						? this._draftSettings.settingThemeViewModel.theme
+						: this._currentSettings.settingThemeViewModel.theme,
+			},
 		}
 	}
 
@@ -109,5 +118,9 @@ export class SettingsStore {
 
 	onChangeFontFamily(family: string) {
 		this._draftSettings.settingFontViewModel.family = family
+	}
+
+	onChangeTheme(theme: string) {
+		this._draftSettings.settingThemeViewModel.theme = theme
 	}
 }

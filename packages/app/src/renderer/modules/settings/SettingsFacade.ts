@@ -90,10 +90,10 @@ export class SettingsFacade {
 				on: this.renderer.onChangeFontFamily.bind(this.renderer),
 				update: this.store.onChangeFontFamily.bind(this.store),
 			},
-			// {
-			//     on: this.renderer.onChangeTheme.bind(this.renderer),
-			//     update: this.store.setTheme.bind(this.store),
-			// },
+			{
+				on: this.renderer.onChangeTheme.bind(this.renderer),
+				update: this.store.onChangeTheme.bind(this.store),
+			},
 		]
 
 		for (const { on, update } of bindings) {

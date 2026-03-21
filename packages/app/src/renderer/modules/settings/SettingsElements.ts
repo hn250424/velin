@@ -15,6 +15,9 @@ export class SettingsElements {
 	public readonly fontFamilyDiv: HTMLElement
 	public readonly fontFamilyInput: HTMLInputElement
 
+	public readonly themeDiv: HTMLElement
+	public readonly themeSelect: HTMLSelectElement
+
 	constructor() {
 		this.exit = document.querySelector("#settings-exit") as HTMLElement
 		this.apply = document.querySelector("#settings-apply-btn") as HTMLElement
@@ -30,5 +33,8 @@ export class SettingsElements {
 
 		this.fontFamilyDiv = document.querySelector("#setting-node-font-family") as HTMLElement
 		this.fontFamilyInput = document.querySelector("#setting-node-font-family input") as HTMLInputElement
+
+		this.themeDiv = document.querySelector("#settings-node-theme") as HTMLElement
+		this.themeSelect = document.querySelector("#settings-node-theme select") as HTMLSelectElement
 	}
 }

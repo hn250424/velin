@@ -1,27 +1,27 @@
 @use "../colors.scss" as colors;
 @use "../dimensions.scss" as dimensions;
 
-$bg-frame: colors.$grey-3;
-$bg-subtle: colors.$grey-2;
-$bg-surface: colors.$grey-1;
-$bg-highlight: #fafafa;
+$bg-frame: #ebdbb2;
+$bg-subtle: #eee8d5;
+$bg-surface: #f5efdc;
+$bg-highlight: #fdf6e3;
 
-$ref: colors.$grey-5;
-$deactive: colors.$grey-6;
-$accent: colors.$red-2;
+$ref: #928374;
+$deactive: #a89984;
+$accent: #af3a03;
 
-$warning-color: colors.$red-3;
+$warning-color: #9d0006;
 
-$theme-light: (
+$theme-solarized: (
 	--app-bg: $bg-surface,
-	--app-font-color: black,
+	--app-font-color: #3c3836,
 
 	--overlay-surface-bg: $bg-highlight,
 
 	--overlay-surface-button-bg: $bg-surface,
 	--overlay-surface-button-hover-bg: $bg-highlight,
 
-	--close-btn: colors.$grey-7,
+	--close-btn: #7c6f64,
 
 	--title-bg: $bg-frame,
 	--side-menu-bg: $bg-frame,
@@ -45,8 +45,8 @@ $theme-light: (
 	--dropdown-item-hover: $bg-surface,
 	--dropdown-divider: $bg-subtle,
 
-	--search-highlight: colors.$yellow-1,
-	--search-highlight-current: colors.$yellow-3,
+	--search-highlight: #b57614,
+	--search-highlight-current: #af3a03,
 
 	--scrollbar-thumb: $bg-subtle,
 	--scrollbar-thumb-hover: #{$accent}b3,
@@ -56,7 +56,7 @@ $theme-light: (
 	--tab-selected: $bg-highlight,
 	--tab-btn-bg: transparent,
 	--tab-btn-hover-bg: $bg-frame,
-	--tab-btn-hover-font: black,
+	--tab-btn-hover-font: #3c3836,
 	--tab-indicator: $accent,
 
 	--tree-node-cut: $ref,
