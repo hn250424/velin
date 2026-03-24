@@ -513,6 +513,7 @@ export class TabEditorFacade {
 
 				tv.setTabSpanTextContent(dto.fileName)
 				tv.setTabButtonTextContent(EXIT_TEXT)
+				tv.tabBox.classList.remove(DOM.CLASS_IS_MODIFIED)
 
 				vm.isModified = false
 				vm.filePath = dto.filePath
