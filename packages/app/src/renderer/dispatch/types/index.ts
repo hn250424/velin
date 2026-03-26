@@ -1,2 +1,2 @@
-export type { DispatchEventsWithArgs, GetArgs } from "./events"
+export type { AppEvents } from "./events"
 export type { Source } from "./Source"

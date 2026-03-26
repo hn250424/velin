@@ -4,13 +4,13 @@ import { FocusManager } from "../core"
 import { DI } from "../constants/id"
 import { CommandManager } from "../modules"
 import { assert } from "../utils"
-import type { DispatchEventsWithArgs, GetArgs, Source } from "./types"
+import type { AppEvents, Source } from "./types"
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 
 @injectable()
 export class Dispatcher {
 	private readonly _handlers: {
-		[E in keyof DispatchEventsWithArgs]: Partial<
+		[E in AppEvents]: Partial<
 			Record<Task | "default", Partial<Record<Source | "default", (...args: any[]) => void | Promise<void>>>>
 		>
 	}
@@ -204,7 +204,7 @@ export class Dispatcher {
 		}
 	}
 
-	async dispatch<E extends keyof DispatchEventsWithArgs>(event: E, source: Source, ...args: GetArgs<E>) {
+	async dispatch(event: AppEvents, source: Source, ...args: any[]) {
 		const task = this.focusManager.getFocusedTask()
 
 		const eventNode = this._handlers[event]
