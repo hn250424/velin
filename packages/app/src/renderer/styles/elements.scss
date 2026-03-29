@@ -14,3 +14,7 @@ button:hover,
 select:hover {
 	cursor: pointer;
 }
+
+button:active {
+	scale: 0.98;
+}

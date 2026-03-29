@@ -6,6 +6,7 @@ import type {
 } from "@renderer/viewmodels/SettingsViewModel"
 import { inject, injectable } from "inversify"
 import type { SettingsElements } from "./SettingsElements"
+import type { AeroOption } from "@hn250424/aero"
 
 @injectable()
 export class SettingsRenderer {
@@ -34,7 +35,9 @@ export class SettingsRenderer {
 	}
 
 	private _renderSettingTheme(themeViewModel: SettingThemeViewModel) {
-		this.elements.themeSelect.value = themeViewModel.theme
+		this.elements.themeSelect.optionIndex = Array.from(this.elements.themeOptions).findIndex(
+			(el) => el.value === themeViewModel.theme
+		)
 	}
 
 	//
@@ -52,8 +55,9 @@ export class SettingsRenderer {
 	}
 
 	onChangeTheme(callback: (theme: string) => void) {
-		this.elements.themeSelect.addEventListener("change", () => {
-			callback(this.elements.themeSelect.value)
+		this.elements.themeSelect.addEventListener("aero-select-changed", (e) => {
+			const option = e.detail.option as AeroOption
+			callback(option.value)
 		})
 	}
 }

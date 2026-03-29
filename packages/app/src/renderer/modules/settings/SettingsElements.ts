@@ -1,4 +1,5 @@
 import { injectable } from "inversify"
+import * as aero from "@hn250424/aero"
 
 @injectable()
 export class SettingsElements {
@@ -16,7 +17,8 @@ export class SettingsElements {
 	public readonly fontFamilyInput: HTMLInputElement
 
 	public readonly themeDiv: HTMLElement
-	public readonly themeSelect: HTMLSelectElement
+	public readonly themeSelect: aero.AeroSelect
+	public readonly themeOptions: NodeListOf<aero.AeroOption>
 
 	constructor() {
 		this.exit = document.querySelector("#settings-exit") as HTMLElement
@@ -35,6 +37,7 @@ export class SettingsElements {
 		this.fontFamilyInput = document.querySelector("#setting-node-font-family input") as HTMLInputElement
 
 		this.themeDiv = document.querySelector("#settings-node-theme") as HTMLElement
-		this.themeSelect = document.querySelector("#settings-node-theme select") as HTMLSelectElement
+		this.themeSelect = document.querySelector("#settings-node-theme aero-select") as aero.AeroSelect
+		this.themeOptions = this.themeSelect.querySelectorAll("aero-option") as NodeListOf<aero.AeroOption>
 	}
 }
