@@ -16,5 +16,5 @@ select:hover {
 }
 
 button:active {
-	scale: 0.98;
+  background-image: radial-gradient(circle, transparent 1%, rgba(0, 0, 0, 0.1) 1%);
 }
