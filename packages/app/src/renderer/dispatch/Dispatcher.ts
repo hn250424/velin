@@ -107,9 +107,6 @@ export class Dispatcher {
 			},
 			copy: {
 				editor: {
-					shortcut: () => {
-						/* intentional no-op */
-					},
 					menu: async () => await this.commandManager.performCopyEditor(),
 				},
 				tree: { default: async () => this.commandManager.performCopyTree() },
@@ -186,9 +183,6 @@ export class Dispatcher {
 				editor: {
 					shortcut: async () => this.commandManager.performCloseFindReplaceBox(),
 				},
-				default: {
-          shortcut: () => { /* intentional no-op */ }
-        }
 			},
 			enter: {
 				"find-replace": {
@@ -197,9 +191,6 @@ export class Dispatcher {
 				tree: {
 					shortcut: async () => await this.commandManager.performOpenFileOrDirectoryByLastSelectedIndex(),
 				},
-				default: {
-          shortcut: () => { /* intentional no-op */ }
-        }
 			},
 		}
 	}
@@ -211,10 +202,18 @@ export class Dispatcher {
 		assert(eventNode, `Missing event: ${event}`)
 
 		const taskNode = eventNode[task] || eventNode["default"]
-		assert(taskNode, `Missing task node: ${event} > ${task}`)
+		if (!taskNode) {
+			if (source === "shortcut") return
+			assert(taskNode, `Missing task node: ${event} > ${task}`)
+			return
+		}
 
 		const handler = taskNode[source] || taskNode["default"]
-		assert(handler, `Missing handler: ${event} > ${task} > ${source}`)
+		if (!handler) {
+			if (source === "shortcut") return
+			assert(handler, `Missing handler: ${event} > ${task} > ${source}`)
+			return
+		}
 
 		await handler(...args)
 	}
