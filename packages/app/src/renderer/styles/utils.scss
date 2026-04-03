@@ -22,7 +22,7 @@ $tooltip-border-radius: 4px;
 .dropdown {
 	display: none;
 	position: absolute;
-	background: white;
+	background: var(--dropdown-bg);
 	border: 1px solid var(--dropdown-border);
 	min-width: $dropdown-min-width;
 	z-index: 96;
@@ -40,7 +40,7 @@ $tooltip-border-radius: 4px;
 }
 
 .dropdown-item:hover {
-	background-color: var(--dropdown-item-hover);
+	background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
 }
 
 .dropdown-divider {

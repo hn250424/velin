@@ -41,8 +41,8 @@ $theme-slate: (
 	--deactive: $deactive,
 	--not-implemented: $deactive,
 
-	--dropdown-border: $bg-surface,
-	--dropdown-item-hover: $bg-surface,
+	--dropdown-bg: $bg-surface,
+	--dropdown-border: $bg-frame,
 	--dropdown-divider: $bg-subtle,
 
 	--search-highlight: colors.$yellow-1,
