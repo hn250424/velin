@@ -1,81 +1,20 @@
 @use "../colors.scss" as colors;
-@use "../dimensions.scss" as dimensions;
 
-$bg-frame: #ebdbb2;
-$bg-subtle: #eee8d5;
-$bg-surface: #f5efdc;
-$bg-highlight: #fdf6e3;
-
-$ref: #928374;
-$deactive: #a89984;
-$accent: #af3a03;
-
-$warning-color: #9d0006;
-
-$theme-solarized: (
-	--app-bg: $bg-surface,
-	--app-font-color: #3c3836,
-
-	--overlay-surface-bg: $bg-highlight,
-
-	--overlay-surface-button-bg: $bg-surface,
-	--overlay-surface-button-hover-bg: $bg-highlight,
-
-	--close-btn: #7c6f64,
-
-	--title-bg: $bg-frame,
-	--side-menu-bg: $bg-frame,
-	--side-resizer: $accent,
-
-	--menu-item-hover: $bg-subtle,
-	--window-icon-hover: $bg-subtle,
-
-	--find-replace-container-bg: $bg-frame,
-	--find-replace-input: $bg-highlight,
-	--find-replace-button-hover: $bg-subtle,
-
-	--tooltip-bg: colors.$grey-6,
-	--tooltip-font: white,
-
-	--shortcut-font: $ref,
-	--deactive: $deactive,
-	--not-implemented: $deactive,
-
-	--dropdown-bg: $bg-surface,
-	--dropdown-border: $bg-frame,
-	--dropdown-divider: $bg-subtle,
-
-	--search-highlight: #b57614,
-	--search-highlight-current: #af3a03,
-
-	--scrollbar-thumb: $bg-subtle,
-	--scrollbar-thumb-hover: #{$accent}b3,
-
-	--tab-bg: $bg-subtle,
-	--tab-ghost-bg: $bg-surface,
-	--tab-selected: $bg-highlight,
-	--tab-btn-bg: transparent,
-	--tab-btn-hover-bg: $bg-frame,
-	--tab-btn-hover-font: #3c3836,
-	--tab-indicator: $accent,
-
-	--tree-node-cut: $ref,
-	--tree-node-focused: $accent,
-	--tree-node-selected: $bg-subtle,
-	--tree-node-hover: $bg-subtle,
-	--tree-ghost-bg: $bg-subtle,
-	--tree-top-icon-hover: $bg-subtle,
-	--tree-wrapper-drag-overlay: $bg-subtle,
-
-	--settings-menu-container: $bg-surface,
-	--settings-menu-button-bg: $bg-subtle,
-	--settings-menu-button-hover: $bg-highlight,
-	--settings-menu-button-selected: $bg-highlight,
-	--settings-contents: $bg-highlight,
-	--setting-node-border-color: $ref,
-
-	--warning-color: $warning-color,
-	--hover-foreground-color: white,
-
-	--disabled-bg: $ref,
+$palette: (
+	bg-frame: #ebdbb2,
+	bg-subtle: #eee8d5,
+	bg-surface: #f5efdc,
+	bg-highlight: #fdf6e3,
+	ref: #928374,
+	deactive: #a89984,
+	accent: #af3a03,
+	warning-color: #9d0006,
+	font-color: #3c3836,
+	close-btn-color: #7c6f64,
+	tooltip-bg: colors.$grey-6,
+	tooltip-font: white,
+	search-highlight: #b57614,
+	search-highlight-current: #af3a03,
+	hover-foreground-color: white,
+	disabled-bg: #928374,
 );

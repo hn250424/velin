@@ -1,81 +1,20 @@
 @use "../colors.scss" as colors;
-@use "../dimensions.scss" as dimensions;
 
-$bg-frame: colors.$grey-3;
-$bg-subtle: colors.$grey-2;
-$bg-surface: colors.$grey-1;
-$bg-highlight: #fafafa;
-
-$ref: colors.$grey-5;
-$deactive: colors.$grey-6;
-$accent: colors.$red-2;
-
-$warning-color: colors.$red-3;
-
-$theme-light: (
-	--app-bg: $bg-surface,
-	--app-font-color: black,
-
-	--overlay-surface-bg: $bg-highlight,
-
-	--overlay-surface-button-bg: $bg-surface,
-	--overlay-surface-button-hover-bg: $bg-highlight,
-
-	--close-btn: colors.$grey-7,
-
-	--title-bg: $bg-frame,
-	--side-menu-bg: $bg-frame,
-	--side-resizer: $accent,
-
-	--menu-item-hover: $bg-subtle,
-	--window-icon-hover: $bg-subtle,
-
-	--find-replace-container-bg: $bg-frame,
-	--find-replace-input: $bg-highlight,
-	--find-replace-button-hover: $bg-subtle,
-
-	--tooltip-bg: colors.$grey-6,
-	--tooltip-font: white,
-
-	--shortcut-font: $ref,
-	--deactive: $deactive,
-	--not-implemented: $deactive,
-
-	--dropdown-bg: $bg-surface,
-	--dropdown-border: $bg-frame,
-	--dropdown-divider: $bg-subtle,
-
-	--search-highlight: colors.$yellow-1,
-	--search-highlight-current: colors.$yellow-3,
-
-	--scrollbar-thumb: $bg-subtle,
-	--scrollbar-thumb-hover: #{$accent}b3,
-
-	--tab-bg: $bg-subtle,
-	--tab-ghost-bg: $bg-surface,
-	--tab-selected: $bg-highlight,
-	--tab-btn-bg: transparent,
-	--tab-btn-hover-bg: $bg-frame,
-	--tab-btn-hover-font: black,
-	--tab-indicator: $accent,
-
-	--tree-node-cut: $ref,
-	--tree-node-focused: $accent,
-	--tree-node-selected: $bg-subtle,
-	--tree-node-hover: $bg-subtle,
-	--tree-ghost-bg: $bg-subtle,
-	--tree-top-icon-hover: $bg-subtle,
-	--tree-wrapper-drag-overlay: $bg-subtle,
-
-	--settings-menu-container: $bg-surface,
-	--settings-menu-button-bg: $bg-subtle,
-	--settings-menu-button-hover: $bg-highlight,
-	--settings-menu-button-selected: $bg-highlight,
-	--settings-contents: $bg-highlight,
-	--setting-node-border-color: $ref,
-
-	--warning-color: $warning-color,
-	--hover-foreground-color: white,
-
-	--disabled-bg: $ref,
+$palette: (
+	bg-frame: colors.$grey-3,
+	bg-subtle: colors.$grey-2,
+	bg-surface: colors.$grey-1,
+	bg-highlight: #fafafa,
+	ref: colors.$grey-5,
+	deactive: colors.$grey-6,
+	accent: colors.$red-2,
+	warning-color: colors.$red-3,
+	font-color: black,
+	close-btn-color: colors.$grey-7,
+	tooltip-bg: colors.$grey-6,
+	tooltip-font: white,
+	search-highlight: colors.$yellow-1,
+	search-highlight-current: colors.$yellow-3,
+	hover-foreground-color: white,
+	disabled-bg: colors.$grey-5,
 );

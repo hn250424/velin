@@ -1,25 +1,20 @@
+@use "./_base.scss" as base;
 @use "./light.scss";
 @use "./slate.scss";
 @use "./solarized.scss";
 
-@mixin theme-map($map: ()) {
-	@each $key, $value in $map {
-		#{$key}: $value;
-	}
-}
-
 :root {
-	@include theme-map(light.$theme-light);
+	@include base.define-theme-from-palette(light.$palette);
 }
 
 html.light {
-	@include theme-map(light.$theme-light);
+	@include base.define-theme-from-palette(light.$palette);
 }
 
 html.solarized {
-	@include theme-map(solarized.$theme-solarized);
+	@include base.define-theme-from-palette(solarized.$palette);
 }
 
 html.slate {
-	@include theme-map(slate.$theme-slate);
+	@include base.define-theme-from-palette(slate.$palette);
 }
