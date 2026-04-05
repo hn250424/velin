@@ -250,8 +250,8 @@ export class TabEditorRenderer {
 	//
 
 	changeFontSize(baseSize: number) {
-		const container = this.elements.editorContainer
-		const setVar = (name: string, value: string) => container.style.setProperty(name, value)
+		const containers = [this.elements.editorContainer, this.elements.findAndReplaceContainer]
+		const setVar = (name: string, value: string) => containers.forEach((c) => c.style.setProperty(name, value))
 
 		const scale = {
 			spacing: 0.25,
@@ -283,7 +283,8 @@ export class TabEditorRenderer {
 	}
 
 	changeFontFamily(family: string) {
-		this.elements.editorContainer.style.fontFamily = family
+		const containers = [this.elements.editorContainer, this.elements.findAndReplaceContainer]
+		containers.forEach((c) => (c.style.fontFamily = family))
 	}
 
 	//
