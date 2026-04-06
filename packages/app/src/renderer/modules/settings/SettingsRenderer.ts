@@ -1,4 +1,4 @@
-import { DI } from "@renderer/constants/id"
+import { DI } from "@renderer/constants"
 import type {
 	SettingsViewModel,
 	SettingFontViewModel,

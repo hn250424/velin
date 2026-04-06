@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify"
-import { DI } from "../constants/id"
+import { DI } from "../constants"
 import { FocusManager } from "./index"
 
 @injectable()

@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify"
 import type { Task } from "../core"
 import { FocusManager } from "../core"
-import { DI } from "../constants/id"
+import { DI } from "../constants"
 import { CommandManager } from "../modules"
 import { assert } from "../utils"
 import type { AppEvents, Source } from "./types"

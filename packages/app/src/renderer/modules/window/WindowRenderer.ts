@@ -1,4 +1,4 @@
-import { DI } from "@renderer/constants/id"
+import { DI } from "@renderer/constants"
 import { inject, injectable } from "inversify"
 import type { WindowElements } from "./WindowElements"
 import maximizeSvg from "../../assets/icons/maximize.svg?raw"

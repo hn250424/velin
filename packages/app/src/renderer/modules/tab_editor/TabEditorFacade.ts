@@ -4,14 +4,13 @@ import type { TabEditorViewModel } from "../../viewmodels/TabEditorViewModel"
 
 import { inject, injectable } from "inversify"
 
-import { DI } from "../../constants/id"
 import { DATASET_ATTR_TAB_ID, EXIT_TEXT } from "../../constants/dom"
 import { TabEditorRenderer } from "./TabEditorRenderer"
 import { TabEditorStore } from "./TabEditorStore"
 import { TabEditorView } from "./TabEditorView"
 import { TabDragManager } from "./TabDragManager"
 import { assert } from "@renderer/utils"
-import { DOM } from "@renderer/constants"
+import { DI, DOM } from "@renderer/constants"
 
 // export const BINARY_FILE_WARNING = '❌'
 export const BINARY_FILE_WARNING = `Can't read this file`

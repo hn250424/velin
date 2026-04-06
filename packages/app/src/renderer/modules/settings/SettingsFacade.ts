@@ -2,7 +2,7 @@ import type { SettingsDto } from "@shared/dto/SettingsDto"
 import type { SettingsViewModel } from "@renderer/viewmodels/SettingsViewModel"
 
 import { inject, injectable } from "inversify"
-import { DI } from "../../constants/id"
+import { DI } from "../../constants"
 import { SettingsStore } from "./SettingsStore"
 import { SettingsRenderer } from "./SettingsRenderer"
 

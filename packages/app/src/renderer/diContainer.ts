@@ -1,5 +1,5 @@
 import "reflect-metadata"
-import { DI } from "./constants/id"
+import { DI } from "./constants"
 import { Container } from "inversify"
 
 import { FocusManager } from "./core/FocusManager"

@@ -1,4 +1,4 @@
-import { DI } from "@renderer/constants/id"
+import { DI } from "@renderer/constants"
 import { inject, injectable } from "inversify"
 import { SideStore } from "./SideStore"
 import { SideRenderer } from "./SideRenderer"
