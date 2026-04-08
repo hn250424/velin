@@ -1,6 +1,7 @@
+@use "./dimensions.scss" as dimensions;
+
 $editor-horizontal-padding: 16px;
 $editor-vertical-padding: 8px;
-$scrollbar-size: 8px;
 
 #editor-container {
 	width: 100%;
@@ -24,8 +25,8 @@ $scrollbar-size: 8px;
 	background-color: var(--tab-selected);
 
 	&::-webkit-scrollbar {
-		width: $scrollbar-size;
-		height: $scrollbar-size;
+		width: dimensions.$scrollbar-size;
+		height: dimensions.$scrollbar-size;
 	}
 
 	&::-webkit-scrollbar-track {

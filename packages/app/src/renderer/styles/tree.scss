@@ -1,6 +1,5 @@
 @use "./dimensions.scss" as dimensions;
 
-$scrollbar-size: 8px;
 $tree-horizontal-gap: 5px;
 $ghost-padding: 4px;
 
@@ -179,12 +178,14 @@ $tree-top-min-height: 25px;
 }
 
 .simplebar-track.simplebar-vertical {
-  width: $scrollbar-size;
+  width: dimensions.$scrollbar-size !important;
   background: transparent;
   right: 0 !important;
 }
 
 .simplebar-scrollbar {
+	width: dimensions.$scrollbar-size !important;
+
   &::before {
 		// SimpleBar applies styles to the ::before pseudo-element
     background-color: transparent !important;
