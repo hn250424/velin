@@ -16,8 +16,6 @@ export default defineConfig({
 				"electron",
 				...builtinModules.flatMap((m) => [m, `node:${m}`]),
 				"chokidar",
-				"inversify",
-				"reflect-metadata",
 			],
 		},
 		target: "node20",
