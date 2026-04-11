@@ -2,6 +2,7 @@ import "../mocks/screen"
 import { loadedRenderer } from "@services/loadService"
 import { TAB_SESSION_PATH } from "@main/constants/file_info"
 import { beforeEach, describe, expect, test } from "vitest"
+import path from "path"
 import FakeMainWindow from "../mocks/FakeMainWindow"
 import FakeFileManager from "../modules/fs/FakeFileManager"
 import FakeTabRepository from "../modules/tab/FakeTabRepository"
@@ -44,8 +45,8 @@ describe("Load Service - loadedRenderer", () => {
 		fakeMainWindow = new FakeMainWindow()
 		fakeFileManager = new FakeFileManager()
 		fakeSideRepository = new FakeSideRepository(sideSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		fakeTreeUtils = new FakeTreeUtils(fakeFileManager)
 		fakeTreeRepository = new FakeTreeRepository(treeSessionPath, fakeFileManager)
 		fakeFileWatcher = new FakeFileWatcher()
@@ -78,8 +79,8 @@ describe("Load Service - loadedRenderer", () => {
 		const initialTabSession: TabSessionModel = {
 			activatedId: 1,
 			data: [
-				{ id: 0, filePath: "file1.txt" },
-				{ id: 1, filePath: "file2.txt" },
+				{ id: 0, filePath: "file1.txt", isModified: false },
+				{ id: 1, filePath: "file2.txt", isModified: false },
 			],
 		}
 		const initialTreeSession = {
@@ -210,5 +211,49 @@ describe("Load Service - loadedRenderer", () => {
 		expect(fakeMainWindow.webContents.send.mock.calls[0][0]).toBe("session")
 		const sentData = fakeMainWindow.webContents.send.mock.calls[0][1]
 		expect(Array.isArray(sentData)).toBe(false)
+	})
+
+	test("should recover modified tab content from temp file when isModified is true", async () => {
+		// Given.
+		const initialTabSession: TabSessionModel = {
+			activatedId: 0,
+			data: [
+				{ id: 0, filePath: "original.txt", isModified: true },
+			],
+		}
+
+		const tempDir = path.join(path.dirname(tabSessionPath), "temp")
+		const tempFilePath = path.join(tempDir, "0.txt")
+
+		fakeFileManager.setPathExistence(tabSessionPath, true)
+		fakeFileManager.setPathExistence("original.txt", true)
+		fakeFileManager.setFilecontent("original.txt", "original content")
+
+		fakeFileManager.setPathExistence(tempFilePath, true)
+		fakeFileManager.setFilecontent(tempFilePath, "unsaved changes")
+
+		await fakeTabRepository.setTabSession(initialTabSession)
+
+		// When.
+		await loadedRenderer(
+			fakeMainWindow as any,
+			fakeFileManager,
+			fakeFileWatcher,
+			fakeWindowRepository,
+			fakeSettingsRepository,
+			fakeSideRepository,
+			fakeTabRepository,
+			fakeTreeRepository,
+			fakeWindowUtils,
+			fakeSettingsUtils,
+			fakeTabUtils,
+			fakeTreeUtils
+		)
+
+		// Then.
+		expect(fakeMainWindow.webContents.send).toHaveBeenCalled()
+		const tabSentData = fakeMainWindow.webContents.send.mock.calls[0][4]
+		expect(tabSentData.data[0].content).toBe("unsaved changes")
+		expect(tabSentData.data[0].isModified).toBe(true)
 	})
 })

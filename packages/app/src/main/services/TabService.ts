@@ -7,6 +7,7 @@ import type ITabUtils from "@main/modules/contracts/ITabUtils"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
+import path from "path"
 
 export default class TabService {
 	constructor(
@@ -32,6 +33,11 @@ export default class TabService {
 					await this.fileManager.write(data.filePath, data.content)
 				}
 			}
+		}
+
+		const tempFilePath = path.join(path.dirname(this.tabRepository.getTabSessionPath()), "temp", `${data.id}.txt`)
+		if (await this.fileManager.exists(tempFilePath)) {
+			await this.fileManager.deletePermanently(tempFilePath)
 		}
 
 		// Delete session.
@@ -62,7 +68,7 @@ export default class TabService {
 
 		for (const data of dto.data) {
 			if (exceptData.id === data.id) {
-				sessionArr.push({ id: data.id, filePath: data.filePath })
+				sessionArr.push({ id: data.id, filePath: data.filePath, isModified: data.isModified })
 				responseArr.push(false)
 				continue
 			}
@@ -72,7 +78,7 @@ export default class TabService {
 			if (result) {
 				responseArr.push(true)
 			} else {
-				sessionArr.push({ id: data.id, filePath: data.filePath })
+				sessionArr.push({ id: data.id, filePath: data.filePath, isModified: data.isModified })
 				responseArr.push(false)
 			}
 		}
@@ -97,7 +103,7 @@ export default class TabService {
 		const responseArr = []
 
 		for (let i = 0; i <= refIdx; i++) {
-			sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath })
+			sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath, isModified: data[i].isModified })
 			responseArr.push(false)
 		}
 
@@ -108,7 +114,7 @@ export default class TabService {
 				responseArr.push(true)
 			} else {
 				responseArr.push(false)
-				sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath })
+				sessionToKeep.push({ id: data[i].id, filePath: data[i].filePath, isModified: data[i].isModified })
 			}
 		}
 
@@ -131,7 +137,7 @@ export default class TabService {
 				responseArr.push(true)
 			} else {
 				responseArr.push(false)
-				sessionArr.push({ id: tab.id, filePath: tab.filePath })
+				sessionArr.push({ id: tab.id, filePath: tab.filePath, isModified: tab.isModified })
 			}
 		}
 

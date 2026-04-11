@@ -39,6 +39,14 @@ export default function registerFileHandlers(mainWindow: BrowserWindow, fileServ
 		}
 	})
 
+	ipcMain.handle(electronAPI.events.rendererToMain.tempSave, async (e, data: TabEditorDto) => {
+		await fileService.tempSave(data)
+		return {
+			result: true,
+			data: null,
+		}
+	})
+
 	ipcMain.handle(electronAPI.events.rendererToMain.saveAs, async (e, data: TabEditorDto) => {
 		const tabEditorData = await fileService.saveAs(data, mainWindow)
 		return {

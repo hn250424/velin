@@ -2,9 +2,11 @@ import type { TabSessionModel } from "@main/models/TabSessionModel"
 import type IFileManager from "@main/modules/contracts/IFileManager"
 import type ITabUtils from "@main/modules/contracts/ITabUtils"
 import type { TabEditorDto, TabEditorsDto } from "@shared/dto/TabEditorDto"
+import path from "path"
+import type ITabRepository from "@main/modules/contracts/ITabRepository"
 
 export default class FakeTabUtils implements ITabUtils {
-	constructor(private fakeFileManager: IFileManager) {}
+	constructor(private fakeFileManager: IFileManager, private tabRepository: ITabRepository) {}
 
 	async syncSessionWithFs(session: TabSessionModel): Promise<TabSessionModel> {
 		if (!session || !session.data.length) return { activatedId: -1, data: [] }
@@ -34,10 +36,22 @@ export default class FakeTabUtils implements ITabUtils {
 		const data = await Promise.all(
 			session.data.map(async (data) => {
 				const fileName = data.filePath ? this.fakeFileManager.getBasename(data.filePath) : ""
-				const content = data.filePath ? await this.fakeFileManager.read(data.filePath) : ""
+
+				let content = ""
+				if (data.isModified) {
+					const tempFilePath = path.join(path.dirname(this.tabRepository.getTabSessionPath()), "temp", `${data.id}.txt`)
+					if (await this.fakeFileManager.exists(tempFilePath)) {
+						content = await this.fakeFileManager.read(tempFilePath)
+					}
+				}
+
+				if (!content && data.filePath) {
+					content = await this.fakeFileManager.read(data.filePath)
+				}
+
 				return {
 					id: data.id,
-					isModified: false,
+					isModified: data.isModified ?? false,
 					filePath: data.filePath,
 					fileName,
 					content,
@@ -58,6 +72,7 @@ export default class FakeTabUtils implements ITabUtils {
 			data: tabEditorsDto.data.map((d) => ({
 				id: d.id,
 				filePath: d.filePath,
+				isModified: d.isModified,
 			})),
 		}
 	}

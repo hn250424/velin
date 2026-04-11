@@ -145,7 +145,7 @@ export default class FakeFileManager implements IFileManager {
 		delete this.pathExists[filePath]
 	}
 
-	async create(targetPath: string, directory: boolean): Promise<void> {
+	async create(targetPath: string, directory: boolean): Promise<boolean> {
 		if (directory) {
 			this.pathExists[targetPath] = true
 		} else {
@@ -156,6 +156,7 @@ export default class FakeFileManager implements IFileManager {
 			this.savedFiles[targetPath] = path.basename(targetPath)
 			this.pathExists[targetPath] = true
 		}
+		return true
 	}
 
 	// getOsTrashFiles(): Record<string, string> {

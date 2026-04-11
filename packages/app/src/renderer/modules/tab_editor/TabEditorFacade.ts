@@ -432,7 +432,8 @@ export class TabEditorFacade {
 				tabs[i].fileName,
 				tabs[i].content,
 				tabs[i].isBinary,
-				tabs[i].id === activatedId
+				tabs[i].id === activatedId,
+				tabs[i].isModified
 			)
 		}
 	}
@@ -467,10 +468,10 @@ export class TabEditorFacade {
 		}
 	}
 
-	async addTab(id = 0, filePath = "", fileName = "", content = "", isBinary = false, activate = true) {
+	async addTab(id = 0, filePath = "", fileName = "", content = "", isBinary = false, activate = true, isModified = false) {
 		const vm: TabEditorViewModel = {
 			id: id,
-			isModified: false,
+			isModified: isModified,
 			isBinary: isBinary,
 			filePath: filePath,
 			fileName: fileName,

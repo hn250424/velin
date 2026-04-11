@@ -25,7 +25,7 @@ describe("Tab Service - closeTab", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager)
 	})
 
@@ -36,7 +36,7 @@ describe("Tab Service - closeTab", () => {
 		setFakeConfirmResult(true)
 		fakeTabRepository.setTabSession({
 			activatedId: data.id,
-			data: [{ id: data.id, filePath: data.filePath }],
+			data: [{ id: data.id, filePath: data.filePath, isModified: false }],
 		})
 
 		// When.
@@ -57,7 +57,7 @@ describe("Tab Service - closeTab", () => {
 		setFakeConfirmResult(false)
 		await fakeTabRepository.setTabSession({
 			activatedId: data.id,
-			data: [{ id: data.id, filePath: data.filePath }],
+			data: [{ id: data.id, filePath: data.filePath, isModified: false }],
 		})
 
 		// When.
@@ -80,7 +80,7 @@ describe("Tab Service - closeTab", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: data.id,
-			data: [{ id: data.id, filePath: data.filePath }],
+			data: [{ id: data.id, filePath: data.filePath, isModified: false }],
 		})
 
 		// When.
@@ -105,7 +105,7 @@ describe("Tab Service - closeTab", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: data.id,
-			data: [{ id: data.id, filePath: data.filePath }],
+			data: [{ id: data.id, filePath: data.filePath, isModified: false }],
 		})
 
 		// When.
@@ -123,7 +123,7 @@ describe("Tab Service - closeTab", () => {
 		fakeFileManager.setPathExistence(tabSessionPath, true)
 		await fakeTabRepository.setTabSession({
 			activatedId: data.id,
-			data: [{ id: data.id, filePath: data.filePath }],
+			data: [{ id: data.id, filePath: data.filePath, isModified: false }],
 		})
 
 		// When.
@@ -140,7 +140,7 @@ describe("Tab Service - closeOtherTabs", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager)
 	})
 
@@ -155,7 +155,7 @@ describe("Tab Service - closeOtherTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 		const exceptData: TabEditorDto = copiedDto.data[1]
@@ -183,7 +183,7 @@ describe("Tab Service - closeOtherTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 		const exceptData: TabEditorDto = copiedDto.data[1]
@@ -210,7 +210,7 @@ describe("Tab Service - closeOtherTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		for (const { filePath } of copiedDto.data) {
 			fakeFileManager.setFilecontent(filePath, "dummy")
@@ -235,7 +235,7 @@ describe("Tab Service - closeTabsToRight", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager)
 	})
 
@@ -250,7 +250,7 @@ describe("Tab Service - closeTabsToRight", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 		const refData: TabEditorDto = copiedDto.data[1]
@@ -278,7 +278,7 @@ describe("Tab Service - closeTabsToRight", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 		const refData: TabEditorDto = copiedDto.data[1]
@@ -305,7 +305,7 @@ describe("Tab Service - closeTabsToRight", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		for (const { filePath } of copiedDto.data) {
 			fakeFileManager.setFilecontent(filePath, "dummy")
@@ -330,7 +330,7 @@ describe("Tab Service - closeAllTabs", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager)
 	})
 
@@ -345,7 +345,7 @@ describe("Tab Service - closeAllTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 
@@ -370,7 +370,7 @@ describe("Tab Service - closeAllTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		const spy = vi.spyOn(fakeFileManager, "write")
 
@@ -394,7 +394,7 @@ describe("Tab Service - closeAllTabs", () => {
 		})
 		await fakeTabRepository.setTabSession({
 			activatedId: copiedDto.activatedId,
-			data: copiedDto.data.map(({ id, filePath }) => ({ id, filePath })),
+			data: copiedDto.data.map(({ id, filePath, isModified }) => ({ id, filePath, isModified })),
 		})
 		for (const { filePath } of copiedDto.data) {
 			fakeFileManager.setFilecontent(filePath, "dummy")
@@ -416,7 +416,7 @@ describe("Tab Service - syncTabSession", () => {
 	beforeEach(() => {
 		fakeFileManager = new FakeFileManager()
 		fakeTabRepository = new FakeTabRepository(tabSessionPath, fakeFileManager)
-		fakeTabUtils = new FakeTabUtils(fakeFileManager)
+		fakeTabUtils = new FakeTabUtils(fakeFileManager, fakeTabRepository)
 		tabService = new TabService(fakeFileManager, fakeTabRepository, fakeTabUtils, fakeDialogManager)
 	})
 
@@ -433,6 +433,7 @@ describe("Tab Service - syncTabSession", () => {
 			return {
 				id: d.id,
 				filePath: d.filePath,
+				isModified: d.isModified,
 			}
 		})
 		expect(dtoToSessionData).toEqual(session!.data)

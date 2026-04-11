@@ -6,4 +6,5 @@ export interface TabSessionModel {
 export interface TabSessionData {
 	id: number
 	filePath: string
+	isModified: boolean
 }

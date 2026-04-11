@@ -11,6 +11,7 @@ import type { TreeDto } from "@shared/dto/TreeDto"
 import { BrowserWindow } from "electron"
 import { inject } from "inversify"
 import DI_KEYS from "../constants/di_keys"
+import path from "path"
 
 export default class FileService {
 	constructor(
@@ -30,7 +31,7 @@ export default class FileService {
 
 		const data = model.data
 		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0
-		data.push({ id: id, filePath: "" })
+		data.push({ id: id, filePath: "", isModified: false })
 		await this.tabRepository.writeTabSession(model)
 		return id
 	}
@@ -56,7 +57,7 @@ export default class FileService {
 
 		const data = model.data
 		const id = data.length > 0 ? data[data.length - 1].id + 1 : 0
-		data.push({ id: id, filePath: filePath })
+		data.push({ id: id, filePath: filePath, isModified: false })
 		model.activatedId = id
 		await this.tabRepository.writeTabSession(model)
 
@@ -168,7 +169,56 @@ export default class FileService {
 		return root
 	}
 
+	private _getTempFilePath(id: number): string {
+		const sessionPath = this.tabRepository.getTabSessionPath()
+		return path.join(path.dirname(sessionPath), "temp", `${id}.txt`)
+	}
+
+	async tempSave(data: TabEditorDto) {
+		const tempFilePath = this._getTempFilePath(data.id)
+
+		if (!data.isModified) {
+			if (await this.fileManager.exists(tempFilePath)) {
+				await this.fileManager.deletePermanently(tempFilePath)
+			}
+
+			const model = await this.tabRepository.readTabSession()
+			if (model) {
+				const tab = model.data.find((t) => t.id === data.id)
+				if (tab && tab.isModified) {
+					tab.isModified = false
+					await this.tabRepository.writeTabSession(model)
+				}
+			}
+			return
+		}
+
+		const tempDir = path.dirname(tempFilePath)
+
+		if (!(await this.fileManager.exists(tempDir))) {
+			await this.fileManager.create(tempDir, true)
+		}
+
+		await this.fileManager.write(tempFilePath, data.content)
+
+		const model = await this.tabRepository.readTabSession()
+		if (model) {
+			const tab = model.data.find((t) => t.id === data.id)
+			if (tab && !tab.isModified) {
+				tab.isModified = true
+				await this.tabRepository.writeTabSession(model)
+			}
+		}
+	}
+
 	async save(data: TabEditorDto, mainWindow: BrowserWindow, writeSession = true) {
+		const tempFilePath = this._getTempFilePath(data.id)
+		const cleanTemp = async () => {
+			if (await this.fileManager.exists(tempFilePath)) {
+				await this.fileManager.deletePermanently(tempFilePath)
+			}
+		}
+
 		if (!data.filePath) {
 			const result = await this.dialogManager.showSaveDialog(mainWindow, data.fileName)
 
@@ -176,6 +226,7 @@ export default class FileService {
 				return data
 			} else {
 				await this.fileManager.write(result.filePath, data.content)
+				await cleanTemp()
 
 				const tabSession = (await this.tabRepository.readTabSession()) ?? {
 					activatedId: -1,
@@ -183,7 +234,10 @@ export default class FileService {
 				}
 
 				const session = tabSession.data.find((s) => s.id === data.id)
-				if (session) session.filePath = result.filePath
+				if (session) {
+					session.filePath = result.filePath
+					session.isModified = false
+				}
 				if (writeSession) await this.tabRepository.writeTabSession(tabSession)
 
 				return {
@@ -195,6 +249,19 @@ export default class FileService {
 			}
 		} else {
 			await this.fileManager.write(data.filePath, data.content)
+			await cleanTemp()
+
+			if (writeSession) {
+				const tabSession = await this.tabRepository.readTabSession()
+				if (tabSession) {
+					const session = tabSession.data.find((s) => s.id === data.id)
+					if (session) {
+						session.isModified = false
+						await this.tabRepository.writeTabSession(tabSession)
+					}
+				}
+			}
+
 			return {
 				...data,
 				isModified: false,
@@ -218,7 +285,7 @@ export default class FileService {
 			}
 			const arr = model.data
 			const id = arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
-			arr.push({ id: id, filePath: result.filePath })
+			arr.push({ id: id, filePath: result.filePath, isModified: false })
 			model.data = arr
 			this.tabRepository.writeTabSession(model)
 
@@ -241,7 +308,7 @@ export default class FileService {
 			const { id, isModified, filePath, fileName, content, isBinary } = tab
 
 			if (!isModified) {
-				sessionArr.push({ id: id, filePath: filePath })
+				sessionArr.push({ id: id, filePath: filePath, isModified: false })
 				responseArr.push({
 					id: id,
 					isModified: false,
@@ -254,7 +321,7 @@ export default class FileService {
 			}
 
 			const result = await this.save(tab, mainWindow, false)
-			sessionArr.push({ id: result.id, filePath: result.filePath })
+			sessionArr.push({ id: result.id, filePath: result.filePath, isModified: false })
 			responseArr.push(result)
 		}
 

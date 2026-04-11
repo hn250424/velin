@@ -10,6 +10,7 @@ import { TabEditorView } from "./TabEditorView"
 import { BINARY_FILE_WARNING } from "./TabEditorFacade"
 import { DI, DOM } from "@renderer/constants"
 import type { TabEditorElements } from "./TabEditorElements"
+import { throttle } from "../../utils/throttle"
 
 @injectable()
 export class TabEditorRenderer {
@@ -18,6 +19,16 @@ export class TabEditorRenderer {
 
 	private _ghostTab: HTMLElement | null = null
 	private _indicator: HTMLElement | null = null
+	private _throttledTempSave = throttle(async (view: TabEditorView, vm: TabEditorViewModel) => {
+		await window.rendererToMain.tempSave({
+			id: vm.id,
+			isModified: vm.isModified,
+			filePath: vm.filePath,
+			fileName: vm.fileName,
+			content: view.getContent(),
+			isBinary: vm.isBinary,
+		})
+	}, 1500)
 
 	constructor(@inject(DI.TabEditorElements) readonly elements: TabEditorElements) {}
 
@@ -87,6 +98,10 @@ export class TabEditorRenderer {
 		const current = view.getContent()
 		const isModified = current !== vm.initialContent
 
+		if (isModified) {
+			this._throttledTempSave(view, vm)
+		}
+
 		if (isModified && !vm.isModified) {
 			vm.isModified = true
 			view.setTabButtonTextContent(DOM.MODIFIED_TEXT)
@@ -95,6 +110,8 @@ export class TabEditorRenderer {
 			vm.isModified = false
 			view.setTabButtonTextContent(DOM.EXIT_TEXT)
 			view.tabBox.classList.remove(DOM.CLASS_IS_MODIFIED)
+
+			this._throttledTempSave(view, vm)
 		}
 	}
 
@@ -110,6 +127,11 @@ export class TabEditorRenderer {
 
 		const { tabBox, tabSpan, tabButton } = this._createTabEl(String(id), filePath, fileName)
 		const { editorBox, editor } = await this._createEditorEl(isBinary, initialContent)
+
+		if (isModified) {
+			tabButton.textContent = DOM.MODIFIED_TEXT
+			tabBox.classList.add(DOM.CLASS_IS_MODIFIED)
+		}
 
 		this.elements.tabContainer.appendChild(tabBox)
 		this.elements.editorContainer.appendChild(editorBox)

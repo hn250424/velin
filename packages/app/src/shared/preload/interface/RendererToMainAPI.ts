@@ -18,6 +18,7 @@ export default interface RendererToMainAPI {
 	openFile: (filePath?: string) => Promise<Response<TabEditorDto>>
 	openDirectory: (data?: TreeDto) => Promise<Response<TreeDto>>
 	save: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
+	tempSave: (data: TabEditorDto) => Promise<Response<void>>
 	saveAs: (data: TabEditorDto) => Promise<Response<TabEditorDto>>
 	saveAll: (data: TabEditorsDto) => Promise<Response<TabEditorsDto>>
 

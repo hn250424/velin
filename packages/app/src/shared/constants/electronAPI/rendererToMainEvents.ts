@@ -10,6 +10,7 @@ export const rendererToMainEvents = {
 	openFile: "openFile",
 	openDirectory: "openDirectory",
 	save: "save",
+	tempSave: "tempSave",
 	saveAs: "saveAs",
 	saveAll: "saveAll",
 
