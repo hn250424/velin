@@ -18,7 +18,6 @@ export const Download = () => {
 					<span>Note</span>
 					<ul>
 						<li>This program is currently in beta testing.</li>
-						<li>Auto-saving is not implemented.</li>
 						<li>Currently runs only on Windows 10/11 (64-bit).</li>
 					</ul>
 				</div>
