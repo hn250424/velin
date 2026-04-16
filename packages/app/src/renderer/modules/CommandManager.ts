@@ -428,7 +428,7 @@ export class CommandManager {
 			this.undoStack.push(cmd)
 			this.redoStack.length = 0
 		} catch (error) {
-			// intentionally empty
+			this._restoreTreeSpan(treeNode, prePath)
 		} finally {
 			await sleep(300)
 			window.rendererToMain.setWatchSkipState(false)
