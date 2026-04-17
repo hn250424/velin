@@ -8,6 +8,7 @@ import { TreeRenderer } from "./TreeRenderer"
 import { TreeStore } from "./TreeStore"
 import { TreeDragManager } from "./TreeDragManager"
 import { CLASS_SELECTED } from "@renderer/constants/dom"
+import { adjustMenuPosition } from "@renderer/utils"
 
 @injectable()
 export class TreeFacade {
@@ -401,8 +402,7 @@ export class TreeFacade {
 
 		treeContextPaste.classList.toggle(DOM.CLASS_DEACTIVE, isPasteDisabled)
 		treeContextMenu.classList.add(DOM.CLASS_SELECTED)
-		treeContextMenu.style.left = `${e.clientX}px`
-		treeContextMenu.style.top = `${e.clientY}px`
+		adjustMenuPosition(e, treeContextMenu)
 	}
 
 	handleHideContextmenu() {

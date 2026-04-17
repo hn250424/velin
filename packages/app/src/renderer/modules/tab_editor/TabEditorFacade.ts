@@ -9,7 +9,7 @@ import { TabEditorRenderer } from "./TabEditorRenderer"
 import { TabEditorStore } from "./TabEditorStore"
 import { TabEditorView } from "./TabEditorView"
 import { TabDragManager } from "./TabDragManager"
-import { assert } from "@renderer/utils"
+import { adjustMenuPosition, assert } from "@renderer/utils"
 import { DI, DOM } from "@renderer/constants"
 
 // export const BINARY_FILE_WARNING = '❌'
@@ -397,8 +397,7 @@ export class TabEditorFacade {
 		const { tabContextMenu } = this.renderer.elements
 
 		tabContextMenu.classList.add(DOM.CLASS_SELECTED)
-		tabContextMenu.style.left = `${e.clientX}px`
-		tabContextMenu.style.top = `${e.clientY}px`
+		adjustMenuPosition(e, tabContextMenu)
 
 		this.contextTabId = parseInt(tab.dataset[DOM.DATASET_ATTR_TAB_ID]!)
 	}
