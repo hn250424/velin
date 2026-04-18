@@ -34,7 +34,8 @@ export class TreeFacade {
 		return this.store.getRootTreeViewModel()
 	}
 
-	// TODO: expense
+	// NOTE: Full rebuild — only use for initial load or directory switch.
+	// For incremental changes (create/delete/paste), use applyCreate/applyDelete/applyPaste.
 	setRootTreeViewModel(root: TreeViewModel) {
 		this.store.setRootTreeViewModel(root)
 	}
@@ -201,12 +202,10 @@ export class TreeFacade {
 
 	// renderer
 
-	// TODO: expense
+	// NOTE: Full rebuild — only use for initial load or directory switch.
+	// For incremental changes, use applyCreate/applyDelete/applyPaste.
 	render(viewModel: TreeViewModel, container?: HTMLElement) {
 		this.renderer.render(viewModel, container)
-
-		// new SimpleBar(this.renderer.elements.treeNodeContainer).recalculate()
-		// this.renderer.elements.simpleBar.recalculate()
 	}
 
 	//
@@ -496,15 +495,15 @@ export class TreeFacade {
 				const parent = this.flattenTree[parentIndex]
 				if (parent.children) {
 					parent.children = parent.children.filter(
-						(child: any) => !toDelete.some((deleted) => deleted.path === child.path)
+						(child: any) => child.path !== target.path
 					)
 				}
 			}
 
 			for (const node of toDelete) {
 				const path = node.path
-
 				const wrapper = this.getTreeWrapperByPath(path)
+				
 				wrapper?.remove()
 
 				this.deleteTreeWrapperByPath(path)
@@ -514,5 +513,70 @@ export class TreeFacade {
 		}
 
 		this.updatePathToFlattenTreeIndex(minIndex)
+	}
+
+	applyCreate(parentPath: string, createdPath: string, isDirectory: boolean) {
+		const parent = this.getTreeViewModelByPath(parentPath)
+
+		const name = window.utils.getBaseName(createdPath)
+
+		const newNode: TreeViewModel = {
+			path: createdPath,
+			name,
+			indent: parent.indent + 1,
+			directory: isDirectory,
+			expanded: false,
+			children: isDirectory ? [] : null,
+			selected: false,
+		}
+
+		// Insert into parent.children at sorted position
+		if (!parent.children) parent.children = []
+		const childInsertIdx = this.store.findSortedChildInsertIndex(parent, name, isDirectory)
+		parent.children.splice(childInsertIdx, 0, newNode)
+
+		// If parent is not expanded, only update the model (DOM stays collapsed)
+		if (!parent.expanded) return
+
+		// Calculate flattenTree insert position
+		const parentFlatIdx = this.getFlattenIndexByPath(parentPath)!
+		let flatInsertIdx: number
+		if (childInsertIdx === 0) {
+			flatInsertIdx = parentFlatIdx + 1
+		} else {
+			const prevSibling = parent.children[childInsertIdx - 1]
+			const prevSiblingFlatIdx = this.getFlattenIndexByPath(prevSibling.path)!
+			const prevSubtreeSize = this.store.getSubtreeSize(prevSiblingFlatIdx)
+			flatInsertIdx = prevSiblingFlatIdx + prevSubtreeSize
+		}
+
+		// Insert into flattenTree
+		this.store.insertIntoFlattenTree(flatInsertIdx, [newNode])
+
+		// Insert into DOM
+		const container = this.getChildrenContainer(parentPath)
+		const nextSibling = childInsertIdx < parent.children.length - 1
+			? parent.children[childInsertIdx + 1]
+			: null
+		const beforeElement = nextSibling ? this.getTreeWrapperByPath(nextSibling.path) : null
+		
+		this.renderer.renderSingleNode(newNode, container, beforeElement)
+	}
+
+	applyPaste(parentPath: string, newPaths: string[], isDirectories: boolean[]) {
+		for (let i = 0; i < newPaths.length; i++) {
+			this.applyCreate(parentPath, newPaths[i], isDirectories[i])
+		}
+	}
+
+	private getChildrenContainer(parentPath: string): HTMLElement {
+		const parentFlatIdx = this.getFlattenIndexByPath(parentPath)!
+		const wrapper = this.getTreeWrapperByPath(parentPath)!
+
+		// Root: wrapper IS the container (simpleBar content element)
+		if (parentFlatIdx === 0) return wrapper
+
+		// Non-root: children container is nested inside wrapper
+		return wrapper.querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
 	}
 }

@@ -5,8 +5,15 @@ import type { TreeViewModel } from "../viewmodels/TreeViewModel"
 
 import { TabEditorFacade, TreeFacade } from "../modules"
 
+type DeletedItemInfo = {
+	path: string
+	isDirectory: boolean
+	parentPath: string
+}
+
 export class DeleteCommand implements ICommand {
 	private trashMap: TrashMap[] | null = null
+	private deletedItems: DeletedItemInfo[] = []
 
 	constructor(
 		private treeFacade: TreeFacade,
@@ -21,6 +28,13 @@ export class DeleteCommand implements ICommand {
 			const viewModel = this.treeFacade.getTreeViewModelByIndex(this.selectedIndices[i])
 			pathsToDelete.push(viewModel.path)
 			idsToDelete.push(...this.getIdsFromTreeViewModel(viewModel))
+
+			// Save metadata for undo
+			this.deletedItems.push({
+				path: viewModel.path,
+				isDirectory: viewModel.directory,
+				parentPath: window.utils.getDirName(viewModel.path),
+			})
 		}
 
 		pathsToDelete.sort((a, b) => b.localeCompare(a))
@@ -47,12 +61,13 @@ export class DeleteCommand implements ICommand {
 		const result = await window.rendererToMain.undo_delete(this.trashMap)
 		if (!result) return
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
-		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-			this.treeFacade.render(viewModel)
-			this.treeFacade.setRootTreeViewModel(viewModel)
+		for (const item of this.deletedItems) {
+			this.treeFacade.applyCreate(item.parentPath, item.path, item.isDirectory)
 		}
+
+		const viewModel = this.treeFacade.getRootTreeViewModel()
+		const treeDto = this.treeFacade.toTreeDto(viewModel)
+		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 	}
 
 	private getIdsFromTreeViewModel(vm: TreeViewModel, arr: number[] = []) {

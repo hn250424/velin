@@ -6,3 +6,9 @@ export interface TreeDto {
 	expanded: boolean
 	children: TreeDto[] | null
 }
+
+export interface TreePartialUpdate {
+	type: "add" | "remove"
+	path: string
+	isDirectory: boolean
+}

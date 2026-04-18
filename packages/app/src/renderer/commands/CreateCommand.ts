@@ -21,12 +21,11 @@ export class CreateCommand implements ICommand {
 
 		this.createdPath = response.data
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
-		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-			this.treeFacade.render(viewModel)
-			this.treeFacade.setRootTreeViewModel(viewModel)
-		}
+		this.treeFacade.applyCreate(this.parentPath, this.createdPath, this.isDirectory)
+
+		const viewModel = this.treeFacade.getRootTreeViewModel()
+		const treeDto = this.treeFacade.toTreeDto(viewModel)
+		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 	}
 
 	async undo() {
@@ -34,11 +33,9 @@ export class CreateCommand implements ICommand {
 
 		await window.rendererToMain.delete([this.createdPath])
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
-		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-			this.treeFacade.render(viewModel)
-			this.treeFacade.setRootTreeViewModel(viewModel)
+		const idx = this.treeFacade.getFlattenIndexByPath(this.createdPath)
+		if (idx !== undefined) {
+			this.treeFacade.applyDelete([idx])
 		}
 
 		if (this.openedTabId !== null) {
@@ -46,6 +43,10 @@ export class CreateCommand implements ICommand {
 			const tabEditorView = this.tabEditorFacade.getTabEditorViewByPath(tabEditorViewModel.filePath)
 			this.tabEditorFacade.removeTab(tabEditorView.getId())
 		}
+
+		const viewModel = this.treeFacade.getRootTreeViewModel()
+		const treeDto = this.treeFacade.toTreeDto(viewModel)
+		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 	}
 
 	getCreatedPath() {

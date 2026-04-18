@@ -56,12 +56,10 @@ export class TreeStore {
 		if (this._flattenTree.length === 0) return {} as TreeViewModel
 
 		const pathToNode = new Map<string, TreeViewModel>()
-		const root = this._flattenTree[0]
-		pathToNode.set(root.path, root)
-
-		for (let i = 1; i < this._flattenTree.length; i++) {
+		// Make a copy so we do not mutate the cached objects
+		for (let i = 0; i < this._flattenTree.length; i++) {
 			const node = this._flattenTree[i]
-			pathToNode.set(node.path, node)
+			pathToNode.set(node.path, { ...node, children: node.directory ? [] : null })
 		}
 
 		for (let i = 1; i < this._flattenTree.length; i++) {
@@ -79,7 +77,7 @@ export class TreeStore {
 			}
 		}
 
-		return root
+		return pathToNode.get(this._flattenTree[0].path)!
 	}
 
 	setRootTreeViewModel(root: TreeViewModel) {
@@ -156,6 +154,40 @@ export class TreeStore {
 			this._flattenTree.splice(index + 1, removeCount)
 			this.updatePathToFlattenTreeIndex(index + 1)
 		}
+	}
+
+	//
+
+	findSortedChildInsertIndex(parent: TreeViewModel, newName: string, isDirectory: boolean): number {
+		if (!parent.children) return 0
+
+		for (let i = 0; i < parent.children.length; i++) {
+			const child = parent.children[i]
+
+			// Directories come first
+			if (isDirectory && !child.directory) return i
+			if (!isDirectory && child.directory) continue
+
+			// Same type: alphabetical
+			if (newName.localeCompare(child.name) < 0) return i
+		}
+
+		return parent.children.length
+	}
+
+	getSubtreeSize(flatIdx: number): number {
+		const baseIndent = this._flattenTree[flatIdx].indent
+		let count = 1
+		for (let i = flatIdx + 1; i < this._flattenTree.length; i++) {
+			if (this._flattenTree[i].indent <= baseIndent) break
+			count++
+		}
+		return count
+	}
+
+	insertIntoFlattenTree(position: number, nodes: TreeViewModel[]) {
+		this._flattenTree.splice(position, 0, ...nodes)
+		this.updatePathToFlattenTreeIndex(position)
 	}
 
 	//

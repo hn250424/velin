@@ -18,7 +18,7 @@ export class TreeRenderer {
 
 	//
 
-	private _renderElement(container: HTMLElement, viewModel: TreeViewModel) {
+	private _createNodeWrapper(viewModel: TreeViewModel): HTMLElement {
 		const type = document.createElement("div")
 		type.classList.add(DOM.CLASS_TREE_NODE_TYPE)
 
@@ -52,14 +52,31 @@ export class TreeRenderer {
 		node.appendChild(text)
 		wrapper.appendChild(node)
 		wrapper.appendChild(children)
-		container.appendChild(wrapper)
 
 		this._pathToTreeWrapper.set(viewModel.path, wrapper)
 
+		return wrapper
+	}
+
+	private _renderElement(container: HTMLElement, viewModel: TreeViewModel) {
+		const wrapper = this._createNodeWrapper(viewModel)
+		container.appendChild(wrapper)
+
 		if (viewModel.expanded && viewModel.children && viewModel.children.length > 0) {
+			const childrenContainer = wrapper.querySelector(DOM.SELECTOR_TREE_NODE_CHILDREN) as HTMLElement
 			for (const child of viewModel.children) {
-				this._renderElement(children, child)
+				this._renderElement(childrenContainer, child)
 			}
+		}
+	}
+
+	renderSingleNode(viewModel: TreeViewModel, container: HTMLElement, beforeElement?: Element | null) {
+		const wrapper = this._createNodeWrapper(viewModel)
+
+		if (beforeElement) {
+			container.insertBefore(wrapper, beforeElement)
+		} else {
+			container.appendChild(wrapper)
 		}
 	}
 

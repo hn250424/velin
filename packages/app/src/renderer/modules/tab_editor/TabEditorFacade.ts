@@ -687,7 +687,7 @@ export class TabEditorFacade {
 		}
 	}
 
-	// TODO
+	//
 
 	findNextMatch(direction: "up" | "down" = this.findDirection) {
 		const tabEditorView = this.getActiveTabEditorView()

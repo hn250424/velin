@@ -1,6 +1,6 @@
 import type { MainToRendererAPI } from "@shared/preload"
 import type { TabEditorsDto } from "@shared/dto/TabEditorDto"
-import type { TreeDto } from "@shared/dto/TreeDto"
+import type { TreeDto, TreePartialUpdate } from "@shared/dto/TreeDto"
 import type { SideDto } from "@shared/dto/SideDto"
 import type { WindowDto } from "@shared/dto/WindowDto"
 import type { SettingsDto } from "@shared/dto/SettingsDto"
@@ -25,10 +25,19 @@ const mainToRenderer: MainToRendererAPI = {
 			}
 		)
 	},
-	syncFromWatch: (callback: (tabEditorsDto: TabEditorsDto, treeDto: TreeDto) => void) => {
-		ipcRenderer.on(electronAPI.events.mainToRenderer.syncFromWatch, (e, tabEditorsDto, treeDto) => {
-			callback(tabEditorsDto, treeDto)
-		})
+	syncFromWatch: (
+		callback: (
+			tabEditorsDto: TabEditorsDto,
+			treeDto: TreeDto,
+			partialUpdates?: TreePartialUpdate[]
+		) => void
+	) => {
+		ipcRenderer.on(
+			electronAPI.events.mainToRenderer.syncFromWatch,
+			(e, tabEditorsDto, treeDto, partialUpdates) => {
+				callback(tabEditorsDto, treeDto, partialUpdates)
+			}
+		)
 	},
 	onMaximizeWindow: (callback: () => void) => {
 		ipcRenderer.on(electronAPI.events.mainToRenderer.onMaximizeWindow, () => {

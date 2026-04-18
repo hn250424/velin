@@ -231,7 +231,10 @@ export class CommandManager {
 		if (!parentInfo) return
 
 		const { idx, viewModel, container } = parentInfo
-		if (!viewModel.expanded) await this.performOpenDirectoryByTreeNode(this.treeFacade.getTreeNodeByIndex(idx))
+		
+		if (!viewModel.expanded) {
+			await this.performOpenDirectoryByTreeNode(this.treeFacade.getTreeNodeByIndex(idx))
+		}
 
 		const name = await this._promptForName(container, isDirectory, viewModel.indent)
 		if (!name) return
@@ -281,10 +284,14 @@ export class CommandManager {
 
 			const onKeyDown = (e: KeyboardEvent) => {
 				if (e.key === "Enter") {
+					e.stopPropagation()
+					e.preventDefault()
 					const value = input.value.trim()
 					cleanup()
 					resolve(value || null)
 				} else if (e.key === "Escape") {
+					e.stopPropagation()
+					e.preventDefault()
 					cleanup()
 					resolve(null)
 				}
@@ -398,12 +405,16 @@ export class CommandManager {
 
 			const onKeyDown = (e: KeyboardEvent) => {
 				if (e.key === "Enter") {
+					e.stopPropagation()
+					e.preventDefault()
 					const val = treeNodeInput.value.trim()
 					cleanup()
 					resolve(val || null)
 				} else if (e.key === "Escape") {
+					e.stopPropagation()
+					e.preventDefault()
 					cleanup()
-					treeNode.replaceChild(treeNodeSpan, treeNodeInput) // 원복
+					treeNode.replaceChild(treeNodeSpan, treeNodeInput)
 					resolve(null)
 				}
 			}
@@ -586,14 +597,16 @@ export class CommandManager {
 		if (targetIndex === -1) return
 
 		let targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
-		if (!targetViewModel.directory) {
+		
+		const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
+		const isPastingOnSelf = clipboardPaths.includes(targetViewModel.path)
+
+		if (!targetViewModel.directory || isPastingOnSelf) {
 			targetIndex = this.treeFacade.findParentDirectoryIndex(targetIndex)
 			targetViewModel = this.treeFacade.getTreeViewModelByIndex(targetIndex)
 		}
 
 		const selectedViewModels = []
-		const clipboardPaths = this.treeFacade.getClipboardPaths() ?? []
-
 		for (const path of clipboardPaths) {
 			selectedViewModels.push(this.treeFacade.getTreeViewModelByPath(path))
 		}

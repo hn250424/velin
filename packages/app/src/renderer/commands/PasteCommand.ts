@@ -38,15 +38,35 @@ export class PasteCommand implements ICommand {
 		if (response.result) {
 			const newPaths = response.data
 
-			for (let i = 0; i < selectedDtos.length; i++) {
-				const oldPath = selectedDtos[i].path
+			// Replicate the same-dir filter logic from Main's TreeService.paste()
+			const targetDir = targetDto.path
+			const targetsToProcess =
+				this.clipboardMode === "cut"
+					? selectedDtos.filter((dto) => window.utils.getDirName(dto.path) !== targetDir)
+					: selectedDtos
+
+			// For cut mode, remove old nodes from tree first
+			if (this.clipboardMode === "cut") {
+				const indicesToRemove: number[] = []
+				for (const dto of targetsToProcess) {
+					const idx = this.treeFacade.getFlattenIndexByPath(dto.path)
+					if (idx !== undefined) indicesToRemove.push(idx)
+				}
+				if (indicesToRemove.length > 0) {
+					this.treeFacade.applyDelete(indicesToRemove)
+				}
+			}
+
+			// Build undo info and update tabs (for cut mode)
+			for (let i = 0; i < targetsToProcess.length; i++) {
+				const oldPath = targetsToProcess[i].path
 				const newPath = newPaths[i]
 
 				this.undoInfos.push({
 					src: oldPath,
 					dest: newPath,
 					mode: this.clipboardMode,
-					isDir: selectedDtos[i].directory,
+					isDir: targetsToProcess[i].directory,
 				})
 
 				if (this.clipboardMode === "cut") {
@@ -69,12 +89,13 @@ export class PasteCommand implements ICommand {
 				}
 			}
 
-			const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
-			if (newTreeSession) {
-				const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-				this.treeFacade.render(viewModel)
-				this.treeFacade.setRootTreeViewModel(viewModel)
-			}
+			// Partial update: add new nodes to tree
+			const isDirectories = targetsToProcess.map((dto) => dto.directory)
+			this.treeFacade.applyPaste(targetDir, newPaths, isDirectories)
+
+			const viewModel = this.treeFacade.getRootTreeViewModel()
+			const treeDto = this.treeFacade.toTreeDto(viewModel)
+			await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 		}
 	}
 
@@ -84,6 +105,18 @@ export class PasteCommand implements ICommand {
 
 			if (mode === "cut") await window.rendererToMain.copyTree(dest, src)
 			await window.rendererToMain.deletePermanently(dest)
+
+			// Remove pasted node from tree
+			const destIdx = this.treeFacade.getFlattenIndexByPath(dest)
+			if (destIdx !== undefined) {
+				this.treeFacade.applyDelete([destIdx])
+			}
+
+			// For cut mode, restore the original node
+			if (mode === "cut") {
+				const parentPath = window.utils.getDirName(src)
+				this.treeFacade.applyCreate(parentPath, src, isDir)
+			}
 
 			const view = this.tabEditorFacade.getTabEditorViewByPath(dest)
 			if (view) {
@@ -97,11 +130,8 @@ export class PasteCommand implements ICommand {
 			}
 		}
 
-		const newTreeSession = await window.rendererToMain.getSyncedTreeSession()
-		if (newTreeSession) {
-			const viewModel = this.treeFacade.toTreeViewModel(newTreeSession)
-			this.treeFacade.render(viewModel)
-			this.treeFacade.setRootTreeViewModel(viewModel)
-		}
+		const viewModel = this.treeFacade.getRootTreeViewModel()
+		const treeDto = this.treeFacade.toTreeDto(viewModel)
+		await window.rendererToMain.syncTreeSessionFromRenderer(treeDto)
 	}
 }
