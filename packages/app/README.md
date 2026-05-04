@@ -13,4 +13,4 @@ A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
 ## Download
 
-**Download** the latest version from the [release page](https://github.com/hn250424/velin/releases/latest)
+**Download** the latest version from the [release page](https://github.com/taren250424/velin/releases/latest)

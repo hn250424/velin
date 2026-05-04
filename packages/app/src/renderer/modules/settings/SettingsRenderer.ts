@@ -6,7 +6,7 @@ import type {
 } from "@renderer/viewmodels/SettingsViewModel"
 import { inject, injectable } from "inversify"
 import type { SettingsElements } from "./SettingsElements"
-import type { AeroOption } from "@hn250424/aero"
+import type { AeroOption } from "@taren250424/aero"
 
 @injectable()
 export class SettingsRenderer {

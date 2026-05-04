@@ -1,5 +1,5 @@
 import { injectable } from "inversify"
-import * as aero from "@hn250424/aero"
+import * as aero from "@taren250424/aero"
 
 @injectable()
 export class SettingsElements {

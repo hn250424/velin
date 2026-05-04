@@ -13,8 +13,8 @@ A Markdown editor with a WYSIWYG interface based on the Milkdown library.
 
 ## Donwloads
 
-**Download** the latest version from the [release page](https://github.com/hn250424/velin/releases/latest)
+**Download** the latest version from the [release page](https://github.com/taren250424/velin/releases/latest)
 
 ## Site
 
-https://hn250424.github.io/velin/
+https://taren250424.github.io/velin/

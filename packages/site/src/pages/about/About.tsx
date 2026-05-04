@@ -7,11 +7,11 @@ export const About = () => {
 				<ul>
 					<li>
 						<span>Github: </span>
-						<span>hn250424</span>
+						<span>taren250424</span>
 					</li>
 					<li>
 						<span>Email: </span>
-						<span>nami53410879@gmail.com</span>
+						<span>taren250424@gmail.com</span>
 					</li>
 				</ul>
 			</div>
